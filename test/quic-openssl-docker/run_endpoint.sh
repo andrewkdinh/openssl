@@ -46,7 +46,7 @@ if [ "$ROLE" == "client" ]; then
         fi
         exit 0
         ;;
-    "handshake"|"transfer")
+    "handshake"|"transfer"|"retry")
        HOSTNAME=none
        for req in $REQUESTS
        do
@@ -59,15 +59,6 @@ if [ "$ROLE" == "client" ]; then
            echo -n "$OUTFILE " >> ./reqfile.txt
        done
        SSLKEYLOGFILE=/logs/keys.log SSL_CERT_FILE=/certs/ca.pem SSL_CERT_DIR=/certs quic-hq-interop $HOSTNAME $HOSTPORT ./reqfile.txt 
-       if [ $? -ne 0 ]
-       then
-           exit 1
-       fi
-       exit 0
-       ;; 
-    "retry")
-       OUTFILE=$(basename $REQUESTS)
-       SSL_CERT_FILE=/certs/ca.pem curl --verbose --http3 -o /downloads/$OUTFILE $REQUESTS
        if [ $? -ne 0 ]
        then
            exit 1
