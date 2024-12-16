@@ -697,6 +697,8 @@ static int setup_connection(char *hostname, char *port,
         goto end;
     }
 
+    SSL_CTX_set_options(*ctx, SSL_OP_NO_QUERY_MTU);
+
     /*
      * Configure the client to abort the handshake if certificate
      * verification fails. Virtually all clients should do this unless you

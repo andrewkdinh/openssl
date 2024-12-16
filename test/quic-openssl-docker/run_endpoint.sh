@@ -42,7 +42,7 @@ if [ "$ROLE" == "client" ]; then
         SSL_CERT_FILE=/certs/ca.pem curl --config $CURLRC || exit 1
         exit 0
         ;;
-    "handshake"|"transfer"|"retry"|"ipv6")
+    "handshake"|"transfer"|"retry"|"ipv6"|"multiconnect"|"handshakeloss"|"handshakecorruption")
         HOSTNAME=none
         for req in $REQUESTS
         do
@@ -88,7 +88,7 @@ elif [ "$ROLE" == "server" ]; then
     echo "TESTCASE is $TESTCASE"
     rm -f $CURLRC 
     case "$TESTCASE" in
-    "handshake"|"ipv6")
+    "handshake"|"ipv6"|"multiconnect"|"handshakeloss"|"handshakecorruption")
         NO_ADDR_VALIDATE=yes SSLKEYLOGFILE=/logs/keys.log FILEPREFIX=/www quic-hq-interop-server 443 /certs/cert.pem /certs/priv.key
         ;;
     "transfer")
