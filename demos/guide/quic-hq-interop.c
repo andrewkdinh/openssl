@@ -801,7 +801,7 @@ static int setup_connection(char *hostname, char *port,
 
     /* Do the handshake with the server */
     while ((ret = SSL_connect(*ssl)) != 1) {
-        if (handle_io_failure(*ssl, ret) == 1)
+        if ((ret = handle_io_failure(*ssl, ret)) == 1 || ret == 0)
             continue; /* Retry */
         fprintf(stderr, "Failed to connect to server\n");
         goto end; /* Cannot retry: error */
