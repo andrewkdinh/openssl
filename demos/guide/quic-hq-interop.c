@@ -809,7 +809,6 @@ static int setup_connection(char *hostname, char *port,
 end:
     SSL_CTX_free(*ctx);
     SSL_free(*ssl);
-    BIO_ADDR_free(peer_addr);
     return 0;
 }
 
