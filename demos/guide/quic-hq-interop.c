@@ -321,7 +321,7 @@ static int handle_io_failure(SSL *ssl, int res)
             break;
 
         default:
-            fprintf(stderr, "Unknown stream failure: %d\n", ret);
+            fprintf(stderr, "Unknown stream failure");
             break;
         }
         /*
