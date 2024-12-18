@@ -282,7 +282,9 @@ static void wait_for_activity(SSL *ssl)
  */
 static int handle_io_failure(SSL *ssl, int res)
 {
-    switch (SSL_get_error(ssl, res)) {
+    int ret;
+
+    switch (ret = SSL_get_error(ssl, res)) {
     case SSL_ERROR_WANT_READ:
     case SSL_ERROR_WANT_WRITE:
         /* Temporary failure. Wait until we can read/write and try again */
@@ -317,7 +319,7 @@ static int handle_io_failure(SSL *ssl, int res)
             break;
 
         default:
-            fprintf(stderr, "Unknown stream failure\n");
+            fprintf(stderr, "Unknown stream failure: %d\n", ret);
             break;
         }
         /*
