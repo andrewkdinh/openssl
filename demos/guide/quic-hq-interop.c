@@ -284,7 +284,7 @@ static int handle_io_failure(SSL *ssl, int res)
 {
     int ret;
 
-    switch (ret = SSL_get_error(ssl, res)) {
+    switch (SSL_get_error(ssl, res)) {
     case SSL_ERROR_WANT_READ:
     case SSL_ERROR_WANT_WRITE:
         /* Temporary failure. Wait until we can read/write and try again */
@@ -304,7 +304,7 @@ static int handle_io_failure(SSL *ssl, int res)
          * stream reset - or some failure occurred on the underlying
          * connection.
          */
-        switch (SSL_get_stream_read_state(ssl)) {
+        switch (ret = SSL_get_stream_read_state(ssl)) {
         case SSL_STREAM_STATE_RESET_REMOTE:
             fprintf(stderr, "Stream reset occurred\n");
             /*
