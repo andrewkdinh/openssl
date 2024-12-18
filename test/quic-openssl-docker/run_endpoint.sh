@@ -42,7 +42,7 @@ if [ "$ROLE" == "client" ]; then
         SSL_CERT_FILE=/certs/ca.pem curl --config $CURLRC || exit 1
         exit 0
         ;;
-    "handshake"|"transfer"|"retry"|"ipv6"|"multiconnect"|"handshakeloss"|"handshakecorruption")
+    "handshake"|"transfer"|"retry"|"ipv6")
         HOSTNAME=none
         for req in $REQUESTS
         do
@@ -57,6 +57,36 @@ if [ "$ROLE" == "client" ]; then
         SSLKEYLOGFILE=/logs/keys.log SSL_CERT_FILE=/certs/ca.pem SSL_CERT_DIR=/certs quic-hq-interop $HOSTNAME $HOSTPORT ./reqfile.txt || exit 1
         exit 0
         ;; 
+    "multiconnect")
+        HOSTNAME=none
+        for req in $REQUESTS
+        do
+            OUTFILE=$(basename $req)
+            if [ "$HOSTNAME" == "none" ]
+            then
+                HOSTNAME=$(printf "%s\n" "$req" | sed -ne 's,^https://\([^/:]*\).*,\1,p')
+                HOSTPORT=$(printf "%s\n" "$req" | sed -ne 's,^https://[^:/]*:\([^/]*\).*,\1,p')
+            fi
+            echo -n "$OUTFILE " >> ./reqfile.txt
+        done
+
+        # Run the client in parallel
+        PIDS=()
+        for FILE in $(cat "./reqfile.txt")
+        do
+            echo "Starting $FILE"
+            echo -n "$FILE" > "./reqfile-$FILE"
+            SSLKEYLOGFILE=/logs/keys.log SSL_CERT_FILE=/certs/ca.pem SSL_CERT_DIR=/certs quic-hq-interop $HOSTNAME $HOSTPORT "./reqfile-$FILE" &
+            PIDS+=($!)
+        done
+
+        for PID in "${PIDS[@]}"
+        do
+            wait "$PID" || exit 1
+        done
+
+        exit 0
+        ;;
     "resumption")
         for req in $REQUESTS
         do
@@ -88,7 +118,7 @@ elif [ "$ROLE" == "server" ]; then
     echo "TESTCASE is $TESTCASE"
     rm -f $CURLRC 
     case "$TESTCASE" in
-    "handshake"|"ipv6"|"multiconnect"|"handshakeloss"|"handshakecorruption")
+    "handshake"|"ipv6")
         NO_ADDR_VALIDATE=yes SSLKEYLOGFILE=/logs/keys.log FILEPREFIX=/www quic-hq-interop-server 443 /certs/cert.pem /certs/priv.key
         ;;
     "transfer")
