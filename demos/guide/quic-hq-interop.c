@@ -305,6 +305,8 @@ static int handle_io_failure(SSL *ssl, int res)
          * connection.
          */
         switch (ret = SSL_get_stream_read_state(ssl)) {
+        case SSL_STREAM_STATE_NONE:
+            return 0;
         case SSL_STREAM_STATE_RESET_REMOTE:
             fprintf(stderr, "Stream reset occurred\n");
             /*
