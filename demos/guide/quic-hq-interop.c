@@ -82,6 +82,8 @@ static BIO *session_bio = NULL;
  *
  * @param hostname The hostname of the server to connect to.
  * @param port The port number of the server to connect to.
+ * @param family The desired address family (e.g., AF_INET for IPv4,
+ *        AF_INET6 for IPv6).
  * @param peer_addr A pointer to a BIO_ADDR pointer that will hold the address
  *                  of the connected peer on success. The caller is responsible
  *                  for freeing this memory using BIO_ADDR_free().
@@ -98,7 +100,7 @@ static BIO *session_bio = NULL;
  *       freed.
  */
 static BIO *create_socket_bio(const char *hostname, const char *port,
-                              BIO_ADDR **peer_addr)
+                              int family, BIO_ADDR **peer_addr)
 {
     int sock = -1;
     BIO_ADDRINFO *res;
@@ -108,8 +110,8 @@ static BIO *create_socket_bio(const char *hostname, const char *port,
     /*
      * Lookup IP address info for the server.
      */
-    if (!BIO_lookup_ex(hostname, port, BIO_LOOKUP_CLIENT, AF_UNSPEC, SOCK_DGRAM,
-                       0, &res))
+    if (!BIO_lookup_ex(hostname, port, BIO_LOOKUP_CLIENT, family, SOCK_DGRAM, 0,
+                       &res))
         return NULL;
 
     /*
@@ -282,8 +284,6 @@ static void wait_for_activity(SSL *ssl)
  */
 static int handle_io_failure(SSL *ssl, int res)
 {
-    int ret;
-
     switch (SSL_get_error(ssl, res)) {
     case SSL_ERROR_WANT_READ:
     case SSL_ERROR_WANT_WRITE:
@@ -304,9 +304,7 @@ static int handle_io_failure(SSL *ssl, int res)
          * stream reset - or some failure occurred on the underlying
          * connection.
          */
-        switch (ret = SSL_get_stream_read_state(ssl)) {
-        case SSL_STREAM_STATE_NONE:
-            return 0;
+        switch (SSL_get_stream_read_state(ssl)) {
         case SSL_STREAM_STATE_RESET_REMOTE:
             fprintf(stderr, "Stream reset occurred\n");
             /*
@@ -321,7 +319,7 @@ static int handle_io_failure(SSL *ssl, int res)
             break;
 
         default:
-            fprintf(stderr, "Unknown stream failure");
+            fprintf(stderr, "Unknown stream failure\n");
             break;
         }
         /*
@@ -678,12 +676,13 @@ static BIO_ADDR *peer_addr = NULL;
  *
  * @param hostname Hostname to connect to.
  * @param port Port to connect to.
+ * @param ipv6 Whether to use IPv6 (non-zero for IPv6, zero for IPv4).
  * @param ctx Pointer to an SSL_CTX object, which will be created.
  * @param ssl Pointer to an SSL object, which will be created.
  *
  * @return Returns 0 on success, 1 on error.
  */
-static int setup_connection(char *hostname, char *port,
+static int setup_connection(char *hostname, char *port, int ipv6,
                             SSL_CTX **ctx, SSL **ssl)
 {
     unsigned char alpn[] = {10, 'h', 'q', '-', 'i', 'n', 't', 'e', 'r', 'o', 'p'};
@@ -700,8 +699,6 @@ static int setup_connection(char *hostname, char *port,
         fprintf(stderr, "Failed to create the SSL_CTX\n");
         goto end;
     }
-
-    SSL_CTX_set_options(*ctx, SSL_OP_NO_QUERY_MTU);
 
     /*
      * Configure the client to abort the handshake if certificate
@@ -750,7 +747,8 @@ static int setup_connection(char *hostname, char *port,
      * Create the underlying transport socket/BIO and associate it with the
      * connection.
      */
-    bio = create_socket_bio(hostname, port, &peer_addr);
+    bio = create_socket_bio(hostname, port, ipv6 ? AF_INET6 : AF_INET,
+                            &peer_addr);
     if (bio == NULL) {
         fprintf(stderr, "Failed to crete the BIO\n");
         goto end;
@@ -801,7 +799,7 @@ static int setup_connection(char *hostname, char *port,
 
     /* Do the handshake with the server */
     while ((ret = SSL_connect(*ssl)) != 1) {
-        if ((ret = handle_io_failure(*ssl, ret)) == 1 || ret == 0)
+        if (handle_io_failure(*ssl, ret) == 1)
             continue; /* Retry */
         fprintf(stderr, "Failed to connect to server\n");
         goto end; /* Cannot retry: error */
@@ -811,6 +809,7 @@ static int setup_connection(char *hostname, char *port,
 end:
     SSL_CTX_free(*ctx);
     SSL_free(*ssl);
+    BIO_ADDR_free(peer_addr);
     return 0;
 }
 
@@ -819,16 +818,16 @@ end:
  *
  * This function sets up an SSL/TLS connection using QUIC, sends HTTP GET
  * requests for files specified in the command-line arguments, and saves
- * the responses to disk. It handles various configurations such as session
- * caching, and key logging.
+ * the responses to disk. It handles various configurations such as IPv6
+ * support, session caching, and key logging.
  *
  * @param argc The number of command-line arguments.
  * @param argv The array of command-line arguments. The expected format is
- *             "hostname port file".
+ *             "[-6] hostname port file".
  * @return EXIT_SUCCESS on success, or EXIT_FAILURE on error.
  *
  * @note The function performs the following main tasks:
- *       - Parses command-line arguments.
+ *       - Parses command-line arguments and configures IPv6 if specified.
  *       - Reads the list of requests from the specified file.
  *       - Sets up the SSL context and configures certificate verification.
  *       - Optionally enables key logging and session caching.
@@ -860,12 +859,21 @@ int main(int argc, char *argv[])
     size_t this_poll_count = 0;
     char *req = NULL;
     char *hostname, *port;
+    int ipv6 = 0;
 
     if (argc < 4) {
-        fprintf(stderr, "Usage: quic-hq-interop hostname port reqfile\n");
+        fprintf(stderr, "Usage: quic-hq-interop [-6] hostname port reqfile\n");
         goto end;
     }
 
+    if (!strcmp(argv[argnext], "-6")) {
+        if (argc < 5) {
+            fprintf(stderr, "Usage: quic-hq-interop [-6] hostname port reqfile\n");
+            goto end;
+        }
+        ipv6 = 1;
+        argnext++;
+    }
     hostname = argv[argnext++];
     port = argv[argnext++];
     reqfile = argv[argnext];
@@ -893,7 +901,7 @@ int main(int argc, char *argv[])
     req_bio = NULL;
     reqnames[read_offset + 1] = '\0';
 
-    if (!setup_connection(hostname, port, &ctx, &ssl)) {
+    if (!setup_connection(hostname, port, ipv6, &ctx, &ssl)) {
         fprintf(stderr, "Unable to establish connection\n");
         goto end;
     }
