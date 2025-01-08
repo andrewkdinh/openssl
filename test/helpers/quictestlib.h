@@ -266,6 +266,7 @@ int bio_msg_copy(BIO_MSG *dst, BIO_MSG *src);
 #define BIO_CTRL_NOISE_RECV_BANDWIDTH 1003
 #define BIO_CTRL_NOISE_SEND_BANDWIDTH 1004
 #define BIO_CTRL_NOISE_SET_NOW_CB     1005
+#define BIO_CTRL_NOISE_DROP_PACKETS   1006
 
 struct bio_noise_now_cb_st {
     OSSL_TIME (*now_cb)(void *);

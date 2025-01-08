@@ -33,6 +33,15 @@ struct noisy_dgram_st {
     uint64_t reinject_dgram;
     int backoff;
     int noise_rate;      /* 1 in noise_rate packets will get noise */
+
+    /* Indices of datagram to drop, in increasing order */
+    size_t *drop_dgram;
+    size_t curr_drop_dgram;
+    size_t drop_dgram_len;
+
+    /* Count of total number of datagrams seen */
+    size_t dgram_cnt;
+
     struct bw_limiter_st recv_limit, send_limit;
     OSSL_TIME (*now_cb)(void *arg);
     void *now_cb_arg;
@@ -102,6 +111,19 @@ static long noisy_dgram_ctrl(BIO *bio, int cmd, long num, void *ptr)
             ret = 1;
             break;
         }
+    case BIO_CTRL_NOISE_DROP_PACKETS: {
+        struct noisy_dgram_st *data;
+        int *drop_dgram = ptr;
+
+        data = BIO_get_data(bio);
+        if (!TEST_ptr(data))
+            return 0;
+        data->drop_dgram = drop_dgram;
+        data->drop_dgram_len = (size_t)num;
+        data->curr_drop_dgram = 0;
+        ret = 1;
+        break;
+    }
     default:
         ret = BIO_ctrl(next, cmd, num, ptr);
         break;
@@ -361,10 +383,10 @@ static int noisy_dgram_recvmmsg(BIO *bio, BIO_MSG *msg, size_t stride,
     for (i = 0, thismsg = msg;
          i < msg_cnt;
          i++, thismsg++, data->this_dgram++) {
-        uint64_t reinject;
-        int should_drop;
-        uint16_t flip;
-        size_t flip_offset;
+        uint64_t reinject = 0;
+        int should_drop = 0;
+        uint16_t flip = 0;
+        size_t flip_offset = 0;
 
         /* If we have a message to reinject then insert it now */
         if (data->reinject_dgram > 0
@@ -389,23 +411,33 @@ static int noisy_dgram_recvmmsg(BIO *bio, BIO_MSG *msg, size_t stride,
             data->reinject_dgram = 0;
         }
 
-        get_noise(data->noise_rate,
-                  /* long header */ (((uint8_t *)thismsg->data)[0] & 0x80) != 0,
-                  &reinject, &should_drop, &flip, &flip_offset);
-        if (data->backoff) {
-            /*
-             * We might be asked to back off on introducing too much noise if
-             * there is a danger that the connection will fail. In that case
-             * we always ensure that the next datagram does not get dropped so
-             * that the connection always survives. After that we can resume
-             * with normal noise
-             */
+        if (data->drop_dgram != NULL) {
+            if (data->curr_drop_dgram < data->drop_dgram_len
+                && data->drop_dgram[data->curr_drop_dgram] == data->dgram_cnt) {
+                fprintf(stderr, "ANDREW: Dropping datagram with id %d\n", data->drop_dgram[data->curr_drop_dgram]);
+                should_drop = 1;
+                data->curr_drop_dgram++;
+            }
+        } else {
+            get_noise(data->noise_rate,
+                      /* long header */ (((uint8_t *)thismsg->data)[0] & 0x80) != 0,
+                      &reinject, &should_drop, &flip, &flip_offset);
+
+            if (data->backoff) {
+                /*
+                * We might be asked to back off on introducing too much noise if
+                * there is a danger that the connection will fail. In that case
+                * we always ensure that the next datagram does not get dropped so
+                * that the connection always survives. After that we can resume
+                * with normal noise
+                */
 #ifdef OSSL_NOISY_DGRAM_DEBUG
             printf("**Back off applied\n");
 #endif
-            should_drop = 0;
-            flip = 0;
-            data->backoff = 0;
+                should_drop = 0;
+                flip = 0;
+                data->backoff = 0;
+            }
         }
 
         flip_bits(thismsg->data, thismsg->data_len, flip, flip_offset);
@@ -446,6 +478,7 @@ static int noisy_dgram_recvmmsg(BIO *bio, BIO_MSG *msg, size_t stride,
             }
             msg_cnt--;
         }
+        data->dgram_cnt++;
     }
 
 #ifdef OSSL_NOISY_DGRAM_DEBUG
