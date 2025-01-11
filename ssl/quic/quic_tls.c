@@ -798,6 +798,8 @@ int ossl_quic_tls_tick(QUIC_TLS *qtls)
         ret = SSL_read(qtls->args.s, NULL, 0);
     else
         ret = SSL_do_handshake(qtls->args.s);
+        // Attempt to do handshake twice
+        ret = SSL_do_handshake(qtls->args.s);
 
     if (ret <= 0) {
         err = ossl_ssl_get_error(qtls->args.s, ret,
