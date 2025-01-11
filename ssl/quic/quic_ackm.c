@@ -774,8 +774,7 @@ static OSSL_ACKM_TX_PKT *ackm_detect_and_remove_lost_pkts(OSSL_ACKM *ackm,
     loss_delay = ossl_time_divide(loss_delay, K_TIME_THRESHOLD_DEN);
 
     /* Minimum time of K_GRANULARITY before packets are deemed lost. */
-    // loss_delay = ossl_time_max(loss_delay, ossl_ticks2time(K_GRANULARITY));
-    loss_delay = ossl_ticks2time(1);
+    loss_delay = ossl_time_max(loss_delay, ossl_ticks2time(K_GRANULARITY));
 
     /* Packets sent before this time are deemed lost. */
     now = ackm->now(ackm->now_arg);
