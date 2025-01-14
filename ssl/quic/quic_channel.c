@@ -2401,9 +2401,10 @@ static void ch_rx_handle_packet(QUIC_CHANNEL *ch, int channel_only)
                       &ch->qrx_pkt->hdr->src_conn_id, old_have_processed_any_pkt))
             ossl_quic_channel_raise_protocol_error(ch, OSSL_QUIC_ERR_INTERNAL_ERROR,
                                                    0, "handling retry packet");
-        break;
 
         ossl_ackm_update_rtt_initial(ch->ackm, ch->statm, ch->qrx_pkt->time);
+
+        break;
 
     case QUIC_PKT_TYPE_0RTT:
         if (!ch->is_server)
