@@ -491,10 +491,10 @@ static int rx_pkt_history_bump_watermark(struct rx_pkt_history_st *h,
 
 /* Constants used by the ACK manager; see RFC 9002. */
 #define K_GRANULARITY           (1 * OSSL_TIME_MS)
-// #define K_PKT_THRESHOLD         3
-// #define K_TIME_THRESHOLD_NUM    9
-#define K_PKT_THRESHOLD         6
-#define K_TIME_THRESHOLD_NUM    1
+#define K_PKT_THRESHOLD         3
+#define K_TIME_THRESHOLD_NUM    9
+// #define K_PKT_THRESHOLD         6
+// #define K_TIME_THRESHOLD_NUM    1
 #define K_TIME_THRESHOLD_DEN    8
 
 /* The maximum number of times we allow PTO to be doubled. */
@@ -749,6 +749,21 @@ static OSSL_ACKM_TX_PKT *ackm_detect_and_remove_newly_acked_pkts(OSSL_ACKM *ackm
 stop:
 
     return acked_pkts;
+}
+
+int ossl_ackm_update_rtt_initial(OSSL_ACKM *ackm, OSSL_STATM statm,
+                                 OSSL_TIME received_time)
+{
+    struct tx_pkt_history_st *h = get_tx_history(ackm, QUIC_PN_SPACE_INITIAL);
+    OSSL_ACKM_TX_PKT *pkt = ossl_list_tx_history_head(&h->packets);
+    OSSL_TIME latest_rtt = ossl_time_subtract(received_time, pkt->time);
+
+    statm.min_rtt              = latest_rtt;
+    statm.smoothed_rtt         = latest_rtt;
+    statm.rtt_variance         = ossl_time_divide(latest_rtt, 2);
+    statm.have_first_sample    = 1;
+
+    return 1;
 }
 
 /*

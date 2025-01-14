@@ -2395,7 +2395,8 @@ static void ch_rx_handle_packet(QUIC_CHANNEL *ch, int channel_only)
 
         if (!ch_retry(ch, ch->qrx_pkt->hdr->data,
                       ch->qrx_pkt->hdr->len - QUIC_RETRY_INTEGRITY_TAG_LEN,
-                      &ch->qrx_pkt->hdr->src_conn_id, old_have_processed_any_pkt))
+                      &ch->qrx_pkt->hdr->src_conn_id, old_have_processed_any_pkt)
+            || !ossl_ackm_update_rtt_initial(ch->ackm, ch->statm, ch->qrx_pkt->time))
             ossl_quic_channel_raise_protocol_error(ch, OSSL_QUIC_ERR_INTERNAL_ERROR,
                                                    0, "handling retry packet");
         break;
