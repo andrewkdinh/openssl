@@ -2315,6 +2315,9 @@ static void ch_rx_handle_packet(QUIC_CHANNEL *ch, int channel_only)
                  */
                 ossl_quic_tx_packetiser_set_protocol_version(ch->txp, QUIC_VERSION_1);
 
+                /* Update RTT time */
+                ossl_ackm_update_rtt_initial(ch->ackm, ch->statm, ch->qrx_pkt->time);
+
                 /*
                  * And then request a restart of the QUIC connection 
                  */
@@ -2395,11 +2398,12 @@ static void ch_rx_handle_packet(QUIC_CHANNEL *ch, int channel_only)
 
         if (!ch_retry(ch, ch->qrx_pkt->hdr->data,
                       ch->qrx_pkt->hdr->len - QUIC_RETRY_INTEGRITY_TAG_LEN,
-                      &ch->qrx_pkt->hdr->src_conn_id, old_have_processed_any_pkt)
-            || !ossl_ackm_update_rtt_initial(ch->ackm, ch->statm, ch->qrx_pkt->time))
+                      &ch->qrx_pkt->hdr->src_conn_id, old_have_processed_any_pkt))
             ossl_quic_channel_raise_protocol_error(ch, OSSL_QUIC_ERR_INTERNAL_ERROR,
                                                    0, "handling retry packet");
         break;
+
+        ossl_ackm_update_rtt_initial(ch->ackm, ch->statm, ch->qrx_pkt->time);
 
     case QUIC_PKT_TYPE_0RTT:
         if (!ch->is_server)

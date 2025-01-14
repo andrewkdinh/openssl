@@ -297,8 +297,8 @@ QUIC_PN ossl_ackm_get_largest_acked(OSSL_ACKM *ackm, int pkt_space);
  * Version Negotiation packet is received. The client MAY use this value in
  * place of its default for the initial RTT estimate.
 */
-int ossl_ackm_update_rtt_initial(OSSL_ACKM *ackm, OSSL_STATM statm,
-                                 OSSL_TIME received_time);
+void ossl_ackm_update_rtt_initial(OSSL_ACKM *ackm, OSSL_STATM statm,
+                                  OSSL_TIME received_time);
 
 # endif
 

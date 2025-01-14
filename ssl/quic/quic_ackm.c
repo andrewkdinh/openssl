@@ -751,8 +751,8 @@ stop:
     return acked_pkts;
 }
 
-int ossl_ackm_update_rtt_initial(OSSL_ACKM *ackm, OSSL_STATM statm,
-                                 OSSL_TIME received_time)
+void ossl_ackm_update_rtt_initial(OSSL_ACKM *ackm, OSSL_STATM statm,
+                                  OSSL_TIME received_time)
 {
     struct tx_pkt_history_st *h = get_tx_history(ackm, QUIC_PN_SPACE_INITIAL);
     OSSL_ACKM_TX_PKT *pkt = ossl_list_tx_history_head(&h->packets);
@@ -762,8 +762,6 @@ int ossl_ackm_update_rtt_initial(OSSL_ACKM *ackm, OSSL_STATM statm,
     statm.smoothed_rtt         = latest_rtt;
     statm.rtt_variance         = ossl_time_divide(latest_rtt, 2);
     statm.have_first_sample    = 1;
-
-    return 1;
 }
 
 /*
