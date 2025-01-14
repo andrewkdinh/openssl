@@ -491,8 +491,10 @@ static int rx_pkt_history_bump_watermark(struct rx_pkt_history_st *h,
 
 /* Constants used by the ACK manager; see RFC 9002. */
 #define K_GRANULARITY           (1 * OSSL_TIME_MS)
-#define K_PKT_THRESHOLD         3
-#define K_TIME_THRESHOLD_NUM    9
+// #define K_PKT_THRESHOLD         3
+// #define K_TIME_THRESHOLD_NUM    9
+#define K_PKT_THRESHOLD         6
+#define K_TIME_THRESHOLD_NUM    1
 #define K_TIME_THRESHOLD_DEN    8
 
 /* The maximum number of times we allow PTO to be doubled. */
