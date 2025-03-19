@@ -388,33 +388,11 @@ static int run_quic_server(SSL_CTX *ctx, int fd)
             wait_for_activity(listener);
         printf("Accepted new connection\n");
 
-        /* Read from client until the client sends a end of stream packet */
-        while (!eof) {
-            ret = SSL_read_ex(conn, buf + total_read, sizeof(buf) - total_read,
-                              &nread);
-            total_read += nread;
-            if (total_read >= 8192) {
-                fprintf(stderr, "Could not fit all data into buffer\n");
-                goto err;
-            }
-
-            switch (handle_io_failure(conn, ret)) {
-            case 1:
-                continue; /* Retry */
-            case 0:
-                /* Reached end of stream */
-                if (!SSL_has_pending(conn))
-                    eof = 1;
-                break;
-            default:
-                fprintf(stderr, "Failed reading remaining data\n");
-                goto err;
-            }
-        }
-
-        /* Echo client input */
-        while (!SSL_write_ex2(conn, buf,
-                              total_read,
+        /* Endlessly echo random garbage */
+        /* TODO: ANDREW: Clean everything else up */
+        char *my_buf = OPENSSL_malloc(999999999999);
+        while (!SSL_write_ex2(conn, my_buf,
+                              999999999999,
                               SSL_WRITE_FLAG_CONCLUDE, &total_written)) {
             if (handle_io_failure(conn, 0) == 1)
                 continue;
