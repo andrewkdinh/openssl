@@ -485,7 +485,11 @@ sub run {
 	close $pipe;
     } else {
 	$ENV{HARNESS_OSSL_PREFIX} = "# ";
-	system("$prefix$cmd");
+    if ($ENV{"DO_MPROFILE"}) {
+        system("echo \$PWD > mprofile.txt && $prefix$cmd");
+    } else {
+        system("$prefix$cmd");
+    }
 	delete $ENV{HARNESS_OSSL_PREFIX};
     }
     $e = ($? & 0x7f) ? ($? & 0x7f)|0x80 : ($? >> 8);
