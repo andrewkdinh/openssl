@@ -4,10 +4,6 @@
 # You may wish to alter this file to override the set of languages analyzed,
 # or to provide custom queries or build logic.
 #
-# ******** NOTE ********
-# We have attempted to detect the languages in your repository. Please check
-# the `language` matrix defined below to confirm you have the correct set of
-# supported CodeQL languages.
 #
 name: "CodeQL Advanced"
 
@@ -46,7 +42,7 @@ jobs:
         - language: actions
           build-mode: none
         - language: c-cpp
-          build-mode: autobuild
+          build-mode: manual
         - language: python
           build-mode: none
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
@@ -67,7 +63,7 @@ jobs:
     # - name: Setup runtime (example)
     #   uses: actions/setup-example@v1
     - name: config
-      run: CC=clang ./config --strict-warnings enable-demos enable-h3demo && perl configdata.pm --dump
+      run: ./config --strict-warnings --banner=Configured enable-fips && perl configdata.pm --dump
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
