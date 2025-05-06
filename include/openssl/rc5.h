@@ -41,9 +41,9 @@ extern "C" {
 #define RC5_16_ROUNDS 16
 
 typedef struct rc5_key_st {
-  /* Number of rounds */
-  int rounds;
-  RC5_32_INT data[2 * (RC5_16_ROUNDS + 1)];
+    /* Number of rounds */
+    int rounds;
+    RC5_32_INT data[2 * (RC5_16_ROUNDS + 1)];
 } RC5_32_KEY;
 #endif
 #ifndef OPENSSL_NO_DEPRECATED_3_0

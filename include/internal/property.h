@@ -18,9 +18,9 @@ typedef struct ossl_method_store_st OSSL_METHOD_STORE;
 typedef struct ossl_property_list_st OSSL_PROPERTY_LIST;
 
 typedef enum {
-  OSSL_PROPERTY_TYPE_STRING,
-  OSSL_PROPERTY_TYPE_NUMBER,
-  OSSL_PROPERTY_TYPE_VALUE_UNDEFINED
+    OSSL_PROPERTY_TYPE_STRING,
+    OSSL_PROPERTY_TYPE_NUMBER,
+    OSSL_PROPERTY_TYPE_VALUE_UNDEFINED
 } OSSL_PROPERTY_TYPE;
 typedef struct ossl_property_definition_st OSSL_PROPERTY_DEFINITION;
 

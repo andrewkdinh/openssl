@@ -25,44 +25,44 @@ IMPLEMENT_ASN1_FUNCTIONS(OSSL_AUTHORITY_ATTRIBUTE_ID_SYNTAX)
 
 static int i2r_ISSUER_SERIAL(X509V3_EXT_METHOD * method,
                              OSSL_ISSUER_SERIAL *iss, BIO *out, int indent) {
-  if (iss->issuer != NULL) {
-    BIO_printf(out, "%*sIssuer Names:\n", indent, "");
-    OSSL_GENERAL_NAMES_print(out, iss->issuer, indent);
+    if (iss->issuer != NULL) {
+        BIO_printf(out, "%*sIssuer Names:\n", indent, "");
+        OSSL_GENERAL_NAMES_print(out, iss->issuer, indent);
+        BIO_puts(out, "\n");
+    } else {
+        BIO_printf(out, "%*sIssuer Names: <none>\n", indent, "");
+    }
+    BIO_printf(out, "%*sIssuer Serial: ", indent, "");
+    if (i2a_ASN1_INTEGER(out, &(iss->serial)) <= 0)
+        return 0;
     BIO_puts(out, "\n");
-  } else {
-    BIO_printf(out, "%*sIssuer Names: <none>\n", indent, "");
-  }
-  BIO_printf(out, "%*sIssuer Serial: ", indent, "");
-  if (i2a_ASN1_INTEGER(out, &(iss->serial)) <= 0)
-    return 0;
-  BIO_puts(out, "\n");
-  if (iss->issuerUID != NULL) {
-    BIO_printf(out, "%*sIssuer UID: ", indent, "");
-    if (i2a_ASN1_STRING(out, iss->issuerUID, V_ASN1_BIT_STRING) <= 0)
-      return 0;
-    BIO_puts(out, "\n");
-  } else {
-    BIO_printf(out, "%*sIssuer UID: <none>\n", indent, "");
-  }
-  return 1;
+    if (iss->issuerUID != NULL) {
+        BIO_printf(out, "%*sIssuer UID: ", indent, "");
+        if (i2a_ASN1_STRING(out, iss->issuerUID, V_ASN1_BIT_STRING) <= 0)
+            return 0;
+        BIO_puts(out, "\n");
+    } else {
+        BIO_printf(out, "%*sIssuer UID: <none>\n", indent, "");
+    }
+    return 1;
 }
 
 static int i2r_auth_attr_id(X509V3_EXT_METHOD *method,
                             OSSL_AUTHORITY_ATTRIBUTE_ID_SYNTAX *aids, BIO *out,
                             int indent) {
-  int i;
-  OSSL_ISSUER_SERIAL *aid;
+    int i;
+    OSSL_ISSUER_SERIAL *aid;
 
-  for (i = 0; i < sk_OSSL_ISSUER_SERIAL_num(aids); i++) {
-    if (BIO_printf(out, "%*sIssuer-Serials:\n", indent, "") <= 0)
-      return 0;
-    aid = sk_OSSL_ISSUER_SERIAL_value(aids, i);
-    if (i2r_ISSUER_SERIAL(method, aid, out, indent + 4) <= 0)
-      return 0;
-    if (BIO_puts(out, "\n") <= 0)
-      return 0;
-  }
-  return 1;
+    for (i = 0; i < sk_OSSL_ISSUER_SERIAL_num(aids); i++) {
+        if (BIO_printf(out, "%*sIssuer-Serials:\n", indent, "") <= 0)
+            return 0;
+        aid = sk_OSSL_ISSUER_SERIAL_value(aids, i);
+        if (i2r_ISSUER_SERIAL(method, aid, out, indent + 4) <= 0)
+            return 0;
+        if (BIO_puts(out, "\n") <= 0)
+            return 0;
+    }
+    return 1;
 }
 
 const X509V3_EXT_METHOD ossl_v3_authority_attribute_identifier = {

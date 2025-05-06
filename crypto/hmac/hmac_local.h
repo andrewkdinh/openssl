@@ -18,39 +18,39 @@
 #define HMAC_MAX_MD_CBLOCK_SIZE 144
 
 struct hmac_ctx_st {
-  const EVP_MD *md;
-  EVP_MD_CTX *md_ctx;
-  EVP_MD_CTX *i_ctx;
-  EVP_MD_CTX *o_ctx;
+    const EVP_MD *md;
+    EVP_MD_CTX *md_ctx;
+    EVP_MD_CTX *i_ctx;
+    EVP_MD_CTX *o_ctx;
 
-  /* Platform specific data */
-  union {
-    int dummy;
+    /* Platform specific data */
+    union {
+        int dummy;
 #ifdef OPENSSL_HMAC_S390X
-    struct {
-      unsigned int fc; /* 0 if not supported by kmac instruction */
-      int blk_size;
-      int ikp;
-      int iimp;
-      unsigned char *buf;
-      size_t size; /* must be multiple of digest block size */
-      size_t num;
-      union {
-        OSSL_UNION_ALIGN;
         struct {
-          uint32_t h[8];
-          uint64_t imbl;
-          unsigned char key[64];
-        } hmac_224_256;
-        struct {
-          uint64_t h[8];
-          uint128_t imbl;
-          unsigned char key[128];
-        } hmac_384_512;
-      } param;
-    } s390x;
+            unsigned int fc; /* 0 if not supported by kmac instruction */
+            int blk_size;
+            int ikp;
+            int iimp;
+            unsigned char *buf;
+            size_t size; /* must be multiple of digest block size */
+            size_t num;
+            union {
+                OSSL_UNION_ALIGN;
+                struct {
+                    uint32_t h[8];
+                    uint64_t imbl;
+                    unsigned char key[64];
+                } hmac_224_256;
+                struct {
+                    uint64_t h[8];
+                    uint128_t imbl;
+                    unsigned char key[128];
+                } hmac_384_512;
+            } param;
+        } s390x;
 #endif /* OPENSSL_HMAC_S390X */
-  } plat;
+    } plat;
 };
 
 #ifdef OPENSSL_HMAC_S390X

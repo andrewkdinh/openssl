@@ -24,17 +24,17 @@
 /* Override the default free and new methods */
 static int dsa_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                   void *exarg) {
-  if (operation == ASN1_OP_NEW_PRE) {
-    *pval = (ASN1_VALUE *)DSA_new();
-    if (*pval != NULL)
-      return 2;
-    return 0;
-  } else if (operation == ASN1_OP_FREE_PRE) {
-    DSA_free((DSA *)*pval);
-    *pval = NULL;
-    return 2;
-  }
-  return 1;
+    if (operation == ASN1_OP_NEW_PRE) {
+        *pval = (ASN1_VALUE *)DSA_new();
+        if (*pval != NULL)
+            return 2;
+        return 0;
+    } else if (operation == ASN1_OP_FREE_PRE) {
+        DSA_free((DSA *)*pval);
+        *pval = NULL;
+        return 2;
+    }
+    return 1;
 }
 
 ASN1_SEQUENCE_cb(DSAPrivateKey, dsa_cb) =
@@ -67,5 +67,5 @@ IMPLEMENT_ASN1_ENCODE_FUNCTIONS_fname(DSA, DSAPublicKey, DSAPublicKey)
 
 DSA
 * DSAparams_dup(const DSA *dsa) {
-  return ASN1_item_dup(ASN1_ITEM_rptr(DSAparams), dsa);
+    return ASN1_item_dup(ASN1_ITEM_rptr(DSAparams), dsa);
 }

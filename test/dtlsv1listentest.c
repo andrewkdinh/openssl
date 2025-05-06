@@ -234,14 +234,14 @@ static const unsigned char verify[] = {
 };
 
 typedef struct {
-  const unsigned char *in;
-  unsigned int inlen;
-  /*
-   * GOOD == positive return value from DTLSv1_listen, no output yet
-   * VERIFY == 0 return value, HelloVerifyRequest sent
-   * DROP == 0 return value, no output
-   */
-  enum { GOOD, VERIFY, DROP } outtype;
+    const unsigned char *in;
+    unsigned int inlen;
+    /*
+     * GOOD == positive return value from DTLSv1_listen, no output yet
+     * VERIFY == 0 return value, HelloVerifyRequest sent
+     * DROP == 0 return value, no output
+     */
+    enum { GOOD, VERIFY, DROP } outtype;
 } tests;
 
 static tests testpackets[9] = {
@@ -259,93 +259,94 @@ static tests testpackets[9] = {
 
 static int cookie_gen(SSL *ssl, unsigned char *cookie,
                       unsigned int *cookie_len) {
-  unsigned int i;
+    unsigned int i;
 
-  for (i = 0; i < COOKIE_LEN; i++, cookie++)
-    *cookie = i;
-  *cookie_len = COOKIE_LEN;
+    for (i = 0; i < COOKIE_LEN; i++, cookie++)
+        *cookie = i;
+    *cookie_len = COOKIE_LEN;
 
-  return 1;
+    return 1;
 }
 
 static int cookie_verify(SSL *ssl, const unsigned char *cookie,
                          unsigned int cookie_len) {
-  unsigned int i;
+    unsigned int i;
 
-  if (cookie_len != COOKIE_LEN)
-    return 0;
+    if (cookie_len != COOKIE_LEN)
+        return 0;
 
-  for (i = 0; i < COOKIE_LEN; i++, cookie++) {
-    if (*cookie != i)
-      return 0;
-  }
+    for (i = 0; i < COOKIE_LEN; i++, cookie++) {
+        if (*cookie != i)
+            return 0;
+    }
 
-  return 1;
+    return 1;
 }
 
 static int dtls_listen_test(int i) {
-  SSL_CTX *ctx = NULL;
-  SSL *ssl = NULL;
-  BIO *outbio = NULL;
-  BIO *inbio = NULL;
-  BIO_ADDR *peer = NULL;
-  tests *tp = &testpackets[i];
-  char *data;
-  long datalen;
-  int ret, success = 0;
+    SSL_CTX *ctx = NULL;
+    SSL *ssl = NULL;
+    BIO *outbio = NULL;
+    BIO *inbio = NULL;
+    BIO_ADDR *peer = NULL;
+    tests *tp = &testpackets[i];
+    char *data;
+    long datalen;
+    int ret, success = 0;
 
-  if (!TEST_ptr(ctx = SSL_CTX_new(DTLS_server_method())) ||
-      !TEST_ptr(peer = BIO_ADDR_new()))
-    goto err;
-  SSL_CTX_set_cookie_generate_cb(ctx, cookie_gen);
-  SSL_CTX_set_cookie_verify_cb(ctx, cookie_verify);
+    if (!TEST_ptr(ctx = SSL_CTX_new(DTLS_server_method())) ||
+        !TEST_ptr(peer = BIO_ADDR_new()))
+        goto err;
+    SSL_CTX_set_cookie_generate_cb(ctx, cookie_gen);
+    SSL_CTX_set_cookie_verify_cb(ctx, cookie_verify);
 
-  /* Create an SSL object and set the BIO */
-  if (!TEST_ptr(ssl = SSL_new(ctx)) || !TEST_ptr(outbio = BIO_new(BIO_s_mem())))
-    goto err;
-  SSL_set0_wbio(ssl, outbio);
+    /* Create an SSL object and set the BIO */
+    if (!TEST_ptr(ssl = SSL_new(ctx)) ||
+        !TEST_ptr(outbio = BIO_new(BIO_s_mem())))
+        goto err;
+    SSL_set0_wbio(ssl, outbio);
 
-  /* Set Non-blocking IO behaviour */
-  if (!TEST_ptr(inbio = BIO_new_mem_buf((char *)tp->in, tp->inlen)))
-    goto err;
-  BIO_set_mem_eof_return(inbio, -1);
-  SSL_set0_rbio(ssl, inbio);
+    /* Set Non-blocking IO behaviour */
+    if (!TEST_ptr(inbio = BIO_new_mem_buf((char *)tp->in, tp->inlen)))
+        goto err;
+    BIO_set_mem_eof_return(inbio, -1);
+    SSL_set0_rbio(ssl, inbio);
 
-  /* Process the incoming packet */
-  if (!TEST_int_ge(ret = DTLSv1_listen(ssl, peer), 0))
-    goto err;
-  datalen = BIO_get_mem_data(outbio, &data);
+    /* Process the incoming packet */
+    if (!TEST_int_ge(ret = DTLSv1_listen(ssl, peer), 0))
+        goto err;
+    datalen = BIO_get_mem_data(outbio, &data);
 
-  if (tp->outtype == VERIFY) {
-    if (!TEST_int_eq(ret, 0) ||
-        !TEST_mem_eq(data, datalen, verify, sizeof(verify)))
-      goto err;
-  } else if (datalen == 0) {
-    if (!TEST_true((ret == 0 && tp->outtype == DROP) ||
-                   (ret == 1 && tp->outtype == GOOD)))
-      goto err;
-  } else {
-    TEST_info("Test %d: unexpected data output", i);
-    goto err;
-  }
-  (void)BIO_reset(outbio);
-  inbio = NULL;
-  SSL_set0_rbio(ssl, NULL);
-  success = 1;
+    if (tp->outtype == VERIFY) {
+        if (!TEST_int_eq(ret, 0) ||
+            !TEST_mem_eq(data, datalen, verify, sizeof(verify)))
+            goto err;
+    } else if (datalen == 0) {
+        if (!TEST_true((ret == 0 && tp->outtype == DROP) ||
+                       (ret == 1 && tp->outtype == GOOD)))
+            goto err;
+    } else {
+        TEST_info("Test %d: unexpected data output", i);
+        goto err;
+    }
+    (void)BIO_reset(outbio);
+    inbio = NULL;
+    SSL_set0_rbio(ssl, NULL);
+    success = 1;
 
 err:
-  /* Also frees up outbio */
-  SSL_free(ssl);
-  SSL_CTX_free(ctx);
-  BIO_free(inbio);
-  OPENSSL_free(peer);
-  return success;
+    /* Also frees up outbio */
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
+    BIO_free(inbio);
+    OPENSSL_free(peer);
+    return success;
 }
 #endif
 
 int setup_tests(void) {
 #ifndef OPENSSL_NO_SOCK
-  ADD_ALL_TESTS(dtls_listen_test, (int)OSSL_NELEM(testpackets));
+    ADD_ALL_TESTS(dtls_listen_test, (int)OSSL_NELEM(testpackets));
 #endif
-  return 1;
+    return 1;
 }

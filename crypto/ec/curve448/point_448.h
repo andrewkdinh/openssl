@@ -23,16 +23,16 @@
 
 /* Projective Niels coordinates */
 typedef struct {
-  gf a, b, c;
+    gf a, b, c;
 } niels_s, niels_t[1];
 typedef struct {
-  niels_t n;
-  gf z;
+    niels_t n;
+    gf z;
 } pniels_t[1];
 
 /* Precomputed base */
 struct curve448_precomputed_s {
-  niels_t table[COMBS_N << (COMBS_T - 1)];
+    niels_t table[COMBS_N << (COMBS_T - 1)];
 };
 
 #define C448_SCALAR_LIMBS ((446 - 1) / C448_WORD_BITS + 1)
@@ -54,7 +54,7 @@ struct curve448_precomputed_s {
 
 /* Twisted Edwards extended homogeneous coordinates */
 typedef struct curve448_point_s {
-  gf x, y, z, t;
+    gf x, y, z, t;
 } curve448_point_t[1];
 
 /* Precomputed table based on a point.  Can be trivial implementation. */
@@ -65,7 +65,7 @@ typedef struct curve448_precomputed_s curve448_precomputed_s;
 
 /* Scalar is stored packed, because we don't need the speed. */
 typedef struct curve448_scalar_s {
-  c448_word_t limb[C448_SCALAR_LIMBS];
+    c448_word_t limb[C448_SCALAR_LIMBS];
 } curve448_scalar_t[1];
 
 /* A scalar equal to 1. */
@@ -162,7 +162,7 @@ void ossl_curve448_scalar_halve(curve448_scalar_t out,
  */
 static ossl_inline void curve448_scalar_copy(curve448_scalar_t out,
                                              const curve448_scalar_t a) {
-  *out = *a;
+    *out = *a;
 }
 
 /*
@@ -174,7 +174,7 @@ static ossl_inline void curve448_scalar_copy(curve448_scalar_t out,
  */
 static ossl_inline void curve448_point_copy(curve448_point_t a,
                                             const curve448_point_t b) {
-  *a = *b;
+    *a = *b;
 }
 
 /*

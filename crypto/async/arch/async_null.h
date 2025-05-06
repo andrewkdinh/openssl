@@ -18,7 +18,7 @@
 #define ASYNC_ARCH
 
 typedef struct async_fibre_st {
-  int dummy;
+    int dummy;
 } async_fibre;
 
 #define async_fibre_swapcontext(o, n, r) 0

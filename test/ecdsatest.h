@@ -21,14 +21,14 @@
  */
 
 typedef struct {
-  const int nid;    /* curve NID */
-  const int md_nid; /* hash function NID */
-  const char *msg;  /* message to sign */
-  const char *d;    /* ECDSA private key */
-  const char *Q;    /* ECDSA public key: Q = dG */
-  const char *k;    /* ECDSA nonce */
-  const char *r;    /* ECDSA signature (r,s) */
-  const char *s;
+    const int nid;    /* curve NID */
+    const int md_nid; /* hash function NID */
+    const char *msg;  /* message to sign */
+    const char *d;    /* ECDSA private key */
+    const char *Q;    /* ECDSA public key: Q = dG */
+    const char *k;    /* ECDSA nonce */
+    const char *r;    /* ECDSA signature (r,s) */
+    const char *s;
 } ecdsa_cavs_kat_t;
 
 static const ecdsa_cavs_kat_t ecdsa_cavs_kats[] = {

@@ -14,12 +14,12 @@
 /* Declarations for string types */
 
 #define IMPLEMENT_ASN1_STRING_FUNCTIONS(sname)                                 \
-  IMPLEMENT_ASN1_TYPE(sname)                                                   \
-  IMPLEMENT_ASN1_ENCODE_FUNCTIONS_fname(sname, sname, sname)                   \
-  sname *sname##_new(void) {                                                   \
-    return ASN1_STRING_type_new(V_##sname);                                    \
-  }                                                                            \
-  void sname##_free(sname *x) { ASN1_STRING_free(x); }
+    IMPLEMENT_ASN1_TYPE(sname)                                                 \
+    IMPLEMENT_ASN1_ENCODE_FUNCTIONS_fname(sname, sname, sname)                 \
+    sname *sname##_new(void) {                                                 \
+        return ASN1_STRING_type_new(V_##sname);                                \
+    }                                                                          \
+    void sname##_free(sname *x) { ASN1_STRING_free(x); }
 
 IMPLEMENT_ASN1_STRING_FUNCTIONS(ASN1_OCTET_STRING)
 IMPLEMENT_ASN1_STRING_FUNCTIONS(ASN1_INTEGER)

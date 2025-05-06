@@ -49,59 +49,59 @@ IMPLEMENT_ASN1_FUNCTIONS(OSSL_ATTRIBUTE_MAPPINGS)
 static int i2r_ATTRIBUTE_MAPPING(X509V3_EXT_METHOD * method,
                                  OSSL_ATTRIBUTE_MAPPING *am, BIO *out,
                                  int indent) {
-  ASN1_OBJECT *local_type, *remote_type;
-  int local_attr_nid, remote_attr_nid;
-  ASN1_TYPE *local_val, *remote_val;
+    ASN1_OBJECT *local_type, *remote_type;
+    int local_attr_nid, remote_attr_nid;
+    ASN1_TYPE *local_val, *remote_val;
 
-  switch (am->type) {
-  case (OSSL_ATTR_MAP_TYPE):
-    if (i2a_ASN1_OBJECT(out, am->choice.typeMappings->local) <= 0)
-      return 0;
-    if (BIO_puts(out, " == ") <= 0)
-      return 0;
-    return i2a_ASN1_OBJECT(out, am->choice.typeMappings->remote);
-  case (OSSL_ATTR_MAP_VALUE):
-    local_type = am->choice.typeValueMappings->local->type;
-    remote_type = am->choice.typeValueMappings->remote->type;
-    local_val = am->choice.typeValueMappings->local->value;
-    remote_val = am->choice.typeValueMappings->remote->value;
-    local_attr_nid = OBJ_obj2nid(local_type);
-    remote_attr_nid = OBJ_obj2nid(remote_type);
-    if (i2a_ASN1_OBJECT(out, local_type) <= 0)
-      return 0;
-    if (BIO_puts(out, ":") <= 0)
-      return 0;
-    if (ossl_print_attribute_value(out, local_attr_nid, local_val, 0) <= 0)
-      return 0;
-    if (BIO_puts(out, " == ") <= 0)
-      return 0;
-    if (i2a_ASN1_OBJECT(out, remote_type) <= 0)
-      return 0;
-    if (BIO_puts(out, ":") <= 0)
-      return 0;
-    return ossl_print_attribute_value(out, remote_attr_nid, remote_val, 0);
-  default:
-    return 0;
-  }
-  return 1;
+    switch (am->type) {
+    case (OSSL_ATTR_MAP_TYPE):
+        if (i2a_ASN1_OBJECT(out, am->choice.typeMappings->local) <= 0)
+            return 0;
+        if (BIO_puts(out, " == ") <= 0)
+            return 0;
+        return i2a_ASN1_OBJECT(out, am->choice.typeMappings->remote);
+    case (OSSL_ATTR_MAP_VALUE):
+        local_type = am->choice.typeValueMappings->local->type;
+        remote_type = am->choice.typeValueMappings->remote->type;
+        local_val = am->choice.typeValueMappings->local->value;
+        remote_val = am->choice.typeValueMappings->remote->value;
+        local_attr_nid = OBJ_obj2nid(local_type);
+        remote_attr_nid = OBJ_obj2nid(remote_type);
+        if (i2a_ASN1_OBJECT(out, local_type) <= 0)
+            return 0;
+        if (BIO_puts(out, ":") <= 0)
+            return 0;
+        if (ossl_print_attribute_value(out, local_attr_nid, local_val, 0) <= 0)
+            return 0;
+        if (BIO_puts(out, " == ") <= 0)
+            return 0;
+        if (i2a_ASN1_OBJECT(out, remote_type) <= 0)
+            return 0;
+        if (BIO_puts(out, ":") <= 0)
+            return 0;
+        return ossl_print_attribute_value(out, remote_attr_nid, remote_val, 0);
+    default:
+        return 0;
+    }
+    return 1;
 }
 
 static int i2r_ATTRIBUTE_MAPPINGS(X509V3_EXT_METHOD *method,
                                   OSSL_ATTRIBUTE_MAPPINGS *ams, BIO *out,
                                   int indent) {
-  int i;
-  OSSL_ATTRIBUTE_MAPPING *am;
+    int i;
+    OSSL_ATTRIBUTE_MAPPING *am;
 
-  for (i = 0; i < sk_OSSL_ATTRIBUTE_MAPPING_num(ams); i++) {
-    am = sk_OSSL_ATTRIBUTE_MAPPING_value(ams, i);
-    if (BIO_printf(out, "%*s", indent, "") <= 0)
-      return 0;
-    if (i2r_ATTRIBUTE_MAPPING(method, am, out, indent + 4) <= 0)
-      return 0;
-    if (BIO_puts(out, "\n") <= 0)
-      return 0;
-  }
-  return 1;
+    for (i = 0; i < sk_OSSL_ATTRIBUTE_MAPPING_num(ams); i++) {
+        am = sk_OSSL_ATTRIBUTE_MAPPING_value(ams, i);
+        if (BIO_printf(out, "%*s", indent, "") <= 0)
+            return 0;
+        if (i2r_ATTRIBUTE_MAPPING(method, am, out, indent + 4) <= 0)
+            return 0;
+        if (BIO_puts(out, "\n") <= 0)
+            return 0;
+    }
+    return 1;
 }
 
 const X509V3_EXT_METHOD ossl_v3_attribute_mappings = {

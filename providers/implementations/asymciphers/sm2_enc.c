@@ -41,128 +41,129 @@ static OSSL_FUNC_asym_cipher_settable_ctx_params_fn sm2_settable_ctx_params;
  */
 
 typedef struct {
-  OSSL_LIB_CTX *libctx;
-  EC_KEY *key;
-  PROV_DIGEST md;
+    OSSL_LIB_CTX *libctx;
+    EC_KEY *key;
+    PROV_DIGEST md;
 } PROV_SM2_CTX;
 
 static void *sm2_newctx(void *provctx) {
-  PROV_SM2_CTX *psm2ctx = OPENSSL_zalloc(sizeof(PROV_SM2_CTX));
+    PROV_SM2_CTX *psm2ctx = OPENSSL_zalloc(sizeof(PROV_SM2_CTX));
 
-  if (psm2ctx == NULL)
-    return NULL;
-  psm2ctx->libctx = PROV_LIBCTX_OF(provctx);
+    if (psm2ctx == NULL)
+        return NULL;
+    psm2ctx->libctx = PROV_LIBCTX_OF(provctx);
 
-  return psm2ctx;
+    return psm2ctx;
 }
 
 static int sm2_init(void *vpsm2ctx, void *vkey, const OSSL_PARAM params[]) {
-  PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
+    PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
 
-  if (psm2ctx == NULL || vkey == NULL || !EC_KEY_up_ref(vkey))
-    return 0;
-  EC_KEY_free(psm2ctx->key);
-  psm2ctx->key = vkey;
+    if (psm2ctx == NULL || vkey == NULL || !EC_KEY_up_ref(vkey))
+        return 0;
+    EC_KEY_free(psm2ctx->key);
+    psm2ctx->key = vkey;
 
-  return sm2_set_ctx_params(psm2ctx, params);
+    return sm2_set_ctx_params(psm2ctx, params);
 }
 
 static const EVP_MD *sm2_get_md(PROV_SM2_CTX *psm2ctx) {
-  const EVP_MD *md = ossl_prov_digest_md(&psm2ctx->md);
+    const EVP_MD *md = ossl_prov_digest_md(&psm2ctx->md);
 
-  if (md == NULL)
-    md = ossl_prov_digest_fetch(&psm2ctx->md, psm2ctx->libctx, "SM3", NULL);
+    if (md == NULL)
+        md = ossl_prov_digest_fetch(&psm2ctx->md, psm2ctx->libctx, "SM3", NULL);
 
-  return md;
+    return md;
 }
 
 static int sm2_asym_encrypt(void *vpsm2ctx, unsigned char *out, size_t *outlen,
                             size_t outsize, const unsigned char *in,
                             size_t inlen) {
-  PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
-  const EVP_MD *md = sm2_get_md(psm2ctx);
+    PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
+    const EVP_MD *md = sm2_get_md(psm2ctx);
 
-  if (md == NULL)
-    return 0;
+    if (md == NULL)
+        return 0;
 
-  if (out == NULL) {
-    if (!ossl_sm2_ciphertext_size(psm2ctx->key, md, inlen, outlen)) {
-      ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
-      return 0;
+    if (out == NULL) {
+        if (!ossl_sm2_ciphertext_size(psm2ctx->key, md, inlen, outlen)) {
+            ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
+            return 0;
+        }
+        return 1;
     }
-    return 1;
-  }
 
-  return ossl_sm2_encrypt(psm2ctx->key, md, in, inlen, out, outlen);
+    return ossl_sm2_encrypt(psm2ctx->key, md, in, inlen, out, outlen);
 }
 
 static int sm2_asym_decrypt(void *vpsm2ctx, unsigned char *out, size_t *outlen,
                             size_t outsize, const unsigned char *in,
                             size_t inlen) {
-  PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
-  const EVP_MD *md = sm2_get_md(psm2ctx);
+    PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
+    const EVP_MD *md = sm2_get_md(psm2ctx);
 
-  if (md == NULL)
-    return 0;
+    if (md == NULL)
+        return 0;
 
-  if (out == NULL) {
-    if (!ossl_sm2_plaintext_size(in, inlen, outlen))
-      return 0;
-    return 1;
-  }
+    if (out == NULL) {
+        if (!ossl_sm2_plaintext_size(in, inlen, outlen))
+            return 0;
+        return 1;
+    }
 
-  return ossl_sm2_decrypt(psm2ctx->key, md, in, inlen, out, outlen);
+    return ossl_sm2_decrypt(psm2ctx->key, md, in, inlen, out, outlen);
 }
 
 static void sm2_freectx(void *vpsm2ctx) {
-  PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
+    PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
 
-  EC_KEY_free(psm2ctx->key);
-  ossl_prov_digest_reset(&psm2ctx->md);
+    EC_KEY_free(psm2ctx->key);
+    ossl_prov_digest_reset(&psm2ctx->md);
 
-  OPENSSL_free(psm2ctx);
+    OPENSSL_free(psm2ctx);
 }
 
 static void *sm2_dupctx(void *vpsm2ctx) {
-  PROV_SM2_CTX *srcctx = (PROV_SM2_CTX *)vpsm2ctx;
-  PROV_SM2_CTX *dstctx;
+    PROV_SM2_CTX *srcctx = (PROV_SM2_CTX *)vpsm2ctx;
+    PROV_SM2_CTX *dstctx;
 
-  dstctx = OPENSSL_zalloc(sizeof(*srcctx));
-  if (dstctx == NULL)
-    return NULL;
+    dstctx = OPENSSL_zalloc(sizeof(*srcctx));
+    if (dstctx == NULL)
+        return NULL;
 
-  *dstctx = *srcctx;
-  memset(&dstctx->md, 0, sizeof(dstctx->md));
+    *dstctx = *srcctx;
+    memset(&dstctx->md, 0, sizeof(dstctx->md));
 
-  if (dstctx->key != NULL && !EC_KEY_up_ref(dstctx->key)) {
-    OPENSSL_free(dstctx);
-    return NULL;
-  }
+    if (dstctx->key != NULL && !EC_KEY_up_ref(dstctx->key)) {
+        OPENSSL_free(dstctx);
+        return NULL;
+    }
 
-  if (!ossl_prov_digest_copy(&dstctx->md, &srcctx->md)) {
-    sm2_freectx(dstctx);
-    return NULL;
-  }
+    if (!ossl_prov_digest_copy(&dstctx->md, &srcctx->md)) {
+        sm2_freectx(dstctx);
+        return NULL;
+    }
 
-  return dstctx;
+    return dstctx;
 }
 
 static int sm2_get_ctx_params(void *vpsm2ctx, OSSL_PARAM *params) {
-  PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
-  OSSL_PARAM *p;
+    PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
+    OSSL_PARAM *p;
 
-  if (vpsm2ctx == NULL)
-    return 0;
+    if (vpsm2ctx == NULL)
+        return 0;
 
-  p = OSSL_PARAM_locate(params, OSSL_ASYM_CIPHER_PARAM_DIGEST);
-  if (p != NULL) {
-    const EVP_MD *md = ossl_prov_digest_md(&psm2ctx->md);
+    p = OSSL_PARAM_locate(params, OSSL_ASYM_CIPHER_PARAM_DIGEST);
+    if (p != NULL) {
+        const EVP_MD *md = ossl_prov_digest_md(&psm2ctx->md);
 
-    if (!OSSL_PARAM_set_utf8_string(p, md == NULL ? "" : EVP_MD_get0_name(md)))
-      return 0;
-  }
+        if (!OSSL_PARAM_set_utf8_string(p,
+                                        md == NULL ? "" : EVP_MD_get0_name(md)))
+            return 0;
+    }
 
-  return 1;
+    return 1;
 }
 
 static const OSSL_PARAM known_gettable_ctx_params[] = {
@@ -170,21 +171,22 @@ OSSL_PARAM_utf8_string(OSSL_ASYM_CIPHER_PARAM_DIGEST, NULL, 0), OSSL_PARAM_END};
 
 static const OSSL_PARAM *sm2_gettable_ctx_params(ossl_unused void *vpsm2ctx,
                                                  ossl_unused void *provctx) {
-  return known_gettable_ctx_params;
+    return known_gettable_ctx_params;
 }
 
 static int sm2_set_ctx_params(void *vpsm2ctx, const OSSL_PARAM params[]) {
-  PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
+    PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
 
-  if (psm2ctx == NULL)
-    return 0;
-  if (ossl_param_is_empty(params))
+    if (psm2ctx == NULL)
+        return 0;
+    if (ossl_param_is_empty(params))
+        return 1;
+
+    if (!ossl_prov_digest_load_from_params(&psm2ctx->md, params,
+                                           psm2ctx->libctx))
+        return 0;
+
     return 1;
-
-  if (!ossl_prov_digest_load_from_params(&psm2ctx->md, params, psm2ctx->libctx))
-    return 0;
-
-  return 1;
 }
 
 static const OSSL_PARAM known_settable_ctx_params[] = {
@@ -194,7 +196,7 @@ OSSL_PARAM_utf8_string(OSSL_ASYM_CIPHER_PARAM_ENGINE, NULL, 0), OSSL_PARAM_END};
 
 static const OSSL_PARAM *sm2_settable_ctx_params(ossl_unused void *vpsm2ctx,
                                                  ossl_unused void *provctx) {
-  return known_settable_ctx_params;
+    return known_settable_ctx_params;
 }
 
 const OSSL_DISPATCH ossl_sm2_asym_cipher_functions[] = {

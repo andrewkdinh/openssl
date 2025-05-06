@@ -49,89 +49,89 @@ static const unsigned char expected_output[] = {
 static char *propq = NULL;
 
 int main(int argc, char **argv) {
-  int ret = EXIT_FAILURE;
-  EVP_MAC *mac = NULL;
-  EVP_MAC_CTX *mctx = NULL;
-  unsigned char out[16];
-  OSSL_PARAM params[4], *p = params;
-  OSSL_LIB_CTX *library_context = NULL;
-  size_t out_len = 0;
+    int ret = EXIT_FAILURE;
+    EVP_MAC *mac = NULL;
+    EVP_MAC_CTX *mctx = NULL;
+    unsigned char out[16];
+    OSSL_PARAM params[4], *p = params;
+    OSSL_LIB_CTX *library_context = NULL;
+    size_t out_len = 0;
 
-  library_context = OSSL_LIB_CTX_new();
-  if (library_context == NULL) {
-    fprintf(stderr, "OSSL_LIB_CTX_new() returned NULL\n");
-    goto end;
-  }
+    library_context = OSSL_LIB_CTX_new();
+    if (library_context == NULL) {
+        fprintf(stderr, "OSSL_LIB_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* Fetch the GMAC implementation */
-  mac = EVP_MAC_fetch(library_context, "GMAC", propq);
-  if (mac == NULL) {
-    fprintf(stderr, "EVP_MAC_fetch() returned NULL\n");
-    goto end;
-  }
+    /* Fetch the GMAC implementation */
+    mac = EVP_MAC_fetch(library_context, "GMAC", propq);
+    if (mac == NULL) {
+        fprintf(stderr, "EVP_MAC_fetch() returned NULL\n");
+        goto end;
+    }
 
-  /* Create a context for the GMAC operation */
-  mctx = EVP_MAC_CTX_new(mac);
-  if (mctx == NULL) {
-    fprintf(stderr, "EVP_MAC_CTX_new() returned NULL\n");
-    goto end;
-  }
+    /* Create a context for the GMAC operation */
+    mctx = EVP_MAC_CTX_new(mac);
+    if (mctx == NULL) {
+        fprintf(stderr, "EVP_MAC_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* GMAC requires a GCM mode cipher to be specified */
-  *p++ =
-  OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_CIPHER, "AES-128-GCM", 0);
-
-  /*
-   * If a non-default property query is required when fetching the GCM mode
-   * cipher, it needs to be specified too.
-   */
-  if (propq != NULL)
+    /* GMAC requires a GCM mode cipher to be specified */
     *p++ =
-    OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_PROPERTIES, propq, 0);
+    OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_CIPHER, "AES-128-GCM", 0);
 
-  /* Set the initialisation vector (IV) */
-  *p++ =
-  OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_IV, iv, sizeof(iv));
-  *p = OSSL_PARAM_construct_end();
+    /*
+     * If a non-default property query is required when fetching the GCM mode
+     * cipher, it needs to be specified too.
+     */
+    if (propq != NULL)
+        *p++ =
+        OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_PROPERTIES, propq, 0);
 
-  /* Initialise the GMAC operation */
-  if (!EVP_MAC_init(mctx, key, sizeof(key), params)) {
-    fprintf(stderr, "EVP_MAC_init() failed\n");
-    goto end;
-  }
+    /* Set the initialisation vector (IV) */
+    *p++ =
+    OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_IV, iv, sizeof(iv));
+    *p = OSSL_PARAM_construct_end();
 
-  /* Make one or more calls to process the data to be authenticated */
-  if (!EVP_MAC_update(mctx, data, sizeof(data))) {
-    fprintf(stderr, "EVP_MAC_update() failed\n");
-    goto end;
-  }
+    /* Initialise the GMAC operation */
+    if (!EVP_MAC_init(mctx, key, sizeof(key), params)) {
+        fprintf(stderr, "EVP_MAC_init() failed\n");
+        goto end;
+    }
 
-  /* Make one call to the final to get the MAC */
-  if (!EVP_MAC_final(mctx, out, &out_len, sizeof(out))) {
-    fprintf(stderr, "EVP_MAC_final() failed\n");
-    goto end;
-  }
+    /* Make one or more calls to process the data to be authenticated */
+    if (!EVP_MAC_update(mctx, data, sizeof(data))) {
+        fprintf(stderr, "EVP_MAC_update() failed\n");
+        goto end;
+    }
 
-  printf("Generated MAC:\n");
-  BIO_dump_indent_fp(stdout, out, out_len, 2);
-  putchar('\n');
+    /* Make one call to the final to get the MAC */
+    if (!EVP_MAC_final(mctx, out, &out_len, sizeof(out))) {
+        fprintf(stderr, "EVP_MAC_final() failed\n");
+        goto end;
+    }
 
-  if (out_len != sizeof(expected_output)) {
-    fprintf(stderr, "Generated MAC has an unexpected length\n");
-    goto end;
-  }
+    printf("Generated MAC:\n");
+    BIO_dump_indent_fp(stdout, out, out_len, 2);
+    putchar('\n');
 
-  if (CRYPTO_memcmp(expected_output, out, sizeof(expected_output)) != 0) {
-    fprintf(stderr, "Generated MAC does not match expected value\n");
-    goto end;
-  }
+    if (out_len != sizeof(expected_output)) {
+        fprintf(stderr, "Generated MAC has an unexpected length\n");
+        goto end;
+    }
 
-  ret = EXIT_SUCCESS;
+    if (CRYPTO_memcmp(expected_output, out, sizeof(expected_output)) != 0) {
+        fprintf(stderr, "Generated MAC does not match expected value\n");
+        goto end;
+    }
+
+    ret = EXIT_SUCCESS;
 end:
-  EVP_MAC_CTX_free(mctx);
-  EVP_MAC_free(mac);
-  OSSL_LIB_CTX_free(library_context);
-  if (ret != EXIT_SUCCESS)
-    ERR_print_errors_fp(stderr);
-  return ret;
+    EVP_MAC_CTX_free(mctx);
+    EVP_MAC_free(mac);
+    OSSL_LIB_CTX_free(library_context);
+    if (ret != EXIT_SUCCESS)
+        ERR_print_errors_fp(stderr);
+    return ret;
 }

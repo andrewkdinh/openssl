@@ -67,164 +67,169 @@ static uint8_t ml_kem_expected_shared_secret[3][32] = {
 };
 
 static int sanity_test(void) {
-  static const int alg[3] = {EVP_PKEY_ML_KEM_512, EVP_PKEY_ML_KEM_768,
-                             EVP_PKEY_ML_KEM_1024};
-  EVP_RAND_CTX *privctx;
-  EVP_RAND_CTX *pubctx;
-  EVP_MD *sha256 = EVP_MD_fetch(NULL, "sha256", NULL);
-  uint8_t *decap_entropy;
-  int i, ret = 0;
+    static const int alg[3] = {EVP_PKEY_ML_KEM_512, EVP_PKEY_ML_KEM_768,
+                               EVP_PKEY_ML_KEM_1024};
+    EVP_RAND_CTX *privctx;
+    EVP_RAND_CTX *pubctx;
+    EVP_MD *sha256 = EVP_MD_fetch(NULL, "sha256", NULL);
+    uint8_t *decap_entropy;
+    int i, ret = 0;
 
-  if (!TEST_ptr(sha256))
-    return 0;
+    if (!TEST_ptr(sha256))
+        return 0;
 
-  if (!TEST_ptr(privctx = RAND_get0_private(NULL)) ||
-      !TEST_ptr(pubctx = RAND_get0_public(NULL)))
-    return 0;
+    if (!TEST_ptr(privctx = RAND_get0_private(NULL)) ||
+        !TEST_ptr(pubctx = RAND_get0_public(NULL)))
+        return 0;
 
-  decap_entropy = ml_kem_public_entropy + ML_KEM_RANDOM_BYTES;
+    decap_entropy = ml_kem_public_entropy + ML_KEM_RANDOM_BYTES;
 
-  for (i = 0; i < (int)OSSL_NELEM(alg); ++i) {
-    OSSL_PARAM params[3];
-    uint8_t hash[32];
-    uint8_t shared_secret[ML_KEM_SHARED_SECRET_BYTES];
-    uint8_t shared_secret2[ML_KEM_SHARED_SECRET_BYTES];
-    uint8_t *encoded_public_key = NULL;
-    uint8_t *ciphertext = NULL;
-    ML_KEM_KEY *private_key = NULL;
-    ML_KEM_KEY *public_key = NULL;
-    int ret2 = -1;
-    unsigned char c;
-    unsigned int strength = 256;
-    const ML_KEM_VINFO *v;
+    for (i = 0; i < (int)OSSL_NELEM(alg); ++i) {
+        OSSL_PARAM params[3];
+        uint8_t hash[32];
+        uint8_t shared_secret[ML_KEM_SHARED_SECRET_BYTES];
+        uint8_t shared_secret2[ML_KEM_SHARED_SECRET_BYTES];
+        uint8_t *encoded_public_key = NULL;
+        uint8_t *ciphertext = NULL;
+        ML_KEM_KEY *private_key = NULL;
+        ML_KEM_KEY *public_key = NULL;
+        int ret2 = -1;
+        unsigned char c;
+        unsigned int strength = 256;
+        const ML_KEM_VINFO *v;
 
-    /* Configure the private RNG to output just the keygen seed */
-    params[0] = OSSL_PARAM_construct_octet_string(
-    OSSL_RAND_PARAM_TEST_ENTROPY, ml_kem_private_entropy,
-    sizeof(ml_kem_private_entropy));
-    params[1] = OSSL_PARAM_construct_uint(OSSL_RAND_PARAM_STRENGTH, &strength);
-    params[2] = OSSL_PARAM_construct_end();
-    if (!TEST_true(EVP_RAND_CTX_set_params(privctx, params)))
-      return 0;
+        /* Configure the private RNG to output just the keygen seed */
+        params[0] = OSSL_PARAM_construct_octet_string(
+        OSSL_RAND_PARAM_TEST_ENTROPY, ml_kem_private_entropy,
+        sizeof(ml_kem_private_entropy));
+        params[1] =
+        OSSL_PARAM_construct_uint(OSSL_RAND_PARAM_STRENGTH, &strength);
+        params[2] = OSSL_PARAM_construct_end();
+        if (!TEST_true(EVP_RAND_CTX_set_params(privctx, params)))
+            return 0;
 
-    public_key = ossl_ml_kem_key_new(NULL, NULL, alg[i]);
-    private_key = ossl_ml_kem_key_new(NULL, NULL, alg[i]);
-    if (private_key == NULL || public_key == NULL ||
-        (v = ossl_ml_kem_key_vinfo(public_key)) == NULL)
-      goto done;
+        public_key = ossl_ml_kem_key_new(NULL, NULL, alg[i]);
+        private_key = ossl_ml_kem_key_new(NULL, NULL, alg[i]);
+        if (private_key == NULL || public_key == NULL ||
+            (v = ossl_ml_kem_key_vinfo(public_key)) == NULL)
+            goto done;
 
-    encoded_public_key = OPENSSL_malloc(v->pubkey_bytes);
-    ciphertext = OPENSSL_malloc(v->ctext_bytes);
-    if (encoded_public_key == NULL || ciphertext == NULL)
-      goto done;
+        encoded_public_key = OPENSSL_malloc(v->pubkey_bytes);
+        ciphertext = OPENSSL_malloc(v->ctext_bytes);
+        if (encoded_public_key == NULL || ciphertext == NULL)
+            goto done;
 
-    ret2 = -2;
-    /* Generate a private key */
-    if (!ossl_ml_kem_genkey(encoded_public_key, v->pubkey_bytes, private_key))
-      goto done;
+        ret2 = -2;
+        /* Generate a private key */
+        if (!ossl_ml_kem_genkey(encoded_public_key, v->pubkey_bytes,
+                                private_key))
+            goto done;
 
-    /* Check that no more entropy is available! */
-    if (!TEST_int_le(RAND_priv_bytes(&c, 1), 0))
-      goto done;
+        /* Check that no more entropy is available! */
+        if (!TEST_int_le(RAND_priv_bytes(&c, 1), 0))
+            goto done;
 
-    ret2 = -3;
-    /* Check that we got the expected 'rho' value in the ciphertext */
-    if (!TEST_mem_eq(encoded_public_key + v->vector_bytes, ML_KEM_RANDOM_BYTES,
-                     ml_kem_expected_rho[i], ML_KEM_RANDOM_BYTES))
-      goto done;
+        ret2 = -3;
+        /* Check that we got the expected 'rho' value in the ciphertext */
+        if (!TEST_mem_eq(encoded_public_key + v->vector_bytes,
+                         ML_KEM_RANDOM_BYTES, ml_kem_expected_rho[i],
+                         ML_KEM_RANDOM_BYTES))
+            goto done;
 
-    ret2 = -4;
-    /* Create the expected associated public key */
-    if (!ossl_ml_kem_parse_public_key(encoded_public_key, v->pubkey_bytes,
-                                      public_key))
-      goto done;
+        ret2 = -4;
+        /* Create the expected associated public key */
+        if (!ossl_ml_kem_parse_public_key(encoded_public_key, v->pubkey_bytes,
+                                          public_key))
+            goto done;
 
-    /* Configure the public RNG to output the encap and decap seeds */
-    params[0] = OSSL_PARAM_construct_octet_string(
-    OSSL_RAND_PARAM_TEST_ENTROPY, ml_kem_public_entropy,
-    sizeof(ml_kem_public_entropy));
-    if (!TEST_true(EVP_RAND_CTX_set_params(pubctx, params)))
-      goto done;
+        /* Configure the public RNG to output the encap and decap seeds */
+        params[0] = OSSL_PARAM_construct_octet_string(
+        OSSL_RAND_PARAM_TEST_ENTROPY, ml_kem_public_entropy,
+        sizeof(ml_kem_public_entropy));
+        if (!TEST_true(EVP_RAND_CTX_set_params(pubctx, params)))
+            goto done;
 
-    /* encaps - decaps test: validate shared secret equality */
-    ret2 = -5;
-    if (!ossl_ml_kem_encap_rand(ciphertext, v->ctext_bytes, shared_secret,
-                                sizeof(shared_secret), public_key))
-      goto done;
+        /* encaps - decaps test: validate shared secret equality */
+        ret2 = -5;
+        if (!ossl_ml_kem_encap_rand(ciphertext, v->ctext_bytes, shared_secret,
+                                    sizeof(shared_secret), public_key))
+            goto done;
 
-    ret2 = -6;
-    /* Check the ciphertext hash */
-    if (!TEST_true(
-        EVP_Digest(ciphertext, v->ctext_bytes, hash, NULL, sha256, NULL)) ||
-        !TEST_mem_eq(hash, sizeof(hash), ml_kem_expected_ctext_sha256[i],
-                     sizeof(ml_kem_expected_ctext_sha256[i])))
-      goto done;
+        ret2 = -6;
+        /* Check the ciphertext hash */
+        if (!TEST_true(
+            EVP_Digest(ciphertext, v->ctext_bytes, hash, NULL, sha256, NULL)) ||
+            !TEST_mem_eq(hash, sizeof(hash), ml_kem_expected_ctext_sha256[i],
+                         sizeof(ml_kem_expected_ctext_sha256[i])))
+            goto done;
 
-    /* Check for the expected shared secret */
-    if (!TEST_mem_eq(shared_secret, sizeof(shared_secret),
-                     ml_kem_expected_shared_secret[i],
-                     ML_KEM_SHARED_SECRET_BYTES))
-      goto done;
+        /* Check for the expected shared secret */
+        if (!TEST_mem_eq(shared_secret, sizeof(shared_secret),
+                         ml_kem_expected_shared_secret[i],
+                         ML_KEM_SHARED_SECRET_BYTES))
+            goto done;
 
-    /* Now decapsulate the ciphertext */
-    ret2 = -7;
-    if (!ossl_ml_kem_decap(shared_secret2, sizeof(shared_secret2), ciphertext,
-                           v->ctext_bytes, private_key))
-      goto done;
+        /* Now decapsulate the ciphertext */
+        ret2 = -7;
+        if (!ossl_ml_kem_decap(shared_secret2, sizeof(shared_secret2),
+                               ciphertext, v->ctext_bytes, private_key))
+            goto done;
 
-    /* Check for the same shared secret */
-    if (!TEST_mem_eq(shared_secret, sizeof(shared_secret), shared_secret2,
-                     sizeof(shared_secret2)))
-      goto done;
+        /* Check for the same shared secret */
+        if (!TEST_mem_eq(shared_secret, sizeof(shared_secret), shared_secret2,
+                         sizeof(shared_secret2)))
+            goto done;
 
-    ret2 = -8;
-    /* Now a quick negative test by zeroing the ciphertext */
-    memset(ciphertext, 0, v->ctext_bytes);
-    if (!TEST_true(ossl_ml_kem_decap(shared_secret2, sizeof(shared_secret2),
-                                     ciphertext, v->ctext_bytes, private_key)))
-      goto done;
+        ret2 = -8;
+        /* Now a quick negative test by zeroing the ciphertext */
+        memset(ciphertext, 0, v->ctext_bytes);
+        if (!TEST_true(ossl_ml_kem_decap(shared_secret2, sizeof(shared_secret2),
+                                         ciphertext, v->ctext_bytes,
+                                         private_key)))
+            goto done;
 
-    /* Ensure we have a mismatch */
-    if (!TEST_mem_ne(shared_secret, sizeof(shared_secret), shared_secret2,
-                     sizeof(shared_secret2)))
-      goto done;
+        /* Ensure we have a mismatch */
+        if (!TEST_mem_ne(shared_secret, sizeof(shared_secret), shared_secret2,
+                         sizeof(shared_secret2)))
+            goto done;
 
-    ret2 = -9;
-    /*
-     * Change the ciphertext length, decap should fail, but and consume the
-     * last batch of entropy to return a fake shared secret, just in case.
-     */
-    if (!TEST_false(ossl_ml_kem_decap(shared_secret2, sizeof(shared_secret2),
-                                      ciphertext, v->ctext_bytes - 1,
-                                      private_key)))
-      goto done;
+        ret2 = -9;
+        /*
+         * Change the ciphertext length, decap should fail, but and consume the
+         * last batch of entropy to return a fake shared secret, just in case.
+         */
+        if (!TEST_false(ossl_ml_kem_decap(shared_secret2,
+                                          sizeof(shared_secret2), ciphertext,
+                                          v->ctext_bytes - 1, private_key)))
+            goto done;
 
-    if (!TEST_mem_eq(shared_secret2, sizeof(shared_secret2), decap_entropy,
-                     ML_KEM_SHARED_SECRET_BYTES))
-      goto done;
+        if (!TEST_mem_eq(shared_secret2, sizeof(shared_secret2), decap_entropy,
+                         ML_KEM_SHARED_SECRET_BYTES))
+            goto done;
 
-    /* Check that no more entropy is available! */
-    if (!TEST_int_le(RAND_bytes(&c, 1), 0))
-      goto done;
+        /* Check that no more entropy is available! */
+        if (!TEST_int_le(RAND_bytes(&c, 1), 0))
+            goto done;
 
-    ret2 = 0;
+        ret2 = 0;
 
-  done:
-    if (ret2 != 0)
-      ret = ret2;
-    ossl_ml_kem_key_free(private_key);
-    ossl_ml_kem_key_free(public_key);
-    OPENSSL_free(encoded_public_key);
-    OPENSSL_free(ciphertext);
-  }
-  EVP_MD_free(sha256);
-  return ret == 0;
+    done:
+        if (ret2 != 0)
+            ret = ret2;
+        ossl_ml_kem_key_free(private_key);
+        ossl_ml_kem_key_free(public_key);
+        OPENSSL_free(encoded_public_key);
+        OPENSSL_free(ciphertext);
+    }
+    EVP_MD_free(sha256);
+    return ret == 0;
 }
 
 int setup_tests(void) {
-  if (!TEST_true(RAND_set_DRBG_type(NULL, "TEST-RAND", "fips=no", NULL, NULL)))
-    return 0;
+    if (!TEST_true(
+        RAND_set_DRBG_type(NULL, "TEST-RAND", "fips=no", NULL, NULL)))
+        return 0;
 
-  ADD_TEST(sanity_test);
-  return 1;
+    ADD_TEST(sanity_test);
+    return 1;
 }

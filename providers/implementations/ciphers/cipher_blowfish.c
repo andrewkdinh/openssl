@@ -25,25 +25,25 @@ static OSSL_FUNC_cipher_freectx_fn blowfish_freectx;
 static OSSL_FUNC_cipher_dupctx_fn blowfish_dupctx;
 
 static void blowfish_freectx(void *vctx) {
-  PROV_BLOWFISH_CTX *ctx = (PROV_BLOWFISH_CTX *)vctx;
+    PROV_BLOWFISH_CTX *ctx = (PROV_BLOWFISH_CTX *)vctx;
 
-  ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
-  OPENSSL_clear_free(ctx, sizeof(*ctx));
+    ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
+    OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
 static void *blowfish_dupctx(void *ctx) {
-  PROV_BLOWFISH_CTX *in = (PROV_BLOWFISH_CTX *)ctx;
-  PROV_BLOWFISH_CTX *ret;
+    PROV_BLOWFISH_CTX *in = (PROV_BLOWFISH_CTX *)ctx;
+    PROV_BLOWFISH_CTX *ret;
 
-  if (!ossl_prov_is_running())
-    return NULL;
+    if (!ossl_prov_is_running())
+        return NULL;
 
-  ret = OPENSSL_malloc(sizeof(*ret));
-  if (ret == NULL)
-    return NULL;
-  *ret = *in;
+    ret = OPENSSL_malloc(sizeof(*ret));
+    if (ret == NULL)
+        return NULL;
+    *ret = *in;
 
-  return ret;
+    return ret;
 }
 
 /* bf_ecb_functions */

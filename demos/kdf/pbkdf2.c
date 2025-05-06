@@ -48,62 +48,62 @@ static const unsigned char expected_output[] = {
 0xbb, 0xa1, 0xd0, 0x78, 0x47, 0x8f, 0x62, 0xb3, 0x97, 0xf3, 0x3c, 0x8d};
 
 int main(int argc, char **argv) {
-  int ret = EXIT_FAILURE;
-  EVP_KDF *kdf = NULL;
-  EVP_KDF_CTX *kctx = NULL;
-  unsigned char out[64];
-  OSSL_PARAM params[5], *p = params;
-  OSSL_LIB_CTX *library_context = NULL;
+    int ret = EXIT_FAILURE;
+    EVP_KDF *kdf = NULL;
+    EVP_KDF_CTX *kctx = NULL;
+    unsigned char out[64];
+    OSSL_PARAM params[5], *p = params;
+    OSSL_LIB_CTX *library_context = NULL;
 
-  library_context = OSSL_LIB_CTX_new();
-  if (library_context == NULL) {
-    fprintf(stderr, "OSSL_LIB_CTX_new() returned NULL\n");
-    goto end;
-  }
+    library_context = OSSL_LIB_CTX_new();
+    if (library_context == NULL) {
+        fprintf(stderr, "OSSL_LIB_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* Fetch the key derivation function implementation */
-  kdf = EVP_KDF_fetch(library_context, "PBKDF2", NULL);
-  if (kdf == NULL) {
-    fprintf(stderr, "EVP_KDF_fetch() returned NULL\n");
-    goto end;
-  }
+    /* Fetch the key derivation function implementation */
+    kdf = EVP_KDF_fetch(library_context, "PBKDF2", NULL);
+    if (kdf == NULL) {
+        fprintf(stderr, "EVP_KDF_fetch() returned NULL\n");
+        goto end;
+    }
 
-  /* Create a context for the key derivation operation */
-  kctx = EVP_KDF_CTX_new(kdf);
-  if (kctx == NULL) {
-    fprintf(stderr, "EVP_KDF_CTX_new() returned NULL\n");
-    goto end;
-  }
+    /* Create a context for the key derivation operation */
+    kctx = EVP_KDF_CTX_new(kdf);
+    if (kctx == NULL) {
+        fprintf(stderr, "EVP_KDF_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* Set password */
-  *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_PASSWORD, password,
-                                           sizeof(password));
-  /* Set salt */
-  *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_SALT, pbkdf2_salt,
-                                           sizeof(pbkdf2_salt));
-  /* Set iteration count (default 2048) */
-  *p++ = OSSL_PARAM_construct_uint(OSSL_KDF_PARAM_ITER, &pbkdf2_iterations);
-  /* Set the underlying hash function used to derive the key */
-  *p++ = OSSL_PARAM_construct_utf8_string(OSSL_KDF_PARAM_DIGEST, "SHA256", 0);
-  *p = OSSL_PARAM_construct_end();
+    /* Set password */
+    *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_PASSWORD, password,
+                                             sizeof(password));
+    /* Set salt */
+    *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_SALT, pbkdf2_salt,
+                                             sizeof(pbkdf2_salt));
+    /* Set iteration count (default 2048) */
+    *p++ = OSSL_PARAM_construct_uint(OSSL_KDF_PARAM_ITER, &pbkdf2_iterations);
+    /* Set the underlying hash function used to derive the key */
+    *p++ = OSSL_PARAM_construct_utf8_string(OSSL_KDF_PARAM_DIGEST, "SHA256", 0);
+    *p = OSSL_PARAM_construct_end();
 
-  /* Derive the key */
-  if (EVP_KDF_derive(kctx, out, sizeof(out), params) != 1) {
-    fprintf(stderr, "EVP_KDF_derive() failed\n");
-    goto end;
-  }
+    /* Derive the key */
+    if (EVP_KDF_derive(kctx, out, sizeof(out), params) != 1) {
+        fprintf(stderr, "EVP_KDF_derive() failed\n");
+        goto end;
+    }
 
-  if (CRYPTO_memcmp(expected_output, out, sizeof(expected_output)) != 0) {
-    fprintf(stderr, "Generated key does not match expected value\n");
-    goto end;
-  }
+    if (CRYPTO_memcmp(expected_output, out, sizeof(expected_output)) != 0) {
+        fprintf(stderr, "Generated key does not match expected value\n");
+        goto end;
+    }
 
-  printf("Success\n");
+    printf("Success\n");
 
-  ret = EXIT_SUCCESS;
+    ret = EXIT_SUCCESS;
 end:
-  EVP_KDF_CTX_free(kctx);
-  EVP_KDF_free(kdf);
-  OSSL_LIB_CTX_free(library_context);
-  return ret;
+    EVP_KDF_CTX_free(kctx);
+    EVP_KDF_free(kdf);
+    OSSL_LIB_CTX_free(library_context);
+    return ret;
 }

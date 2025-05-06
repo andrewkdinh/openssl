@@ -25,23 +25,23 @@
  * ======================================
  */
 struct quic_fifd_st {
-  /* Internal data; use the ossl_quic_fifd functions. */
-  QUIC_CFQ *cfq;
-  OSSL_ACKM *ackm;
-  QUIC_TXPIM *txpim;
-  QUIC_SSTREAM *(*get_sstream_by_id)(uint64_t stream_id, uint32_t pn_space,
-                                     void *arg);
-  void *get_sstream_by_id_arg;
-  void (*regen_frame)(uint64_t frame_type, uint64_t stream_id,
-                      QUIC_TXPIM_PKT *pkt, void *arg);
-  void *regen_frame_arg;
-  void (*confirm_frame)(uint64_t frame_type, uint64_t stream_id,
+    /* Internal data; use the ossl_quic_fifd functions. */
+    QUIC_CFQ *cfq;
+    OSSL_ACKM *ackm;
+    QUIC_TXPIM *txpim;
+    QUIC_SSTREAM *(*get_sstream_by_id)(uint64_t stream_id, uint32_t pn_space,
+                                       void *arg);
+    void *get_sstream_by_id_arg;
+    void (*regen_frame)(uint64_t frame_type, uint64_t stream_id,
                         QUIC_TXPIM_PKT *pkt, void *arg);
-  void *confirm_frame_arg;
-  void (*sstream_updated)(uint64_t stream_id, void *arg);
-  void *sstream_updated_arg;
-  QLOG *(*get_qlog_cb)(void *arg);
-  void *get_qlog_cb_arg;
+    void *regen_frame_arg;
+    void (*confirm_frame)(uint64_t frame_type, uint64_t stream_id,
+                          QUIC_TXPIM_PKT *pkt, void *arg);
+    void *confirm_frame_arg;
+    void (*sstream_updated)(uint64_t stream_id, void *arg);
+    void *sstream_updated_arg;
+    QLOG *(*get_qlog_cb)(void *arg);
+    void *get_qlog_cb_arg;
 };
 
 int ossl_quic_fifd_init(

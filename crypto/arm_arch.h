@@ -137,22 +137,22 @@ extern unsigned int OPENSSL_armv8_rsa_neonized;
 #define MIDR_IMPLEMENTER_SHIFT 24
 #define MIDR_IMPLEMENTER_MASK (0xffU << MIDR_IMPLEMENTER_SHIFT)
 #define MIDR_IMPLEMENTER(midr)                                                 \
-  (((midr) & MIDR_IMPLEMENTER_MASK) >> MIDR_IMPLEMENTER_SHIFT)
+    (((midr) & MIDR_IMPLEMENTER_MASK) >> MIDR_IMPLEMENTER_SHIFT)
 
 #define MIDR_ARCHITECTURE_SHIFT 16
 #define MIDR_ARCHITECTURE_MASK (0xfU << MIDR_ARCHITECTURE_SHIFT)
 #define MIDR_ARCHITECTURE(midr)                                                \
-  (((midr) & MIDR_ARCHITECTURE_MASK) >> MIDR_ARCHITECTURE_SHIFT)
+    (((midr) & MIDR_ARCHITECTURE_MASK) >> MIDR_ARCHITECTURE_SHIFT)
 
 #define MIDR_CPU_MODEL_MASK                                                    \
-  (MIDR_IMPLEMENTER_MASK | MIDR_PARTNUM_MASK | MIDR_ARCHITECTURE_MASK)
+    (MIDR_IMPLEMENTER_MASK | MIDR_PARTNUM_MASK | MIDR_ARCHITECTURE_MASK)
 
 #define MIDR_CPU_MODEL(imp, partnum)                                           \
-  (((imp) << MIDR_IMPLEMENTER_SHIFT) | (0xfU << MIDR_ARCHITECTURE_SHIFT) |     \
-   ((partnum) << MIDR_PARTNUM_SHIFT))
+    (((imp) << MIDR_IMPLEMENTER_SHIFT) | (0xfU << MIDR_ARCHITECTURE_SHIFT) |   \
+     ((partnum) << MIDR_PARTNUM_SHIFT))
 
 #define MIDR_IS_CPU_MODEL(midr, imp, partnum)                                  \
-  (((midr) & MIDR_CPU_MODEL_MASK) == MIDR_CPU_MODEL(imp, partnum))
+    (((midr) & MIDR_CPU_MODEL_MASK) == MIDR_CPU_MODEL(imp, partnum))
 
 #if defined(__ASSEMBLER__)
 
@@ -166,7 +166,8 @@ extern unsigned int OPENSSL_armv8_rsa_neonized;
  */
 
 #if defined(__ARM_FEATURE_BTI_DEFAULT) && __ARM_FEATURE_BTI_DEFAULT == 1
-#define GNU_PROPERTY_AARCH64_BTI (1 << 0)  /* Has Branch Target Identification \
+#define GNU_PROPERTY_AARCH64_BTI                                               \
+    (1 << 0)                               /* Has Branch Target Identification \
                                             */
 #define AARCH64_VALID_CALL_TARGET hint #34 /* BTI 'c' */
 #else
@@ -177,13 +178,13 @@ extern unsigned int OPENSSL_armv8_rsa_neonized;
 #if defined(__ARM_FEATURE_PAC_DEFAULT) &&                                      \
 (__ARM_FEATURE_PAC_DEFAULT & 1) == 1 /* Signed with A-key */
 #define GNU_PROPERTY_AARCH64_POINTER_AUTH                                      \
-  (1 << 1)                                      /* Has Pointer Authentication */
+    (1 << 1)                                    /* Has Pointer Authentication */
 #define AARCH64_SIGN_LINK_REGISTER hint #25     /* PACIASP */
 #define AARCH64_VALIDATE_LINK_REGISTER hint #29 /* AUTIASP */
 #elif defined(__ARM_FEATURE_PAC_DEFAULT) &&                                    \
 (__ARM_FEATURE_PAC_DEFAULT & 2) == 2 /* Signed with B-key */
 #define GNU_PROPERTY_AARCH64_POINTER_AUTH                                      \
-  (1 << 1)                                      /* Has Pointer Authentication */
+    (1 << 1)                                    /* Has Pointer Authentication */
 #define AARCH64_SIGN_LINK_REGISTER hint #27     /* PACIBSP */
 #define AARCH64_VALIDATE_LINK_REGISTER hint #31 /* AUTIBSP */
 #else

@@ -28,7 +28,7 @@
  */
 #define ML_COMMON_SPKI_OVERHEAD 22
 typedef struct {
-  const uint8_t asn1_prefix[ML_COMMON_SPKI_OVERHEAD];
+    const uint8_t asn1_prefix[ML_COMMON_SPKI_OVERHEAD];
 } ML_COMMON_SPKI_FMT;
 
 /*-
@@ -67,28 +67,28 @@ typedef struct {
 #define NUM_PKCS8_FORMATS 6
 
 typedef struct {
-  const char *p8_name; /* Format name */
-  size_t p8_bytes;     /* Total P8 encoding length */
-  int p8_shift;        /* 4 - (top-level tag + len) */
-  uint32_t p8_magic;   /* The tag + len value */
-  uint16_t seed_magic; /* Interior tag + len for the seed */
-  size_t seed_offset;  /* Seed offset from start */
-  size_t seed_length;  /* Seed bytes */
-  uint32_t priv_magic; /* Interior tag + len for the key */
-  size_t priv_offset;  /* Key offset from start */
-  size_t priv_length;  /* Key bytes */
-  size_t pub_offset;   /* Pubkey offset */
-  size_t pub_length;   /* Pubkey bytes */
+    const char *p8_name; /* Format name */
+    size_t p8_bytes;     /* Total P8 encoding length */
+    int p8_shift;        /* 4 - (top-level tag + len) */
+    uint32_t p8_magic;   /* The tag + len value */
+    uint16_t seed_magic; /* Interior tag + len for the seed */
+    size_t seed_offset;  /* Seed offset from start */
+    size_t seed_length;  /* Seed bytes */
+    uint32_t priv_magic; /* Interior tag + len for the key */
+    size_t priv_offset;  /* Key offset from start */
+    size_t priv_length;  /* Key bytes */
+    size_t pub_offset;   /* Pubkey offset */
+    size_t pub_length;   /* Pubkey bytes */
 } ML_COMMON_PKCS8_FMT;
 
 typedef struct {
-  const ML_COMMON_SPKI_FMT *spkifmt;
-  const ML_COMMON_PKCS8_FMT *p8fmt;
+    const ML_COMMON_SPKI_FMT *spkifmt;
+    const ML_COMMON_PKCS8_FMT *p8fmt;
 } ML_COMMON_CODEC;
 
 typedef struct {
-  const ML_COMMON_PKCS8_FMT *fmt;
-  int pref;
+    const ML_COMMON_PKCS8_FMT *fmt;
+    int pref;
 } ML_COMMON_PKCS8_FMT_PREF;
 
 ML_COMMON_PKCS8_FMT_PREF *

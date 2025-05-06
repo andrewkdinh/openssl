@@ -31,16 +31,16 @@ int SipHash_Final(SIPHASH *ctx, unsigned char *out, size_t outlen);
 /* Based on https://131002.net/siphash C reference implementation */
 
 struct siphash_st {
-  uint64_t total_inlen;
-  uint64_t v0;
-  uint64_t v1;
-  uint64_t v2;
-  uint64_t v3;
-  unsigned int len;
-  unsigned int hash_size;
-  unsigned int crounds;
-  unsigned int drounds;
-  unsigned char leavings[SIPHASH_BLOCK_SIZE];
+    uint64_t total_inlen;
+    uint64_t v0;
+    uint64_t v1;
+    uint64_t v2;
+    uint64_t v3;
+    unsigned int len;
+    unsigned int hash_size;
+    unsigned int crounds;
+    unsigned int drounds;
+    unsigned char leavings[SIPHASH_BLOCK_SIZE];
 };
 
 /* default: SipHash-2-4 */

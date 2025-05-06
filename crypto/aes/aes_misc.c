@@ -14,9 +14,9 @@
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 const char *AES_options(void) {
 #ifdef FULL_UNROLL
-  return "aes(full)";
+    return "aes(full)";
 #else
-  return "aes(partial)";
+    return "aes(partial)";
 #endif
 }
 #endif

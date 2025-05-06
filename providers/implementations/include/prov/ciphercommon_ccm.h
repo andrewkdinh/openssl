@@ -21,31 +21,31 @@ typedef struct prov_ccm_hw_st PROV_CCM_HW;
  * (see z/Architecture Principles of Operation >= SA22-7832-08)
  */
 typedef struct S390X_kmac_params_st {
-  union {
-    unsigned long long g[2];
-    unsigned char b[16];
-  } icv;
-  unsigned char k[32];
+    union {
+        unsigned long long g[2];
+        unsigned char b[16];
+    } icv;
+    unsigned char k[32];
 } S390X_KMAC_PARAMS;
 /* KMAC-AES parameter block - end */
 #endif
 
 /* Base structure that is shared by AES & ARIA for CCM MODE */
 typedef struct prov_ccm_st {
-  unsigned int enc : 1;
-  unsigned int key_set : 1; /* Set if key initialised */
-  unsigned int iv_set : 1;  /* Set if an iv is set */
-  unsigned int tag_set : 1; /* Set if tag is valid */
-  unsigned int len_set : 1; /* Set if message length set */
-  size_t l, m;              /* L and M parameters from RFC3610 */
-  size_t keylen;
-  size_t tls_aad_len; /* TLS AAD length */
-  size_t tls_aad_pad_sz;
-  unsigned char iv[GENERIC_BLOCK_SIZE];
-  unsigned char buf[GENERIC_BLOCK_SIZE];
-  CCM128_CONTEXT ccm_ctx;
-  ccm128_f str;
-  const PROV_CCM_HW *hw; /* hardware specific methods  */
+    unsigned int enc : 1;
+    unsigned int key_set : 1; /* Set if key initialised */
+    unsigned int iv_set : 1;  /* Set if an iv is set */
+    unsigned int tag_set : 1; /* Set if tag is valid */
+    unsigned int len_set : 1; /* Set if message length set */
+    size_t l, m;              /* L and M parameters from RFC3610 */
+    size_t keylen;
+    size_t tls_aad_len; /* TLS AAD length */
+    size_t tls_aad_pad_sz;
+    unsigned char iv[GENERIC_BLOCK_SIZE];
+    unsigned char buf[GENERIC_BLOCK_SIZE];
+    CCM128_CONTEXT ccm_ctx;
+    ccm128_f str;
+    const PROV_CCM_HW *hw; /* hardware specific methods  */
 } PROV_CCM_CTX;
 
 PROV_CIPHER_FUNC(int, CCM_cipher,
@@ -74,12 +74,12 @@ PROV_CIPHER_FUNC(int, CCM_gettag,
  * (and different algorithms).
  */
 struct prov_ccm_hw_st {
-  OSSL_CCM_setkey_fn setkey;
-  OSSL_CCM_setiv_fn setiv;
-  OSSL_CCM_setaad_fn setaad;
-  OSSL_CCM_auth_encrypt_fn auth_encrypt;
-  OSSL_CCM_auth_decrypt_fn auth_decrypt;
-  OSSL_CCM_gettag_fn gettag;
+    OSSL_CCM_setkey_fn setkey;
+    OSSL_CCM_setiv_fn setiv;
+    OSSL_CCM_setaad_fn setaad;
+    OSSL_CCM_auth_encrypt_fn auth_encrypt;
+    OSSL_CCM_auth_decrypt_fn auth_decrypt;
+    OSSL_CCM_gettag_fn gettag;
 };
 
 OSSL_FUNC_cipher_encrypt_init_fn ossl_ccm_einit;

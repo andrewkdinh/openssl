@@ -107,69 +107,69 @@
 #define QUIC_CHANNEL_STATE_TERMINATED 4
 
 typedef struct quic_channel_args_st {
-  /*
-   * The QUIC_PORT which the channel is to belong to. The lifetime of the
-   * QUIC_PORT must exceed that of the created channel.
-   */
-  QUIC_PORT *port;
-  /* LCIDM to register LCIDs with. */
-  QUIC_LCIDM *lcidm;
-  /* SRTM to register SRTs with. */
-  QUIC_SRTM *srtm;
-  OSSL_QRX *qrx;
+    /*
+     * The QUIC_PORT which the channel is to belong to. The lifetime of the
+     * QUIC_PORT must exceed that of the created channel.
+     */
+    QUIC_PORT *port;
+    /* LCIDM to register LCIDs with. */
+    QUIC_LCIDM *lcidm;
+    /* SRTM to register SRTs with. */
+    QUIC_SRTM *srtm;
+    OSSL_QRX *qrx;
 
-  int is_server;
-  SSL *tls;
+    int is_server;
+    SSL *tls;
 
-  /* Whether to use qlog. */
-  int use_qlog;
+    /* Whether to use qlog. */
+    int use_qlog;
 
-  int is_tserver_ch;
+    int is_tserver_ch;
 
-  /* Title to use for the qlog session, or NULL. */
-  const char *qlog_title;
+    /* Title to use for the qlog session, or NULL. */
+    const char *qlog_title;
 } QUIC_CHANNEL_ARGS;
 
 /* Represents the cause for a connection's termination. */
 typedef struct quic_terminate_cause_st {
-  /*
-   * If we are in a TERMINATING or TERMINATED state, this is the error code
-   * associated with the error. This field is valid iff we are in the
-   * TERMINATING or TERMINATED states.
-   */
-  uint64_t error_code;
+    /*
+     * If we are in a TERMINATING or TERMINATED state, this is the error code
+     * associated with the error. This field is valid iff we are in the
+     * TERMINATING or TERMINATED states.
+     */
+    uint64_t error_code;
 
-  /*
-   * If terminate_app is set and this is nonzero, this is the frame type which
-   * caused the connection to be terminated.
-   */
-  uint64_t frame_type;
+    /*
+     * If terminate_app is set and this is nonzero, this is the frame type which
+     * caused the connection to be terminated.
+     */
+    uint64_t frame_type;
 
-  /*
-   * Optional reason string. When calling ossl_quic_channel_local_close, if a
-   * reason string pointer is passed, it is copied and stored inside
-   * QUIC_CHANNEL for the remainder of the lifetime of the channel object.
-   * Thus the string pointed to by this value, if non-NULL, is valid for the
-   * lifetime of the QUIC_CHANNEL object.
-   */
-  const char *reason;
+    /*
+     * Optional reason string. When calling ossl_quic_channel_local_close, if a
+     * reason string pointer is passed, it is copied and stored inside
+     * QUIC_CHANNEL for the remainder of the lifetime of the channel object.
+     * Thus the string pointed to by this value, if non-NULL, is valid for the
+     * lifetime of the QUIC_CHANNEL object.
+     */
+    const char *reason;
 
-  /*
-   * Length of reason in bytes. The reason is supposed to contain a UTF-8
-   * string but may be arbitrary data if the reason came from the network.
-   */
-  size_t reason_len;
+    /*
+     * Length of reason in bytes. The reason is supposed to contain a UTF-8
+     * string but may be arbitrary data if the reason came from the network.
+     */
+    size_t reason_len;
 
-  /* Is this error code in the transport (0) or application (1) space? */
-  unsigned int app : 1;
+    /* Is this error code in the transport (0) or application (1) space? */
+    unsigned int app : 1;
 
-  /*
-   * If set, the cause of the termination is a received CONNECTION_CLOSE
-   * frame. Otherwise, we decided to terminate ourselves and sent a
-   * CONNECTION_CLOSE frame (regardless of whether the peer later also sends
-   * one).
-   */
-  unsigned int remote : 1;
+    /*
+     * If set, the cause of the termination is a received CONNECTION_CLOSE
+     * frame. Otherwise, we decided to terminate ourselves and sent a
+     * CONNECTION_CLOSE frame (regardless of whether the peer later also sends
+     * one).
+     */
+    unsigned int remote : 1;
 } QUIC_TERMINATE_CAUSE;
 
 /*
@@ -245,15 +245,15 @@ ERR_STATE *err_state, const char *src_file, int src_line, const char *src_func);
 
 #define ossl_quic_channel_raise_protocol_error(ch, error_code, frame_type,     \
                                                reason)                         \
-  ossl_quic_channel_raise_protocol_error_loc((ch), (error_code), (frame_type), \
-                                             (reason), NULL, OPENSSL_FILE,     \
-                                             OPENSSL_LINE, OPENSSL_FUNC)
+    ossl_quic_channel_raise_protocol_error_loc(                                \
+    (ch), (error_code), (frame_type), (reason), NULL, OPENSSL_FILE,            \
+    OPENSSL_LINE, OPENSSL_FUNC)
 
 #define ossl_quic_channel_raise_protocol_error_state(                          \
 ch, error_code, frame_type, reason, state)                                     \
-  ossl_quic_channel_raise_protocol_error_loc((ch), (error_code), (frame_type), \
-                                             (reason), (state), OPENSSL_FILE,  \
-                                             OPENSSL_LINE, OPENSSL_FUNC)
+    ossl_quic_channel_raise_protocol_error_loc(                                \
+    (ch), (error_code), (frame_type), (reason), (state), OPENSSL_FILE,         \
+    OPENSSL_LINE, OPENSSL_FUNC)
 
 /*
  * Returns 1 if permanent net error was detected on the QUIC_CHANNEL,

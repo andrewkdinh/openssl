@@ -39,57 +39,57 @@ int EVP_PBE_scrypt_ex(const char *pass, size_t passlen,
                       uint64_t r, uint64_t p, uint64_t maxmem,
                       unsigned char *key, size_t keylen, OSSL_LIB_CTX *ctx,
                       const char *propq) {
-  const char *empty = "";
-  int rv = 1;
-  EVP_KDF *kdf;
-  EVP_KDF_CTX *kctx;
-  OSSL_PARAM params[7], *z = params;
+    const char *empty = "";
+    int rv = 1;
+    EVP_KDF *kdf;
+    EVP_KDF_CTX *kctx;
+    OSSL_PARAM params[7], *z = params;
 
-  if (r > UINT32_MAX || p > UINT32_MAX) {
-    ERR_raise(ERR_LIB_EVP, EVP_R_PARAMETER_TOO_LARGE);
-    return 0;
-  }
+    if (r > UINT32_MAX || p > UINT32_MAX) {
+        ERR_raise(ERR_LIB_EVP, EVP_R_PARAMETER_TOO_LARGE);
+        return 0;
+    }
 
-  /* Maintain existing behaviour. */
-  if (pass == NULL) {
-    pass = empty;
-    passlen = 0;
-  }
-  if (salt == NULL) {
-    salt = (const unsigned char *)empty;
-    saltlen = 0;
-  }
-  if (maxmem == 0)
-    maxmem = SCRYPT_MAX_MEM;
+    /* Maintain existing behaviour. */
+    if (pass == NULL) {
+        pass = empty;
+        passlen = 0;
+    }
+    if (salt == NULL) {
+        salt = (const unsigned char *)empty;
+        saltlen = 0;
+    }
+    if (maxmem == 0)
+        maxmem = SCRYPT_MAX_MEM;
 
-  /* Use OSSL_LIB_CTX_set0_default() if you need a library context */
-  kdf = EVP_KDF_fetch(ctx, OSSL_KDF_NAME_SCRYPT, propq);
-  kctx = EVP_KDF_CTX_new(kdf);
-  EVP_KDF_free(kdf);
-  if (kctx == NULL)
-    return 0;
+    /* Use OSSL_LIB_CTX_set0_default() if you need a library context */
+    kdf = EVP_KDF_fetch(ctx, OSSL_KDF_NAME_SCRYPT, propq);
+    kctx = EVP_KDF_CTX_new(kdf);
+    EVP_KDF_free(kdf);
+    if (kctx == NULL)
+        return 0;
 
-  *z++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_PASSWORD,
-                                           (unsigned char *)pass, passlen);
-  *z++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_SALT,
-                                           (unsigned char *)salt, saltlen);
-  *z++ = OSSL_PARAM_construct_uint64(OSSL_KDF_PARAM_SCRYPT_N, &N);
-  *z++ = OSSL_PARAM_construct_uint64(OSSL_KDF_PARAM_SCRYPT_R, &r);
-  *z++ = OSSL_PARAM_construct_uint64(OSSL_KDF_PARAM_SCRYPT_P, &p);
-  *z++ = OSSL_PARAM_construct_uint64(OSSL_KDF_PARAM_SCRYPT_MAXMEM, &maxmem);
-  *z = OSSL_PARAM_construct_end();
-  if (EVP_KDF_derive(kctx, key, keylen, params) != 1)
-    rv = 0;
+    *z++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_PASSWORD,
+                                             (unsigned char *)pass, passlen);
+    *z++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_SALT,
+                                             (unsigned char *)salt, saltlen);
+    *z++ = OSSL_PARAM_construct_uint64(OSSL_KDF_PARAM_SCRYPT_N, &N);
+    *z++ = OSSL_PARAM_construct_uint64(OSSL_KDF_PARAM_SCRYPT_R, &r);
+    *z++ = OSSL_PARAM_construct_uint64(OSSL_KDF_PARAM_SCRYPT_P, &p);
+    *z++ = OSSL_PARAM_construct_uint64(OSSL_KDF_PARAM_SCRYPT_MAXMEM, &maxmem);
+    *z = OSSL_PARAM_construct_end();
+    if (EVP_KDF_derive(kctx, key, keylen, params) != 1)
+        rv = 0;
 
-  EVP_KDF_CTX_free(kctx);
-  return rv;
+    EVP_KDF_CTX_free(kctx);
+    return rv;
 }
 
 int EVP_PBE_scrypt(const char *pass, size_t passlen, const unsigned char *salt,
                    size_t saltlen, uint64_t N, uint64_t r, uint64_t p,
                    uint64_t maxmem, unsigned char *key, size_t keylen) {
-  return EVP_PBE_scrypt_ex(pass, passlen, salt, saltlen, N, r, p, maxmem, key,
-                           keylen, NULL, NULL);
+    return EVP_PBE_scrypt_ex(pass, passlen, salt, saltlen, N, r, p, maxmem, key,
+                             keylen, NULL, NULL);
 }
 
 #endif

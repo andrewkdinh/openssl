@@ -16,21 +16,21 @@
 
 static int i2r_GROUP_AC(X509V3_EXT_METHOD *method, void *su, BIO *out,
                         int indent) {
-  return 1;
+    return 1;
 }
 
 static void *r2i_GROUP_AC(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
                           const char *value) {
-  return ASN1_NULL_new();
+    return ASN1_NULL_new();
 }
 
 static char *i2s_GROUP_AC(const X509V3_EXT_METHOD *method, void *val) {
-  return OPENSSL_strdup("NULL");
+    return OPENSSL_strdup("NULL");
 }
 
 static void *s2i_GROUP_AC(const X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
                           const char *str) {
-  return ASN1_NULL_new();
+    return ASN1_NULL_new();
 }
 
 /*

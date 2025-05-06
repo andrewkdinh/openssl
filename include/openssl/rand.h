@@ -38,12 +38,12 @@ extern "C" {
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 struct rand_meth_st {
-  int (*seed)(const void *buf, int num);
-  int (*bytes)(unsigned char *buf, int num);
-  void (*cleanup)(void);
-  int (*add)(const void *buf, int num, double randomness);
-  int (*pseudorand)(unsigned char *buf, int num);
-  int (*status)(void);
+    int (*seed)(const void *buf, int num);
+    int (*bytes)(unsigned char *buf, int num);
+    void (*cleanup)(void);
+    int (*add)(const void *buf, int num, double randomness);
+    int (*pseudorand)(unsigned char *buf, int num);
+    int (*status)(void);
 };
 
 OSSL_DEPRECATEDIN_3_0 int RAND_set_rand_method(const RAND_METHOD *meth);
@@ -57,8 +57,8 @@ OSSL_DEPRECATEDIN_3_0 RAND_METHOD *RAND_OpenSSL(void);
 
 #ifndef OPENSSL_NO_DEPRECATED_1_1_0
 #define RAND_cleanup()                                                         \
-  while (0)                                                                    \
-  continue
+    while (0)                                                                  \
+    continue
 #endif
 int RAND_bytes(unsigned char *buf, int num);
 int RAND_priv_bytes(unsigned char *buf, int num);

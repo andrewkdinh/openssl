@@ -170,9 +170,9 @@ static char *fpexpected[][11][5] = {
 };
 
 typedef struct z_data_st {
-  size_t value;
-  const char *format;
-  const char *expected;
+    size_t value;
+    const char *format;
+    const char *expected;
 } z_data;
 
 static z_data zu_data[] = {
@@ -193,19 +193,19 @@ static z_data zu_data[] = {
 };
 
 static int test_zu(int i) {
-  char bio_buf[80];
-  const z_data *data = &zu_data[i];
+    char bio_buf[80];
+    const z_data *data = &zu_data[i];
 
-  BIO_snprintf(bio_buf, sizeof(bio_buf) - 1, data->format, data->value);
-  if (!TEST_str_eq(bio_buf, data->expected))
-    return 0;
-  return 1;
+    BIO_snprintf(bio_buf, sizeof(bio_buf) - 1, data->format, data->value);
+    if (!TEST_str_eq(bio_buf, data->expected))
+        return 0;
+    return 1;
 }
 
 typedef struct j_data_st {
-  uint64_t value;
-  const char *format;
-  const char *expected;
+    uint64_t value;
+    const char *format;
+    const char *expected;
 } j_data;
 
 static j_data jf_data[] = {
@@ -220,19 +220,19 @@ static j_data jf_data[] = {
 };
 
 static int test_j(int i) {
-  const j_data *data = &jf_data[i];
-  char bio_buf[80];
+    const j_data *data = &jf_data[i];
+    char bio_buf[80];
 
-  BIO_snprintf(bio_buf, sizeof(bio_buf) - 1, data->format, data->value);
-  if (!TEST_str_eq(bio_buf, data->expected))
-    return 0;
-  return 1;
+    BIO_snprintf(bio_buf, sizeof(bio_buf) - 1, data->format, data->value);
+    if (!TEST_str_eq(bio_buf, data->expected))
+        return 0;
+    return 1;
 }
 
 /* Precision and width. */
 typedef struct pw_st {
-  int p;
-  const char *w;
+    int p;
+    const char *w;
 } pw;
 
 static pw pw_params[] = {{4, ""}, {5, ""},  {4, "12"}, {5, "12"},
@@ -240,104 +240,105 @@ static pw pw_params[] = {{4, ""}, {5, ""},  {4, "12"}, {5, "12"},
 
 static int dofptest(int test, int sub, double val, const char *width,
                     int prec) {
-  static const char *fspecs[] = {"e", "f", "g", "E", "G"};
-  char format[80], result[80];
-  int ret = 1, i;
+    static const char *fspecs[] = {"e", "f", "g", "E", "G"};
+    char format[80], result[80];
+    int ret = 1, i;
 
-  for (i = 0; i < (int)OSSL_NELEM(fspecs); i++) {
-    const char *fspec = fspecs[i];
+    for (i = 0; i < (int)OSSL_NELEM(fspecs); i++) {
+        const char *fspec = fspecs[i];
 
-    if (prec >= 0)
-      BIO_snprintf(format, sizeof(format), "%%%s.%d%s", width, prec, fspec);
-    else
-      BIO_snprintf(format, sizeof(format), "%%%s%s", width, fspec);
-    BIO_snprintf(result, sizeof(result), format, val);
+        if (prec >= 0)
+            BIO_snprintf(format, sizeof(format), "%%%s.%d%s", width, prec,
+                         fspec);
+        else
+            BIO_snprintf(format, sizeof(format), "%%%s%s", width, fspec);
+        BIO_snprintf(result, sizeof(result), format, val);
 
-    if (justprint) {
-      if (i == 0)
-        printf("    /*  %d.%02d */ { \"%s\"", test, sub, result);
-      else
-        printf(", \"%s\"", result);
-    } else if (!TEST_str_eq(fpexpected[test][sub][i], result)) {
-      TEST_info("test %d format=|%s| exp=|%s|, ret=|%s|", test, format,
-                fpexpected[test][sub][i], result);
-      ret = 0;
+        if (justprint) {
+            if (i == 0)
+                printf("    /*  %d.%02d */ { \"%s\"", test, sub, result);
+            else
+                printf(", \"%s\"", result);
+        } else if (!TEST_str_eq(fpexpected[test][sub][i], result)) {
+            TEST_info("test %d format=|%s| exp=|%s|, ret=|%s|", test, format,
+                      fpexpected[test][sub][i], result);
+            ret = 0;
+        }
     }
-  }
-  if (justprint)
-    printf(" },\n");
-  return ret;
+    if (justprint)
+        printf(" },\n");
+    return ret;
 }
 
 static int test_fp(int i) {
-  int t = 0, r;
-  const double frac = 2.0 / 3.0;
-  const pw *pwp = &pw_params[i];
+    int t = 0, r;
+    const double frac = 2.0 / 3.0;
+    const pw *pwp = &pw_params[i];
 
-  if (justprint)
-    printf("    {\n");
-  r = TEST_true(dofptest(i, t++, 0.0, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, 0.67, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, frac, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, frac / 1000, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, frac / 10000, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, 6.0 + frac, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, 66.0 + frac, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, 666.0 + frac, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, 6666.0 + frac, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, 66666.0 + frac, pwp->w, pwp->p)) &&
-      TEST_true(dofptest(i, t++, -66666.0 - frac, pwp->w, pwp->p));
-  if (justprint)
-    printf("    },\n");
-  return r;
+    if (justprint)
+        printf("    {\n");
+    r = TEST_true(dofptest(i, t++, 0.0, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, 0.67, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, frac, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, frac / 1000, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, frac / 10000, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, 6.0 + frac, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, 66.0 + frac, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, 666.0 + frac, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, 6666.0 + frac, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, 66666.0 + frac, pwp->w, pwp->p)) &&
+        TEST_true(dofptest(i, t++, -66666.0 - frac, pwp->w, pwp->p));
+    if (justprint)
+        printf("    },\n");
+    return r;
 }
 
 static int test_big(void) {
-  char buf[80];
+    char buf[80];
 
-  /* Test excessively big number. Should fail */
-  if (!TEST_int_eq(
-      BIO_snprintf(buf, sizeof(buf), "%f\n", 2 * (double)ULONG_MAX), -1))
-    return 0;
+    /* Test excessively big number. Should fail */
+    if (!TEST_int_eq(
+        BIO_snprintf(buf, sizeof(buf), "%f\n", 2 * (double)ULONG_MAX), -1))
+        return 0;
 
-  return 1;
+    return 1;
 }
 
 typedef enum OPTION_choice {
-  OPT_ERR = -1,
-  OPT_EOF = 0,
-  OPT_PRINT,
-  OPT_TEST_ENUM
+    OPT_ERR = -1,
+    OPT_EOF = 0,
+    OPT_PRINT,
+    OPT_TEST_ENUM
 } OPTION_CHOICE;
 
 const OPTIONS *test_get_options(void) {
-  static const OPTIONS options[] = {
-  OPT_TEST_OPTIONS_DEFAULT_USAGE,
-  {"expected", OPT_PRINT, '-', "Output values"},
-  {NULL}};
-  return options;
+    static const OPTIONS options[] = {
+    OPT_TEST_OPTIONS_DEFAULT_USAGE,
+    {"expected", OPT_PRINT, '-', "Output values"},
+    {NULL}};
+    return options;
 }
 
 int setup_tests(void) {
-  OPTION_CHOICE o;
+    OPTION_CHOICE o;
 
-  while ((o = opt_next()) != OPT_EOF) {
-    switch (o) {
-    case OPT_PRINT:
-      justprint = 1;
-      break;
-    case OPT_TEST_CASES:
-      break;
-    default:
-      return 0;
+    while ((o = opt_next()) != OPT_EOF) {
+        switch (o) {
+        case OPT_PRINT:
+            justprint = 1;
+            break;
+        case OPT_TEST_CASES:
+            break;
+        default:
+            return 0;
+        }
     }
-  }
 
-  ADD_TEST(test_big);
-  ADD_ALL_TESTS(test_fp, OSSL_NELEM(pw_params));
-  ADD_ALL_TESTS(test_zu, OSSL_NELEM(zu_data));
-  ADD_ALL_TESTS(test_j, OSSL_NELEM(jf_data));
-  return 1;
+    ADD_TEST(test_big);
+    ADD_ALL_TESTS(test_fp, OSSL_NELEM(pw_params));
+    ADD_ALL_TESTS(test_zu, OSSL_NELEM(zu_data));
+    ADD_ALL_TESTS(test_j, OSSL_NELEM(jf_data));
+    return 1;
 }
 
 /*
@@ -361,11 +362,11 @@ void test_close_streams(void) {}
  * and it uses only "%s", which is not "fancy"...
  */
 int test_vprintf_stdout(const char *fmt, va_list ap) {
-  return fprintf(stdout, "%*s# ", tap_level, "") + vfprintf(stdout, fmt, ap);
+    return fprintf(stdout, "%*s# ", tap_level, "") + vfprintf(stdout, fmt, ap);
 }
 
 int test_vprintf_stderr(const char *fmt, va_list ap) {
-  return fprintf(stderr, "%*s# ", tap_level, "") + vfprintf(stderr, fmt, ap);
+    return fprintf(stderr, "%*s# ", tap_level, "") + vfprintf(stderr, fmt, ap);
 }
 
 int test_flush_stdout(void) { return fflush(stdout); }
@@ -373,11 +374,11 @@ int test_flush_stdout(void) { return fflush(stdout); }
 int test_flush_stderr(void) { return fflush(stderr); }
 
 int test_vprintf_tapout(const char *fmt, va_list ap) {
-  return fprintf(stdout, "%*s", tap_level, "") + vfprintf(stdout, fmt, ap);
+    return fprintf(stdout, "%*s", tap_level, "") + vfprintf(stdout, fmt, ap);
 }
 
 int test_vprintf_taperr(const char *fmt, va_list ap) {
-  return fprintf(stderr, "%*s", tap_level, "") + vfprintf(stderr, fmt, ap);
+    return fprintf(stderr, "%*s", tap_level, "") + vfprintf(stderr, fmt, ap);
 }
 
 int test_flush_tapout(void) { return fflush(stdout); }

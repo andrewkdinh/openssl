@@ -28,9 +28,9 @@
 #ifndef OPENSSL_NO_KEYPARAMS
 
 struct pubkey {
-  int bad;
-  const unsigned char *key_bin;
-  size_t key_bin_len;
+    int bad;
+    const unsigned char *key_bin;
+    size_t key_bin_len;
 };
 
 #ifndef OPENSSL_NO_DH
@@ -179,10 +179,10 @@ static const unsigned char eckey_3[] = {
 #define NUM_KEYS 10
 
 static const struct {
-  int type;
-  const unsigned char *param_bin;
-  size_t param_bin_len;
-  struct pubkey keys[NUM_KEYS];
+    int type;
+    const unsigned char *param_bin;
+    size_t param_bin_len;
+    struct pubkey keys[NUM_KEYS];
 } pkey_params[] = {
 #ifndef OPENSSL_NO_DH
 {EVP_PKEY_DH,
@@ -210,74 +210,76 @@ static const struct {
 };
 
 static int params_bio_test(int id) {
-  int ret, out_len;
-  BIO *in = NULL, *out = NULL;
-  EVP_PKEY *in_key = NULL, *out_key = NULL;
-  unsigned char *out_bin;
-  int type = pkey_params[id].type;
+    int ret, out_len;
+    BIO *in = NULL, *out = NULL;
+    EVP_PKEY *in_key = NULL, *out_key = NULL;
+    unsigned char *out_bin;
+    int type = pkey_params[id].type;
 
-  ret = TEST_ptr(in = BIO_new_mem_buf(pkey_params[id].param_bin,
-                                      (int)pkey_params[id].param_bin_len))
-        /* Load in pkey params from binary */
-        && TEST_ptr(d2i_KeyParams_bio(type, &in_key, in)) &&
-        TEST_ptr(out = BIO_new(BIO_s_mem()))
-        /* Save pkey params to binary */
-        && TEST_int_gt(i2d_KeyParams_bio(out, in_key), 0)
-        /* test the output binary is the expected value */
-        && TEST_int_gt(out_len = BIO_get_mem_data(out, &out_bin), 0) &&
-        TEST_mem_eq(pkey_params[id].param_bin,
-                    (int)pkey_params[id].param_bin_len, out_bin, out_len);
+    ret = TEST_ptr(in = BIO_new_mem_buf(pkey_params[id].param_bin,
+                                        (int)pkey_params[id].param_bin_len))
+          /* Load in pkey params from binary */
+          && TEST_ptr(d2i_KeyParams_bio(type, &in_key, in)) &&
+          TEST_ptr(out = BIO_new(BIO_s_mem()))
+          /* Save pkey params to binary */
+          && TEST_int_gt(i2d_KeyParams_bio(out, in_key), 0)
+          /* test the output binary is the expected value */
+          && TEST_int_gt(out_len = BIO_get_mem_data(out, &out_bin), 0) &&
+          TEST_mem_eq(pkey_params[id].param_bin,
+                      (int)pkey_params[id].param_bin_len, out_bin, out_len);
 
-  BIO_free(in);
-  BIO_free(out);
-  EVP_PKEY_free(in_key);
-  EVP_PKEY_free(out_key);
-  return ret;
+    BIO_free(in);
+    BIO_free(out);
+    EVP_PKEY_free(in_key);
+    EVP_PKEY_free(out_key);
+    return ret;
 }
 
 static int set_enc_pubkey_test(int id) {
-  int ret, i;
-  BIO *in = NULL;
-  EVP_PKEY *in_key = NULL;
-  int type = pkey_params[id].type;
-  const struct pubkey *keys = pkey_params[id].keys;
+    int ret, i;
+    BIO *in = NULL;
+    EVP_PKEY *in_key = NULL;
+    int type = pkey_params[id].type;
+    const struct pubkey *keys = pkey_params[id].keys;
 
-  if (keys[0].key_bin == NULL)
-    return TEST_skip("Not applicable test");
+    if (keys[0].key_bin == NULL)
+        return TEST_skip("Not applicable test");
 
-  ret = TEST_ptr(in = BIO_new_mem_buf(pkey_params[id].param_bin,
-                                      (int)pkey_params[id].param_bin_len))
-        /* Load in pkey params from binary */
-        && TEST_ptr(d2i_KeyParams_bio(type, &in_key, in));
+    ret = TEST_ptr(in = BIO_new_mem_buf(pkey_params[id].param_bin,
+                                        (int)pkey_params[id].param_bin_len))
+          /* Load in pkey params from binary */
+          && TEST_ptr(d2i_KeyParams_bio(type, &in_key, in));
 
-  for (i = 0; ret && i < NUM_KEYS && keys[i].key_bin != NULL; i++) {
-    if (keys[i].bad) {
-      ERR_set_mark();
-      ret = ret && TEST_int_le(EVP_PKEY_set1_encoded_public_key(
+    for (i = 0; ret && i < NUM_KEYS && keys[i].key_bin != NULL; i++) {
+        if (keys[i].bad) {
+            ERR_set_mark();
+            ret =
+            ret && TEST_int_le(EVP_PKEY_set1_encoded_public_key(
                                in_key, keys[i].key_bin, keys[i].key_bin_len),
                                0);
-      ERR_pop_to_mark();
-    } else {
-      ret = ret && TEST_int_gt(EVP_PKEY_set1_encoded_public_key(
+            ERR_pop_to_mark();
+        } else {
+            ret =
+            ret && TEST_int_gt(EVP_PKEY_set1_encoded_public_key(
                                in_key, keys[i].key_bin, keys[i].key_bin_len),
                                0);
+        }
+        if (!ret)
+            TEST_info("Test key index #%d", i);
     }
-    if (!ret)
-      TEST_info("Test key index #%d", i);
-  }
 
-  BIO_free(in);
-  EVP_PKEY_free(in_key);
-  return ret;
+    BIO_free(in);
+    EVP_PKEY_free(in_key);
+    return ret;
 }
 #endif
 
 int setup_tests(void) {
 #ifdef OPENSSL_NO_KEYPARAMS
-  TEST_note("No DH/DSA/EC support");
+    TEST_note("No DH/DSA/EC support");
 #else
-  ADD_ALL_TESTS(params_bio_test, OSSL_NELEM(pkey_params));
-  ADD_ALL_TESTS(set_enc_pubkey_test, OSSL_NELEM(pkey_params));
+    ADD_ALL_TESTS(params_bio_test, OSSL_NELEM(pkey_params));
+    ADD_ALL_TESTS(set_enc_pubkey_test, OSSL_NELEM(pkey_params));
 #endif
-  return 1;
+    return 1;
 }

@@ -40,17 +40,17 @@
 typedef struct stream_frame_st STREAM_FRAME;
 
 typedef struct sframe_list_st {
-  STREAM_FRAME *head, *tail;
-  /* Is the tail frame final. */
-  unsigned int fin;
-  /* Number of stream frames in the list. */
-  size_t num_frames;
-  /* Offset of data not yet dropped */
-  uint64_t offset;
-  /* Is head locked ? */
-  int head_locked;
-  /* Cleanse data on release? */
-  int cleanse;
+    STREAM_FRAME *head, *tail;
+    /* Is the tail frame final. */
+    unsigned int fin;
+    /* Number of stream frames in the list. */
+    size_t num_frames;
+    /* Offset of data not yet dropped */
+    uint64_t offset;
+    /* Is head locked ? */
+    int head_locked;
+    /* Cleanse data on release? */
+    int cleanse;
 } SFRAME_LIST;
 
 /*

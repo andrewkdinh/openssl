@@ -27,23 +27,23 @@
  */
 static int rsa_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                   void *exarg) {
-  if (operation == ASN1_OP_NEW_PRE) {
-    *pval = (ASN1_VALUE *)RSA_new();
-    if (*pval != NULL)
-      return 2;
-    return 0;
-  } else if (operation == ASN1_OP_FREE_PRE) {
-    RSA_free((RSA *)*pval);
-    *pval = NULL;
-    return 2;
-  } else if (operation == ASN1_OP_D2I_POST) {
-    if (((RSA *)*pval)->version != RSA_ASN1_VERSION_MULTI) {
-      /* not a multi-prime key, skip */
-      return 1;
+    if (operation == ASN1_OP_NEW_PRE) {
+        *pval = (ASN1_VALUE *)RSA_new();
+        if (*pval != NULL)
+            return 2;
+        return 0;
+    } else if (operation == ASN1_OP_FREE_PRE) {
+        RSA_free((RSA *)*pval);
+        *pval = NULL;
+        return 2;
+    } else if (operation == ASN1_OP_D2I_POST) {
+        if (((RSA *)*pval)->version != RSA_ASN1_VERSION_MULTI) {
+            /* not a multi-prime key, skip */
+            return 1;
+        }
+        return (ossl_rsa_multip_calc_product((RSA *)*pval) == 1) ? 2 : 0;
     }
-    return (ossl_rsa_multip_calc_product((RSA *)*pval) == 1) ? 2 : 0;
-  }
-  return 1;
+    return 1;
 }
 
 /* Based on definitions in RFC 8017 appendix A.1.2 */
@@ -76,11 +76,11 @@ ASN1_SIMPLE(RSA, e, BIGNUM),
 /* Free up maskHash */
 static int rsa_pss_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                       void *exarg) {
-  if (operation == ASN1_OP_FREE_PRE) {
-    RSA_PSS_PARAMS *pss = (RSA_PSS_PARAMS *)*pval;
-    X509_ALGOR_free(pss->maskHash);
-  }
-  return 1;
+    if (operation == ASN1_OP_FREE_PRE) {
+        RSA_PSS_PARAMS *pss = (RSA_PSS_PARAMS *)*pval;
+        X509_ALGOR_free(pss->maskHash);
+    }
+    return 1;
 }
 
 ASN1_SEQUENCE_cb(RSA_PSS_PARAMS, rsa_pss_cb) =
@@ -96,11 +96,11 @@ IMPLEMENT_ASN1_DUP_FUNCTION(RSA_PSS_PARAMS)
 /* Free up maskHash */
 static int rsa_oaep_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                        void *exarg) {
-  if (operation == ASN1_OP_FREE_PRE) {
-    RSA_OAEP_PARAMS *oaep = (RSA_OAEP_PARAMS *)*pval;
-    X509_ALGOR_free(oaep->maskHash);
-  }
-  return 1;
+    if (operation == ASN1_OP_FREE_PRE) {
+        RSA_OAEP_PARAMS *oaep = (RSA_OAEP_PARAMS *)*pval;
+        X509_ALGOR_free(oaep->maskHash);
+    }
+    return 1;
 }
 
 ASN1_SEQUENCE_cb(RSA_OAEP_PARAMS, rsa_oaep_cb) =
@@ -118,9 +118,9 @@ IMPLEMENT_ASN1_ENCODE_FUNCTIONS_fname(RSA, RSAPublicKey, RSAPublicKey)
 
 RSA
 * RSAPublicKey_dup(const RSA *rsa) {
-  return ASN1_item_dup(ASN1_ITEM_rptr(RSAPublicKey), rsa);
+    return ASN1_item_dup(ASN1_ITEM_rptr(RSAPublicKey), rsa);
 }
 
 RSA *RSAPrivateKey_dup(const RSA *rsa) {
-  return ASN1_item_dup(ASN1_ITEM_rptr(RSAPrivateKey), rsa);
+    return ASN1_item_dup(ASN1_ITEM_rptr(RSAPrivateKey), rsa);
 }

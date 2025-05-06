@@ -224,33 +224,33 @@ CTYPE_MASK_base64 | CTYPE_MASK_asn1print,
 
 #ifdef CHARSET_EBCDIC
 int ossl_toascii(int c) {
-  if (c < -128 || c > 256 || c == EOF)
-    return c;
-  /*
-   * Adjust negatively signed characters.
-   * This is not required for ASCII because any character that sign extends
-   * is not seven bit and all of the checks are on the seven bit characters.
-   * I.e. any check must fail on sign extension.
-   */
-  if (c < 0)
-    c += 256;
-  return os_toascii[c];
+    if (c < -128 || c > 256 || c == EOF)
+        return c;
+    /*
+     * Adjust negatively signed characters.
+     * This is not required for ASCII because any character that sign extends
+     * is not seven bit and all of the checks are on the seven bit characters.
+     * I.e. any check must fail on sign extension.
+     */
+    if (c < 0)
+        c += 256;
+    return os_toascii[c];
 }
 
 int ossl_fromascii(int c) {
-  if (c < -128 || c > 256 || c == EOF)
-    return c;
-  if (c < 0)
-    c += 256;
-  return os_toebcdic[c];
+    if (c < -128 || c > 256 || c == EOF)
+        return c;
+    if (c < 0)
+        c += 256;
+    return os_toebcdic[c];
 }
 #endif
 
 int ossl_ctype_check(int c, unsigned int mask) {
-  const int max = sizeof(ctype_char_map) / sizeof(*ctype_char_map);
-  const int a = ossl_toascii(c);
+    const int max = sizeof(ctype_char_map) / sizeof(*ctype_char_map);
+    const int a = ossl_toascii(c);
 
-  return a >= 0 && a < max && (ctype_char_map[a] & mask) != 0;
+    return a >= 0 && a < max && (ctype_char_map[a] & mask) != 0;
 }
 
 /*
@@ -263,21 +263,21 @@ int ossl_ctype_check(int c, unsigned int mask) {
 #define ASCII_IS_LOWER(c) (c >= 0x61 && c <= 0x7A)
 
 int ossl_isdigit(int c) {
-  int a = ossl_toascii(c);
+    int a = ossl_toascii(c);
 
-  return ASCII_IS_DIGIT(a);
+    return ASCII_IS_DIGIT(a);
 }
 
 int ossl_isupper(int c) {
-  int a = ossl_toascii(c);
+    int a = ossl_toascii(c);
 
-  return ASCII_IS_UPPER(a);
+    return ASCII_IS_UPPER(a);
 }
 
 int ossl_islower(int c) {
-  int a = ossl_toascii(c);
+    int a = ossl_toascii(c);
 
-  return ASCII_IS_LOWER(a);
+    return ASCII_IS_LOWER(a);
 }
 
 #if defined(CHARSET_EBCDIC) && !defined(CHARSET_EBCDIC_TEST)
@@ -287,15 +287,15 @@ static const int case_change = 0x20;
 #endif
 
 int ossl_tolower(int c) {
-  int a = ossl_toascii(c);
+    int a = ossl_toascii(c);
 
-  return ASCII_IS_UPPER(a) ? c ^ case_change : c;
+    return ASCII_IS_UPPER(a) ? c ^ case_change : c;
 }
 
 int ossl_toupper(int c) {
-  int a = ossl_toascii(c);
+    int a = ossl_toascii(c);
 
-  return ASCII_IS_LOWER(a) ? c ^ case_change : c;
+    return ASCII_IS_LOWER(a) ? c ^ case_change : c;
 }
 
 int ossl_ascii_isdigit(int c) { return ASCII_IS_DIGIT(c); }

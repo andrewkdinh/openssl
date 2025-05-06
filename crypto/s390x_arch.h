@@ -55,19 +55,19 @@ int s390x_ed448_mul(unsigned char x_dst[57], unsigned char y_dst[57],
  * is not supported, the corresponding field elements are zero.
  */
 struct OPENSSL_s390xcap_st {
-  unsigned long long stfle[4];
-  unsigned long long kimd[2];
-  unsigned long long klmd[2];
-  unsigned long long km[2];
-  unsigned long long kmc[2];
-  unsigned long long kmac[2];
-  unsigned long long kmctr[2];
-  unsigned long long kmo[2];
-  unsigned long long kmf[2];
-  unsigned long long prno[2];
-  unsigned long long kma[2];
-  unsigned long long pcc[2];
-  unsigned long long kdsa[2];
+    unsigned long long stfle[4];
+    unsigned long long kimd[2];
+    unsigned long long klmd[2];
+    unsigned long long km[2];
+    unsigned long long kmc[2];
+    unsigned long long kmac[2];
+    unsigned long long kmctr[2];
+    unsigned long long kmo[2];
+    unsigned long long kmf[2];
+    unsigned long long prno[2];
+    unsigned long long kma[2];
+    unsigned long long pcc[2];
+    unsigned long long kdsa[2];
 };
 
 #if defined(__GNUC__) && defined(__linux)

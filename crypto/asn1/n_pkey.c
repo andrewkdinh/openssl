@@ -17,24 +17,24 @@
 #include <openssl/x509.h>
 
 #define ASN1_BROKEN_SEQUENCE(tname)                                            \
-  static const ASN1_AUX tname##_aux = {NULL, ASN1_AFLG_BROKEN, 0, 0, 0, 0};    \
-  ASN1_SEQUENCE(tname)
+    static const ASN1_AUX tname##_aux = {NULL, ASN1_AFLG_BROKEN, 0, 0, 0, 0};  \
+    ASN1_SEQUENCE(tname)
 #define static_ASN1_BROKEN_SEQUENCE_END(stname)                                \
-  static_ASN1_SEQUENCE_END_ref(stname, stname)
+    static_ASN1_SEQUENCE_END_ref(stname, stname)
 
 typedef struct netscape_pkey_st {
-  int32_t version;
-  X509_ALGOR *algor;
-  ASN1_OCTET_STRING *private_key;
+    int32_t version;
+    X509_ALGOR *algor;
+    ASN1_OCTET_STRING *private_key;
 } NETSCAPE_PKEY;
 
 typedef struct netscape_encrypted_pkey_st {
-  ASN1_OCTET_STRING *os;
-  /*
-   * This is the same structure as DigestInfo so use it: although this
-   * isn't really anything to do with digests.
-   */
-  X509_SIG *enckey;
+    ASN1_OCTET_STRING *os;
+    /*
+     * This is the same structure as DigestInfo so use it: although this
+     * isn't really anything to do with digests.
+     */
+    X509_SIG *enckey;
 } NETSCAPE_ENCRYPTED_PKEY;
 
 ASN1_BROKEN_SEQUENCE(NETSCAPE_ENCRYPTED_PKEY) =

@@ -118,10 +118,10 @@ static const ERR_STRING_DATA EC_str_reasons[] = {
 
 int ossl_err_load_EC_strings(void) {
 #ifndef OPENSSL_NO_ERR
-  if (ERR_reason_error_string(EC_str_reasons[0].error) == NULL)
-    ERR_load_strings_const(EC_str_reasons);
+    if (ERR_reason_error_string(EC_str_reasons[0].error) == NULL)
+        ERR_load_strings_const(EC_str_reasons);
 #endif
-  return 1;
+    return 1;
 }
 #else
 NON_EMPTY_TRANSLATION_UNIT

@@ -17,10 +17,10 @@
 #include <openssl/core_dispatch.h>
 
 typedef struct prov_ctx_st {
-  const OSSL_CORE_HANDLE *handle;
-  OSSL_LIB_CTX *libctx; /* For all provider modules */
-  BIO_METHOD *corebiometh;
-  OSSL_FUNC_core_get_params_fn *core_get_params;
+    const OSSL_CORE_HANDLE *handle;
+    OSSL_LIB_CTX *libctx; /* For all provider modules */
+    BIO_METHOD *corebiometh;
+    OSSL_FUNC_core_get_params_fn *core_get_params;
 } PROV_CTX;
 
 /*

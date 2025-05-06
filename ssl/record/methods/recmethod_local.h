@@ -14,68 +14,68 @@
 #include "../record_local.h"
 
 typedef struct dtls_bitmap_st {
-  /* Track 64 packets */
-  uint64_t map;
-  /* Max record number seen so far, 64-bit value in big-endian encoding */
-  unsigned char max_seq_num[SEQ_NUM_SIZE];
+    /* Track 64 packets */
+    uint64_t map;
+    /* Max record number seen so far, 64-bit value in big-endian encoding */
+    unsigned char max_seq_num[SEQ_NUM_SIZE];
 } DTLS_BITMAP;
 
 typedef struct ssl_mac_buf_st {
-  unsigned char *mac;
-  int alloced;
+    unsigned char *mac;
+    int alloced;
 } SSL_MAC_BUF;
 
 typedef struct tls_buffer_st {
-  /* at least SSL3_RT_MAX_PACKET_SIZE bytes */
-  unsigned char *buf;
-  /* default buffer size (or 0 if no default set) */
-  size_t default_len;
-  /* buffer size */
-  size_t len;
-  /* where to 'copy from' */
-  size_t offset;
-  /* how many bytes left */
-  size_t left;
-  /* 'buf' is from application for KTLS */
-  int app_buffer;
-  /* The type of data stored in this buffer. Only used for writing */
-  int type;
+    /* at least SSL3_RT_MAX_PACKET_SIZE bytes */
+    unsigned char *buf;
+    /* default buffer size (or 0 if no default set) */
+    size_t default_len;
+    /* buffer size */
+    size_t len;
+    /* where to 'copy from' */
+    size_t offset;
+    /* how many bytes left */
+    size_t left;
+    /* 'buf' is from application for KTLS */
+    int app_buffer;
+    /* The type of data stored in this buffer. Only used for writing */
+    int type;
 } TLS_BUFFER;
 
 typedef struct tls_rl_record_st {
-  /* Record layer version */
-  /* r */
-  int rec_version;
-  /* type of record */
-  /* r */
-  int type;
-  /* How many bytes available */
-  /* rw */
-  size_t length;
-  /*
-   * How many bytes were available before padding was removed? This is used
-   * to implement the MAC check in constant time for CBC records.
-   */
-  /* rw */
-  size_t orig_len;
-  /* read/write offset into 'buf' */
-  /* r */
-  size_t off;
-  /* pointer to the record data */
-  /* rw */
-  unsigned char *data;
-  /* where the decode bytes are */
-  /* rw */
-  unsigned char *input;
-  /* only used with decompression - malloc()ed */
-  /* r */
-  unsigned char *comp;
-  /* epoch number, needed by DTLS1 */
-  /* r */
-  uint16_t epoch;
-  /* sequence number, needed by DTLS1 */
-  /* r */
-  unsigned char seq_num[SEQ_NUM_SIZE];
+    /* Record layer version */
+    /* r */
+    int rec_version;
+    /* type of record */
+    /* r */
+    int type;
+    /* How many bytes available */
+    /* rw */
+    size_t length;
+    /*
+     * How many bytes were available before padding was removed? This is used
+     * to implement the MAC check in constant time for CBC records.
+     */
+    /* rw */
+    size_t orig_len;
+    /* read/write offset into 'buf' */
+    /* r */
+    size_t off;
+    /* pointer to the record data */
+    /* rw */
+    unsigned char *data;
+    /* where the decode bytes are */
+    /* rw */
+    unsigned char *input;
+    /* only used with decompression - malloc()ed */
+    /* r */
+    unsigned char *comp;
+    /* epoch number, needed by DTLS1 */
+    /* r */
+    uint16_t epoch;
+    /* sequence number, needed by DTLS1 */
+    /* r */
+    unsigned char seq_num[SEQ_NUM_SIZE];
 } TLS_RL_RECORD;
 
 /* Macros/functions provided by the TLS_RL_RECORD component */
@@ -91,280 +91,281 @@ typedef struct tls_rl_record_st {
 
 /* Protocol version specific function pointers */
 struct record_functions_st {
-  /*
-   * Returns either OSSL_RECORD_RETURN_SUCCESS, OSSL_RECORD_RETURN_FATAL or
-   * OSSL_RECORD_RETURN_NON_FATAL_ERR if we can keep trying to find an
-   * alternative record layer.
-   */
-  int (*set_crypto_state)(OSSL_RECORD_LAYER *rl, int level, unsigned char *key,
-                          size_t keylen, unsigned char *iv, size_t ivlen,
-                          unsigned char *mackey, size_t mackeylen,
-                          const EVP_CIPHER *ciph, size_t taglen, int mactype,
-                          const EVP_MD *md, COMP_METHOD *comp);
+    /*
+     * Returns either OSSL_RECORD_RETURN_SUCCESS, OSSL_RECORD_RETURN_FATAL or
+     * OSSL_RECORD_RETURN_NON_FATAL_ERR if we can keep trying to find an
+     * alternative record layer.
+     */
+    int (*set_crypto_state)(OSSL_RECORD_LAYER *rl, int level,
+                            unsigned char *key, size_t keylen,
+                            unsigned char *iv, size_t ivlen,
+                            unsigned char *mackey, size_t mackeylen,
+                            const EVP_CIPHER *ciph, size_t taglen, int mactype,
+                            const EVP_MD *md, COMP_METHOD *comp);
 
-  /*
-   * Returns:
-   *    0: if the record is publicly invalid, or an internal error, or AEAD
-   *       decryption failed, or EtM decryption failed.
-   *    1: Success or MtE decryption failed (MAC will be randomised)
-   */
-  int (*cipher)(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs, size_t n_recs,
-                int sending, SSL_MAC_BUF *macs, size_t macsize);
-  /* Returns 1 for success or 0 for error */
-  int (*mac)(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec, unsigned char *md,
-             int sending);
+    /*
+     * Returns:
+     *    0: if the record is publicly invalid, or an internal error, or AEAD
+     *       decryption failed, or EtM decryption failed.
+     *    1: Success or MtE decryption failed (MAC will be randomised)
+     */
+    int (*cipher)(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs, size_t n_recs,
+                  int sending, SSL_MAC_BUF *macs, size_t macsize);
+    /* Returns 1 for success or 0 for error */
+    int (*mac)(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec, unsigned char *md,
+               int sending);
 
-  /* Return 1 for success or 0 for error */
-  int (*set_protocol_version)(OSSL_RECORD_LAYER *rl, int version);
+    /* Return 1 for success or 0 for error */
+    int (*set_protocol_version)(OSSL_RECORD_LAYER *rl, int version);
 
-  /* Read related functions */
+    /* Read related functions */
 
-  int (*read_n)(OSSL_RECORD_LAYER *rl, size_t n, size_t max, int extend,
-                int clearold, size_t *readbytes);
+    int (*read_n)(OSSL_RECORD_LAYER *rl, size_t n, size_t max, int extend,
+                  int clearold, size_t *readbytes);
 
-  int (*get_more_records)(OSSL_RECORD_LAYER *rl);
+    int (*get_more_records)(OSSL_RECORD_LAYER *rl);
 
-  /* Return 1 for success or 0 for error */
-  int (*validate_record_header)(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec);
+    /* Return 1 for success or 0 for error */
+    int (*validate_record_header)(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec);
 
-  /* Return 1 for success or 0 for error */
-  int (*post_process_record)(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec);
+    /* Return 1 for success or 0 for error */
+    int (*post_process_record)(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec);
 
-  /* Write related functions */
+    /* Write related functions */
 
-  size_t (*get_max_records)(OSSL_RECORD_LAYER *rl, uint8_t type, size_t len,
-                            size_t maxfrag, size_t *preffrag);
+    size_t (*get_max_records)(OSSL_RECORD_LAYER *rl, uint8_t type, size_t len,
+                              size_t maxfrag, size_t *preffrag);
 
-  /* Return 1 for success or 0 for error */
-  int (*write_records)(OSSL_RECORD_LAYER *rl, OSSL_RECORD_TEMPLATE *templates,
-                       size_t numtempl);
+    /* Return 1 for success or 0 for error */
+    int (*write_records)(OSSL_RECORD_LAYER *rl, OSSL_RECORD_TEMPLATE *templates,
+                         size_t numtempl);
 
-  /* Allocate the rl->wbuf buffers. Return 1 for success or 0 for error */
-  int (*allocate_write_buffers)(OSSL_RECORD_LAYER *rl,
-                                OSSL_RECORD_TEMPLATE *templates,
-                                size_t numtempl, size_t *prefix);
-
-  /*
-   * Initialise the packets in the |pkt| array using the buffers in |rl->wbuf|.
-   * Some protocol versions may use the space in |prefixtempl| to add
-   * an artificial template in front of the |templates| array and hence may
-   * initialise 1 more WPACKET than there are templates. |*wpinited|
-   * returns the number of WPACKETs in |pkt| that were successfully
-   * initialised. This must be 0 on entry and will be filled in even on error.
-   */
-  int (*initialise_write_packets)(OSSL_RECORD_LAYER *rl,
+    /* Allocate the rl->wbuf buffers. Return 1 for success or 0 for error */
+    int (*allocate_write_buffers)(OSSL_RECORD_LAYER *rl,
                                   OSSL_RECORD_TEMPLATE *templates,
-                                  size_t numtempl,
-                                  OSSL_RECORD_TEMPLATE *prefixtempl,
-                                  WPACKET *pkt, TLS_BUFFER *bufs,
-                                  size_t *wpinited);
+                                  size_t numtempl, size_t *prefix);
 
-  /* Get the actual record type to be used for a given template */
-  uint8_t (*get_record_type)(OSSL_RECORD_LAYER *rl,
-                             OSSL_RECORD_TEMPLATE *template);
+    /*
+     * Initialise the packets in the |pkt| array using the buffers in
+     * |rl->wbuf|. Some protocol versions may use the space in |prefixtempl| to
+     * add an artificial template in front of the |templates| array and hence
+     * may initialise 1 more WPACKET than there are templates. |*wpinited|
+     * returns the number of WPACKETs in |pkt| that were successfully
+     * initialised. This must be 0 on entry and will be filled in even on error.
+     */
+    int (*initialise_write_packets)(OSSL_RECORD_LAYER *rl,
+                                    OSSL_RECORD_TEMPLATE *templates,
+                                    size_t numtempl,
+                                    OSSL_RECORD_TEMPLATE *prefixtempl,
+                                    WPACKET *pkt, TLS_BUFFER *bufs,
+                                    size_t *wpinited);
 
-  /* Write the record header data to the WPACKET */
-  int (*prepare_record_header)(OSSL_RECORD_LAYER *rl, WPACKET *thispkt,
-                               OSSL_RECORD_TEMPLATE *templ, uint8_t rectype,
-                               unsigned char **recdata);
+    /* Get the actual record type to be used for a given template */
+    uint8_t (*get_record_type)(OSSL_RECORD_LAYER *rl,
+                               OSSL_RECORD_TEMPLATE *template);
 
-  int (*add_record_padding)(OSSL_RECORD_LAYER *rl,
-                            OSSL_RECORD_TEMPLATE *thistempl, WPACKET *thispkt,
-                            TLS_RL_RECORD *thiswr);
+    /* Write the record header data to the WPACKET */
+    int (*prepare_record_header)(OSSL_RECORD_LAYER *rl, WPACKET *thispkt,
+                                 OSSL_RECORD_TEMPLATE *templ, uint8_t rectype,
+                                 unsigned char **recdata);
 
-  /*
-   * This applies any mac that might be necessary, ensures that we have enough
-   * space in the WPACKET to perform the encryption and sets up the
-   * TLS_RL_RECORD ready for that encryption.
-   */
-  int (*prepare_for_encryption)(OSSL_RECORD_LAYER *rl, size_t mac_size,
-                                WPACKET *thispkt, TLS_RL_RECORD *thiswr);
+    int (*add_record_padding)(OSSL_RECORD_LAYER *rl,
+                              OSSL_RECORD_TEMPLATE *thistempl, WPACKET *thispkt,
+                              TLS_RL_RECORD *thiswr);
 
-  /*
-   * Any updates required to the record after encryption has been applied. For
-   * example, adding a MAC if using encrypt-then-mac
-   */
-  int (*post_encryption_processing)(OSSL_RECORD_LAYER *rl, size_t mac_size,
-                                    OSSL_RECORD_TEMPLATE *thistempl,
-                                    WPACKET *thispkt, TLS_RL_RECORD *thiswr);
+    /*
+     * This applies any mac that might be necessary, ensures that we have enough
+     * space in the WPACKET to perform the encryption and sets up the
+     * TLS_RL_RECORD ready for that encryption.
+     */
+    int (*prepare_for_encryption)(OSSL_RECORD_LAYER *rl, size_t mac_size,
+                                  WPACKET *thispkt, TLS_RL_RECORD *thiswr);
 
-  /*
-   * Some record layer implementations need to do some custom preparation of
-   * the BIO before we write to it. KTLS does this to prevent coalescing of
-   * control and data messages.
-   */
-  int (*prepare_write_bio)(OSSL_RECORD_LAYER *rl, int type);
+    /*
+     * Any updates required to the record after encryption has been applied. For
+     * example, adding a MAC if using encrypt-then-mac
+     */
+    int (*post_encryption_processing)(OSSL_RECORD_LAYER *rl, size_t mac_size,
+                                      OSSL_RECORD_TEMPLATE *thistempl,
+                                      WPACKET *thispkt, TLS_RL_RECORD *thiswr);
+
+    /*
+     * Some record layer implementations need to do some custom preparation of
+     * the BIO before we write to it. KTLS does this to prevent coalescing of
+     * control and data messages.
+     */
+    int (*prepare_write_bio)(OSSL_RECORD_LAYER *rl, int type);
 };
 
 struct ossl_record_layer_st {
-  OSSL_LIB_CTX *libctx;
-  const char *propq;
-  int isdtls;
-  int version;
-  int role;
-  int direction;
-  int level;
-  const EVP_MD *md;
-  /* DTLS only */
-  uint16_t epoch;
+    OSSL_LIB_CTX *libctx;
+    const char *propq;
+    int isdtls;
+    int version;
+    int role;
+    int direction;
+    int level;
+    const EVP_MD *md;
+    /* DTLS only */
+    uint16_t epoch;
 
-  /*
-   * A BIO containing any data read in the previous epoch that was destined
-   * for this epoch
-   */
-  BIO *prev;
+    /*
+     * A BIO containing any data read in the previous epoch that was destined
+     * for this epoch
+     */
+    BIO *prev;
 
-  /* The transport BIO */
-  BIO *bio;
+    /* The transport BIO */
+    BIO *bio;
 
-  /*
-   * A BIO where we will send any data read by us that is destined for the
-   * next epoch.
-   */
-  BIO *next;
+    /*
+     * A BIO where we will send any data read by us that is destined for the
+     * next epoch.
+     */
+    BIO *next;
 
-  /* Types match the equivalent fields in the SSL object */
-  uint64_t options;
-  uint32_t mode;
+    /* Types match the equivalent fields in the SSL object */
+    uint64_t options;
+    uint32_t mode;
 
-  /* write IO goes into here */
-  TLS_BUFFER wbuf[SSL_MAX_PIPELINES + 1];
+    /* write IO goes into here */
+    TLS_BUFFER wbuf[SSL_MAX_PIPELINES + 1];
 
-  /* Next wbuf with pending data still to write */
-  size_t nextwbuf;
+    /* Next wbuf with pending data still to write */
+    size_t nextwbuf;
 
-  /* How many pipelines can be used to write data */
-  size_t numwpipes;
+    /* How many pipelines can be used to write data */
+    size_t numwpipes;
 
-  /* read IO goes into here */
-  TLS_BUFFER rbuf;
-  /* each decoded record goes in here */
-  TLS_RL_RECORD rrec[SSL_MAX_PIPELINES];
+    /* read IO goes into here */
+    TLS_BUFFER rbuf;
+    /* each decoded record goes in here */
+    TLS_RL_RECORD rrec[SSL_MAX_PIPELINES];
 
-  /* How many records have we got available in the rrec buffer */
-  size_t num_recs;
+    /* How many records have we got available in the rrec buffer */
+    size_t num_recs;
 
-  /* The record number in the rrec buffer that can be read next */
-  size_t curr_rec;
+    /* The record number in the rrec buffer that can be read next */
+    size_t curr_rec;
 
-  /* The number of records that have been released via tls_release_record */
-  size_t num_released;
+    /* The number of records that have been released via tls_release_record */
+    size_t num_released;
 
-  /* where we are when reading */
-  int rstate;
+    /* where we are when reading */
+    int rstate;
 
-  /* used internally to point at a raw packet */
-  unsigned char *packet;
-  size_t packet_length;
+    /* used internally to point at a raw packet */
+    unsigned char *packet;
+    size_t packet_length;
 
-  /* Sequence number for the next record */
-  unsigned char sequence[SEQ_NUM_SIZE];
+    /* Sequence number for the next record */
+    unsigned char sequence[SEQ_NUM_SIZE];
 
-  /* Alert code to be used if an error occurs */
-  int alert;
+    /* Alert code to be used if an error occurs */
+    int alert;
 
-  /*
-   * Read as many input bytes as possible (for non-blocking reads)
-   */
-  int read_ahead;
+    /*
+     * Read as many input bytes as possible (for non-blocking reads)
+     */
+    int read_ahead;
 
-  /* The number of consecutive empty records we have received */
-  size_t empty_record_count;
+    /* The number of consecutive empty records we have received */
+    size_t empty_record_count;
 
-  /*
-   * Do we need to send a prefix empty record before application data as a
-   * countermeasure against known-IV weakness (necessary for SSLv3 and
-   * TLSv1.0)
-   */
-  int need_empty_fragments;
+    /*
+     * Do we need to send a prefix empty record before application data as a
+     * countermeasure against known-IV weakness (necessary for SSLv3 and
+     * TLSv1.0)
+     */
+    int need_empty_fragments;
 
-  /* cryptographic state */
-  EVP_CIPHER_CTX *enc_ctx;
+    /* cryptographic state */
+    EVP_CIPHER_CTX *enc_ctx;
 
-  /* TLSv1.3 MAC ctx, only used with integrity-only cipher */
-  EVP_MAC_CTX *mac_ctx;
+    /* TLSv1.3 MAC ctx, only used with integrity-only cipher */
+    EVP_MAC_CTX *mac_ctx;
 
-  /* Explicit IV length */
-  size_t eivlen;
+    /* Explicit IV length */
+    size_t eivlen;
 
-  /* used for mac generation */
-  EVP_MD_CTX *md_ctx;
+    /* used for mac generation */
+    EVP_MD_CTX *md_ctx;
 
-  /* compress/uncompress */
-  COMP_CTX *compctx;
+    /* compress/uncompress */
+    COMP_CTX *compctx;
 
-  /* Set to 1 if this is the first handshake. 0 otherwise */
-  int is_first_handshake;
+    /* Set to 1 if this is the first handshake. 0 otherwise */
+    int is_first_handshake;
 
-  /*
-   * The smaller of the configured and negotiated maximum fragment length
-   * or SSL3_RT_MAX_PLAIN_LENGTH if none
-   */
-  unsigned int max_frag_len;
+    /*
+     * The smaller of the configured and negotiated maximum fragment length
+     * or SSL3_RT_MAX_PLAIN_LENGTH if none
+     */
+    unsigned int max_frag_len;
 
-  /* The maximum amount of early data we can receive/send */
-  uint32_t max_early_data;
+    /* The maximum amount of early data we can receive/send */
+    uint32_t max_early_data;
 
-  /* The amount of early data that we have sent/received */
-  size_t early_data_count;
+    /* The amount of early data that we have sent/received */
+    size_t early_data_count;
 
-  /* TLSv1.3 record padding */
-  size_t block_padding;
-  size_t hs_padding;
+    /* TLSv1.3 record padding */
+    size_t block_padding;
+    size_t hs_padding;
 
-  /* Only used by SSLv3 */
-  unsigned char mac_secret[EVP_MAX_MD_SIZE];
+    /* Only used by SSLv3 */
+    unsigned char mac_secret[EVP_MAX_MD_SIZE];
 
-  /* TLSv1.0/TLSv1.1/TLSv1.2 */
-  int use_etm;
+    /* TLSv1.0/TLSv1.1/TLSv1.2 */
+    int use_etm;
 
-  /* Flags for GOST ciphers */
-  int stream_mac;
-  int tlstree;
+    /* Flags for GOST ciphers */
+    int stream_mac;
+    int tlstree;
 
-  /* TLSv1.3 fields */
-  unsigned char *iv;    /* static IV */
-  unsigned char *nonce; /* part of static IV followed by sequence number */
-  int allow_plain_alerts;
+    /* TLSv1.3 fields */
+    unsigned char *iv;    /* static IV */
+    unsigned char *nonce; /* part of static IV followed by sequence number */
+    int allow_plain_alerts;
 
-  /* TLS "any" fields */
-  /* Set to true if this is the first record in a connection */
-  unsigned int is_first_record;
+    /* TLS "any" fields */
+    /* Set to true if this is the first record in a connection */
+    unsigned int is_first_record;
 
-  size_t taglen;
+    size_t taglen;
 
-  /* DTLS received handshake records (processed and unprocessed) */
-  struct pqueue_st *unprocessed_rcds;
-  struct pqueue_st *processed_rcds;
+    /* DTLS received handshake records (processed and unprocessed) */
+    struct pqueue_st *unprocessed_rcds;
+    struct pqueue_st *processed_rcds;
 
-  /* records being received in the current epoch */
-  DTLS_BITMAP bitmap;
-  /* renegotiation starts a new set of sequence numbers */
-  DTLS_BITMAP next_bitmap;
+    /* records being received in the current epoch */
+    DTLS_BITMAP bitmap;
+    /* renegotiation starts a new set of sequence numbers */
+    DTLS_BITMAP next_bitmap;
 
-  /*
-   * Whether we are currently in a handshake or not. Only maintained for DTLS
-   */
-  int in_init;
+    /*
+     * Whether we are currently in a handshake or not. Only maintained for DTLS
+     */
+    int in_init;
 
-  /* Callbacks */
-  void *cbarg;
-  OSSL_FUNC_rlayer_skip_early_data_fn *skip_early_data;
-  OSSL_FUNC_rlayer_msg_callback_fn *msg_callback;
-  OSSL_FUNC_rlayer_security_fn *security;
-  OSSL_FUNC_rlayer_padding_fn *padding;
+    /* Callbacks */
+    void *cbarg;
+    OSSL_FUNC_rlayer_skip_early_data_fn *skip_early_data;
+    OSSL_FUNC_rlayer_msg_callback_fn *msg_callback;
+    OSSL_FUNC_rlayer_security_fn *security;
+    OSSL_FUNC_rlayer_padding_fn *padding;
 
-  size_t max_pipelines;
+    size_t max_pipelines;
 
-  /* Function pointers for version specific functions */
-  const struct record_functions_st *funcs;
+    /* Function pointers for version specific functions */
+    const struct record_functions_st *funcs;
 };
 
 typedef struct dtls_rlayer_record_data_st {
-  unsigned char *packet;
-  size_t packet_length;
-  TLS_BUFFER rbuf;
-  TLS_RL_RECORD rrec;
+    unsigned char *packet;
+    size_t packet_length;
+    TLS_BUFFER rbuf;
+    TLS_RL_RECORD rrec;
 } DTLS_RLAYER_RECORD_DATA;
 
 extern const struct record_functions_st ssl_3_0_funcs;
@@ -379,13 +380,13 @@ void ossl_rlayer_fatal(OSSL_RECORD_LAYER *rl, int al, int reason,
 
 #define RLAYERfatal(rl, al, r) RLAYERfatal_data((rl), (al), (r), NULL)
 #define RLAYERfatal_data                                                       \
-  (ERR_new(), ERR_set_debug(OPENSSL_FILE, OPENSSL_LINE, OPENSSL_FUNC),         \
-   ossl_rlayer_fatal)
+    (ERR_new(), ERR_set_debug(OPENSSL_FILE, OPENSSL_LINE, OPENSSL_FUNC),       \
+     ossl_rlayer_fatal)
 
 #define RLAYER_USE_EXPLICIT_IV(rl)                                             \
-  ((rl)->version == TLS1_1_VERSION || (rl)->version == TLS1_2_VERSION ||       \
-   (rl)->version == DTLS1_BAD_VER || (rl)->version == DTLS1_VERSION ||         \
-   (rl)->version == DTLS1_2_VERSION)
+    ((rl)->version == TLS1_1_VERSION || (rl)->version == TLS1_2_VERSION ||     \
+     (rl)->version == DTLS1_BAD_VER || (rl)->version == DTLS1_VERSION ||       \
+     (rl)->version == DTLS1_2_VERSION)
 
 void ossl_tls_rl_record_set_seq_num(TLS_RL_RECORD *r,
                                     const unsigned char *seq_num);

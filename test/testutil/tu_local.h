@@ -49,8 +49,8 @@ __owur int run_tests(const char *test_prog_name);
 void set_test_title(const char *title);
 
 typedef enum OPTION_choice_default {
-  OPT_ERR = -1,
-  OPT_EOF = 0,
-  OPT_TEST_ENUM
+    OPT_ERR = -1,
+    OPT_EOF = 0,
+    OPT_TEST_ENUM
 } OPTION_CHOICE_DEFAULT;
 void opt_check_usage(void);

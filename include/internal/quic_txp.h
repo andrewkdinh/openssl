@@ -30,37 +30,37 @@
  * ==================
  */
 typedef struct ossl_quic_tx_packetiser_args_st {
-  /* Configuration Settings */
-  QUIC_CONN_ID cur_scid;       /* Current Source Connection ID we use. */
-  QUIC_CONN_ID cur_dcid;       /* Current Destination Connection ID we use. */
-  BIO_ADDR peer;               /* Current destination L4 address we use. */
-  uint32_t ack_delay_exponent; /* ACK delay exponent used when encoding. */
+    /* Configuration Settings */
+    QUIC_CONN_ID cur_scid;       /* Current Source Connection ID we use. */
+    QUIC_CONN_ID cur_dcid;       /* Current Destination Connection ID we use. */
+    BIO_ADDR peer;               /* Current destination L4 address we use. */
+    uint32_t ack_delay_exponent; /* ACK delay exponent used when encoding. */
 
-  /* Injected Dependencies */
-  OSSL_QTX *qtx;        /* QUIC Record Layer TX we are using */
-  QUIC_TXPIM *txpim;    /* QUIC TX'd Packet Information Manager */
-  QUIC_CFQ *cfq;        /* QUIC Control Frame Queue */
-  OSSL_ACKM *ackm;      /* QUIC Acknowledgement Manager */
-  QUIC_STREAM_MAP *qsm; /* QUIC Streams Map */
-  QUIC_TXFC *conn_txfc; /* QUIC Connection-Level TX Flow Controller */
-  QUIC_RXFC *conn_rxfc; /* QUIC Connection-Level RX Flow Controller */
-  QUIC_RXFC *max_streams_bidi_rxfc; /* QUIC RXFC for MAX_STREAMS generation */
-  QUIC_RXFC *max_streams_uni_rxfc;
-  const OSSL_CC_METHOD *cc_method; /* QUIC Congestion Controller */
-  OSSL_CC_DATA *cc_data;           /* QUIC Congestion Controller Instance */
-  OSSL_TIME (*now)(void *arg);     /* Callback to get current time. */
-  void *now_arg;
-  QLOG *(*get_qlog_cb)(void *arg); /* Optional QLOG retrieval func */
-  void *get_qlog_cb_arg;
-  uint32_t protocol_version; /* The protocol version to try negotiating */
+    /* Injected Dependencies */
+    OSSL_QTX *qtx;        /* QUIC Record Layer TX we are using */
+    QUIC_TXPIM *txpim;    /* QUIC TX'd Packet Information Manager */
+    QUIC_CFQ *cfq;        /* QUIC Control Frame Queue */
+    OSSL_ACKM *ackm;      /* QUIC Acknowledgement Manager */
+    QUIC_STREAM_MAP *qsm; /* QUIC Streams Map */
+    QUIC_TXFC *conn_txfc; /* QUIC Connection-Level TX Flow Controller */
+    QUIC_RXFC *conn_rxfc; /* QUIC Connection-Level RX Flow Controller */
+    QUIC_RXFC *max_streams_bidi_rxfc; /* QUIC RXFC for MAX_STREAMS generation */
+    QUIC_RXFC *max_streams_uni_rxfc;
+    const OSSL_CC_METHOD *cc_method; /* QUIC Congestion Controller */
+    OSSL_CC_DATA *cc_data;           /* QUIC Congestion Controller Instance */
+    OSSL_TIME (*now)(void *arg);     /* Callback to get current time. */
+    void *now_arg;
+    QLOG *(*get_qlog_cb)(void *arg); /* Optional QLOG retrieval func */
+    void *get_qlog_cb_arg;
+    uint32_t protocol_version; /* The protocol version to try negotiating */
 
-  /*
-   * Injected dependencies - crypto streams.
-   *
-   * Note: There is no crypto stream for the 0-RTT EL.
-   *       crypto[QUIC_PN_SPACE_APP] is the 1-RTT crypto stream.
-   */
-  QUIC_SSTREAM *crypto[QUIC_PN_SPACE_NUM];
+    /*
+     * Injected dependencies - crypto streams.
+     *
+     * Note: There is no crypto stream for the 0-RTT EL.
+     *       crypto[QUIC_PN_SPACE_APP] is the 1-RTT crypto stream.
+     */
+    QUIC_SSTREAM *crypto[QUIC_PN_SPACE_NUM];
 
 } OSSL_QUIC_TX_PACKETISER_ARGS;
 
@@ -101,9 +101,9 @@ OSSL_QUIC_TX_PACKETISER *txp, size_t n);
  * See QUIC_TXP_STATUS for details.
  */
 typedef struct quic_txp_status_st {
-  int sent_ack_eliciting; /* Was an ACK-eliciting packet sent? */
-  int sent_handshake;     /* Was a Handshake packet sent? */
-  size_t sent_pkt;        /* Number of packets sent (0 if nothing was sent) */
+    int sent_ack_eliciting; /* Was an ACK-eliciting packet sent? */
+    int sent_handshake;     /* Was a Handshake packet sent? */
+    size_t sent_pkt;        /* Number of packets sent (0 if nothing was sent) */
 } QUIC_TXP_STATUS;
 
 int ossl_quic_tx_packetiser_generate(OSSL_QUIC_TX_PACKETISER *txp,

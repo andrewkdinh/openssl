@@ -50,19 +50,19 @@ int ossl_rsaz_mod_exp_avx512_x2(BN_ULONG *res1, const BN_ULONG *base1,
 static ossl_inline void bn_select_words(BN_ULONG *r, BN_ULONG mask,
                                         const BN_ULONG *a, const BN_ULONG *b,
                                         size_t num) {
-  size_t i;
+    size_t i;
 
-  for (i = 0; i < num; i++) {
-    r[i] = constant_time_select_64(mask, a[i], b[i]);
-  }
+    for (i = 0; i < num; i++) {
+        r[i] = constant_time_select_64(mask, a[i], b[i]);
+    }
 }
 
 static ossl_inline BN_ULONG bn_reduce_once_in_place(BN_ULONG *r, BN_ULONG carry,
                                                     const BN_ULONG *m,
                                                     BN_ULONG *tmp, size_t num) {
-  carry -= bn_sub_words(tmp, r, m, num);
-  bn_select_words(r, carry, r /* tmp < 0 */, tmp /* tmp >= 0 */, num);
-  return carry;
+    carry -= bn_sub_words(tmp, r, m, num);
+    bn_select_words(r, carry, r /* tmp < 0 */, tmp /* tmp >= 0 */, num);
+    return carry;
 }
 
 #endif

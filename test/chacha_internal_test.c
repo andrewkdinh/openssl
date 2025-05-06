@@ -106,31 +106,31 @@ static const unsigned char ref[] = {
 0xb5, 0xaa, 0xd3, 0x3e, 0xa2, 0x15, 0x5d, 0x10, 0x5d, 0x4e};
 
 static int test_cha_cha_internal(int n) {
-  unsigned char buf[sizeof(ref)];
-  unsigned int i = n + 1, j;
+    unsigned char buf[sizeof(ref)];
+    unsigned int i = n + 1, j;
 
-  memset(buf, 0, i);
-  memcpy(buf + i, ref + i, sizeof(ref) - i);
+    memset(buf, 0, i);
+    memcpy(buf + i, ref + i, sizeof(ref) - i);
 
-  ChaCha20_ctr32(buf, buf, i, key, ivp);
+    ChaCha20_ctr32(buf, buf, i, key, ivp);
 
-  /*
-   * Idea behind checking for whole sizeof(ref) is that if
-   * ChaCha20_ctr32 oversteps i-th byte, then we'd know
-   */
-  for (j = 0; j < sizeof(ref); j++)
-    if (!TEST_uchar_eq(buf[j], ref[j])) {
-      TEST_info("%d failed at %u (%02x)\n", i, j, buf[j]);
-      return 0;
-    }
-  return 1;
+    /*
+     * Idea behind checking for whole sizeof(ref) is that if
+     * ChaCha20_ctr32 oversteps i-th byte, then we'd know
+     */
+    for (j = 0; j < sizeof(ref); j++)
+        if (!TEST_uchar_eq(buf[j], ref[j])) {
+            TEST_info("%d failed at %u (%02x)\n", i, j, buf[j]);
+            return 0;
+        }
+    return 1;
 }
 
 int setup_tests(void) {
 #ifdef OPENSSL_CPUID_OBJ
-  OPENSSL_cpuid_setup();
+    OPENSSL_cpuid_setup();
 #endif
 
-  ADD_ALL_TESTS(test_cha_cha_internal, sizeof(ref));
-  return 1;
+    ADD_ALL_TESTS(test_cha_cha_internal, sizeof(ref));
+    return 1;
 }

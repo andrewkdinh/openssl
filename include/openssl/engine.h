@@ -146,24 +146,24 @@ extern "C" {
 #define ENGINE_CTRL_SET_LOGSTREAM 1
 #define ENGINE_CTRL_SET_PASSWORD_CALLBACK 2
 #define ENGINE_CTRL_HUP                                                        \
-  3                                      /* Close and reinitialise             \
+    3                                    /* Close and reinitialise             \
                                           * any handles/connections            \
                                           * etc. */
 #define ENGINE_CTRL_SET_USER_INTERFACE 4 /* Alternative to callback */
 #define ENGINE_CTRL_SET_CALLBACK_DATA                                          \
-  5 /* User-specific data, used                                                \
-     * when calling the password                                               \
-     * callback and the user                                                   \
-     * interface */
+    5 /* User-specific data, used                                              \
+       * when calling the password                                             \
+       * callback and the user                                                 \
+       * interface */
 #define ENGINE_CTRL_LOAD_CONFIGURATION                                         \
-  6 /* Load a configuration,                                                   \
-     * given a string that                                                     \
-     * represents a file name                                                  \
-     * or so */
+    6 /* Load a configuration,                                                 \
+       * given a string that                                                   \
+       * represents a file name                                                \
+       * or so */
 #define ENGINE_CTRL_LOAD_SECTION                                               \
-  7 /* Load data from a given                                                  \
-     * section in the already                                                  \
-     * loaded configuration */
+    7 /* Load data from a given                                                \
+       * section in the already                                                \
+       * loaded configuration */
 
 /*
  * These control commands allow an application to deal with an arbitrary
@@ -259,10 +259,10 @@ extern "C" {
  * has cmd_num set to zero and/or cmd_name set to NULL.
  */
 typedef struct ENGINE_CMD_DEFN_st {
-  unsigned int cmd_num;   /* The command number */
-  const char *cmd_name;   /* The command name itself */
-  const char *cmd_desc;   /* A short description of the command */
-  unsigned int cmd_flags; /* The input the command expects */
+    unsigned int cmd_num;   /* The command number */
+    const char *cmd_name;   /* The command name itself */
+    const char *cmd_desc;   /* A short description of the command */
+    unsigned int cmd_flags; /* The input the command expects */
 } ENGINE_CMD_DEFN;
 
 /* Generic function pointer */
@@ -338,19 +338,19 @@ OSSL_DEPRECATEDIN_3_0 ENGINE *ENGINE_by_id(const char *id);
 
 #ifndef OPENSSL_NO_DEPRECATED_1_1_0
 #define ENGINE_load_openssl()                                                  \
-  OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_OPENSSL, NULL)
+    OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_OPENSSL, NULL)
 #define ENGINE_load_dynamic()                                                  \
-  OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_DYNAMIC, NULL)
+    OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_DYNAMIC, NULL)
 #ifndef OPENSSL_NO_STATIC_ENGINE
 #define ENGINE_load_padlock()                                                  \
-  OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_PADLOCK, NULL)
+    OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_PADLOCK, NULL)
 #define ENGINE_load_capi() OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_CAPI, NULL)
 #define ENGINE_load_afalg() OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_AFALG, NULL)
 #endif
 #define ENGINE_load_cryptodev()                                                \
-  OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_CRYPTODEV, NULL)
+    OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_CRYPTODEV, NULL)
 #define ENGINE_load_rdrand()                                                   \
-  OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_RDRAND, NULL)
+    OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_RDRAND, NULL)
 #endif
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 OSSL_DEPRECATEDIN_3_0 void ENGINE_load_builtin_engines(void);
@@ -528,7 +528,7 @@ OSSL_DEPRECATEDIN_3_0 int ENGINE_set_cmd_defns(ENGINE *e,
 #endif
 /* These functions allow control over any per-structure ENGINE data. */
 #define ENGINE_get_ex_new_index(l, p, newf, dupf, freef)                       \
-  CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_ENGINE, l, p, newf, dupf, freef)
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_ENGINE, l, p, newf, dupf, freef)
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 OSSL_DEPRECATEDIN_3_0 int ENGINE_set_ex_data(ENGINE *e, int idx, void *arg);
 OSSL_DEPRECATEDIN_3_0 void *ENGINE_get_ex_data(const ENGINE *e, int idx);
@@ -540,8 +540,8 @@ OSSL_DEPRECATEDIN_3_0 void *ENGINE_get_ex_data(const ENGINE *e, int idx);
  * now take care of it so it is no longer required to call this function.
  */
 #define ENGINE_cleanup()                                                       \
-  while (0)                                                                    \
-  continue
+    while (0)                                                                  \
+    continue
 #endif
 
 /*
@@ -740,9 +740,9 @@ typedef void *(*dyn_MEM_malloc_fn)(size_t, const char *, int);
 typedef void *(*dyn_MEM_realloc_fn)(void *, size_t, const char *, int);
 typedef void (*dyn_MEM_free_fn)(void *, const char *, int);
 typedef struct st_dynamic_MEM_fns {
-  dyn_MEM_malloc_fn malloc_fn;
-  dyn_MEM_realloc_fn realloc_fn;
-  dyn_MEM_free_fn free_fn;
+    dyn_MEM_malloc_fn malloc_fn;
+    dyn_MEM_realloc_fn realloc_fn;
+    dyn_MEM_free_fn free_fn;
 } dynamic_MEM_fns;
 /*
  * FIXME: Perhaps the memory and locking code (crypto.h) should declare and
@@ -750,8 +750,8 @@ typedef struct st_dynamic_MEM_fns {
  */
 /* The top-level structure */
 typedef struct st_dynamic_fns {
-  void *static_state;
-  dynamic_MEM_fns mem_fns;
+    void *static_state;
+    dynamic_MEM_fns mem_fns;
 } dynamic_fns;
 
 /*
@@ -768,12 +768,12 @@ typedef struct st_dynamic_fns {
  */
 typedef unsigned long (*dynamic_v_check_fn)(unsigned long ossl_version);
 #define IMPLEMENT_DYNAMIC_CHECK_FN()                                           \
-  OPENSSL_EXPORT unsigned long v_check(unsigned long v);                       \
-  OPENSSL_EXPORT unsigned long v_check(unsigned long v) {                      \
-    if (v >= OSSL_DYNAMIC_OLDEST)                                              \
-      return OSSL_DYNAMIC_VERSION;                                             \
-    return 0;                                                                  \
-  }
+    OPENSSL_EXPORT unsigned long v_check(unsigned long v);                     \
+    OPENSSL_EXPORT unsigned long v_check(unsigned long v) {                    \
+        if (v >= OSSL_DYNAMIC_OLDEST)                                          \
+            return OSSL_DYNAMIC_VERSION;                                       \
+        return 0;                                                              \
+    }
 
 /*
  * This function is passed the ENGINE structure to initialise with its own
@@ -796,20 +796,21 @@ typedef unsigned long (*dynamic_v_check_fn)(unsigned long ossl_version);
 typedef int (*dynamic_bind_engine)(ENGINE *e, const char *id,
                                    const dynamic_fns *fns);
 #define IMPLEMENT_DYNAMIC_BIND_FN(fn)                                          \
-  OPENSSL_EXPORT                                                               \
-  int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns);          \
-  OPENSSL_EXPORT                                                               \
-  int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns) {         \
-    if (ENGINE_get_static_state() == fns->static_state)                        \
-      goto skip_cbs;                                                           \
-    CRYPTO_set_mem_functions(fns->mem_fns.malloc_fn, fns->mem_fns.realloc_fn,  \
-                             fns->mem_fns.free_fn);                            \
-    OPENSSL_init_crypto(OPENSSL_INIT_NO_ATEXIT, NULL);                         \
-  skip_cbs:                                                                    \
-    if (!fn(e, id))                                                            \
-      return 0;                                                                \
-    return 1;                                                                  \
-  }
+    OPENSSL_EXPORT                                                             \
+    int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns);        \
+    OPENSSL_EXPORT                                                             \
+    int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns) {       \
+        if (ENGINE_get_static_state() == fns->static_state)                    \
+            goto skip_cbs;                                                     \
+        CRYPTO_set_mem_functions(fns->mem_fns.malloc_fn,                       \
+                                 fns->mem_fns.realloc_fn,                      \
+                                 fns->mem_fns.free_fn);                        \
+        OPENSSL_init_crypto(OPENSSL_INIT_NO_ATEXIT, NULL);                     \
+    skip_cbs:                                                                  \
+        if (!fn(e, id))                                                        \
+            return 0;                                                          \
+        return 1;                                                              \
+    }
 
 /*
  * If the loading application (or library) and the loaded ENGINE library

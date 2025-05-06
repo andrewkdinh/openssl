@@ -71,76 +71,76 @@
  * the reactor interface.
  */
 struct quic_tick_result_st {
-  OSSL_TIME tick_deadline;
-  char net_read_desired;
-  char net_write_desired;
-  char notify_other_threads;
+    OSSL_TIME tick_deadline;
+    char net_read_desired;
+    char net_write_desired;
+    char notify_other_threads;
 };
 
 static ossl_inline ossl_unused void
 ossl_quic_tick_result_merge_into(QUIC_TICK_RESULT *r,
                                  const QUIC_TICK_RESULT *src) {
-  r->net_read_desired = r->net_read_desired || src->net_read_desired;
-  r->net_write_desired = r->net_write_desired || src->net_write_desired;
-  r->notify_other_threads =
-  r->notify_other_threads || src->notify_other_threads;
-  r->tick_deadline = ossl_time_min(r->tick_deadline, src->tick_deadline);
+    r->net_read_desired = r->net_read_desired || src->net_read_desired;
+    r->net_write_desired = r->net_write_desired || src->net_write_desired;
+    r->notify_other_threads =
+    r->notify_other_threads || src->notify_other_threads;
+    r->tick_deadline = ossl_time_min(r->tick_deadline, src->tick_deadline);
 }
 
 struct quic_reactor_st {
-  /*
-   * BIO poll descriptors which can be polled. poll_r is a poll descriptor
-   * which becomes readable when the QUIC state machine can potentially do
-   * work, and poll_w is a poll descriptor which becomes writable when the
-   * QUIC state machine can potentially do work. Generally, either of these
-   * conditions means that SSL_tick() should be called, or another SSL
-   * function which implicitly calls SSL_tick() (e.g. SSL_read/SSL_write()).
-   */
-  BIO_POLL_DESCRIPTOR poll_r, poll_w;
-  OSSL_TIME
-  tick_deadline; /* ossl_time_infinite() if none currently applicable */
+    /*
+     * BIO poll descriptors which can be polled. poll_r is a poll descriptor
+     * which becomes readable when the QUIC state machine can potentially do
+     * work, and poll_w is a poll descriptor which becomes writable when the
+     * QUIC state machine can potentially do work. Generally, either of these
+     * conditions means that SSL_tick() should be called, or another SSL
+     * function which implicitly calls SSL_tick() (e.g. SSL_read/SSL_write()).
+     */
+    BIO_POLL_DESCRIPTOR poll_r, poll_w;
+    OSSL_TIME
+    tick_deadline; /* ossl_time_infinite() if none currently applicable */
 
-  void (*tick_cb)(QUIC_TICK_RESULT *res, void *arg, uint32_t flags);
-  void *tick_cb_arg;
+    void (*tick_cb)(QUIC_TICK_RESULT *res, void *arg, uint32_t flags);
+    void *tick_cb_arg;
 
-  /* The mutex used for ticking. Not owned by the reactor. */
-  CRYPTO_MUTEX *mutex;
+    /* The mutex used for ticking. Not owned by the reactor. */
+    CRYPTO_MUTEX *mutex;
 
-  /* Used to notify other threads. Valid only if have_notifier is set. */
-  RIO_NOTIFIER notifier;
+    /* Used to notify other threads. Valid only if have_notifier is set. */
+    RIO_NOTIFIER notifier;
 
-  /*
-   * Condvar to assist synchronising use of the notifier. Valid only if
-   * have_notifier is set.
-   */
-  CRYPTO_CONDVAR *notifier_cv;
+    /*
+     * Condvar to assist synchronising use of the notifier. Valid only if
+     * have_notifier is set.
+     */
+    CRYPTO_CONDVAR *notifier_cv;
 
-  /*
-   * Count of the current number of blocking waiters. Like everything else,
-   * this is protected by the caller's mutex (i.e., the engine mutex).
-   */
-  size_t cur_blocking_waiters;
+    /*
+     * Count of the current number of blocking waiters. Like everything else,
+     * this is protected by the caller's mutex (i.e., the engine mutex).
+     */
+    size_t cur_blocking_waiters;
 
-  /*
-   * These are true if we would like to know when we can read or write from
-   * the network respectively.
-   */
-  unsigned int net_read_desired : 1;
-  unsigned int net_write_desired : 1;
+    /*
+     * These are true if we would like to know when we can read or write from
+     * the network respectively.
+     */
+    unsigned int net_read_desired : 1;
+    unsigned int net_write_desired : 1;
 
-  /*
-   * Are the read and write poll descriptors we are currently configured with
-   * things we can actually poll?
-   */
-  unsigned int can_poll_r : 1;
-  unsigned int can_poll_w : 1;
+    /*
+     * Are the read and write poll descriptors we are currently configured with
+     * things we can actually poll?
+     */
+    unsigned int can_poll_r : 1;
+    unsigned int can_poll_w : 1;
 
-  /* 1 if notifier is present and initialised. */
-  unsigned int have_notifier : 1;
+    /* 1 if notifier is present and initialised. */
+    unsigned int have_notifier : 1;
 
-  /* 1 if a block_until_pred call has put the notifier in the signalled state.
-   */
-  unsigned int signalled_notifier : 1;
+    /* 1 if a block_until_pred call has put the notifier in the signalled state.
+     */
+    unsigned int signalled_notifier : 1;
 };
 
 /* Create an OS notifier? */

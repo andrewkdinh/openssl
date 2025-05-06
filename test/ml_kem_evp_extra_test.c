@@ -25,19 +25,19 @@
 static OSSL_LIB_CTX *testctx = NULL;
 
 typedef enum OPTION_choice {
-  OPT_ERR = -1,
-  OPT_EOF = 0,
-  OPT_CONFIG_FILE,
-  OPT_TEST_RAND,
-  OPT_TEST_ENUM
+    OPT_ERR = -1,
+    OPT_EOF = 0,
+    OPT_CONFIG_FILE,
+    OPT_TEST_RAND,
+    OPT_TEST_ENUM
 } OPTION_CHOICE;
 
 const OPTIONS *test_get_options(void) {
-  static const OPTIONS options[] = {
-  OPT_TEST_OPTIONS_DEFAULT_USAGE,
-  {"test-rand", OPT_TEST_RAND, '-', "Test non-derandomised ML-KEM"},
-  {NULL}};
-  return options;
+    static const OPTIONS options[] = {
+    OPT_TEST_OPTIONS_DEFAULT_USAGE,
+    {"test-rand", OPT_TEST_RAND, '-', "Test non-derandomised ML-KEM"},
+    {NULL}};
+    return options;
 }
 
 static uint8_t gen_seed[64] = {
@@ -87,276 +87,97 @@ static uint8_t expected_shared_secret[3][32] = {
 };
 
 static int test_ml_kem(void) {
-  EVP_PKEY *akey, *bkey = NULL;
-  int res = 0;
-  size_t publen;
-  unsigned char *rawpub = NULL;
-  EVP_PKEY_CTX *ctx = NULL;
-  unsigned char *wrpkey = NULL, *agenkey = NULL, *bgenkey = NULL;
-  size_t wrpkeylen, agenkeylen, bgenkeylen, i;
-
-  /* Generate Alice's key */
-  akey = EVP_PKEY_Q_keygen(testctx, NULL, "ML-KEM-768");
-  if (!TEST_ptr(akey))
-    goto err;
-
-  /* Get the raw public key */
-  publen = EVP_PKEY_get1_encoded_public_key(akey, &rawpub);
-  if (!TEST_size_t_gt(publen, 0))
-    goto err;
-
-  /* Create Bob's key and populate it with Alice's public key data */
-  bkey = EVP_PKEY_new();
-  if (!TEST_ptr(bkey))
-    goto err;
-
-  if (!TEST_int_gt(EVP_PKEY_copy_parameters(bkey, akey), 0))
-    goto err;
-
-  if (!TEST_true(EVP_PKEY_set1_encoded_public_key(bkey, rawpub, publen)))
-    goto err;
-
-  /* Encapsulate Bob's key */
-  ctx = EVP_PKEY_CTX_new_from_pkey(testctx, bkey, NULL);
-  if (!TEST_ptr(ctx))
-    goto err;
-
-  if (!TEST_int_gt(EVP_PKEY_encapsulate_init(ctx, NULL), 0))
-    goto err;
-
-  if (!TEST_int_gt(
-      EVP_PKEY_encapsulate(ctx, NULL, &wrpkeylen, NULL, &bgenkeylen), 0))
-    goto err;
-
-  if (!TEST_size_t_gt(wrpkeylen, 0) || !TEST_size_t_gt(bgenkeylen, 0))
-    goto err;
-
-  wrpkey = OPENSSL_zalloc(wrpkeylen);
-  bgenkey = OPENSSL_zalloc(bgenkeylen);
-  if (!TEST_ptr(wrpkey) || !TEST_ptr(bgenkey))
-    goto err;
-
-  if (!TEST_int_gt(
-      EVP_PKEY_encapsulate(ctx, wrpkey, &wrpkeylen, bgenkey, &bgenkeylen), 0))
-    goto err;
-
-  EVP_PKEY_CTX_free(ctx);
-
-  /* Alice now decapsulates Bob's key */
-  ctx = EVP_PKEY_CTX_new_from_pkey(testctx, akey, NULL);
-  if (!TEST_ptr(ctx))
-    goto err;
-
-  if (!TEST_int_gt(EVP_PKEY_decapsulate_init(ctx, NULL), 0))
-    goto err;
-
-  if (!TEST_int_gt(
-      EVP_PKEY_decapsulate(ctx, NULL, &agenkeylen, wrpkey, wrpkeylen), 0))
-    goto err;
-
-  if (!TEST_size_t_gt(agenkeylen, 0))
-    goto err;
-
-  agenkey = OPENSSL_zalloc(agenkeylen);
-  if (!TEST_ptr(agenkey))
-    goto err;
-
-  if (!TEST_int_gt(
-      EVP_PKEY_decapsulate(ctx, agenkey, &agenkeylen, wrpkey, wrpkeylen), 0))
-    goto err;
-
-  /* Hopefully we ended up with a shared key */
-  if (!TEST_mem_eq(agenkey, agenkeylen, bgenkey, bgenkeylen))
-    goto err;
-
-  /* Verify we generated a non-zero shared key */
-  for (i = 0; i < agenkeylen; i++)
-    if (agenkey[i] != 0)
-      break;
-  if (!TEST_size_t_ne(i, agenkeylen))
-    goto err;
-
-  res = 1;
-err:
-  EVP_PKEY_CTX_free(ctx);
-  EVP_PKEY_free(akey);
-  EVP_PKEY_free(bkey);
-  OPENSSL_free(rawpub);
-  OPENSSL_free(wrpkey);
-  OPENSSL_free(agenkey);
-  OPENSSL_free(bgenkey);
-  return res;
-}
-
-static int test_non_derandomised_ml_kem(void) {
-  static const int alg[3] = {EVP_PKEY_ML_KEM_512, EVP_PKEY_ML_KEM_768,
-                             EVP_PKEY_ML_KEM_1024};
-  EVP_RAND_CTX *privctx;
-  EVP_RAND_CTX *pubctx;
-  EVP_MD *sha256;
-  int i, ret = 0;
-
-  if (!TEST_ptr(privctx = RAND_get0_private(NULL)) ||
-      !TEST_ptr(pubctx = RAND_get0_public(NULL)))
-    return 0;
-
-  if (!TEST_ptr(sha256 = EVP_MD_fetch(NULL, "sha256", NULL)))
-    return 0;
-
-  for (i = 0; i < (int)OSSL_NELEM(alg); ++i) {
-    const ML_KEM_VINFO *v;
-    OSSL_PARAM params[3], *p;
-    uint8_t hash[32];
-    EVP_PKEY *akey = NULL, *bkey = NULL;
+    EVP_PKEY *akey, *bkey = NULL;
+    int res = 0;
     size_t publen;
     unsigned char *rawpub = NULL;
     EVP_PKEY_CTX *ctx = NULL;
     unsigned char *wrpkey = NULL, *agenkey = NULL, *bgenkey = NULL;
-    size_t wrpkeylen, agenkeylen, bgenkeylen;
-    unsigned int strength = 256;
-    unsigned char c;
-    int res = -1;
+    size_t wrpkeylen, agenkeylen, bgenkeylen, i;
 
-    if ((v = ossl_ml_kem_get_vinfo(alg[i])) == NULL)
-      goto done;
-
-    /* Configure the private RNG to output just the keygen seed */
-    p = params;
-    *p++ = OSSL_PARAM_construct_octet_string(OSSL_RAND_PARAM_TEST_ENTROPY,
-                                             gen_seed, sizeof(gen_seed));
-    *p++ = OSSL_PARAM_construct_uint(OSSL_RAND_PARAM_STRENGTH, &strength);
-    *p = OSSL_PARAM_construct_end();
-    if (!TEST_true(EVP_RAND_CTX_set_params(privctx, params)))
-      goto done;
-
-    res = -2;
     /* Generate Alice's key */
-    akey = EVP_PKEY_Q_keygen(testctx, NULL, v->algorithm_name);
+    akey = EVP_PKEY_Q_keygen(testctx, NULL, "ML-KEM-768");
     if (!TEST_ptr(akey))
-      goto done;
-
-    /* Check that no more entropy is available! */
-    if (!TEST_int_le(RAND_priv_bytes(&c, 1), 0))
-      goto done;
+        goto err;
 
     /* Get the raw public key */
     publen = EVP_PKEY_get1_encoded_public_key(akey, &rawpub);
-    if (!TEST_size_t_eq(publen, v->pubkey_bytes))
-      goto done;
+    if (!TEST_size_t_gt(publen, 0))
+        goto err;
 
-    res = -3;
-    /* Check that we got the expected 'rho' value in the ciphertext */
-    if (!TEST_mem_eq(rawpub + v->vector_bytes, ML_KEM_RANDOM_BYTES,
-                     expected_rho[i], ML_KEM_RANDOM_BYTES))
-      goto done;
-
-    res = -4;
     /* Create Bob's key and populate it with Alice's public key data */
     bkey = EVP_PKEY_new();
     if (!TEST_ptr(bkey))
-      goto done;
-    if (!TEST_int_gt(EVP_PKEY_copy_parameters(bkey, akey), 0))
-      goto done;
-    if (!TEST_true(EVP_PKEY_set1_encoded_public_key(bkey, rawpub, publen)))
-      goto done;
+        goto err;
 
-    /* Configure the public RNG to output just the encap seed */
-    p = params;
-    *p = OSSL_PARAM_construct_octet_string(OSSL_RAND_PARAM_TEST_ENTROPY,
-                                           enc_seed, sizeof(enc_seed));
-    if (!TEST_true(EVP_RAND_CTX_set_params(pubctx, params)))
-      goto done;
+    if (!TEST_int_gt(EVP_PKEY_copy_parameters(bkey, akey), 0))
+        goto err;
+
+    if (!TEST_true(EVP_PKEY_set1_encoded_public_key(bkey, rawpub, publen)))
+        goto err;
 
     /* Encapsulate Bob's key */
-    res = -5;
     ctx = EVP_PKEY_CTX_new_from_pkey(testctx, bkey, NULL);
     if (!TEST_ptr(ctx))
-      goto done;
+        goto err;
+
     if (!TEST_int_gt(EVP_PKEY_encapsulate_init(ctx, NULL), 0))
-      goto done;
+        goto err;
+
     if (!TEST_int_gt(
         EVP_PKEY_encapsulate(ctx, NULL, &wrpkeylen, NULL, &bgenkeylen), 0))
-      goto done;
-    if (!TEST_size_t_eq(wrpkeylen, v->ctext_bytes) ||
-        !TEST_size_t_eq(bgenkeylen, ML_KEM_SHARED_SECRET_BYTES))
-      goto done;
+        goto err;
+
+    if (!TEST_size_t_gt(wrpkeylen, 0) || !TEST_size_t_gt(bgenkeylen, 0))
+        goto err;
+
     wrpkey = OPENSSL_zalloc(wrpkeylen);
     bgenkey = OPENSSL_zalloc(bgenkeylen);
     if (!TEST_ptr(wrpkey) || !TEST_ptr(bgenkey))
-      goto done;
-    if (!TEST_true(
-        EVP_PKEY_encapsulate(ctx, wrpkey, &wrpkeylen, bgenkey, &bgenkeylen)))
-      goto done;
+        goto err;
+
+    if (!TEST_int_gt(
+        EVP_PKEY_encapsulate(ctx, wrpkey, &wrpkeylen, bgenkey, &bgenkeylen), 0))
+        goto err;
+
     EVP_PKEY_CTX_free(ctx);
-    ctx = NULL;
-    /* Check that no more public entropy is available! */
-    if (!TEST_int_le(RAND_bytes(&c, 1), 0))
-      goto done;
 
-    res = -6;
-    /* Check the ciphertext hash */
-    if (!TEST_true(
-        EVP_Digest(wrpkey, v->ctext_bytes, hash, NULL, sha256, NULL)) ||
-        !TEST_mem_eq(hash, sizeof(hash), expected_ctext_sha256[i],
-                     sizeof(expected_ctext_sha256[i])))
-      goto done;
-    /* Check for the expected shared secret */
-    if (!TEST_mem_eq(bgenkey, bgenkeylen, expected_shared_secret[i],
-                     ML_KEM_SHARED_SECRET_BYTES))
-      goto done;
-
-    /*
-     * Alice now decapsulates Bob's key.  Decap should not need a seed if
-     * the ciphertext length is good.
-     */
-    res = -7;
+    /* Alice now decapsulates Bob's key */
     ctx = EVP_PKEY_CTX_new_from_pkey(testctx, akey, NULL);
     if (!TEST_ptr(ctx))
-      goto done;
+        goto err;
+
     if (!TEST_int_gt(EVP_PKEY_decapsulate_init(ctx, NULL), 0))
-      goto done;
-    if (!TEST_true(
-        EVP_PKEY_decapsulate(ctx, NULL, &agenkeylen, wrpkey, wrpkeylen)))
-      goto done;
-    if (!TEST_size_t_eq(agenkeylen, ML_KEM_SHARED_SECRET_BYTES))
-      goto done;
+        goto err;
+
+    if (!TEST_int_gt(
+        EVP_PKEY_decapsulate(ctx, NULL, &agenkeylen, wrpkey, wrpkeylen), 0))
+        goto err;
+
+    if (!TEST_size_t_gt(agenkeylen, 0))
+        goto err;
+
     agenkey = OPENSSL_zalloc(agenkeylen);
     if (!TEST_ptr(agenkey))
-      goto done;
-    if (!TEST_true(
-        EVP_PKEY_decapsulate(ctx, agenkey, &agenkeylen, wrpkey, wrpkeylen)))
-      goto done;
+        goto err;
+
+    if (!TEST_int_gt(
+        EVP_PKEY_decapsulate(ctx, agenkey, &agenkeylen, wrpkey, wrpkeylen), 0))
+        goto err;
+
     /* Hopefully we ended up with a shared key */
     if (!TEST_mem_eq(agenkey, agenkeylen, bgenkey, bgenkeylen))
-      goto done;
+        goto err;
 
-    res = -8;
-    /* Now a quick negative test by zeroing the ciphertext */
-    memset(wrpkey, 0, v->ctext_bytes);
-    if (!TEST_true(
-        EVP_PKEY_decapsulate(ctx, agenkey, &agenkeylen, wrpkey, wrpkeylen)))
-      goto done;
-    if (!TEST_mem_ne(agenkey, agenkeylen, bgenkey, bgenkeylen))
-      goto done;
+    /* Verify we generated a non-zero shared key */
+    for (i = 0; i < agenkeylen; i++)
+        if (agenkey[i] != 0)
+            break;
+    if (!TEST_size_t_ne(i, agenkeylen))
+        goto err;
 
-    res = -9;
-    /* Configure decap entropy for a bad ciphertext length */
-    p = params;
-    *p = OSSL_PARAM_construct_octet_string(OSSL_RAND_PARAM_TEST_ENTROPY,
-                                           dec_seed, sizeof(dec_seed));
-    if (!TEST_true(EVP_RAND_CTX_set_params(pubctx, params)))
-      goto done;
-
-    /* This time decap should fail, and return the decap entropy */
-    if (!TEST_false(
-        EVP_PKEY_decapsulate(ctx, agenkey, &agenkeylen, wrpkey, wrpkeylen - 1)))
-      goto done;
-    if (!TEST_mem_eq(agenkey, agenkeylen, dec_seed, sizeof(dec_seed)))
-      goto done;
-
-    res = 0;
-
-  done:
+    res = 1;
+err:
     EVP_PKEY_CTX_free(ctx);
     EVP_PKEY_free(akey);
     EVP_PKEY_free(bkey);
@@ -364,39 +185,218 @@ static int test_non_derandomised_ml_kem(void) {
     OPENSSL_free(wrpkey);
     OPENSSL_free(agenkey);
     OPENSSL_free(bgenkey);
-    if (res != 0)
-      ret = res;
-  }
+    return res;
+}
 
-  EVP_MD_free(sha256);
-  return ret == 0;
+static int test_non_derandomised_ml_kem(void) {
+    static const int alg[3] = {EVP_PKEY_ML_KEM_512, EVP_PKEY_ML_KEM_768,
+                               EVP_PKEY_ML_KEM_1024};
+    EVP_RAND_CTX *privctx;
+    EVP_RAND_CTX *pubctx;
+    EVP_MD *sha256;
+    int i, ret = 0;
+
+    if (!TEST_ptr(privctx = RAND_get0_private(NULL)) ||
+        !TEST_ptr(pubctx = RAND_get0_public(NULL)))
+        return 0;
+
+    if (!TEST_ptr(sha256 = EVP_MD_fetch(NULL, "sha256", NULL)))
+        return 0;
+
+    for (i = 0; i < (int)OSSL_NELEM(alg); ++i) {
+        const ML_KEM_VINFO *v;
+        OSSL_PARAM params[3], *p;
+        uint8_t hash[32];
+        EVP_PKEY *akey = NULL, *bkey = NULL;
+        size_t publen;
+        unsigned char *rawpub = NULL;
+        EVP_PKEY_CTX *ctx = NULL;
+        unsigned char *wrpkey = NULL, *agenkey = NULL, *bgenkey = NULL;
+        size_t wrpkeylen, agenkeylen, bgenkeylen;
+        unsigned int strength = 256;
+        unsigned char c;
+        int res = -1;
+
+        if ((v = ossl_ml_kem_get_vinfo(alg[i])) == NULL)
+            goto done;
+
+        /* Configure the private RNG to output just the keygen seed */
+        p = params;
+        *p++ = OSSL_PARAM_construct_octet_string(OSSL_RAND_PARAM_TEST_ENTROPY,
+                                                 gen_seed, sizeof(gen_seed));
+        *p++ = OSSL_PARAM_construct_uint(OSSL_RAND_PARAM_STRENGTH, &strength);
+        *p = OSSL_PARAM_construct_end();
+        if (!TEST_true(EVP_RAND_CTX_set_params(privctx, params)))
+            goto done;
+
+        res = -2;
+        /* Generate Alice's key */
+        akey = EVP_PKEY_Q_keygen(testctx, NULL, v->algorithm_name);
+        if (!TEST_ptr(akey))
+            goto done;
+
+        /* Check that no more entropy is available! */
+        if (!TEST_int_le(RAND_priv_bytes(&c, 1), 0))
+            goto done;
+
+        /* Get the raw public key */
+        publen = EVP_PKEY_get1_encoded_public_key(akey, &rawpub);
+        if (!TEST_size_t_eq(publen, v->pubkey_bytes))
+            goto done;
+
+        res = -3;
+        /* Check that we got the expected 'rho' value in the ciphertext */
+        if (!TEST_mem_eq(rawpub + v->vector_bytes, ML_KEM_RANDOM_BYTES,
+                         expected_rho[i], ML_KEM_RANDOM_BYTES))
+            goto done;
+
+        res = -4;
+        /* Create Bob's key and populate it with Alice's public key data */
+        bkey = EVP_PKEY_new();
+        if (!TEST_ptr(bkey))
+            goto done;
+        if (!TEST_int_gt(EVP_PKEY_copy_parameters(bkey, akey), 0))
+            goto done;
+        if (!TEST_true(EVP_PKEY_set1_encoded_public_key(bkey, rawpub, publen)))
+            goto done;
+
+        /* Configure the public RNG to output just the encap seed */
+        p = params;
+        *p = OSSL_PARAM_construct_octet_string(OSSL_RAND_PARAM_TEST_ENTROPY,
+                                               enc_seed, sizeof(enc_seed));
+        if (!TEST_true(EVP_RAND_CTX_set_params(pubctx, params)))
+            goto done;
+
+        /* Encapsulate Bob's key */
+        res = -5;
+        ctx = EVP_PKEY_CTX_new_from_pkey(testctx, bkey, NULL);
+        if (!TEST_ptr(ctx))
+            goto done;
+        if (!TEST_int_gt(EVP_PKEY_encapsulate_init(ctx, NULL), 0))
+            goto done;
+        if (!TEST_int_gt(
+            EVP_PKEY_encapsulate(ctx, NULL, &wrpkeylen, NULL, &bgenkeylen), 0))
+            goto done;
+        if (!TEST_size_t_eq(wrpkeylen, v->ctext_bytes) ||
+            !TEST_size_t_eq(bgenkeylen, ML_KEM_SHARED_SECRET_BYTES))
+            goto done;
+        wrpkey = OPENSSL_zalloc(wrpkeylen);
+        bgenkey = OPENSSL_zalloc(bgenkeylen);
+        if (!TEST_ptr(wrpkey) || !TEST_ptr(bgenkey))
+            goto done;
+        if (!TEST_true(EVP_PKEY_encapsulate(ctx, wrpkey, &wrpkeylen, bgenkey,
+                                            &bgenkeylen)))
+            goto done;
+        EVP_PKEY_CTX_free(ctx);
+        ctx = NULL;
+        /* Check that no more public entropy is available! */
+        if (!TEST_int_le(RAND_bytes(&c, 1), 0))
+            goto done;
+
+        res = -6;
+        /* Check the ciphertext hash */
+        if (!TEST_true(
+            EVP_Digest(wrpkey, v->ctext_bytes, hash, NULL, sha256, NULL)) ||
+            !TEST_mem_eq(hash, sizeof(hash), expected_ctext_sha256[i],
+                         sizeof(expected_ctext_sha256[i])))
+            goto done;
+        /* Check for the expected shared secret */
+        if (!TEST_mem_eq(bgenkey, bgenkeylen, expected_shared_secret[i],
+                         ML_KEM_SHARED_SECRET_BYTES))
+            goto done;
+
+        /*
+         * Alice now decapsulates Bob's key.  Decap should not need a seed if
+         * the ciphertext length is good.
+         */
+        res = -7;
+        ctx = EVP_PKEY_CTX_new_from_pkey(testctx, akey, NULL);
+        if (!TEST_ptr(ctx))
+            goto done;
+        if (!TEST_int_gt(EVP_PKEY_decapsulate_init(ctx, NULL), 0))
+            goto done;
+        if (!TEST_true(
+            EVP_PKEY_decapsulate(ctx, NULL, &agenkeylen, wrpkey, wrpkeylen)))
+            goto done;
+        if (!TEST_size_t_eq(agenkeylen, ML_KEM_SHARED_SECRET_BYTES))
+            goto done;
+        agenkey = OPENSSL_zalloc(agenkeylen);
+        if (!TEST_ptr(agenkey))
+            goto done;
+        if (!TEST_true(
+            EVP_PKEY_decapsulate(ctx, agenkey, &agenkeylen, wrpkey, wrpkeylen)))
+            goto done;
+        /* Hopefully we ended up with a shared key */
+        if (!TEST_mem_eq(agenkey, agenkeylen, bgenkey, bgenkeylen))
+            goto done;
+
+        res = -8;
+        /* Now a quick negative test by zeroing the ciphertext */
+        memset(wrpkey, 0, v->ctext_bytes);
+        if (!TEST_true(
+            EVP_PKEY_decapsulate(ctx, agenkey, &agenkeylen, wrpkey, wrpkeylen)))
+            goto done;
+        if (!TEST_mem_ne(agenkey, agenkeylen, bgenkey, bgenkeylen))
+            goto done;
+
+        res = -9;
+        /* Configure decap entropy for a bad ciphertext length */
+        p = params;
+        *p = OSSL_PARAM_construct_octet_string(OSSL_RAND_PARAM_TEST_ENTROPY,
+                                               dec_seed, sizeof(dec_seed));
+        if (!TEST_true(EVP_RAND_CTX_set_params(pubctx, params)))
+            goto done;
+
+        /* This time decap should fail, and return the decap entropy */
+        if (!TEST_false(EVP_PKEY_decapsulate(ctx, agenkey, &agenkeylen, wrpkey,
+                                             wrpkeylen - 1)))
+            goto done;
+        if (!TEST_mem_eq(agenkey, agenkeylen, dec_seed, sizeof(dec_seed)))
+            goto done;
+
+        res = 0;
+
+    done:
+        EVP_PKEY_CTX_free(ctx);
+        EVP_PKEY_free(akey);
+        EVP_PKEY_free(bkey);
+        OPENSSL_free(rawpub);
+        OPENSSL_free(wrpkey);
+        OPENSSL_free(agenkey);
+        OPENSSL_free(bgenkey);
+        if (res != 0)
+            ret = res;
+    }
+
+    EVP_MD_free(sha256);
+    return ret == 0;
 }
 
 int setup_tests(void) {
-  int test_rand = 0;
-  OPTION_CHOICE o;
+    int test_rand = 0;
+    OPTION_CHOICE o;
 
-  while ((o = opt_next()) != OPT_EOF) {
-    switch (o) {
-    case OPT_TEST_RAND:
-      test_rand = 1;
-      break;
-    case OPT_TEST_CASES:
-      break;
-    default:
-      return 0;
+    while ((o = opt_next()) != OPT_EOF) {
+        switch (o) {
+        case OPT_TEST_RAND:
+            test_rand = 1;
+            break;
+        case OPT_TEST_CASES:
+            break;
+        default:
+            return 0;
+        }
     }
-  }
 
-  if (test_rand != 0) {
-    /* Cargo-culted from test/rand_test.c, this may need changes */
-    if (!TEST_true(
-        RAND_set_DRBG_type(NULL, "TEST-RAND", "fips=no", NULL, NULL)))
-      return 0;
-    ADD_TEST(test_non_derandomised_ml_kem);
+    if (test_rand != 0) {
+        /* Cargo-culted from test/rand_test.c, this may need changes */
+        if (!TEST_true(
+            RAND_set_DRBG_type(NULL, "TEST-RAND", "fips=no", NULL, NULL)))
+            return 0;
+        ADD_TEST(test_non_derandomised_ml_kem);
+        return 1;
+    }
+
+    ADD_TEST(test_ml_kem);
     return 1;
-  }
-
-  ADD_TEST(test_ml_kem);
-  return 1;
 }

@@ -18,15 +18,16 @@
 
 static const QUIC_CONN_ID empty_conn_id = {0, {0}};
 
-#define RX_TEST_OP_END 0                    /* end of script */
-#define RX_TEST_OP_SET_SCID_LEN 1           /* change SCID length */
-#define RX_TEST_OP_SET_INIT_LARGEST_PN 2    /* set initial largest PN */
-#define RX_TEST_OP_SET_RX_DCID 3            /* register an RX DCID */
-#define RX_TEST_OP_INJECT 4                 /* inject a datagram into demux */
-#define RX_TEST_OP_PROVIDE_SECRET 5         /* provide RX secret */
-#define RX_TEST_OP_PROVIDE_SECRET_INITIAL 6 /* provide RX secret for initial   \
-                                             */
-#define RX_TEST_OP_DISCARD_EL 7             /* discard an encryption level */
+#define RX_TEST_OP_END 0                 /* end of script */
+#define RX_TEST_OP_SET_SCID_LEN 1        /* change SCID length */
+#define RX_TEST_OP_SET_INIT_LARGEST_PN 2 /* set initial largest PN */
+#define RX_TEST_OP_SET_RX_DCID 3         /* register an RX DCID */
+#define RX_TEST_OP_INJECT 4              /* inject a datagram into demux */
+#define RX_TEST_OP_PROVIDE_SECRET 5      /* provide RX secret */
+#define RX_TEST_OP_PROVIDE_SECRET_INITIAL                                      \
+    6                                 /* provide RX secret for initial         \
+                                       */
+#define RX_TEST_OP_DISCARD_EL 7       /* discard an encryption level */
 #define RX_TEST_OP_CHECK_PKT 8        /* read packet, compare to expected */
 #define RX_TEST_OP_CHECK_NO_PKT 9     /* check no packet is available to read */
 #define RX_TEST_OP_CHECK_KEY_EPOCH 10 /* check key epoch value matches */
@@ -36,83 +37,92 @@ static const QUIC_CONN_ID empty_conn_id = {0, {0}};
 #define RX_TEST_OP_ALLOW_1RTT 14         /* allow 1RTT packet processing */
 
 struct rx_test_op {
-  unsigned char op;
-  unsigned char subop;
-  const unsigned char *buf;
-  size_t buf_len;
-  const QUIC_PKT_HDR *hdr;
-  uint32_t enc_level, suite_id;
-  QUIC_PN largest_pn;
-  const QUIC_CONN_ID *dcid;
-  int (*new_qrx)(QUIC_DEMUX **demux, OSSL_QRX **qrx);
+    unsigned char op;
+    unsigned char subop;
+    const unsigned char *buf;
+    size_t buf_len;
+    const QUIC_PKT_HDR *hdr;
+    uint32_t enc_level, suite_id;
+    QUIC_PN largest_pn;
+    const QUIC_CONN_ID *dcid;
+    int (*new_qrx)(QUIC_DEMUX **demux, OSSL_QRX **qrx);
 
-  /* For frame checking */
+    /* For frame checking */
 };
 
 #define RX_OP_END {RX_TEST_OP_END}
 #define RX_OP_SET_SCID_LEN(scid_len)                                           \
-  {RX_TEST_OP_SET_SCID_LEN, 0, NULL, 0, NULL, (scid_len), 0, 0, NULL, NULL},
+    {RX_TEST_OP_SET_SCID_LEN, 0, NULL, 0, NULL, (scid_len), 0, 0, NULL, NULL},
 #define RX_OP_SET_INIT_LARGEST_PN(largest_pn)                                  \
-  {RX_TEST_OP_SET_INIT_LARGEST_PN,                                             \
-   0,                                                                          \
-   NULL,                                                                       \
-   0,                                                                          \
-   NULL,                                                                       \
-   0,                                                                          \
-   0,                                                                          \
-   (largest_pn),                                                               \
-   NULL,                                                                       \
-   NULL},
+    {RX_TEST_OP_SET_INIT_LARGEST_PN,                                           \
+     0,                                                                        \
+     NULL,                                                                     \
+     0,                                                                        \
+     NULL,                                                                     \
+     0,                                                                        \
+     0,                                                                        \
+     (largest_pn),                                                             \
+     NULL,                                                                     \
+     NULL},
 #define RX_OP_SET_RX_DCID(dcid)                                                \
-  {RX_TEST_OP_SET_RX_DCID, 0, NULL, 0, NULL, 0, 0, 0, &(dcid), NULL},
+    {RX_TEST_OP_SET_RX_DCID, 0, NULL, 0, NULL, 0, 0, 0, &(dcid), NULL},
 #define RX_OP_INJECT(dgram)                                                    \
-  {RX_TEST_OP_INJECT, 0, (dgram), sizeof(dgram), NULL, 0, 0, 0, NULL},
+    {RX_TEST_OP_INJECT, 0, (dgram), sizeof(dgram), NULL, 0, 0, 0, NULL},
 #define RX_OP_PROVIDE_SECRET(el, suite, key)                                   \
-  {RX_TEST_OP_PROVIDE_SECRET,                                                  \
-   0,                                                                          \
-   (key),                                                                      \
-   sizeof(key),                                                                \
-   NULL,                                                                       \
-   (el),                                                                       \
-   (suite),                                                                    \
-   0,                                                                          \
-   NULL,                                                                       \
-   NULL},
+    {RX_TEST_OP_PROVIDE_SECRET,                                                \
+     0,                                                                        \
+     (key),                                                                    \
+     sizeof(key),                                                              \
+     NULL,                                                                     \
+     (el),                                                                     \
+     (suite),                                                                  \
+     0,                                                                        \
+     NULL,                                                                     \
+     NULL},
 #define RX_OP_PROVIDE_SECRET_INITIAL(dcid)                                     \
-  {RX_TEST_OP_PROVIDE_SECRET_INITIAL, 0, NULL, 0, NULL, 0, 0, 0, &(dcid), NULL},
+    {RX_TEST_OP_PROVIDE_SECRET_INITIAL,                                        \
+     0,                                                                        \
+     NULL,                                                                     \
+     0,                                                                        \
+     NULL,                                                                     \
+     0,                                                                        \
+     0,                                                                        \
+     0,                                                                        \
+     &(dcid),                                                                  \
+     NULL},
 #define RX_OP_DISCARD_EL(el)                                                   \
-  {RX_TEST_OP_DISCARD_EL, 0, NULL, 0, NULL, (el), 0, 0, NULL, NULL},
+    {RX_TEST_OP_DISCARD_EL, 0, NULL, 0, NULL, (el), 0, 0, NULL, NULL},
 #define RX_OP_CHECK_PKT(expect_hdr, expect_body)                               \
-  {RX_TEST_OP_CHECK_PKT,                                                       \
-   0,                                                                          \
-   (expect_body),                                                              \
-   sizeof(expect_body),                                                        \
-   &(expect_hdr),                                                              \
-   0,                                                                          \
-   0,                                                                          \
-   0,                                                                          \
-   NULL,                                                                       \
-   NULL},
+    {RX_TEST_OP_CHECK_PKT,                                                     \
+     0,                                                                        \
+     (expect_body),                                                            \
+     sizeof(expect_body),                                                      \
+     &(expect_hdr),                                                            \
+     0,                                                                        \
+     0,                                                                        \
+     0,                                                                        \
+     NULL,                                                                     \
+     NULL},
 #define RX_OP_CHECK_NO_PKT()                                                   \
-  {RX_TEST_OP_CHECK_NO_PKT, 0, NULL, 0, NULL, 0, 0, 0, NULL, NULL},
+    {RX_TEST_OP_CHECK_NO_PKT, 0, NULL, 0, NULL, 0, 0, 0, NULL, NULL},
 #define RX_OP_CHECK_KEY_EPOCH(expected)                                        \
-  {RX_TEST_OP_CHECK_KEY_EPOCH, 0, NULL, 0, NULL, 0, 0, (expected), NULL},
+    {RX_TEST_OP_CHECK_KEY_EPOCH, 0, NULL, 0, NULL, 0, 0, (expected), NULL},
 #define RX_OP_KEY_UPDATE_TIMEOUT(normal)                                       \
-  {RX_TEST_OP_KEY_UPDATE_TIMEOUT, 0, NULL, 0, NULL, (normal), 0, 0, NULL},
+    {RX_TEST_OP_KEY_UPDATE_TIMEOUT, 0, NULL, 0, NULL, (normal), 0, 0, NULL},
 #define RX_OP_SET_INIT_KEY_PHASE(kp_bit)                                       \
-  {RX_TEST_OP_SET_INIT_KEY_PHASE, 0, NULL, 0, NULL, (kp_bit), 0, 0, NULL},
+    {RX_TEST_OP_SET_INIT_KEY_PHASE, 0, NULL, 0, NULL, (kp_bit), 0, 0, NULL},
 #define RX_OP_CHECK_PKT_EPOCH(expected)                                        \
-  {RX_TEST_OP_CHECK_PKT_EPOCH, 0, NULL, 0, NULL, 0, 0, (expected), NULL},
+    {RX_TEST_OP_CHECK_PKT_EPOCH, 0, NULL, 0, NULL, 0, 0, (expected), NULL},
 #define RX_OP_ALLOW_1RTT()                                                     \
-  {RX_TEST_OP_ALLOW_1RTT, 0, NULL, 0, NULL, 0, 0, 0, NULL},
+    {RX_TEST_OP_ALLOW_1RTT, 0, NULL, 0, NULL, 0, 0, 0, NULL},
 
 #define RX_OP_INJECT_N(n) RX_OP_INJECT(rx_script_##n##_in)
 #define RX_OP_CHECK_PKT_N(n)                                                   \
-  RX_OP_CHECK_PKT(rx_script_##n##_expect_hdr, rx_script_##n##_body)
+    RX_OP_CHECK_PKT(rx_script_##n##_expect_hdr, rx_script_##n##_body)
 
 #define RX_OP_INJECT_CHECK(n)                                                  \
-  RX_OP_INJECT_N(n)                                                            \
-  RX_OP_CHECK_PKT_N(n)
+    RX_OP_INJECT_N(n)                                                          \
+    RX_OP_CHECK_PKT_N(n)
 
 /* 1. RFC 9001 - A.3 Server Initial */
 static const unsigned char rx_script_1_in[] = {
@@ -5090,224 +5100,228 @@ static const struct rx_test_op *rx_scripts[] = {rx_script_1,
                                                 rx_script_8, rx_script_9};
 
 struct rx_state {
-  QUIC_DEMUX *demux;
+    QUIC_DEMUX *demux;
 
-  /* OSSL_QRX with necessary data */
-  OSSL_QRX *qrx;
-  OSSL_QRX_ARGS args;
+    /* OSSL_QRX with necessary data */
+    OSSL_QRX *qrx;
+    OSSL_QRX_ARGS args;
 
-  /* Used for the RX depacketizer */
-  SSL_CTX *quic_ssl_ctx;
-  QUIC_CONNECTION *quic_conn;
+    /* Used for the RX depacketizer */
+    SSL_CTX *quic_ssl_ctx;
+    QUIC_CONNECTION *quic_conn;
 
-  QUIC_CONN_ID rx_dcid;
+    QUIC_CONN_ID rx_dcid;
 
-  int allow_1rtt;
+    int allow_1rtt;
 };
 
 static void rx_state_teardown(struct rx_state *s) {
-  if (s->quic_conn != NULL) {
-    SSL_free((SSL *)s->quic_conn);
-    s->quic_conn = NULL;
-  }
-  if (s->quic_ssl_ctx != NULL) {
-    SSL_CTX_free(s->quic_ssl_ctx);
-    s->quic_ssl_ctx = NULL;
-  }
+    if (s->quic_conn != NULL) {
+        SSL_free((SSL *)s->quic_conn);
+        s->quic_conn = NULL;
+    }
+    if (s->quic_ssl_ctx != NULL) {
+        SSL_CTX_free(s->quic_ssl_ctx);
+        s->quic_ssl_ctx = NULL;
+    }
 
-  if (s->qrx != NULL) {
-    ossl_qrx_free(s->qrx);
-    s->qrx = NULL;
-  }
+    if (s->qrx != NULL) {
+        ossl_qrx_free(s->qrx);
+        s->qrx = NULL;
+    }
 
-  if (s->demux != NULL) {
-    ossl_quic_demux_free(s->demux);
-    s->demux = NULL;
-  }
+    if (s->demux != NULL) {
+        ossl_quic_demux_free(s->demux);
+        s->demux = NULL;
+    }
 }
 
 static uint64_t time_counter = 0;
 
 static OSSL_TIME expected_time(uint64_t counter) {
-  return ossl_time_multiply(ossl_ticks2time(OSSL_TIME_MS), counter);
+    return ossl_time_multiply(ossl_ticks2time(OSSL_TIME_MS), counter);
 }
 
 static OSSL_TIME fake_time(void *arg) { return expected_time(++time_counter); }
 
 static void demux_default_handler(QUIC_URXE *e, void *arg,
                                   const QUIC_CONN_ID *dcid) {
-  struct rx_state *s = arg;
+    struct rx_state *s = arg;
 
-  if (dcid == NULL || !ossl_quic_conn_id_eq(dcid, &s->rx_dcid))
-    return;
+    if (dcid == NULL || !ossl_quic_conn_id_eq(dcid, &s->rx_dcid))
+        return;
 
-  ossl_qrx_inject_urxe(s->qrx, e);
+    ossl_qrx_inject_urxe(s->qrx, e);
 }
 
 static int rx_state_ensure(struct rx_state *s) {
-  if (s->demux == NULL &&
-      !TEST_ptr(s->demux = ossl_quic_demux_new(NULL, s->args.short_conn_id_len,
-                                               fake_time, NULL)))
-    return 0;
+    if (s->demux == NULL &&
+        !TEST_ptr(s->demux = ossl_quic_demux_new(
+                  NULL, s->args.short_conn_id_len, fake_time, NULL)))
+        return 0;
 
-  s->args.demux = s->demux;
-  s->args.max_deferred = 32;
+    s->args.demux = s->demux;
+    s->args.max_deferred = 32;
 
-  /* Initialise OSSL_QRX */
-  if (s->qrx == NULL && !TEST_ptr(s->qrx = ossl_qrx_new(&s->args)))
-    return 0;
+    /* Initialise OSSL_QRX */
+    if (s->qrx == NULL && !TEST_ptr(s->qrx = ossl_qrx_new(&s->args)))
+        return 0;
 
-  ossl_quic_demux_set_default_handler(s->demux, demux_default_handler, s);
+    ossl_quic_demux_set_default_handler(s->demux, demux_default_handler, s);
 
-  if (s->allow_1rtt)
-    ossl_qrx_allow_1rtt_processing(s->qrx);
+    if (s->allow_1rtt)
+        ossl_qrx_allow_1rtt_processing(s->qrx);
 
-  return 1;
+    return 1;
 }
 
 static int rx_run_script(const struct rx_test_op *script) {
-  int testresult = 0;
-  struct rx_state s = {0};
-  size_t i;
-  OSSL_QRX_PKT *pkt = NULL;
-  const struct rx_test_op *op = script;
-  uint64_t last_key_epoch = UINT64_MAX;
+    int testresult = 0;
+    struct rx_state s = {0};
+    size_t i;
+    OSSL_QRX_PKT *pkt = NULL;
+    const struct rx_test_op *op = script;
+    uint64_t last_key_epoch = UINT64_MAX;
 
-  for (; op->op != RX_TEST_OP_END; ++op)
-    switch (op->op) {
-    case RX_TEST_OP_SET_SCID_LEN:
-      rx_state_teardown(&s);
-      s.args.short_conn_id_len = op->enc_level;
-      break;
-    case RX_TEST_OP_SET_INIT_LARGEST_PN:
-      rx_state_teardown(&s);
-      for (i = 0; i < QUIC_PN_SPACE_NUM; ++i)
-        s.args.init_largest_pn[i] = op->largest_pn;
-      break;
-    case RX_TEST_OP_SET_RX_DCID:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
-      s.rx_dcid = *op->dcid;
-      break;
-    case RX_TEST_OP_PROVIDE_SECRET:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
-      if (!TEST_true(ossl_qrx_provide_secret(s.qrx, op->enc_level, op->suite_id,
-                                             NULL, op->buf, op->buf_len)))
-        goto err;
-      break;
-    case RX_TEST_OP_PROVIDE_SECRET_INITIAL:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
-      if (!TEST_true(ossl_quic_provide_initial_secret(NULL, NULL, op->dcid, 0,
-                                                      s.qrx, NULL)))
-        goto err;
-      break;
-    case RX_TEST_OP_DISCARD_EL:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
-      if (!TEST_true(ossl_qrx_discard_enc_level(s.qrx, op->enc_level)))
-        goto err;
-      break;
-    case RX_TEST_OP_INJECT:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
-      if (!TEST_true(
-          ossl_quic_demux_inject(s.demux, op->buf, op->buf_len, NULL, NULL)))
-        goto err;
-      break;
-    case RX_TEST_OP_CHECK_PKT:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
+    for (; op->op != RX_TEST_OP_END; ++op)
+        switch (op->op) {
+        case RX_TEST_OP_SET_SCID_LEN:
+            rx_state_teardown(&s);
+            s.args.short_conn_id_len = op->enc_level;
+            break;
+        case RX_TEST_OP_SET_INIT_LARGEST_PN:
+            rx_state_teardown(&s);
+            for (i = 0; i < QUIC_PN_SPACE_NUM; ++i)
+                s.args.init_largest_pn[i] = op->largest_pn;
+            break;
+        case RX_TEST_OP_SET_RX_DCID:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
+            s.rx_dcid = *op->dcid;
+            break;
+        case RX_TEST_OP_PROVIDE_SECRET:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
+            if (!TEST_true(ossl_qrx_provide_secret(s.qrx, op->enc_level,
+                                                   op->suite_id, NULL, op->buf,
+                                                   op->buf_len)))
+                goto err;
+            break;
+        case RX_TEST_OP_PROVIDE_SECRET_INITIAL:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
+            if (!TEST_true(ossl_quic_provide_initial_secret(
+                NULL, NULL, op->dcid, 0, s.qrx, NULL)))
+                goto err;
+            break;
+        case RX_TEST_OP_DISCARD_EL:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
+            if (!TEST_true(ossl_qrx_discard_enc_level(s.qrx, op->enc_level)))
+                goto err;
+            break;
+        case RX_TEST_OP_INJECT:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
+            if (!TEST_true(ossl_quic_demux_inject(s.demux, op->buf, op->buf_len,
+                                                  NULL, NULL)))
+                goto err;
+            break;
+        case RX_TEST_OP_CHECK_PKT:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
 
-      if (!TEST_true(ossl_qrx_read_pkt(s.qrx, &pkt)))
-        goto err;
+            if (!TEST_true(ossl_qrx_read_pkt(s.qrx, &pkt)))
+                goto err;
 
-      if (!TEST_ptr(pkt) || !TEST_ptr(pkt->hdr))
-        goto err;
+            if (!TEST_ptr(pkt) || !TEST_ptr(pkt->hdr))
+                goto err;
 
-      if (!TEST_mem_eq(pkt->hdr->data, pkt->hdr->len, op->buf, op->buf_len))
-        goto err;
+            if (!TEST_mem_eq(pkt->hdr->data, pkt->hdr->len, op->buf,
+                             op->buf_len))
+                goto err;
 
-      if (!TEST_true(cmp_pkt_hdr(pkt->hdr, op->hdr, op->buf, op->buf_len, 1)))
-        goto err;
+            if (!TEST_true(
+                cmp_pkt_hdr(pkt->hdr, op->hdr, op->buf, op->buf_len, 1)))
+                goto err;
 
-      last_key_epoch = pkt->key_epoch;
+            last_key_epoch = pkt->key_epoch;
 
-      ossl_qrx_pkt_release(pkt);
-      pkt = NULL;
-      break;
-    case RX_TEST_OP_CHECK_NO_PKT:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
+            ossl_qrx_pkt_release(pkt);
+            pkt = NULL;
+            break;
+        case RX_TEST_OP_CHECK_NO_PKT:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
 
-      if (!TEST_false(ossl_qrx_read_pkt(s.qrx, &pkt)))
-        goto err;
+            if (!TEST_false(ossl_qrx_read_pkt(s.qrx, &pkt)))
+                goto err;
 
-      break;
-    case RX_TEST_OP_CHECK_KEY_EPOCH:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
+            break;
+        case RX_TEST_OP_CHECK_KEY_EPOCH:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
 
-      if (!TEST_uint64_t_eq(ossl_qrx_get_key_epoch(s.qrx), op->largest_pn))
-        goto err;
+            if (!TEST_uint64_t_eq(ossl_qrx_get_key_epoch(s.qrx),
+                                  op->largest_pn))
+                goto err;
 
-      break;
-    case RX_TEST_OP_CHECK_PKT_EPOCH:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
+            break;
+        case RX_TEST_OP_CHECK_PKT_EPOCH:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
 
-      if (!TEST_uint64_t_eq(last_key_epoch, op->largest_pn))
-        goto err;
+            if (!TEST_uint64_t_eq(last_key_epoch, op->largest_pn))
+                goto err;
 
-      break;
-    case RX_TEST_OP_KEY_UPDATE_TIMEOUT:
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
+            break;
+        case RX_TEST_OP_KEY_UPDATE_TIMEOUT:
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
 
-      if (!TEST_true(ossl_qrx_key_update_timeout(s.qrx, op->enc_level)))
-        goto err;
+            if (!TEST_true(ossl_qrx_key_update_timeout(s.qrx, op->enc_level)))
+                goto err;
 
-      break;
-    case RX_TEST_OP_SET_INIT_KEY_PHASE:
-      rx_state_teardown(&s);
-      s.args.init_key_phase_bit = (unsigned char)op->enc_level;
-      break;
-    case RX_TEST_OP_ALLOW_1RTT:
-      s.allow_1rtt = 1;
+            break;
+        case RX_TEST_OP_SET_INIT_KEY_PHASE:
+            rx_state_teardown(&s);
+            s.args.init_key_phase_bit = (unsigned char)op->enc_level;
+            break;
+        case RX_TEST_OP_ALLOW_1RTT:
+            s.allow_1rtt = 1;
 
-      if (!TEST_true(rx_state_ensure(&s)))
-        goto err;
+            if (!TEST_true(rx_state_ensure(&s)))
+                goto err;
 
-      break;
-    default:
-      OPENSSL_assert(0);
-      goto err;
-    }
+            break;
+        default:
+            OPENSSL_assert(0);
+            goto err;
+        }
 
-  testresult = 1;
+    testresult = 1;
 err:
-  ossl_qrx_pkt_release(pkt);
-  rx_state_teardown(&s);
-  return testresult;
+    ossl_qrx_pkt_release(pkt);
+    rx_state_teardown(&s);
+    return testresult;
 }
 
 static int test_rx_script(int idx) { return rx_run_script(rx_scripts[idx]); }
 
 /* Packet Header Tests */
 struct pkt_hdr_test {
-  QUIC_PKT_HDR hdr;
-  const unsigned char *expected;
-  size_t expected_len;
-  const unsigned char *payload;
-  size_t payload_len;
-  size_t short_conn_id_len;
-  /*
-   * Minimum number of bytes which should be required for a successful decode.
-   * SIZE_MAX if should never decode successfully.
-   */
-  size_t min_success_len;
-  size_t pn_offset, sample_offset;
+    QUIC_PKT_HDR hdr;
+    const unsigned char *expected;
+    size_t expected_len;
+    const unsigned char *payload;
+    size_t payload_len;
+    size_t short_conn_id_len;
+    /*
+     * Minimum number of bytes which should be required for a successful decode.
+     * SIZE_MAX if should never decode successfully.
+     */
+    size_t min_success_len;
+    size_t pn_offset, sample_offset;
 };
 
 /* Packet Header Test 1: INITIAL With SCID */
@@ -6123,290 +6137,296 @@ static unsigned int counts_c[HPR_CIPHER_COUNT][37] = {0};
 
 static int test_wire_pkt_hdr_actual(int tidx, int repeat, int cipher,
                                     size_t trunc_len) {
-  int testresult = 0;
-  const struct pkt_hdr_test *t = pkt_hdr_tests[tidx];
-  QUIC_PKT_HDR hdr = {0};
-  QUIC_PKT_HDR_PTRS ptrs = {0}, wptrs = {0};
-  PACKET pkt = {0};
-  WPACKET wpkt = {0};
-  unsigned char *buf = NULL;
-  size_t l = 0, i, j;
-  QUIC_HDR_PROTECTOR hpr = {0};
-  unsigned char hpr_key[32] = {0, 1, 2, 3, 4, 5, 6, 7};
-  int have_hpr = 0, hpr_cipher_id, hpr_key_len;
-  unsigned char *hbuf = NULL;
-  int is_trunc = trunc_len < t->expected_len;
-  int expect_fail = trunc_len < t->min_success_len;
-  hpr_key[8] = (unsigned char)tidx;
-  hpr_key[9] = (unsigned char)repeat;
+    int testresult = 0;
+    const struct pkt_hdr_test *t = pkt_hdr_tests[tidx];
+    QUIC_PKT_HDR hdr = {0};
+    QUIC_PKT_HDR_PTRS ptrs = {0}, wptrs = {0};
+    PACKET pkt = {0};
+    WPACKET wpkt = {0};
+    unsigned char *buf = NULL;
+    size_t l = 0, i, j;
+    QUIC_HDR_PROTECTOR hpr = {0};
+    unsigned char hpr_key[32] = {0, 1, 2, 3, 4, 5, 6, 7};
+    int have_hpr = 0, hpr_cipher_id, hpr_key_len;
+    unsigned char *hbuf = NULL;
+    int is_trunc = trunc_len < t->expected_len;
+    int expect_fail = trunc_len < t->min_success_len;
+    hpr_key[8] = (unsigned char)tidx;
+    hpr_key[9] = (unsigned char)repeat;
 
-  if (is_trunc && trunc_len > t->min_success_len &&
-      t->hdr.type == QUIC_PKT_TYPE_VERSION_NEG &&
-      ((trunc_len - t->min_success_len) % 4) != 0)
-    expect_fail = 1;
+    if (is_trunc && trunc_len > t->min_success_len &&
+        t->hdr.type == QUIC_PKT_TYPE_VERSION_NEG &&
+        ((trunc_len - t->min_success_len) % 4) != 0)
+        expect_fail = 1;
 
-  switch (cipher) {
-  case 0:
-    hpr_cipher_id = QUIC_HDR_PROT_CIPHER_AES_128;
-    hpr_key_len = 16;
-    break;
-  case 1:
-    hpr_cipher_id = QUIC_HDR_PROT_CIPHER_AES_256;
-    hpr_key_len = 32;
-    break;
-  case 2:
-    /*
-     * In a build without CHACHA, we rerun the AES 256 tests.
-     * Removing all dependence on CHACHA is more difficult and these
-     * tests are fast enough.
-     */
+    switch (cipher) {
+    case 0:
+        hpr_cipher_id = QUIC_HDR_PROT_CIPHER_AES_128;
+        hpr_key_len = 16;
+        break;
+    case 1:
+        hpr_cipher_id = QUIC_HDR_PROT_CIPHER_AES_256;
+        hpr_key_len = 32;
+        break;
+    case 2:
+        /*
+         * In a build without CHACHA, we rerun the AES 256 tests.
+         * Removing all dependence on CHACHA is more difficult and these
+         * tests are fast enough.
+         */
 #if !defined(OPENSSL_NO_CHACHA) && !defined(OPENSSL_NO_POLY1305)
-    hpr_cipher_id = QUIC_HDR_PROT_CIPHER_CHACHA;
+        hpr_cipher_id = QUIC_HDR_PROT_CIPHER_CHACHA;
 #else
-    hpr_cipher_id = QUIC_HDR_PROT_CIPHER_AES_256;
+        hpr_cipher_id = QUIC_HDR_PROT_CIPHER_AES_256;
 #endif
-    hpr_key_len = 32;
-    break;
-  default:
-    goto err;
-  }
-
-  if (!TEST_ptr(buf = OPENSSL_malloc(TEST_PKT_BUF_LEN)))
-    goto err;
-
-  if (!TEST_true(WPACKET_init_static_len(&wpkt, buf, TEST_PKT_BUF_LEN, 0)))
-    goto err;
-
-  if (!TEST_true(PACKET_buf_init(&pkt, t->expected, trunc_len)))
-    goto err;
-
-  if (!TEST_int_eq(ossl_quic_wire_decode_pkt_hdr(&pkt, t->short_conn_id_len, 0,
-                                                 0, &hdr, &ptrs, NULL),
-                   !expect_fail))
-    goto err;
-
-  if (!expect_fail && !is_trunc) {
-    if (!TEST_true(cmp_pkt_hdr(&hdr, &t->hdr, t->payload, t->payload_len, 1)))
-      goto err;
-
-    if (!TEST_ptr_eq(ptrs.raw_start, t->expected))
-      goto err;
-
-    if (t->pn_offset == SIZE_MAX) {
-      if (!TEST_ptr_null(ptrs.raw_pn))
-        goto err;
-    } else {
-      if (!TEST_ptr_eq(ptrs.raw_pn, t->expected + t->pn_offset))
+        hpr_key_len = 32;
+        break;
+    default:
         goto err;
     }
 
-    if (t->sample_offset != SIZE_MAX) {
-      if (!TEST_ptr_eq(ptrs.raw_sample, t->expected + t->sample_offset))
-        goto err;
-      if (!TEST_size_t_eq(ptrs.raw_sample_len,
-                          t->expected_len - t->sample_offset))
-        goto err;
-    }
-
-    if (!TEST_true(ossl_quic_wire_encode_pkt_hdr(&wpkt, t->short_conn_id_len,
-                                                 &hdr, &wptrs)))
-      goto err;
-
-    if (!TEST_true(WPACKET_memcpy(&wpkt, t->payload, t->payload_len)))
-      goto err;
-
-    if (!TEST_true(WPACKET_get_total_written(&wpkt, &l)))
-      goto err;
-
-    if (!TEST_mem_eq(buf, l, t->expected, t->expected_len))
-      goto err;
-
-    /* Test header protection. */
-    if (t->sample_offset != SIZE_MAX) { /* if packet type has protection */
-      if (!TEST_true(ossl_quic_hdr_protector_init(
-          &hpr, NULL, NULL, hpr_cipher_id, hpr_key, hpr_key_len)))
+    if (!TEST_ptr(buf = OPENSSL_malloc(TEST_PKT_BUF_LEN)))
         goto err;
 
-      have_hpr = 1;
-
-      /*
-       * Copy into a duplicate buffer to test header protection by
-       * comparing it against the original.
-       */
-      hbuf = OPENSSL_malloc(t->expected_len);
-      if (!TEST_ptr(hbuf))
+    if (!TEST_true(WPACKET_init_static_len(&wpkt, buf, TEST_PKT_BUF_LEN, 0)))
         goto err;
 
-      memcpy(hbuf, t->expected, t->expected_len);
-
-      /* Fixup pointers to new buffer and encrypt. */
-      ptrs.raw_pn = hbuf + (ptrs.raw_pn - ptrs.raw_start);
-      ptrs.raw_sample = hbuf + (ptrs.raw_sample - ptrs.raw_start);
-      ptrs.raw_start = hbuf;
-      if (!TEST_true(ossl_quic_hdr_protector_encrypt(&hpr, &ptrs)))
+    if (!TEST_true(PACKET_buf_init(&pkt, t->expected, trunc_len)))
         goto err;
 
-      /* Ensure that bytes which should not have changed did not change */
-      for (i = 0; i < t->expected_len; ++i) {
-        unsigned char d = t->expected[i] ^ hbuf[i], rej_mask = 0xff;
-        size_t jrel = 0;
-        if (i == 0) {
-          /* Bits in first byte which must not change */
-          rej_mask = (t->hdr.type == QUIC_PKT_TYPE_1RTT) ? ~0x1f : ~0xf;
-        } else if (i >= t->pn_offset && i < t->pn_offset + t->hdr.pn_len) {
-          /* PN bytes change */
-          rej_mask = 0;
-          jrel = 5 + (i - t->pn_offset) * 8;
+    if (!TEST_int_eq(ossl_quic_wire_decode_pkt_hdr(&pkt, t->short_conn_id_len,
+                                                   0, 0, &hdr, &ptrs, NULL),
+                     !expect_fail))
+        goto err;
+
+    if (!expect_fail && !is_trunc) {
+        if (!TEST_true(
+            cmp_pkt_hdr(&hdr, &t->hdr, t->payload, t->payload_len, 1)))
+            goto err;
+
+        if (!TEST_ptr_eq(ptrs.raw_start, t->expected))
+            goto err;
+
+        if (t->pn_offset == SIZE_MAX) {
+            if (!TEST_ptr_null(ptrs.raw_pn))
+                goto err;
+        } else {
+            if (!TEST_ptr_eq(ptrs.raw_pn, t->expected + t->pn_offset))
+                goto err;
         }
 
-        if (rej_mask != 0xff)
-          for (j = 0; j < 8; ++j) {
-            if (((1U << j) & rej_mask) != 0)
-              /*
-               * Bit unrelated to header protection, do not record
-               * stats about it.
-               */
-              continue;
+        if (t->sample_offset != SIZE_MAX) {
+            if (!TEST_ptr_eq(ptrs.raw_sample, t->expected + t->sample_offset))
+                goto err;
+            if (!TEST_size_t_eq(ptrs.raw_sample_len,
+                                t->expected_len - t->sample_offset))
+                goto err;
+        }
 
-            OPENSSL_assert(jrel + j < OSSL_NELEM(counts_u[cipher]));
-            if ((d & (1U << j)) != 0)
-              ++counts_c[cipher][jrel + j]; /* bit did change */
-            else
-              ++counts_u[cipher][jrel + j]; /* bit did not change */
-          }
+        if (!TEST_true(ossl_quic_wire_encode_pkt_hdr(
+            &wpkt, t->short_conn_id_len, &hdr, &wptrs)))
+            goto err;
 
-        /* Bits in rej_mask must not change */
-        if (!TEST_int_eq(d & rej_mask, 0))
-          goto err;
-      }
+        if (!TEST_true(WPACKET_memcpy(&wpkt, t->payload, t->payload_len)))
+            goto err;
 
-      /* Decrypt and check matches original. */
-      if (!TEST_true(ossl_quic_hdr_protector_decrypt(&hpr, &ptrs)))
-        goto err;
+        if (!TEST_true(WPACKET_get_total_written(&wpkt, &l)))
+            goto err;
 
-      if (!TEST_mem_eq(hbuf, t->expected_len, t->expected, t->expected_len))
-        goto err;
+        if (!TEST_mem_eq(buf, l, t->expected, t->expected_len))
+            goto err;
+
+        /* Test header protection. */
+        if (t->sample_offset != SIZE_MAX) { /* if packet type has protection */
+            if (!TEST_true(ossl_quic_hdr_protector_init(
+                &hpr, NULL, NULL, hpr_cipher_id, hpr_key, hpr_key_len)))
+                goto err;
+
+            have_hpr = 1;
+
+            /*
+             * Copy into a duplicate buffer to test header protection by
+             * comparing it against the original.
+             */
+            hbuf = OPENSSL_malloc(t->expected_len);
+            if (!TEST_ptr(hbuf))
+                goto err;
+
+            memcpy(hbuf, t->expected, t->expected_len);
+
+            /* Fixup pointers to new buffer and encrypt. */
+            ptrs.raw_pn = hbuf + (ptrs.raw_pn - ptrs.raw_start);
+            ptrs.raw_sample = hbuf + (ptrs.raw_sample - ptrs.raw_start);
+            ptrs.raw_start = hbuf;
+            if (!TEST_true(ossl_quic_hdr_protector_encrypt(&hpr, &ptrs)))
+                goto err;
+
+            /* Ensure that bytes which should not have changed did not change */
+            for (i = 0; i < t->expected_len; ++i) {
+                unsigned char d = t->expected[i] ^ hbuf[i], rej_mask = 0xff;
+                size_t jrel = 0;
+                if (i == 0) {
+                    /* Bits in first byte which must not change */
+                    rej_mask =
+                    (t->hdr.type == QUIC_PKT_TYPE_1RTT) ? ~0x1f : ~0xf;
+                } else if (i >= t->pn_offset &&
+                           i < t->pn_offset + t->hdr.pn_len) {
+                    /* PN bytes change */
+                    rej_mask = 0;
+                    jrel = 5 + (i - t->pn_offset) * 8;
+                }
+
+                if (rej_mask != 0xff)
+                    for (j = 0; j < 8; ++j) {
+                        if (((1U << j) & rej_mask) != 0)
+                            /*
+                             * Bit unrelated to header protection, do not record
+                             * stats about it.
+                             */
+                            continue;
+
+                        OPENSSL_assert(jrel + j < OSSL_NELEM(counts_u[cipher]));
+                        if ((d & (1U << j)) != 0)
+                            ++counts_c[cipher][jrel + j]; /* bit did change */
+                        else
+                            ++counts_u[cipher]
+                                      [jrel + j]; /* bit did not change */
+                    }
+
+                /* Bits in rej_mask must not change */
+                if (!TEST_int_eq(d & rej_mask, 0))
+                    goto err;
+            }
+
+            /* Decrypt and check matches original. */
+            if (!TEST_true(ossl_quic_hdr_protector_decrypt(&hpr, &ptrs)))
+                goto err;
+
+            if (!TEST_mem_eq(hbuf, t->expected_len, t->expected,
+                             t->expected_len))
+                goto err;
+        }
     }
-  }
 
-  testresult = 1;
+    testresult = 1;
 err:
-  if (have_hpr)
-    ossl_quic_hdr_protector_cleanup(&hpr);
-  WPACKET_finish(&wpkt);
-  OPENSSL_free(buf);
-  OPENSSL_free(hbuf);
-  return testresult;
+    if (have_hpr)
+        ossl_quic_hdr_protector_cleanup(&hpr);
+    WPACKET_finish(&wpkt);
+    OPENSSL_free(buf);
+    OPENSSL_free(hbuf);
+    return testresult;
 }
 
 static int test_wire_pkt_hdr_inner(int tidx, int repeat, int cipher) {
-  int testresult = 0;
-  const struct pkt_hdr_test *t = pkt_hdr_tests[tidx];
-  size_t i;
+    int testresult = 0;
+    const struct pkt_hdr_test *t = pkt_hdr_tests[tidx];
+    size_t i;
 
-  /* Test with entire packet */
-  if (!TEST_true(
-      test_wire_pkt_hdr_actual(tidx, repeat, cipher, t->expected_len)))
-    goto err;
+    /* Test with entire packet */
+    if (!TEST_true(
+        test_wire_pkt_hdr_actual(tidx, repeat, cipher, t->expected_len)))
+        goto err;
 
-  /* Now repeat for every possible truncation of the packet */
-  for (i = 0; i < t->expected_len; ++i)
-    if (!TEST_true(test_wire_pkt_hdr_actual(tidx, repeat, cipher, i)))
-      goto err;
+    /* Now repeat for every possible truncation of the packet */
+    for (i = 0; i < t->expected_len; ++i)
+        if (!TEST_true(test_wire_pkt_hdr_actual(tidx, repeat, cipher, i)))
+            goto err;
 
-  testresult = 1;
+    testresult = 1;
 err:
-  return testresult;
+    return testresult;
 }
 
 static int test_hdr_prot_stats(void) {
-  int testresult = 0;
-  size_t i, cipher;
+    int testresult = 0;
+    size_t i, cipher;
 
-  /*
-   * Test that, across all previously executed tests for each header
-   * protection cipher, every bit which can have header protection applied a)
-   * was changed in at least one test of applying header protection, and b)
-   * was unchanged in at least one test of applying header protection.
-   */
-  for (cipher = 0; cipher < HPR_CIPHER_COUNT; ++cipher)
-    for (i = 0; i < OSSL_NELEM(counts_u[0]); ++i) {
-      if (!TEST_uint_gt(counts_u[cipher][i], 0))
-        goto err;
-      if (!TEST_uint_gt(counts_c[cipher][i], 0))
-        goto err;
-    }
+    /*
+     * Test that, across all previously executed tests for each header
+     * protection cipher, every bit which can have header protection applied a)
+     * was changed in at least one test of applying header protection, and b)
+     * was unchanged in at least one test of applying header protection.
+     */
+    for (cipher = 0; cipher < HPR_CIPHER_COUNT; ++cipher)
+        for (i = 0; i < OSSL_NELEM(counts_u[0]); ++i) {
+            if (!TEST_uint_gt(counts_u[cipher][i], 0))
+                goto err;
+            if (!TEST_uint_gt(counts_c[cipher][i], 0))
+                goto err;
+        }
 
-  testresult = 1;
+    testresult = 1;
 err:
-  return testresult;
+    return testresult;
 }
 
 #define NUM_WIRE_PKT_HDR_TESTS                                                 \
-  (OSSL_NELEM(pkt_hdr_tests) * HPR_REPEAT_COUNT * HPR_CIPHER_COUNT)
+    (OSSL_NELEM(pkt_hdr_tests) * HPR_REPEAT_COUNT * HPR_CIPHER_COUNT)
 
 static int test_wire_pkt_hdr(int idx) {
-  int tidx, repeat, cipher;
+    int tidx, repeat, cipher;
 
-  if (idx == NUM_WIRE_PKT_HDR_TESTS)
-    return test_hdr_prot_stats();
+    if (idx == NUM_WIRE_PKT_HDR_TESTS)
+        return test_hdr_prot_stats();
 
-  cipher = idx % HPR_CIPHER_COUNT;
-  idx /= HPR_CIPHER_COUNT;
+    cipher = idx % HPR_CIPHER_COUNT;
+    idx /= HPR_CIPHER_COUNT;
 
-  repeat = idx % HPR_REPEAT_COUNT;
-  idx /= HPR_REPEAT_COUNT;
+    repeat = idx % HPR_REPEAT_COUNT;
+    idx /= HPR_REPEAT_COUNT;
 
-  tidx = idx;
+    tidx = idx;
 
-  return test_wire_pkt_hdr_inner(tidx, repeat, cipher);
+    return test_wire_pkt_hdr_inner(tidx, repeat, cipher);
 }
 
 /* TX Tests */
-#define TX_TEST_OP_END 0                    /* end of script */
-#define TX_TEST_OP_WRITE 1                  /* write packet */
-#define TX_TEST_OP_PROVIDE_SECRET 2         /* provide TX secret */
-#define TX_TEST_OP_PROVIDE_SECRET_INITIAL 3 /* provide TX secret for initial   \
-                                             */
-#define TX_TEST_OP_DISCARD_EL 4             /* discard an encryption level */
+#define TX_TEST_OP_END 0            /* end of script */
+#define TX_TEST_OP_WRITE 1          /* write packet */
+#define TX_TEST_OP_PROVIDE_SECRET 2 /* provide TX secret */
+#define TX_TEST_OP_PROVIDE_SECRET_INITIAL                                      \
+    3                               /* provide TX secret for initial           \
+                                     */
+#define TX_TEST_OP_DISCARD_EL 4     /* discard an encryption level */
 #define TX_TEST_OP_CHECK_DGRAM 5    /* read datagram, compare to expected */
 #define TX_TEST_OP_CHECK_NO_DGRAM 6 /* check no datagram is in queue */
 #define TX_TEST_OP_KEY_UPDATE 7     /* perform key update for 1-RTT */
 
 struct tx_test_op {
-  unsigned char op;
-  const unsigned char *buf;
-  size_t buf_len;
-  const OSSL_QTX_PKT *pkt;
-  uint32_t enc_level, suite_id;
-  const QUIC_CONN_ID *dcid;
+    unsigned char op;
+    const unsigned char *buf;
+    size_t buf_len;
+    const OSSL_QTX_PKT *pkt;
+    uint32_t enc_level, suite_id;
+    const QUIC_CONN_ID *dcid;
 };
 
 #define TX_OP_END {TX_TEST_OP_END}
 #define TX_OP_WRITE(pkt) {TX_TEST_OP_WRITE, NULL, 0, &(pkt), 0, 0, NULL},
 #define TX_OP_PROVIDE_SECRET(el, suite, key)                                   \
-  {TX_TEST_OP_PROVIDE_SECRET, (key), sizeof(key), NULL, (el), (suite), NULL},
+    {TX_TEST_OP_PROVIDE_SECRET, (key), sizeof(key), NULL, (el), (suite), NULL},
 #define TX_OP_PROVIDE_SECRET_INITIAL(dcid, is_server)                          \
-  {TX_TEST_OP_PROVIDE_SECRET_INITIAL, NULL, 0, NULL, 0, (is_server), &(dcid)},
+    {TX_TEST_OP_PROVIDE_SECRET_INITIAL, NULL, 0, NULL, 0, (is_server), &(dcid)},
 #define TX_OP_DISCARD_EL(el)                                                   \
-  {TX_TEST_OP_DISCARD_EL, NULL, 0, NULL, (el), 0, NULL},
+    {TX_TEST_OP_DISCARD_EL, NULL, 0, NULL, (el), 0, NULL},
 #define TX_OP_CHECK_DGRAM(expect_dgram)                                        \
-  {TX_TEST_OP_CHECK_DGRAM,                                                     \
-   (expect_dgram),                                                             \
-   sizeof(expect_dgram),                                                       \
-   NULL,                                                                       \
-   0,                                                                          \
-   0,                                                                          \
-   NULL},
+    {TX_TEST_OP_CHECK_DGRAM,                                                   \
+     (expect_dgram),                                                           \
+     sizeof(expect_dgram),                                                     \
+     NULL,                                                                     \
+     0,                                                                        \
+     0,                                                                        \
+     NULL},
 #define TX_OP_CHECK_NO_DGRAM()                                                 \
-  {TX_TEST_OP_CHECK_NO_PKT, NULL, 0, NULL, 0, 0, NULL},
+    {TX_TEST_OP_CHECK_NO_PKT, NULL, 0, NULL, 0, 0, NULL},
 
 #define TX_OP_WRITE_N(n) TX_OP_WRITE(tx_script_##n##_pkt)
 #define TX_OP_CHECK_DGRAM_N(n) TX_OP_CHECK_DGRAM(tx_script_##n##_dgram)
 
 #define TX_OP_WRITE_CHECK(n)                                                   \
-  TX_OP_WRITE_N(n)                                                             \
-  TX_OP_CHECK_DGRAM_N(n)
+    TX_OP_WRITE_N(n)                                                           \
+    TX_OP_CHECK_DGRAM_N(n)
 
 #define TX_OP_KEY_UPDATE() {TX_TEST_OP_KEY_UPDATE, NULL, 0, NULL, 0, 0, NULL},
 
@@ -7036,100 +7056,101 @@ static const struct tx_test_op *const tx_scripts[] = {tx_script_1, tx_script_2,
                                                       tx_script_6};
 
 static int tx_run_script(const struct tx_test_op *script) {
-  int testresult = 0;
-  const struct tx_test_op *op = script;
-  OSSL_QTX *qtx = NULL;
-  BIO_MSG msg = {0};
-  OSSL_QTX_ARGS args = {0};
+    int testresult = 0;
+    const struct tx_test_op *op = script;
+    OSSL_QTX *qtx = NULL;
+    BIO_MSG msg = {0};
+    OSSL_QTX_ARGS args = {0};
 
-  args.mdpl = 1472;
+    args.mdpl = 1472;
 
-  if (!TEST_ptr(qtx = ossl_qtx_new(&args)))
-    goto err;
-
-  for (; op->op != TX_TEST_OP_END; ++op)
-    switch (op->op) {
-    case TX_TEST_OP_PROVIDE_SECRET:
-      if (!TEST_true(ossl_qtx_provide_secret(qtx, op->enc_level, op->suite_id,
-                                             NULL, op->buf, op->buf_len)))
-        goto err;
-      break;
-    case TX_TEST_OP_PROVIDE_SECRET_INITIAL:
-      if (!TEST_true(ossl_quic_provide_initial_secret(
-          NULL, NULL, op->dcid, (int)op->suite_id, NULL, qtx)))
-        goto err;
-      break;
-    case TX_TEST_OP_DISCARD_EL:
-      if (!TEST_true(ossl_qtx_discard_enc_level(qtx, op->enc_level)))
-        goto err;
-      break;
-    case TX_TEST_OP_WRITE: {
-      uint32_t enc_level = ossl_quic_pkt_type_to_enc_level(op->pkt->hdr->type);
-      uint64_t old_value = 0, new_value, max_value;
-
-      if (enc_level < QUIC_ENC_LEVEL_NUM) { /* encrypted packet */
-        max_value = ossl_qtx_get_max_epoch_pkt_count(qtx, enc_level);
-
-        if (!TEST_uint64_t_lt(max_value, UINT64_MAX))
-          goto err;
-
-        old_value = ossl_qtx_get_cur_epoch_pkt_count(qtx, enc_level);
-        if (!TEST_uint64_t_lt(old_value, UINT64_MAX))
-          goto err;
-      }
-
-      if (!TEST_true(ossl_qtx_write_pkt(qtx, op->pkt)))
+    if (!TEST_ptr(qtx = ossl_qtx_new(&args)))
         goto err;
 
-      if (enc_level < QUIC_ENC_LEVEL_NUM) {
-        new_value = ossl_qtx_get_cur_epoch_pkt_count(qtx, enc_level);
-        if (!TEST_uint64_t_eq(old_value + 1, new_value))
-          goto err;
-      }
-    } break;
-    case TX_TEST_OP_CHECK_DGRAM:
-      if (!TEST_true(ossl_qtx_pop_net(qtx, &msg)))
-        goto err;
+    for (; op->op != TX_TEST_OP_END; ++op)
+        switch (op->op) {
+        case TX_TEST_OP_PROVIDE_SECRET:
+            if (!TEST_true(ossl_qtx_provide_secret(
+                qtx, op->enc_level, op->suite_id, NULL, op->buf, op->buf_len)))
+                goto err;
+            break;
+        case TX_TEST_OP_PROVIDE_SECRET_INITIAL:
+            if (!TEST_true(ossl_quic_provide_initial_secret(
+                NULL, NULL, op->dcid, (int)op->suite_id, NULL, qtx)))
+                goto err;
+            break;
+        case TX_TEST_OP_DISCARD_EL:
+            if (!TEST_true(ossl_qtx_discard_enc_level(qtx, op->enc_level)))
+                goto err;
+            break;
+        case TX_TEST_OP_WRITE: {
+            uint32_t enc_level =
+            ossl_quic_pkt_type_to_enc_level(op->pkt->hdr->type);
+            uint64_t old_value = 0, new_value, max_value;
 
-      if (!TEST_mem_eq(msg.data, msg.data_len, op->buf, op->buf_len))
-        goto err;
+            if (enc_level < QUIC_ENC_LEVEL_NUM) { /* encrypted packet */
+                max_value = ossl_qtx_get_max_epoch_pkt_count(qtx, enc_level);
 
-      break;
-    case TX_TEST_OP_CHECK_NO_DGRAM:
-      if (!TEST_false(ossl_qtx_pop_net(qtx, &msg)))
-        goto err;
-      break;
-    case TX_TEST_OP_KEY_UPDATE:
-      if (!TEST_true(ossl_qtx_trigger_key_update(qtx)))
-        goto err;
-      break;
-    default:
-      OPENSSL_assert(0);
-      goto err;
-    }
+                if (!TEST_uint64_t_lt(max_value, UINT64_MAX))
+                    goto err;
 
-  testresult = 1;
+                old_value = ossl_qtx_get_cur_epoch_pkt_count(qtx, enc_level);
+                if (!TEST_uint64_t_lt(old_value, UINT64_MAX))
+                    goto err;
+            }
+
+            if (!TEST_true(ossl_qtx_write_pkt(qtx, op->pkt)))
+                goto err;
+
+            if (enc_level < QUIC_ENC_LEVEL_NUM) {
+                new_value = ossl_qtx_get_cur_epoch_pkt_count(qtx, enc_level);
+                if (!TEST_uint64_t_eq(old_value + 1, new_value))
+                    goto err;
+            }
+        } break;
+        case TX_TEST_OP_CHECK_DGRAM:
+            if (!TEST_true(ossl_qtx_pop_net(qtx, &msg)))
+                goto err;
+
+            if (!TEST_mem_eq(msg.data, msg.data_len, op->buf, op->buf_len))
+                goto err;
+
+            break;
+        case TX_TEST_OP_CHECK_NO_DGRAM:
+            if (!TEST_false(ossl_qtx_pop_net(qtx, &msg)))
+                goto err;
+            break;
+        case TX_TEST_OP_KEY_UPDATE:
+            if (!TEST_true(ossl_qtx_trigger_key_update(qtx)))
+                goto err;
+            break;
+        default:
+            OPENSSL_assert(0);
+            goto err;
+        }
+
+    testresult = 1;
 err:
-  if (qtx != NULL)
-    ossl_qtx_free(qtx);
+    if (qtx != NULL)
+        ossl_qtx_free(qtx);
 
-  return testresult;
+    return testresult;
 }
 
 static int test_tx_script(int idx) { return tx_run_script(tx_scripts[idx]); }
 
 int setup_tests(void) {
-  ADD_ALL_TESTS(test_rx_script, OSSL_NELEM(rx_scripts));
-  /*
-   * Each instance of this test is executed multiple times to get enough
-   * statistical coverage for our statistical test, as well as for each
-   * supported key type.
-   *
-   * We call the statistical test as the last index in the wire_pkt_hdr
-   * test rather than as a separate case, as it needs to execute last
-   * and otherwise random test ordering will cause itt to randomly fail.
-   */
-  ADD_ALL_TESTS(test_wire_pkt_hdr, NUM_WIRE_PKT_HDR_TESTS + 1);
-  ADD_ALL_TESTS(test_tx_script, OSSL_NELEM(tx_scripts));
-  return 1;
+    ADD_ALL_TESTS(test_rx_script, OSSL_NELEM(rx_scripts));
+    /*
+     * Each instance of this test is executed multiple times to get enough
+     * statistical coverage for our statistical test, as well as for each
+     * supported key type.
+     *
+     * We call the statistical test as the last index in the wire_pkt_hdr
+     * test rather than as a separate case, as it needs to execute last
+     * and otherwise random test ordering will cause itt to randomly fail.
+     */
+    ADD_ALL_TESTS(test_wire_pkt_hdr, NUM_WIRE_PKT_HDR_TESTS + 1);
+    ADD_ALL_TESTS(test_tx_script, OSSL_NELEM(tx_scripts));
+    return 1;
 }

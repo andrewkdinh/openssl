@@ -23,12 +23,12 @@
  */
 
 ASN1_SCTX *ASN1_SCTX_new(int (*scan_cb)(ASN1_SCTX *ctx)) {
-  ASN1_SCTX *ret = OPENSSL_zalloc(sizeof(*ret));
+    ASN1_SCTX *ret = OPENSSL_zalloc(sizeof(*ret));
 
-  if (ret == NULL)
-    return NULL;
-  ret->scan_cb = scan_cb;
-  return ret;
+    if (ret == NULL)
+        return NULL;
+    ret->scan_cb = scan_cb;
+    return ret;
 }
 
 void ASN1_SCTX_free(ASN1_SCTX *p) { OPENSSL_free(p); }

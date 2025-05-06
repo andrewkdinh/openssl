@@ -64,21 +64,21 @@ typedef int64_t dsword_t;
  * c448_error_t.
  */
 static ossl_inline c448_bool_t mask_to_bool(mask_t m) {
-  return (c448_sword_t)(sword_t)m;
+    return (c448_sword_t)(sword_t)m;
 }
 
 static ossl_inline mask_t bool_to_mask(c448_bool_t m) {
-  /* On most arches this will be optimized to a simple cast. */
-  mask_t ret = 0;
-  unsigned int i;
-  unsigned int limit = sizeof(c448_bool_t) / sizeof(mask_t);
+    /* On most arches this will be optimized to a simple cast. */
+    mask_t ret = 0;
+    unsigned int i;
+    unsigned int limit = sizeof(c448_bool_t) / sizeof(mask_t);
 
-  if (limit < 1)
-    limit = 1;
-  for (i = 0; i < limit; i++)
-    ret |= ~word_is_zero(m >> (i * 8 * sizeof(word_t)));
+    if (limit < 1)
+        limit = 1;
+    for (i = 0; i < limit; i++)
+        ret |= ~word_is_zero(m >> (i * 8 * sizeof(word_t)));
 
-  return ret;
+    return ret;
 }
 
 #endif /* OSSL_CRYPTO_EC_CURVE448_WORD_H */

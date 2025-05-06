@@ -38,8 +38,8 @@ typedef struct ossl_core_bio_st OSSL_CORE_BIO;
  * An array of these is always terminated by function_id == 0
  */
 struct ossl_dispatch_st {
-  int function_id;
-  void (*function)(void);
+    int function_id;
+    void (*function)(void);
 };
 
 #define OSSL_DISPATCH_END {0, NULL}
@@ -58,8 +58,8 @@ struct ossl_dispatch_st {
  * An array of these is always terminated by id == 0 && ptr == NULL
  */
 struct ossl_item_st {
-  unsigned int id;
-  void *ptr;
+    unsigned int id;
+    void *ptr;
 };
 
 /*
@@ -69,10 +69,10 @@ struct ossl_item_st {
  * An array of these is always terminated by algorithm_names == NULL
  */
 struct ossl_algorithm_st {
-  const char *algorithm_names;     /* key */
-  const char *property_definition; /* key */
-  const OSSL_DISPATCH *implementation;
-  const char *algorithm_description;
+    const char *algorithm_names;     /* key */
+    const char *property_definition; /* key */
+    const OSSL_DISPATCH *implementation;
+    const char *algorithm_description;
 };
 
 /*
@@ -82,11 +82,11 @@ struct ossl_algorithm_st {
  * An array of these is always terminated by key == NULL
  */
 struct ossl_param_st {
-  const char *key;        /* the name of the parameter */
-  unsigned int data_type; /* declare what kind of content is in buffer */
-  void *data;             /* value being passed in or out */
-  size_t data_size;       /* data size */
-  size_t return_size;     /* returned content size */
+    const char *key;        /* the name of the parameter */
+    unsigned int data_type; /* declare what kind of content is in buffer */
+    void *data;             /* value being passed in or out */
+    size_t data_size;       /* data size */
+    size_t return_size;     /* returned content size */
 };
 
 /* Currently supported OSSL_PARAM data types */

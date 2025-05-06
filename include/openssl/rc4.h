@@ -26,8 +26,8 @@ extern "C" {
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 typedef struct rc4_key_st {
-  RC4_INT x, y;
-  RC4_INT data[256];
+    RC4_INT x, y;
+    RC4_INT data[256];
 } RC4_KEY;
 #endif
 #ifndef OPENSSL_NO_DEPRECATED_3_0

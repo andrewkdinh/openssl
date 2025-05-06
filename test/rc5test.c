@@ -180,59 +180,59 @@ static unsigned char rc5_cbc_iv[RC5_CBC_NUM][8] = {
 };
 
 static int test_rc5_ecb(int n) {
-  int testresult = 1;
-  RC5_32_KEY key;
-  unsigned char buf[8], buf2[8];
+    int testresult = 1;
+    RC5_32_KEY key;
+    unsigned char buf[8], buf2[8];
 
-  if (!TEST_true(RC5_32_set_key(&key, 16, &RC5key[n][0], 12)))
-    return 0;
+    if (!TEST_true(RC5_32_set_key(&key, 16, &RC5key[n][0], 12)))
+        return 0;
 
-  RC5_32_ecb_encrypt(&RC5plain[n][0], buf, &key, RC5_ENCRYPT);
-  if (!TEST_mem_eq(&RC5cipher[n][0], sizeof(RC5cipher[0]), buf, sizeof(buf)))
-    testresult = 0;
+    RC5_32_ecb_encrypt(&RC5plain[n][0], buf, &key, RC5_ENCRYPT);
+    if (!TEST_mem_eq(&RC5cipher[n][0], sizeof(RC5cipher[0]), buf, sizeof(buf)))
+        testresult = 0;
 
-  RC5_32_ecb_encrypt(buf, buf2, &key, RC5_DECRYPT);
-  if (!TEST_mem_eq(&RC5plain[n][0], sizeof(RC5cipher[0]), buf2, sizeof(buf2)))
-    testresult = 0;
+    RC5_32_ecb_encrypt(buf, buf2, &key, RC5_DECRYPT);
+    if (!TEST_mem_eq(&RC5plain[n][0], sizeof(RC5cipher[0]), buf2, sizeof(buf2)))
+        testresult = 0;
 
-  return testresult;
+    return testresult;
 }
 
 static int test_rc5_cbc(int n) {
-  int testresult = 1;
-  int i;
-  RC5_32_KEY key;
-  unsigned char buf[8], buf2[8], ivb[8];
+    int testresult = 1;
+    int i;
+    RC5_32_KEY key;
+    unsigned char buf[8], buf2[8], ivb[8];
 
-  i = rc5_cbc_rounds[n];
-  if (i >= 8) {
-    if (!TEST_true(
-        RC5_32_set_key(&key, rc5_cbc_key[n][0], &rc5_cbc_key[n][1], i)))
-      return 0;
+    i = rc5_cbc_rounds[n];
+    if (i >= 8) {
+        if (!TEST_true(
+            RC5_32_set_key(&key, rc5_cbc_key[n][0], &rc5_cbc_key[n][1], i)))
+            return 0;
 
-    memcpy(ivb, &rc5_cbc_iv[n][0], 8);
-    RC5_32_cbc_encrypt(&rc5_cbc_plain[n][0], buf, 8, &key, &ivb[0],
-                       RC5_ENCRYPT);
+        memcpy(ivb, &rc5_cbc_iv[n][0], 8);
+        RC5_32_cbc_encrypt(&rc5_cbc_plain[n][0], buf, 8, &key, &ivb[0],
+                           RC5_ENCRYPT);
 
-    if (!TEST_mem_eq(&rc5_cbc_cipher[n][0], sizeof(rc5_cbc_cipher[0]), buf,
-                     sizeof(buf)))
-      testresult = 0;
+        if (!TEST_mem_eq(&rc5_cbc_cipher[n][0], sizeof(rc5_cbc_cipher[0]), buf,
+                         sizeof(buf)))
+            testresult = 0;
 
-    memcpy(ivb, &rc5_cbc_iv[n][0], 8);
-    RC5_32_cbc_encrypt(buf, buf2, 8, &key, &ivb[0], RC5_DECRYPT);
-    if (!TEST_mem_eq(&rc5_cbc_plain[n][0], sizeof(rc5_cbc_plain[0]), buf2,
-                     sizeof(buf2)))
-      testresult = 0;
-  }
+        memcpy(ivb, &rc5_cbc_iv[n][0], 8);
+        RC5_32_cbc_encrypt(buf, buf2, 8, &key, &ivb[0], RC5_DECRYPT);
+        if (!TEST_mem_eq(&rc5_cbc_plain[n][0], sizeof(rc5_cbc_plain[0]), buf2,
+                         sizeof(buf2)))
+            testresult = 0;
+    }
 
-  return testresult;
+    return testresult;
 }
 #endif
 
 int setup_tests(void) {
 #ifndef OPENSSL_NO_RC5
-  ADD_ALL_TESTS(test_rc5_ecb, OSSL_NELEM(RC5key));
-  ADD_ALL_TESTS(test_rc5_cbc, RC5_CBC_NUM);
+    ADD_ALL_TESTS(test_rc5_ecb, OSSL_NELEM(RC5key));
+    ADD_ALL_TESTS(test_rc5_cbc, RC5_CBC_NUM);
 #endif
-  return 1;
+    return 1;
 }

@@ -86,7 +86,7 @@ typedef struct quic_reactor_wait_slot_st QUIC_REACTOR_WAIT_SLOT;
 DECLARE_LIST_OF(quic_reactor_wait_slot, QUIC_REACTOR_WAIT_SLOT);
 
 struct quic_reactor_wait_ctx_st {
-  OSSL_LIST(quic_reactor_wait_slot) slots;
+    OSSL_LIST(quic_reactor_wait_slot) slots;
 };
 
 /* Initialises a wait context. */

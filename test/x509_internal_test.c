@@ -27,29 +27,29 @@
 #include "../crypto/x509/standard_exts.h"
 
 static int test_standard_exts(void) {
-  size_t i;
-  int prev = -1, good = 1;
-  const X509V3_EXT_METHOD **tmp;
+    size_t i;
+    int prev = -1, good = 1;
+    const X509V3_EXT_METHOD **tmp;
 
-  tmp = standard_exts;
-  for (i = 0; i < OSSL_NELEM(standard_exts); i++, tmp++) {
-    if ((*tmp)->ext_nid < prev)
-      good = 0;
-    prev = (*tmp)->ext_nid;
-  }
-  if (!good) {
     tmp = standard_exts;
-    TEST_error("Extensions out of order!");
-    for (i = 0; i < STANDARD_EXTENSION_COUNT; i++, tmp++)
-      TEST_note("%d : %s", (*tmp)->ext_nid, OBJ_nid2sn((*tmp)->ext_nid));
-  }
-  return good;
+    for (i = 0; i < OSSL_NELEM(standard_exts); i++, tmp++) {
+        if ((*tmp)->ext_nid < prev)
+            good = 0;
+        prev = (*tmp)->ext_nid;
+    }
+    if (!good) {
+        tmp = standard_exts;
+        TEST_error("Extensions out of order!");
+        for (i = 0; i < STANDARD_EXTENSION_COUNT; i++, tmp++)
+            TEST_note("%d : %s", (*tmp)->ext_nid, OBJ_nid2sn((*tmp)->ext_nid));
+    }
+    return good;
 }
 
 typedef struct {
-  const char *ipasc;
-  const char *data;
-  int length;
+    const char *ipasc;
+    const char *data;
+    int length;
 } IP_TESTDATA;
 
 static IP_TESTDATA a2i_ipaddress_tests[] = {
@@ -155,37 +155,37 @@ static IP_TESTDATA a2i_ipaddress_tests[] = {
 };
 
 static int test_a2i_ipaddress(int idx) {
-  int good = 1;
-  ASN1_OCTET_STRING *ip;
-  int len = a2i_ipaddress_tests[idx].length;
+    int good = 1;
+    ASN1_OCTET_STRING *ip;
+    int len = a2i_ipaddress_tests[idx].length;
 
-  ip = a2i_IPADDRESS(a2i_ipaddress_tests[idx].ipasc);
-  if (len == 0) {
-    if (!TEST_ptr_null(ip)) {
-      good = 0;
-      TEST_note("'%s' should not be parsed as IP address",
-                a2i_ipaddress_tests[idx].ipasc);
+    ip = a2i_IPADDRESS(a2i_ipaddress_tests[idx].ipasc);
+    if (len == 0) {
+        if (!TEST_ptr_null(ip)) {
+            good = 0;
+            TEST_note("'%s' should not be parsed as IP address",
+                      a2i_ipaddress_tests[idx].ipasc);
+        }
+    } else {
+        if (!TEST_ptr(ip) || !TEST_int_eq(ASN1_STRING_length(ip), len) ||
+            !TEST_mem_eq(ASN1_STRING_get0_data(ip), len,
+                         a2i_ipaddress_tests[idx].data, len)) {
+            good = 0;
+        }
     }
-  } else {
-    if (!TEST_ptr(ip) || !TEST_int_eq(ASN1_STRING_length(ip), len) ||
-        !TEST_mem_eq(ASN1_STRING_get0_data(ip), len,
-                     a2i_ipaddress_tests[idx].data, len)) {
-      good = 0;
-    }
-  }
-  ASN1_OCTET_STRING_free(ip);
-  return good;
+    ASN1_OCTET_STRING_free(ip);
+    return good;
 }
 
 static int ck_purp(ossl_unused const X509_PURPOSE *purpose,
                    ossl_unused const X509 *x, int ca) {
-  return 1;
+    return 1;
 }
 
 static int tests_X509_PURPOSE(void) {
-  OSSL_LIB_CTX *libctx = NULL;
-  int id, idx, *p;
-  X509_PURPOSE *xp;
+    OSSL_LIB_CTX *libctx = NULL;
+    int id, idx, *p;
+    X509_PURPOSE *xp;
 
 #undef LN
 #define LN "LN_test"
@@ -193,41 +193,41 @@ static int tests_X509_PURPOSE(void) {
 #define SN "SN_test"
 #undef ARGS
 #define ARGS(id, sn) id, X509_TRUST_MAX, 0, ck_purp, LN, sn, NULL
-  return TEST_int_gt((id = X509_PURPOSE_get_unused_id(libctx)),
-                     X509_PURPOSE_MAX) &&
-         TEST_int_eq(X509_PURPOSE_get_count() + 1, id) &&
-         TEST_int_eq(X509_PURPOSE_get_by_id(id), -1) &&
-         TEST_int_eq(X509_PURPOSE_get_by_sname(SN), -1)
+    return TEST_int_gt((id = X509_PURPOSE_get_unused_id(libctx)),
+                       X509_PURPOSE_MAX) &&
+           TEST_int_eq(X509_PURPOSE_get_count() + 1, id) &&
+           TEST_int_eq(X509_PURPOSE_get_by_id(id), -1) &&
+           TEST_int_eq(X509_PURPOSE_get_by_sname(SN), -1)
 
-         /* add new entry with fresh id and fresh sname: */
-         && TEST_int_eq(X509_PURPOSE_add(ARGS(id, SN)), 1) &&
-         TEST_int_ne((idx = X509_PURPOSE_get_by_sname(SN)), -1) &&
-         TEST_int_eq(X509_PURPOSE_get_by_id(id), idx)
+           /* add new entry with fresh id and fresh sname: */
+           && TEST_int_eq(X509_PURPOSE_add(ARGS(id, SN)), 1) &&
+           TEST_int_ne((idx = X509_PURPOSE_get_by_sname(SN)), -1) &&
+           TEST_int_eq(X509_PURPOSE_get_by_id(id), idx)
 
-         /* overwrite same entry, should be idempotent: */
-         && TEST_int_eq(X509_PURPOSE_add(ARGS(id, SN)), 1) &&
-         TEST_int_eq(X509_PURPOSE_get_by_sname(SN), idx) &&
-         TEST_int_eq(X509_PURPOSE_get_by_id(id), idx)
+           /* overwrite same entry, should be idempotent: */
+           && TEST_int_eq(X509_PURPOSE_add(ARGS(id, SN)), 1) &&
+           TEST_int_eq(X509_PURPOSE_get_by_sname(SN), idx) &&
+           TEST_int_eq(X509_PURPOSE_get_by_id(id), idx)
 
-         /* fail adding entry with same sname but existing conflicting id: */
-         && TEST_int_eq(X509_PURPOSE_add(ARGS(X509_PURPOSE_MAX, SN)), 0)
-         /* fail adding entry with same existing id but conflicting sname: */
-         && TEST_int_eq(X509_PURPOSE_add(ARGS(id, SN "_different")), 0)
+           /* fail adding entry with same sname but existing conflicting id: */
+           && TEST_int_eq(X509_PURPOSE_add(ARGS(X509_PURPOSE_MAX, SN)), 0)
+           /* fail adding entry with same existing id but conflicting sname: */
+           && TEST_int_eq(X509_PURPOSE_add(ARGS(id, SN "_different")), 0)
 
-         && TEST_ptr((xp = X509_PURPOSE_get0(idx))) &&
-         TEST_int_eq(X509_PURPOSE_get_id(xp), id) &&
-         TEST_str_eq(X509_PURPOSE_get0_name(xp), LN) &&
-         TEST_str_eq(X509_PURPOSE_get0_sname(xp), SN) &&
-         TEST_int_eq(X509_PURPOSE_get_trust(xp), X509_TRUST_MAX)
+           && TEST_ptr((xp = X509_PURPOSE_get0(idx))) &&
+           TEST_int_eq(X509_PURPOSE_get_id(xp), id) &&
+           TEST_str_eq(X509_PURPOSE_get0_name(xp), LN) &&
+           TEST_str_eq(X509_PURPOSE_get0_sname(xp), SN) &&
+           TEST_int_eq(X509_PURPOSE_get_trust(xp), X509_TRUST_MAX)
 
-         && TEST_int_eq(*(p = &xp->purpose), id) &&
-         TEST_int_eq(X509_PURPOSE_set(p, X509_PURPOSE_DEFAULT_ANY), 1) &&
-         TEST_int_eq(X509_PURPOSE_get_id(xp), X509_PURPOSE_DEFAULT_ANY);
+           && TEST_int_eq(*(p = &xp->purpose), id) &&
+           TEST_int_eq(X509_PURPOSE_set(p, X509_PURPOSE_DEFAULT_ANY), 1) &&
+           TEST_int_eq(X509_PURPOSE_get_id(xp), X509_PURPOSE_DEFAULT_ANY);
 }
 
 int setup_tests(void) {
-  ADD_TEST(test_standard_exts);
-  ADD_ALL_TESTS(test_a2i_ipaddress, OSSL_NELEM(a2i_ipaddress_tests));
-  ADD_TEST(tests_X509_PURPOSE);
-  return 1;
+    ADD_TEST(test_standard_exts);
+    ADD_ALL_TESTS(test_a2i_ipaddress, OSSL_NELEM(a2i_ipaddress_tests));
+    ADD_TEST(tests_X509_PURPOSE);
+    return 1;
 }

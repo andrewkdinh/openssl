@@ -14,9 +14,9 @@
 struct rcu_qp;
 
 struct rcu_cb_item {
-  rcu_cb_fn fn;
-  void *data;
-  struct rcu_cb_item *next;
+    rcu_cb_fn fn;
+    void *data;
+    struct rcu_cb_item *next;
 };
 
 #endif

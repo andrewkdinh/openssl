@@ -48,36 +48,36 @@ long OPENSSL_rdtsc_mftb(void);
 long OPENSSL_rdtsc_mfspr268(void);
 
 uint32_t OPENSSL_rdtsc(void) {
-  if (OPENSSL_ppccap_P & PPC_MFTB)
-    return OPENSSL_rdtsc_mftb();
-  else if (OPENSSL_ppccap_P & PPC_MFSPR268)
-    return OPENSSL_rdtsc_mfspr268();
-  else
-    return 0;
+    if (OPENSSL_ppccap_P & PPC_MFTB)
+        return OPENSSL_rdtsc_mftb();
+    else if (OPENSSL_ppccap_P & PPC_MFSPR268)
+        return OPENSSL_rdtsc_mfspr268();
+    else
+        return 0;
 }
 
 size_t OPENSSL_instrument_bus_mftb(unsigned int *, size_t);
 size_t OPENSSL_instrument_bus_mfspr268(unsigned int *, size_t);
 
 size_t OPENSSL_instrument_bus(unsigned int *out, size_t cnt) {
-  if (OPENSSL_ppccap_P & PPC_MFTB)
-    return OPENSSL_instrument_bus_mftb(out, cnt);
-  else if (OPENSSL_ppccap_P & PPC_MFSPR268)
-    return OPENSSL_instrument_bus_mfspr268(out, cnt);
-  else
-    return 0;
+    if (OPENSSL_ppccap_P & PPC_MFTB)
+        return OPENSSL_instrument_bus_mftb(out, cnt);
+    else if (OPENSSL_ppccap_P & PPC_MFSPR268)
+        return OPENSSL_instrument_bus_mfspr268(out, cnt);
+    else
+        return 0;
 }
 
 size_t OPENSSL_instrument_bus2_mftb(unsigned int *, size_t, size_t);
 size_t OPENSSL_instrument_bus2_mfspr268(unsigned int *, size_t, size_t);
 
 size_t OPENSSL_instrument_bus2(unsigned int *out, size_t cnt, size_t max) {
-  if (OPENSSL_ppccap_P & PPC_MFTB)
-    return OPENSSL_instrument_bus2_mftb(out, cnt, max);
-  else if (OPENSSL_ppccap_P & PPC_MFSPR268)
-    return OPENSSL_instrument_bus2_mfspr268(out, cnt, max);
-  else
-    return 0;
+    if (OPENSSL_ppccap_P & PPC_MFTB)
+        return OPENSSL_instrument_bus2_mftb(out, cnt, max);
+    else if (OPENSSL_ppccap_P & PPC_MFSPR268)
+        return OPENSSL_instrument_bus2_mfspr268(out, cnt, max);
+    else
+        return 0;
 }
 
 #if defined(__GLIBC__) && defined(__GLIBC_PREREQ)
@@ -101,12 +101,12 @@ size_t OPENSSL_instrument_bus2(unsigned int *out, size_t cnt, size_t max) {
 #define OSSL_IMPLEMENT_GETAUXVAL
 
 static unsigned long getauxval(unsigned long key) {
-  unsigned long val = 0ul;
+    unsigned long val = 0ul;
 
-  if (elf_aux_info((int)key, &val, sizeof(val)) != 0)
-    return 0ul;
+    if (elf_aux_info((int)key, &val, sizeof(val)) != 0)
+        return 0ul;
 
-  return val;
+    return val;
 }
 #endif
 #endif
@@ -129,186 +129,186 @@ static unsigned long getauxval(unsigned long key) {
 #define HWCAP_ARCH_3_1 (1U << 18)
 
 void OPENSSL_cpuid_setup(void) {
-  char *e;
-  struct sigaction ill_oact, ill_act;
-  sigset_t oset;
-  static int trigger = 0;
+    char *e;
+    struct sigaction ill_oact, ill_act;
+    sigset_t oset;
+    static int trigger = 0;
 
-  if (trigger)
-    return;
-  trigger = 1;
+    if (trigger)
+        return;
+    trigger = 1;
 
-  if ((e = getenv("OPENSSL_ppccap"))) {
-    OPENSSL_ppccap_P = strtoul(e, NULL, 0);
-    return;
-  }
+    if ((e = getenv("OPENSSL_ppccap"))) {
+        OPENSSL_ppccap_P = strtoul(e, NULL, 0);
+        return;
+    }
 
-  OPENSSL_ppccap_P = 0;
+    OPENSSL_ppccap_P = 0;
 
 #if defined(_AIX)
-  OPENSSL_ppccap_P |= PPC_FPU;
+    OPENSSL_ppccap_P |= PPC_FPU;
 
-  if (sizeof(size_t) == 4) {
-    struct utsname uts;
+    if (sizeof(size_t) == 4) {
+        struct utsname uts;
 #if defined(_SC_AIX_KERNEL_BITMODE)
-    if (sysconf(_SC_AIX_KERNEL_BITMODE) != 64)
-      return;
+        if (sysconf(_SC_AIX_KERNEL_BITMODE) != 64)
+            return;
 #endif
-    if (uname(&uts) != 0 || atoi(uts.version) < 6)
-      return;
-  }
+        if (uname(&uts) != 0 || atoi(uts.version) < 6)
+            return;
+    }
 
 #if defined(__power_set)
-  /*
-   * Value used in __power_set is a single-bit 1<<n one denoting
-   * specific processor class. Incidentally 0xffffffff<<n can be
-   * used to denote specific processor and its successors.
-   */
-  if (sizeof(size_t) == 4) {
-    /* In 32-bit case PPC_FPU64 is always fastest [if option] */
-    if (__power_set(0xffffffffU << 13)) /* POWER5 and later */
-      OPENSSL_ppccap_P |= PPC_FPU64;
-  } else {
-    /* In 64-bit case PPC_FPU64 is fastest only on POWER6 */
-    if (__power_set(0x1U << 14)) /* POWER6 */
-      OPENSSL_ppccap_P |= PPC_FPU64;
-  }
+    /*
+     * Value used in __power_set is a single-bit 1<<n one denoting
+     * specific processor class. Incidentally 0xffffffff<<n can be
+     * used to denote specific processor and its successors.
+     */
+    if (sizeof(size_t) == 4) {
+        /* In 32-bit case PPC_FPU64 is always fastest [if option] */
+        if (__power_set(0xffffffffU << 13)) /* POWER5 and later */
+            OPENSSL_ppccap_P |= PPC_FPU64;
+    } else {
+        /* In 64-bit case PPC_FPU64 is fastest only on POWER6 */
+        if (__power_set(0x1U << 14)) /* POWER6 */
+            OPENSSL_ppccap_P |= PPC_FPU64;
+    }
 
-  if (__power_set(0xffffffffU << 14)) /* POWER6 and later */
-    OPENSSL_ppccap_P |= PPC_ALTIVEC;
+    if (__power_set(0xffffffffU << 14)) /* POWER6 and later */
+        OPENSSL_ppccap_P |= PPC_ALTIVEC;
 
-  if (__power_set(0xffffffffU << 16)) /* POWER8 and later */
-    OPENSSL_ppccap_P |= PPC_CRYPTO207;
+    if (__power_set(0xffffffffU << 16)) /* POWER8 and later */
+        OPENSSL_ppccap_P |= PPC_CRYPTO207;
 
-  if (__power_set(0xffffffffU << 17)) /* POWER9 and later */
-    OPENSSL_ppccap_P |= PPC_MADD300;
+    if (__power_set(0xffffffffU << 17)) /* POWER9 and later */
+        OPENSSL_ppccap_P |= PPC_MADD300;
 
-  if (__power_set(0xffffffffU << 18)) /* POWER10 and later */
-    OPENSSL_ppccap_P |= PPC_BRD31;
+    if (__power_set(0xffffffffU << 18)) /* POWER10 and later */
+        OPENSSL_ppccap_P |= PPC_BRD31;
 
-  return;
+    return;
 #endif
 #endif
 
 #if defined(__APPLE__) && defined(__MACH__)
-  OPENSSL_ppccap_P |= PPC_FPU;
+    OPENSSL_ppccap_P |= PPC_FPU;
 
-  {
-    int val;
-    size_t len = sizeof(val);
+    {
+        int val;
+        size_t len = sizeof(val);
 
-    if (sysctlbyname("hw.optional.64bitops", &val, &len, NULL, 0) == 0) {
-      if (val)
-        OPENSSL_ppccap_P |= PPC_FPU64;
+        if (sysctlbyname("hw.optional.64bitops", &val, &len, NULL, 0) == 0) {
+            if (val)
+                OPENSSL_ppccap_P |= PPC_FPU64;
+        }
+
+        len = sizeof(val);
+        if (sysctlbyname("hw.optional.altivec", &val, &len, NULL, 0) == 0) {
+            if (val)
+                OPENSSL_ppccap_P |= PPC_ALTIVEC;
+        }
+
+        return;
     }
-
-    len = sizeof(val);
-    if (sysctlbyname("hw.optional.altivec", &val, &len, NULL, 0) == 0) {
-      if (val)
-        OPENSSL_ppccap_P |= PPC_ALTIVEC;
-    }
-
-    return;
-  }
 #endif
 
 #ifdef OSSL_IMPLEMENT_GETAUXVAL
-  {
-    unsigned long hwcap = getauxval(AT_HWCAP);
-    unsigned long hwcap2 = getauxval(AT_HWCAP2);
+    {
+        unsigned long hwcap = getauxval(AT_HWCAP);
+        unsigned long hwcap2 = getauxval(AT_HWCAP2);
 
-    if (hwcap & HWCAP_FPU) {
-      OPENSSL_ppccap_P |= PPC_FPU;
+        if (hwcap & HWCAP_FPU) {
+            OPENSSL_ppccap_P |= PPC_FPU;
 
-      if (sizeof(size_t) == 4) {
-        /* In 32-bit case PPC_FPU64 is always fastest [if option] */
-        if (hwcap & HWCAP_PPC64)
-          OPENSSL_ppccap_P |= PPC_FPU64;
-      } else {
-        /* In 64-bit case PPC_FPU64 is fastest only on POWER6 */
-        if (hwcap & HWCAP_POWER6_EXT)
-          OPENSSL_ppccap_P |= PPC_FPU64;
-      }
+            if (sizeof(size_t) == 4) {
+                /* In 32-bit case PPC_FPU64 is always fastest [if option] */
+                if (hwcap & HWCAP_PPC64)
+                    OPENSSL_ppccap_P |= PPC_FPU64;
+            } else {
+                /* In 64-bit case PPC_FPU64 is fastest only on POWER6 */
+                if (hwcap & HWCAP_POWER6_EXT)
+                    OPENSSL_ppccap_P |= PPC_FPU64;
+            }
+        }
+
+        if (hwcap & HWCAP_ALTIVEC) {
+            OPENSSL_ppccap_P |= PPC_ALTIVEC;
+
+            if ((hwcap & HWCAP_VSX) && (hwcap2 & HWCAP_VEC_CRYPTO))
+                OPENSSL_ppccap_P |= PPC_CRYPTO207;
+        }
+
+        if (hwcap2 & HWCAP_ARCH_3_00) {
+            OPENSSL_ppccap_P |= PPC_MADD300;
+        }
+
+        if (hwcap2 & HWCAP_ARCH_3_1) {
+            OPENSSL_ppccap_P |= PPC_BRD31;
+        }
     }
-
-    if (hwcap & HWCAP_ALTIVEC) {
-      OPENSSL_ppccap_P |= PPC_ALTIVEC;
-
-      if ((hwcap & HWCAP_VSX) && (hwcap2 & HWCAP_VEC_CRYPTO))
-        OPENSSL_ppccap_P |= PPC_CRYPTO207;
-    }
-
-    if (hwcap2 & HWCAP_ARCH_3_00) {
-      OPENSSL_ppccap_P |= PPC_MADD300;
-    }
-
-    if (hwcap2 & HWCAP_ARCH_3_1) {
-      OPENSSL_ppccap_P |= PPC_BRD31;
-    }
-  }
 #endif
 
-  sigfillset(&all_masked);
-  sigdelset(&all_masked, SIGILL);
-  sigdelset(&all_masked, SIGTRAP);
+    sigfillset(&all_masked);
+    sigdelset(&all_masked, SIGILL);
+    sigdelset(&all_masked, SIGTRAP);
 #ifdef SIGEMT
-  sigdelset(&all_masked, SIGEMT);
+    sigdelset(&all_masked, SIGEMT);
 #endif
-  sigdelset(&all_masked, SIGFPE);
-  sigdelset(&all_masked, SIGBUS);
-  sigdelset(&all_masked, SIGSEGV);
+    sigdelset(&all_masked, SIGFPE);
+    sigdelset(&all_masked, SIGBUS);
+    sigdelset(&all_masked, SIGSEGV);
 
-  memset(&ill_act, 0, sizeof(ill_act));
-  ill_act.sa_handler = ill_handler;
-  ill_act.sa_mask = all_masked;
+    memset(&ill_act, 0, sizeof(ill_act));
+    ill_act.sa_handler = ill_handler;
+    ill_act.sa_mask = all_masked;
 
-  sigprocmask(SIG_SETMASK, &ill_act.sa_mask, &oset);
-  sigaction(SIGILL, &ill_act, &ill_oact);
+    sigprocmask(SIG_SETMASK, &ill_act.sa_mask, &oset);
+    sigaction(SIGILL, &ill_act, &ill_oact);
 
 #ifndef OSSL_IMPLEMENT_GETAUXVAL
-  if (sigsetjmp(ill_jmp, 1) == 0) {
-    OPENSSL_fpu_probe();
-    OPENSSL_ppccap_P |= PPC_FPU;
-
-    if (sizeof(size_t) == 4) {
-#ifdef __linux
-      struct utsname uts;
-      if (uname(&uts) == 0 && strcmp(uts.machine, "ppc64") == 0)
-#endif
-        if (sigsetjmp(ill_jmp, 1) == 0) {
-          OPENSSL_ppc64_probe();
-          OPENSSL_ppccap_P |= PPC_FPU64;
-        }
-    } else {
-      /*
-       * Wanted code detecting POWER6 CPU and setting PPC_FPU64
-       */
-    }
-  }
-
-  if (sigsetjmp(ill_jmp, 1) == 0) {
-    OPENSSL_altivec_probe();
-    OPENSSL_ppccap_P |= PPC_ALTIVEC;
     if (sigsetjmp(ill_jmp, 1) == 0) {
-      OPENSSL_crypto207_probe();
-      OPENSSL_ppccap_P |= PPC_CRYPTO207;
-    }
-  }
+        OPENSSL_fpu_probe();
+        OPENSSL_ppccap_P |= PPC_FPU;
 
-  if (sigsetjmp(ill_jmp, 1) == 0) {
-    OPENSSL_madd300_probe();
-    OPENSSL_ppccap_P |= PPC_MADD300;
-  }
+        if (sizeof(size_t) == 4) {
+#ifdef __linux
+            struct utsname uts;
+            if (uname(&uts) == 0 && strcmp(uts.machine, "ppc64") == 0)
+#endif
+                if (sigsetjmp(ill_jmp, 1) == 0) {
+                    OPENSSL_ppc64_probe();
+                    OPENSSL_ppccap_P |= PPC_FPU64;
+                }
+        } else {
+            /*
+             * Wanted code detecting POWER6 CPU and setting PPC_FPU64
+             */
+        }
+    }
+
+    if (sigsetjmp(ill_jmp, 1) == 0) {
+        OPENSSL_altivec_probe();
+        OPENSSL_ppccap_P |= PPC_ALTIVEC;
+        if (sigsetjmp(ill_jmp, 1) == 0) {
+            OPENSSL_crypto207_probe();
+            OPENSSL_ppccap_P |= PPC_CRYPTO207;
+        }
+    }
+
+    if (sigsetjmp(ill_jmp, 1) == 0) {
+        OPENSSL_madd300_probe();
+        OPENSSL_ppccap_P |= PPC_MADD300;
+    }
 #endif
 
-  if (sigsetjmp(ill_jmp, 1) == 0) {
-    OPENSSL_rdtsc_mftb();
-    OPENSSL_ppccap_P |= PPC_MFTB;
-  } else if (sigsetjmp(ill_jmp, 1) == 0) {
-    OPENSSL_rdtsc_mfspr268();
-    OPENSSL_ppccap_P |= PPC_MFSPR268;
-  }
+    if (sigsetjmp(ill_jmp, 1) == 0) {
+        OPENSSL_rdtsc_mftb();
+        OPENSSL_ppccap_P |= PPC_MFTB;
+    } else if (sigsetjmp(ill_jmp, 1) == 0) {
+        OPENSSL_rdtsc_mfspr268();
+        OPENSSL_ppccap_P |= PPC_MFSPR268;
+    }
 
-  sigaction(SIGILL, &ill_oact, NULL);
-  sigprocmask(SIG_SETMASK, &oset, NULL);
+    sigaction(SIGILL, &ill_oact, NULL);
+    sigprocmask(SIG_SETMASK, &oset, NULL);
 }

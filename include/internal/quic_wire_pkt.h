@@ -33,56 +33,56 @@
  */
 static ossl_inline ossl_unused uint32_t
 ossl_quic_pkt_type_to_enc_level(uint32_t pkt_type) {
-  switch (pkt_type) {
-  case QUIC_PKT_TYPE_INITIAL:
-    return QUIC_ENC_LEVEL_INITIAL;
-  case QUIC_PKT_TYPE_HANDSHAKE:
-    return QUIC_ENC_LEVEL_HANDSHAKE;
-  case QUIC_PKT_TYPE_0RTT:
-    return QUIC_ENC_LEVEL_0RTT;
-  case QUIC_PKT_TYPE_1RTT:
-    return QUIC_ENC_LEVEL_1RTT;
-  default:
-    return QUIC_ENC_LEVEL_NUM;
-  }
+    switch (pkt_type) {
+    case QUIC_PKT_TYPE_INITIAL:
+        return QUIC_ENC_LEVEL_INITIAL;
+    case QUIC_PKT_TYPE_HANDSHAKE:
+        return QUIC_ENC_LEVEL_HANDSHAKE;
+    case QUIC_PKT_TYPE_0RTT:
+        return QUIC_ENC_LEVEL_0RTT;
+    case QUIC_PKT_TYPE_1RTT:
+        return QUIC_ENC_LEVEL_1RTT;
+    default:
+        return QUIC_ENC_LEVEL_NUM;
+    }
 }
 
 static ossl_inline ossl_unused uint32_t
 ossl_quic_enc_level_to_pkt_type(uint32_t enc_level) {
-  switch (enc_level) {
-  case QUIC_ENC_LEVEL_INITIAL:
-    return QUIC_PKT_TYPE_INITIAL;
-  case QUIC_ENC_LEVEL_HANDSHAKE:
-    return QUIC_PKT_TYPE_HANDSHAKE;
-  case QUIC_ENC_LEVEL_0RTT:
-    return QUIC_PKT_TYPE_0RTT;
-  case QUIC_ENC_LEVEL_1RTT:
-    return QUIC_PKT_TYPE_1RTT;
-  default:
-    return UINT32_MAX;
-  }
+    switch (enc_level) {
+    case QUIC_ENC_LEVEL_INITIAL:
+        return QUIC_PKT_TYPE_INITIAL;
+    case QUIC_ENC_LEVEL_HANDSHAKE:
+        return QUIC_PKT_TYPE_HANDSHAKE;
+    case QUIC_ENC_LEVEL_0RTT:
+        return QUIC_PKT_TYPE_0RTT;
+    case QUIC_ENC_LEVEL_1RTT:
+        return QUIC_PKT_TYPE_1RTT;
+    default:
+        return UINT32_MAX;
+    }
 }
 
 /* Determine if a packet type contains an encrypted payload. */
 static ossl_inline ossl_unused int
 ossl_quic_pkt_type_is_encrypted(uint32_t pkt_type) {
-  switch (pkt_type) {
-  case QUIC_PKT_TYPE_RETRY:
-  case QUIC_PKT_TYPE_VERSION_NEG:
-    return 0;
-  default:
-    return 1;
-  }
+    switch (pkt_type) {
+    case QUIC_PKT_TYPE_RETRY:
+    case QUIC_PKT_TYPE_VERSION_NEG:
+        return 0;
+    default:
+        return 1;
+    }
 }
 
 /* Determine if a packet type contains a PN field. */
 static ossl_inline ossl_unused int
 ossl_quic_pkt_type_has_pn(uint32_t pkt_type) {
-  /*
-   * Currently a packet has a PN iff it is encrypted. This could change
-   * someday.
-   */
-  return ossl_quic_pkt_type_is_encrypted(pkt_type);
+    /*
+     * Currently a packet has a PN iff it is encrypted. This could change
+     * someday.
+     */
+    return ossl_quic_pkt_type_is_encrypted(pkt_type);
 }
 
 /*
@@ -91,11 +91,11 @@ ossl_quic_pkt_type_has_pn(uint32_t pkt_type) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_pkt_type_can_share_dgram(uint32_t pkt_type) {
-  /*
-   * Currently only the encrypted packet types can share a datagram. This
-   * could change someday.
-   */
-  return ossl_quic_pkt_type_is_encrypted(pkt_type);
+    /*
+     * Currently only the encrypted packet types can share a datagram. This
+     * could change someday.
+     */
+    return ossl_quic_pkt_type_is_encrypted(pkt_type);
 }
 
 /*
@@ -104,12 +104,12 @@ ossl_quic_pkt_type_can_share_dgram(uint32_t pkt_type) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_pkt_type_must_be_last(uint32_t pkt_type) {
-  /*
-   * Any packet type which cannot share a datagram obviously must come last.
-   * 1-RTT also must come last as it lacks a length field.
-   */
-  return !ossl_quic_pkt_type_can_share_dgram(pkt_type) ||
-         pkt_type == QUIC_PKT_TYPE_1RTT;
+    /*
+     * Any packet type which cannot share a datagram obviously must come last.
+     * 1-RTT also must come last as it lacks a length field.
+     */
+    return !ossl_quic_pkt_type_can_share_dgram(pkt_type) ||
+           pkt_type == QUIC_PKT_TYPE_1RTT;
 }
 
 /*
@@ -117,8 +117,8 @@ ossl_quic_pkt_type_must_be_last(uint32_t pkt_type) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_pkt_type_has_version(uint32_t pkt_type) {
-  return pkt_type != QUIC_PKT_TYPE_1RTT &&
-         pkt_type != QUIC_PKT_TYPE_VERSION_NEG;
+    return pkt_type != QUIC_PKT_TYPE_1RTT &&
+           pkt_type != QUIC_PKT_TYPE_VERSION_NEG;
 }
 
 /*
@@ -126,7 +126,7 @@ ossl_quic_pkt_type_has_version(uint32_t pkt_type) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_pkt_type_has_scid(uint32_t pkt_type) {
-  return pkt_type != QUIC_PKT_TYPE_1RTT;
+    return pkt_type != QUIC_PKT_TYPE_1RTT;
 }
 
 /*
@@ -148,11 +148,11 @@ typedef struct quic_pkt_hdr_ptrs_st QUIC_PKT_HDR_PTRS;
  * destroyed using ossl_quic_hdr_protector_cleanup when no longer needed.
  */
 typedef struct quic_hdr_protector_st {
-  OSSL_LIB_CTX *libctx;
-  const char *propq;
-  EVP_CIPHER_CTX *cipher_ctx;
-  EVP_CIPHER *cipher;
-  uint32_t cipher_id;
+    OSSL_LIB_CTX *libctx;
+    const char *propq;
+    EVP_CIPHER_CTX *cipher_ctx;
+    EVP_CIPHER *cipher;
+    uint32_t cipher_id;
 } QUIC_HDR_PROTECTOR;
 
 #define QUIC_HDR_PROT_CIPHER_AES_128 1
@@ -300,122 +300,122 @@ int ossl_quic_hdr_protector_encrypt_fields(QUIC_HDR_PROTECTOR *hpr,
  * NULL value.
  */
 typedef struct quic_pkt_hdr_st {
-  /* [ALL] A QUIC_PKT_TYPE_* value. Always valid. */
-  unsigned int type : 8;
+    /* [ALL] A QUIC_PKT_TYPE_* value. Always valid. */
+    unsigned int type : 8;
 
-  /* [S] Value of the spin bit. Valid if (type == 1RTT). */
-  unsigned int spin_bit : 1;
+    /* [S] Value of the spin bit. Valid if (type == 1RTT). */
+    unsigned int spin_bit : 1;
 
-  /*
-   * [S] Value of the Key Phase bit in the short packet.
-   * Valid if (type == 1RTT && !partial).
-   */
-  unsigned int key_phase : 1;
+    /*
+     * [S] Value of the Key Phase bit in the short packet.
+     * Valid if (type == 1RTT && !partial).
+     */
+    unsigned int key_phase : 1;
 
-  /*
-   * [1i0h] Length of packet number in bytes. This is the decoded value.
-   * Valid if ((type == 1RTT || (version && type != RETRY)) && !partial).
-   */
-  unsigned int pn_len : 4;
+    /*
+     * [1i0h] Length of packet number in bytes. This is the decoded value.
+     * Valid if ((type == 1RTT || (version && type != RETRY)) && !partial).
+     */
+    unsigned int pn_len : 4;
 
-  /*
-   * [ALL] Set to 1 if this is a partial decode because the packet header
-   * has not yet been deprotected. pn_len, pn and key_phase are not valid if
-   * this is set.
-   */
-  unsigned int partial : 1;
+    /*
+     * [ALL] Set to 1 if this is a partial decode because the packet header
+     * has not yet been deprotected. pn_len, pn and key_phase are not valid if
+     * this is set.
+     */
+    unsigned int partial : 1;
 
-  /*
-   * [ALL] Whether the fixed bit was set. Note that only Version Negotiation
-   * packets are allowed to have this unset, so this will always be 1 for all
-   * other packet types (decode will fail if it is not set). Ignored when
-   * encoding unless encoding a Version Negotiation packet.
-   */
-  unsigned int fixed : 1;
+    /*
+     * [ALL] Whether the fixed bit was set. Note that only Version Negotiation
+     * packets are allowed to have this unset, so this will always be 1 for all
+     * other packet types (decode will fail if it is not set). Ignored when
+     * encoding unless encoding a Version Negotiation packet.
+     */
+    unsigned int fixed : 1;
 
-  /*
-   * The unused bits in the low 4 bits of a Retry packet header's first byte.
-   * This is used to ensure that Retry packets have the same bit-for-bit
-   * representation in their header when decoding and encoding them again.
-   * This is necessary to validate Retry packet headers.
-   */
-  unsigned int unused : 4;
+    /*
+     * The unused bits in the low 4 bits of a Retry packet header's first byte.
+     * This is used to ensure that Retry packets have the same bit-for-bit
+     * representation in their header when decoding and encoding them again.
+     * This is necessary to validate Retry packet headers.
+     */
+    unsigned int unused : 4;
 
-  /*
-   * The 'Reserved' bits in an Initial, Handshake, 0-RTT or 1-RTT packet
-   * header's first byte. These are provided so that the caller can validate
-   * that they are zero, as this must be done after packet protection is
-   * successfully removed to avoid creating a timing channel.
-   */
-  unsigned int reserved : 2;
+    /*
+     * The 'Reserved' bits in an Initial, Handshake, 0-RTT or 1-RTT packet
+     * header's first byte. These are provided so that the caller can validate
+     * that they are zero, as this must be done after packet protection is
+     * successfully removed to avoid creating a timing channel.
+     */
+    unsigned int reserved : 2;
 
-  /* [L] Version field. Valid if (type != 1RTT). */
-  uint32_t version;
+    /* [L] Version field. Valid if (type != 1RTT). */
+    uint32_t version;
 
-  /* [ALL] The destination connection ID. Always valid. */
-  QUIC_CONN_ID dst_conn_id;
+    /* [ALL] The destination connection ID. Always valid. */
+    QUIC_CONN_ID dst_conn_id;
 
-  /*
-   * [L] The source connection ID.
-   * Valid if (type != 1RTT).
-   */
-  QUIC_CONN_ID src_conn_id;
+    /*
+     * [L] The source connection ID.
+     * Valid if (type != 1RTT).
+     */
+    QUIC_CONN_ID src_conn_id;
 
-  /*
-   * [1i0h] Relatively-encoded packet number in raw, encoded form. The correct
-   * decoding of this value is context-dependent. The number of bytes valid in
-   * this buffer is determined by pn_len above. If the decode was partial,
-   * this field is not valid.
-   *
-   * Valid if ((type == 1RTT || (version && type != RETRY)) && !partial).
-   */
-  unsigned char pn[4];
+    /*
+     * [1i0h] Relatively-encoded packet number in raw, encoded form. The correct
+     * decoding of this value is context-dependent. The number of bytes valid in
+     * this buffer is determined by pn_len above. If the decode was partial,
+     * this field is not valid.
+     *
+     * Valid if ((type == 1RTT || (version && type != RETRY)) && !partial).
+     */
+    unsigned char pn[4];
 
-  /*
-   * [i] Token field in Initial packet. Points to memory inside the decoded
-   * PACKET, and therefore is valid for as long as the PACKET's buffer is
-   * valid. token_len is the length of the token in bytes.
-   *
-   * Valid if (type == INITIAL).
-   */
-  const unsigned char *token;
-  size_t token_len;
+    /*
+     * [i] Token field in Initial packet. Points to memory inside the decoded
+     * PACKET, and therefore is valid for as long as the PACKET's buffer is
+     * valid. token_len is the length of the token in bytes.
+     *
+     * Valid if (type == INITIAL).
+     */
+    const unsigned char *token;
+    size_t token_len;
 
-  /*
-   * [ALL] Payload length in bytes.
-   *
-   * Though 1-RTT, Retry and Version Negotiation packets do not contain an
-   * explicit length field, this field is always valid and is used by the
-   * packet header encoding and decoding routines to describe the payload
-   * length, regardless of whether the packet type encoded or decoded uses an
-   * explicit length indication.
-   */
-  size_t len;
+    /*
+     * [ALL] Payload length in bytes.
+     *
+     * Though 1-RTT, Retry and Version Negotiation packets do not contain an
+     * explicit length field, this field is always valid and is used by the
+     * packet header encoding and decoding routines to describe the payload
+     * length, regardless of whether the packet type encoded or decoded uses an
+     * explicit length indication.
+     */
+    size_t len;
 
-  /*
-   * Pointer to start of payload data in the packet. Points to memory inside
-   * the decoded PACKET, and therefore is valid for as long as the PACKET'S
-   * buffer is valid. The length of the buffer in bytes is in len above.
-   *
-   * For Version Negotiation packets, points to the array of supported
-   * versions.
-   *
-   * For Retry packets, points to the Retry packet payload, which comprises
-   * the Retry Token followed by a 16-byte Retry Integrity Tag.
-   *
-   * Regardless of whether a packet is a Version Negotiation packet (where the
-   * payload contains a list of supported versions), a Retry packet (where the
-   * payload contains a Retry Token and Retry Integrity Tag), or any other
-   * packet type (where the payload contains frames), the payload is not
-   * validated and the user must parse the payload bearing this in mind.
-   *
-   * If the decode was partial (partial is set), this points to the start of
-   * the packet number field, rather than the protected payload, as the length
-   * of the packet number field is unknown. The len field reflects this in
-   * this case (i.e., the len field is the number of payload bytes plus the
-   * number of bytes comprising the PN).
-   */
-  const unsigned char *data;
+    /*
+     * Pointer to start of payload data in the packet. Points to memory inside
+     * the decoded PACKET, and therefore is valid for as long as the PACKET'S
+     * buffer is valid. The length of the buffer in bytes is in len above.
+     *
+     * For Version Negotiation packets, points to the array of supported
+     * versions.
+     *
+     * For Retry packets, points to the Retry packet payload, which comprises
+     * the Retry Token followed by a 16-byte Retry Integrity Tag.
+     *
+     * Regardless of whether a packet is a Version Negotiation packet (where the
+     * payload contains a list of supported versions), a Retry packet (where the
+     * payload contains a Retry Token and Retry Integrity Tag), or any other
+     * packet type (where the payload contains frames), the payload is not
+     * validated and the user must parse the payload bearing this in mind.
+     *
+     * If the decode was partial (partial is set), this points to the start of
+     * the packet number field, rather than the protected payload, as the length
+     * of the packet number field is unknown. The len field reflects this in
+     * this case (i.e., the len field is the number of payload bytes plus the
+     * number of bytes comprising the PN).
+     */
+    const unsigned char *data;
 } QUIC_PKT_HDR;
 
 /*
@@ -424,15 +424,15 @@ typedef struct quic_pkt_hdr_st {
  * needing to partially re-decode the packet header.
  */
 struct quic_pkt_hdr_ptrs_st {
-  unsigned char *raw_start;  /* start of packet */
-  unsigned char *raw_sample; /* start of sampling range */
-  size_t raw_sample_len;     /* maximum length of sampling range */
+    unsigned char *raw_start;  /* start of packet */
+    unsigned char *raw_sample; /* start of sampling range */
+    size_t raw_sample_len;     /* maximum length of sampling range */
 
-  /*
-   * Start of PN field. Guaranteed to be NULL unless at least four bytes are
-   * available via this pointer.
-   */
-  unsigned char *raw_pn;
+    /*
+     * Start of PN field. Guaranteed to be NULL unless at least four bytes are
+     * available via this pointer.
+     */
+    unsigned char *raw_pn;
 };
 
 /*

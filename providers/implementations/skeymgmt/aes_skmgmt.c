@@ -18,28 +18,28 @@ static OSSL_FUNC_skeymgmt_export_fn aes_export;
 
 static void *aes_import(void *provctx, int selection,
                         const OSSL_PARAM params[]) {
-  PROV_SKEY *aes = generic_import(provctx, selection, params);
+    PROV_SKEY *aes = generic_import(provctx, selection, params);
 
-  if (aes == NULL)
-    return NULL;
+    if (aes == NULL)
+        return NULL;
 
-  if (aes->length != 16 && aes->length != 24 && aes->length != 32) {
-    generic_free(aes);
-    return NULL;
-  }
-  aes->type = SKEY_TYPE_AES;
+    if (aes->length != 16 && aes->length != 24 && aes->length != 32) {
+        generic_free(aes);
+        return NULL;
+    }
+    aes->type = SKEY_TYPE_AES;
 
-  return aes;
+    return aes;
 }
 
 static int aes_export(void *keydata, int selection,
                       OSSL_CALLBACK *param_callback, void *cbarg) {
-  PROV_SKEY *aes = keydata;
+    PROV_SKEY *aes = keydata;
 
-  if (aes->type != SKEY_TYPE_AES)
-    return 0;
+    if (aes->type != SKEY_TYPE_AES)
+        return 0;
 
-  return generic_export(keydata, selection, param_callback, cbarg);
+    return generic_export(keydata, selection, param_callback, cbarg);
 }
 
 const OSSL_DISPATCH ossl_aes_skeymgmt_functions[] = {

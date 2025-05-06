@@ -49,24 +49,24 @@ uint32_t OPENSSL_riscvcap_P[((
 #endif
 
 #define RISCV_DEFINE_CAP(NAME, INDEX, BIT_INDEX, HWPROBE_KEY, HWPROBE_VALUE)   \
-  static inline int RISCV_HAS_##NAME(void) {                                   \
-    return (OPENSSL_riscvcap_P[INDEX] & (1 << BIT_INDEX)) != 0;                \
-  }
+    static inline int RISCV_HAS_##NAME(void) {                                 \
+        return (OPENSSL_riscvcap_P[INDEX] & (1 << BIT_INDEX)) != 0;            \
+    }
 #include "riscv_arch.def"
 
 struct RISCV_capability_s {
-  const char *name;
-  size_t index;
-  size_t bit_offset;
+    const char *name;
+    size_t index;
+    size_t bit_offset;
 #ifdef OSSL_RISCV_HWPROBE
-  int32_t hwprobe_key;
-  uint64_t hwprobe_value;
+    int32_t hwprobe_key;
+    uint64_t hwprobe_value;
 #endif
 };
 
 #define RISCV_DEFINE_CAP(NAME, INDEX, BIT_INDEX, OSSL_RISCV_HWPROBE_KEY,       \
                          OSSL_RISCV_HWPROBE_VALUE)                             \
-  +1
+    +1
 extern const struct RISCV_capability_s RISCV_capabilities[
 #include "riscv_arch.def"
 ];
@@ -74,10 +74,10 @@ extern const struct RISCV_capability_s RISCV_capabilities[
 #ifdef OPENSSL_RISCVCAP_IMPL
 #ifdef OSSL_RISCV_HWPROBE
 #define RISCV_DEFINE_CAP(NAME, INDEX, BIT_INDEX, HWPROBE_KEY, HWPROBE_VALUE)   \
-  {#NAME, INDEX, BIT_INDEX, HWPROBE_KEY, HWPROBE_VALUE},
+    {#NAME, INDEX, BIT_INDEX, HWPROBE_KEY, HWPROBE_VALUE},
 #else
 #define RISCV_DEFINE_CAP(NAME, INDEX, BIT_INDEX, HWPROBE_KEY, HWPROBE_VALUE)   \
-  {#NAME, INDEX, BIT_INDEX},
+    {#NAME, INDEX, BIT_INDEX},
 #endif
 const struct RISCV_capability_s RISCV_capabilities[] = {
 #include "riscv_arch.def"
@@ -102,7 +102,7 @@ static const size_t kRISCVNumCaps =
 /* Extension combination tests. */
 #define RISCV_HAS_ZBB_AND_ZBC() (RISCV_HAS_ZBB() && RISCV_HAS_ZBC())
 #define RISCV_HAS_ZBKB_AND_ZKND_AND_ZKNE()                                     \
-  (RISCV_HAS_ZBKB() && RISCV_HAS_ZKND() && RISCV_HAS_ZKNE())
+    (RISCV_HAS_ZBKB() && RISCV_HAS_ZKND() && RISCV_HAS_ZKNE())
 #define RISCV_HAS_ZKND_AND_ZKNE() (RISCV_HAS_ZKND() && RISCV_HAS_ZKNE())
 /*
  * The ZVBB is the superset of ZVKB extension. We use macro here to replace the

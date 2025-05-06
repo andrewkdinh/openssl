@@ -67,12 +67,12 @@ size_t OPENSSL_instrument_bus2(unsigned int *, size_t, size_t);
  * exdata has a stack of callbacks for each instance.
  */
 struct ex_callback_st {
-  long argl;    /* Arbitrary long */
-  void *argp;   /* Arbitrary void * */
-  int priority; /* Priority ordering for freeing */
-  CRYPTO_EX_new *new_func;
-  CRYPTO_EX_free *free_func;
-  CRYPTO_EX_dup *dup_func;
+    long argl;    /* Arbitrary long */
+    void *argp;   /* Arbitrary void * */
+    int priority; /* Priority ordering for freeing */
+    CRYPTO_EX_new *new_func;
+    CRYPTO_EX_free *free_func;
+    CRYPTO_EX_dup *dup_func;
 };
 
 /*
@@ -80,12 +80,12 @@ struct ex_callback_st {
  * a structure allows future changes.
  */
 typedef struct ex_callbacks_st {
-  STACK_OF(EX_CALLBACK) * meth;
+    STACK_OF(EX_CALLBACK) * meth;
 } EX_CALLBACKS;
 
 typedef struct ossl_ex_data_global_st {
-  CRYPTO_RWLOCK *ex_data_lock;
-  EX_CALLBACKS ex_data[CRYPTO_EX_INDEX__COUNT];
+    CRYPTO_RWLOCK *ex_data_lock;
+    EX_CALLBACKS ex_data[CRYPTO_EX_INDEX__COUNT];
 } OSSL_EX_DATA_GLOBAL;
 
 /* OSSL_LIB_CTX */

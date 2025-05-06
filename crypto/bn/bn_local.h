@@ -179,47 +179,47 @@ defined(OPENSSL_SYS_WIN32) || defined(linux)
 #define BN_FLG_FIXED_TOP 0x10000
 #ifdef BN_RAND_DEBUG
 #define bn_pollute(a)                                                          \
-  do {                                                                         \
-    const BIGNUM *_bnum1 = (a);                                                \
-    if (_bnum1->top < _bnum1->dmax) {                                          \
-      unsigned char _tmp_char;                                                 \
-      /* We cast away const without the compiler knowing, any                  \
-       * *genuinely* constant variables that aren't mutable                    \
-       * wouldn't be constructed with top!=dmax. */                            \
-      BN_ULONG *_not_const;                                                    \
-      memcpy(&_not_const, &_bnum1->d, sizeof(_not_const));                     \
-      (void)RAND_bytes(&_tmp_char,                                             \
-                       1); /* Debug only - safe to ignore error return */      \
-      memset(_not_const + _bnum1->top, _tmp_char,                              \
-             sizeof(*_not_const) * (_bnum1->dmax - _bnum1->top));              \
-    }                                                                          \
-  } while (0)
+    do {                                                                       \
+        const BIGNUM *_bnum1 = (a);                                            \
+        if (_bnum1->top < _bnum1->dmax) {                                      \
+            unsigned char _tmp_char;                                           \
+            /* We cast away const without the compiler knowing, any            \
+             * *genuinely* constant variables that aren't mutable              \
+             * wouldn't be constructed with top!=dmax. */                      \
+            BN_ULONG *_not_const;                                              \
+            memcpy(&_not_const, &_bnum1->d, sizeof(_not_const));               \
+            (void)RAND_bytes(                                                  \
+            &_tmp_char, 1); /* Debug only - safe to ignore error return */     \
+            memset(_not_const + _bnum1->top, _tmp_char,                        \
+                   sizeof(*_not_const) * (_bnum1->dmax - _bnum1->top));        \
+        }                                                                      \
+    } while (0)
 #else
 #define bn_pollute(a)
 #endif
 #define bn_check_top(a)                                                        \
-  do {                                                                         \
-    const BIGNUM *_bnum2 = (a);                                                \
-    if (_bnum2 != NULL) {                                                      \
-      int _top = _bnum2->top;                                                  \
-      (void)ossl_assert((_top == 0 && !_bnum2->neg) ||                         \
-                        (_top && ((_bnum2->flags & BN_FLG_FIXED_TOP) ||        \
-                                  _bnum2->d[_top - 1] != 0)));                 \
-      bn_pollute(_bnum2);                                                      \
-    }                                                                          \
-  } while (0)
+    do {                                                                       \
+        const BIGNUM *_bnum2 = (a);                                            \
+        if (_bnum2 != NULL) {                                                  \
+            int _top = _bnum2->top;                                            \
+            (void)ossl_assert((_top == 0 && !_bnum2->neg) ||                   \
+                              (_top && ((_bnum2->flags & BN_FLG_FIXED_TOP) ||  \
+                                        _bnum2->d[_top - 1] != 0)));           \
+            bn_pollute(_bnum2);                                                \
+        }                                                                      \
+    } while (0)
 
 #define bn_fix_top(a) bn_check_top(a)
 
 #define bn_check_size(bn, bits)                                                \
-  bn_wcheck_size(bn, ((bits + BN_BITS2 - 1)) / BN_BITS2)
+    bn_wcheck_size(bn, ((bits + BN_BITS2 - 1)) / BN_BITS2)
 #define bn_wcheck_size(bn, words)                                              \
-  do {                                                                         \
-    const BIGNUM *_bnum2 = (bn);                                               \
-    assert((words) <= (_bnum2)->dmax && (words) >= (_bnum2)->top);             \
-    /* avoid unused variable warning with NDEBUG */                            \
-    (void)(_bnum2);                                                            \
-  } while (0)
+    do {                                                                       \
+        const BIGNUM *_bnum2 = (bn);                                           \
+        assert((words) <= (_bnum2)->dmax && (words) >= (_bnum2)->top);         \
+        /* avoid unused variable warning with NDEBUG */                        \
+        (void)(_bnum2);                                                        \
+    } while (0)
 
 #else /* !BN_DEBUG */
 
@@ -243,30 +243,30 @@ BN_ULONG bn_sub_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
                       int num);
 
 struct bignum_st {
-  BN_ULONG *d; /*
-                * Pointer to an array of 'BN_BITS2' bit
-                * chunks. These chunks are organised in
-                * a least significant chunk first order.
-                */
-  int top;     /* Index of last used d +1. */
-  /* The next are internal book keeping for bn_expand. */
-  int dmax; /* Size of the d array. */
-  int neg;  /* one if the number is negative */
-  int flags;
+    BN_ULONG *d; /*
+                  * Pointer to an array of 'BN_BITS2' bit
+                  * chunks. These chunks are organised in
+                  * a least significant chunk first order.
+                  */
+    int top;     /* Index of last used d +1. */
+    /* The next are internal book keeping for bn_expand. */
+    int dmax; /* Size of the d array. */
+    int neg;  /* one if the number is negative */
+    int flags;
 };
 
 /* Used for montgomery multiplication */
 struct bn_mont_ctx_st {
-  int ri;         /* number of bits in R */
-  BIGNUM RR;      /* used to convert to montgomery form,
-                     possibly zero-padded */
-  BIGNUM N;       /* The modulus */
-  BIGNUM Ni;      /* R*(1/R mod N) - N*Ni = 1 (Ni is only
-                   * stored for bignum algorithm) */
-  BN_ULONG n0[2]; /* least significant word(s) of Ni; (type
-                   * changed with 0.9.9, was "BN_ULONG n0;"
-                   * before) */
-  int flags;
+    int ri;         /* number of bits in R */
+    BIGNUM RR;      /* used to convert to montgomery form,
+                       possibly zero-padded */
+    BIGNUM N;       /* The modulus */
+    BIGNUM Ni;      /* R*(1/R mod N) - N*Ni = 1 (Ni is only
+                     * stored for bignum algorithm) */
+    BN_ULONG n0[2]; /* least significant word(s) of Ni; (type
+                     * changed with 0.9.9, was "BN_ULONG n0;"
+                     * before) */
+    int flags;
 };
 
 /*
@@ -274,23 +274,23 @@ struct bn_mont_ctx_st {
  * threads
  */
 struct bn_recp_ctx_st {
-  BIGNUM N;  /* the divisor */
-  BIGNUM Nr; /* the reciprocal */
-  int num_bits;
-  int shift;
-  int flags;
+    BIGNUM N;  /* the divisor */
+    BIGNUM Nr; /* the reciprocal */
+    int num_bits;
+    int shift;
+    int flags;
 };
 
 /* Used for slow "generation" functions. */
 struct bn_gencb_st {
-  unsigned int ver; /* To handle binary (in)compatibility */
-  void *arg;        /* callback-specific data */
-  union {
-    /* if (ver==1) - handles old style callbacks */
-    void (*cb_1)(int, int, void *);
-    /* if (ver==2) - new callback style */
-    int (*cb_2)(int, int, BN_GENCB *);
-  } cb;
+    unsigned int ver; /* To handle binary (in)compatibility */
+    void *arg;        /* callback-specific data */
+    union {
+        /* if (ver==1) - handles old style callbacks */
+        void (*cb_1)(int, int, void *);
+        /* if (ver==2) - new callback style */
+        int (*cb_2)(int, int, BN_GENCB *);
+    } cb;
 };
 
 /*-
@@ -320,7 +320,7 @@ struct bn_gencb_st {
  * with low Hamming weight, so we use  w = 1  for b <= 23.
  */
 #define BN_window_bits_for_exponent_size(b)                                    \
-  ((b) > 671 ? 6 : (b) > 239 ? 5 : (b) > 79 ? 4 : (b) > 23 ? 3 : 1)
+    ((b) > 671 ? 6 : (b) > 239 ? 5 : (b) > 79 ? 4 : (b) > 23 ? 3 : 1)
 
 /*
  * BN_mod_exp_mont_consttime is based on the assumption that the L1 data cache
@@ -328,7 +328,7 @@ struct bn_gencb_st {
  */
 #define MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH (64)
 #define MOD_EXP_CTIME_MIN_CACHE_LINE_MASK                                      \
-  (MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH - 1)
+    (MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH - 1)
 
 /*
  * Window sizes optimized for fixed window size modular exponentiation
@@ -342,13 +342,13 @@ struct bn_gencb_st {
 #if MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH == 64
 
 #define BN_window_bits_for_ctime_exponent_size(b)                              \
-  ((b) > 937 ? 6 : (b) > 306 ? 5 : (b) > 89 ? 4 : (b) > 22 ? 3 : 1)
+    ((b) > 937 ? 6 : (b) > 306 ? 5 : (b) > 89 ? 4 : (b) > 22 ? 3 : 1)
 #define BN_MAX_WINDOW_BITS_FOR_CTIME_EXPONENT_SIZE (6)
 
 #elif MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH == 32
 
 #define BN_window_bits_for_ctime_exponent_size(b)                              \
-  ((b) > 306 ? 5 : (b) > 89 ? 4 : (b) > 22 ? 3 : 1)
+    ((b) > 306 ? 5 : (b) > 89 ? 4 : (b) > 22 ? 3 : 1)
 #define BN_MAX_WINDOW_BITS_FOR_CTIME_EXPONENT_SIZE (5)
 
 #endif
@@ -383,11 +383,11 @@ struct bn_gencb_st {
 (defined(SIXTY_FOUR_BIT) || defined(SIXTY_FOUR_BIT_LONG))
 #define BN_UMULT_HIGH(a, b) (((uint128_t)(a) * (b)) >> 64)
 #define BN_UMULT_LOHI(low, high, a, b)                                         \
-  ({                                                                           \
-    uint128_t ret = (uint128_t)(a) * (b);                                      \
-    (high) = ret >> 64;                                                        \
-    (low) = ret;                                                               \
-  })
+    ({                                                                         \
+        uint128_t ret = (uint128_t)(a) * (b);                                  \
+        (high) = ret >> 64;                                                    \
+        (low) = ret;                                                           \
+    })
 #elif defined(__alpha) &&                                                      \
 (defined(SIXTY_FOUR_BIT_LONG) || defined(SIXTY_FOUR_BIT))
 #if defined(__DECC)
@@ -395,32 +395,35 @@ struct bn_gencb_st {
 #define BN_UMULT_HIGH(a, b) (BN_ULONG) asm("umulh %a0,%a1,%v0", (a), (b))
 #elif defined(__GNUC__) && __GNUC__ >= 2
 #define BN_UMULT_HIGH(a, b)                                                    \
-  ({                                                                           \
-    register BN_ULONG ret;                                                     \
-    asm("umulh     %1,%2,%0" : "=r"(ret) : "r"(a), "r"(b));                    \
-    ret;                                                                       \
-  })
+    ({                                                                         \
+        register BN_ULONG ret;                                                 \
+        asm("umulh     %1,%2,%0" : "=r"(ret) : "r"(a), "r"(b));                \
+        ret;                                                                   \
+    })
 #endif /* compiler */
 #elif defined(_ARCH_PPC64) && defined(SIXTY_FOUR_BIT_LONG)
 #if defined(__GNUC__) && __GNUC__ >= 2
 #define BN_UMULT_HIGH(a, b)                                                    \
-  ({                                                                           \
-    register BN_ULONG ret;                                                     \
-    asm("mulhdu    %0,%1,%2" : "=r"(ret) : "r"(a), "r"(b));                    \
-    ret;                                                                       \
-  })
+    ({                                                                         \
+        register BN_ULONG ret;                                                 \
+        asm("mulhdu    %0,%1,%2" : "=r"(ret) : "r"(a), "r"(b));                \
+        ret;                                                                   \
+    })
 #endif /* compiler */
 #elif (defined(__x86_64) || defined(__x86_64__)) &&                            \
 (defined(SIXTY_FOUR_BIT_LONG) || defined(SIXTY_FOUR_BIT))
 #if defined(__GNUC__) && __GNUC__ >= 2
 #define BN_UMULT_HIGH(a, b)                                                    \
-  ({                                                                           \
-    register BN_ULONG ret, discard;                                            \
-    asm("mulq      %3" : "=a"(discard), "=d"(ret) : "a"(a), "g"(b) : "cc");    \
-    ret;                                                                       \
-  })
+    ({                                                                         \
+        register BN_ULONG ret, discard;                                        \
+        asm("mulq      %3"                                                     \
+            : "=a"(discard), "=d"(ret)                                         \
+            : "a"(a), "g"(b)                                                   \
+            : "cc");                                                           \
+        ret;                                                                   \
+    })
 #define BN_UMULT_LOHI(low, high, a, b)                                         \
-  asm("mulq      %3" : "=a"(low), "=d"(high) : "a"(a), "g"(b) : "cc");
+    asm("mulq      %3" : "=a"(low), "=d"(high) : "a"(a), "g"(b) : "cc");
 #endif
 #elif (defined(_M_AMD64) || defined(_M_X64)) && defined(SIXTY_FOUR_BIT)
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -435,34 +438,34 @@ unsigned __int64 _umul128(unsigned __int64 a, unsigned __int64 b,
 (defined(SIXTY_FOUR_BIT) || defined(SIXTY_FOUR_BIT_LONG))
 #if defined(__GNUC__) && __GNUC__ >= 2
 #define BN_UMULT_HIGH(a, b)                                                    \
-  ({                                                                           \
-    register BN_ULONG ret;                                                     \
-    asm("dmultu    %1,%2" : "=h"(ret) : "r"(a), "r"(b) : "l");                 \
-    ret;                                                                       \
-  })
+    ({                                                                         \
+        register BN_ULONG ret;                                                 \
+        asm("dmultu    %1,%2" : "=h"(ret) : "r"(a), "r"(b) : "l");             \
+        ret;                                                                   \
+    })
 #define BN_UMULT_LOHI(low, high, a, b)                                         \
-  asm("dmultu    %2,%3" : "=l"(low), "=h"(high) : "r"(a), "r"(b));
+    asm("dmultu    %2,%3" : "=l"(low), "=h"(high) : "r"(a), "r"(b));
 #endif
 #elif defined(__aarch64__) && defined(SIXTY_FOUR_BIT_LONG)
 #if defined(__GNUC__) && __GNUC__ >= 2
 #define BN_UMULT_HIGH(a, b)                                                    \
-  ({                                                                           \
-    register BN_ULONG ret;                                                     \
-    asm("umulh     %0,%1,%2" : "=r"(ret) : "r"(a), "r"(b));                    \
-    ret;                                                                       \
-  })
+    ({                                                                         \
+        register BN_ULONG ret;                                                 \
+        asm("umulh     %0,%1,%2" : "=r"(ret) : "r"(a), "r"(b));                \
+        ret;                                                                   \
+    })
 #endif
 #endif /* cpu */
 #endif /* OPENSSL_NO_ASM */
 
 #ifdef BN_RAND_DEBUG
 #define bn_clear_top2max(a)                                                    \
-  {                                                                            \
-    int ind = (a)->dmax - (a)->top;                                            \
-    BN_ULONG *ftl = &(a)->d[(a)->top - 1];                                     \
-    for (; ind != 0; ind--)                                                    \
-      *(++ftl) = 0x0;                                                          \
-  }
+    {                                                                          \
+        int ind = (a)->dmax - (a)->top;                                        \
+        BN_ULONG *ftl = &(a)->d[(a)->top - 1];                                 \
+        for (; ind != 0; ind--)                                                \
+            *(++ftl) = 0x0;                                                    \
+    }
 #else
 #define bn_clear_top2max(a)
 #endif
@@ -475,91 +478,91 @@ unsigned __int64 _umul128(unsigned __int64 a, unsigned __int64 b,
 #define Hw(t) (((BN_ULONG)((t) >> BN_BITS2)) & BN_MASK2)
 
 #define mul_add(r, a, w, c)                                                    \
-  {                                                                            \
-    BN_ULLONG t;                                                               \
-    t = (BN_ULLONG)w * (a) + (r) + (c);                                        \
-    (r) = Lw(t);                                                               \
-    (c) = Hw(t);                                                               \
-  }
+    {                                                                          \
+        BN_ULLONG t;                                                           \
+        t = (BN_ULLONG)w * (a) + (r) + (c);                                    \
+        (r) = Lw(t);                                                           \
+        (c) = Hw(t);                                                           \
+    }
 
 #define mul(r, a, w, c)                                                        \
-  {                                                                            \
-    BN_ULLONG t;                                                               \
-    t = (BN_ULLONG)w * (a) + (c);                                              \
-    (r) = Lw(t);                                                               \
-    (c) = Hw(t);                                                               \
-  }
+    {                                                                          \
+        BN_ULLONG t;                                                           \
+        t = (BN_ULLONG)w * (a) + (c);                                          \
+        (r) = Lw(t);                                                           \
+        (c) = Hw(t);                                                           \
+    }
 
 #define sqr(r0, r1, a)                                                         \
-  {                                                                            \
-    BN_ULLONG t;                                                               \
-    t = (BN_ULLONG)(a) * (a);                                                  \
-    (r0) = Lw(t);                                                              \
-    (r1) = Hw(t);                                                              \
-  }
+    {                                                                          \
+        BN_ULLONG t;                                                           \
+        t = (BN_ULLONG)(a) * (a);                                              \
+        (r0) = Lw(t);                                                          \
+        (r1) = Hw(t);                                                          \
+    }
 
 #elif defined(BN_UMULT_LOHI)
 #define mul_add(r, a, w, c)                                                    \
-  {                                                                            \
-    BN_ULONG high, low, ret, tmp = (a);                                        \
-    ret = (r);                                                                 \
-    BN_UMULT_LOHI(low, high, w, tmp);                                          \
-    ret += (c);                                                                \
-    (c) = (ret < (c));                                                         \
-    (c) += high;                                                               \
-    ret += low;                                                                \
-    (c) += (ret < low);                                                        \
-    (r) = ret;                                                                 \
-  }
+    {                                                                          \
+        BN_ULONG high, low, ret, tmp = (a);                                    \
+        ret = (r);                                                             \
+        BN_UMULT_LOHI(low, high, w, tmp);                                      \
+        ret += (c);                                                            \
+        (c) = (ret < (c));                                                     \
+        (c) += high;                                                           \
+        ret += low;                                                            \
+        (c) += (ret < low);                                                    \
+        (r) = ret;                                                             \
+    }
 
 #define mul(r, a, w, c)                                                        \
-  {                                                                            \
-    BN_ULONG high, low, ret, ta = (a);                                         \
-    BN_UMULT_LOHI(low, high, w, ta);                                           \
-    ret = low + (c);                                                           \
-    (c) = high;                                                                \
-    (c) += (ret < low);                                                        \
-    (r) = ret;                                                                 \
-  }
+    {                                                                          \
+        BN_ULONG high, low, ret, ta = (a);                                     \
+        BN_UMULT_LOHI(low, high, w, ta);                                       \
+        ret = low + (c);                                                       \
+        (c) = high;                                                            \
+        (c) += (ret < low);                                                    \
+        (r) = ret;                                                             \
+    }
 
 #define sqr(r0, r1, a)                                                         \
-  {                                                                            \
-    BN_ULONG tmp = (a);                                                        \
-    BN_UMULT_LOHI(r0, r1, tmp, tmp);                                           \
-  }
+    {                                                                          \
+        BN_ULONG tmp = (a);                                                    \
+        BN_UMULT_LOHI(r0, r1, tmp, tmp);                                       \
+    }
 
 #elif defined(BN_UMULT_HIGH)
 #define mul_add(r, a, w, c)                                                    \
-  {                                                                            \
-    BN_ULONG high, low, ret, tmp = (a);                                        \
-    ret = (r);                                                                 \
-    high = BN_UMULT_HIGH(w, tmp);                                              \
-    ret += (c);                                                                \
-    low = (w) * tmp;                                                           \
-    (c) = (ret < (c));                                                         \
-    (c) += high;                                                               \
-    ret += low;                                                                \
-    (c) += (ret < low);                                                        \
-    (r) = ret;                                                                 \
-  }
+    {                                                                          \
+        BN_ULONG high, low, ret, tmp = (a);                                    \
+        ret = (r);                                                             \
+        high = BN_UMULT_HIGH(w, tmp);                                          \
+        ret += (c);                                                            \
+        low = (w) * tmp;                                                       \
+        (c) = (ret < (c));                                                     \
+        (c) += high;                                                           \
+        ret += low;                                                            \
+        (c) += (ret < low);                                                    \
+        (r) = ret;                                                             \
+    }
 
 #define mul(r, a, w, c)                                                        \
-  {                                                                            \
-    BN_ULONG high, low, ret, ta = (a);                                         \
-    low = (w) * ta;                                                            \
-    high = BN_UMULT_HIGH(w, ta);                                               \
-    ret = low + (c);                                                           \
-    (c) = high;                                                                \
-    (c) += (ret < low);                                                        \
-    (r) = ret;                                                                 \
-  }
+    {                                                                          \
+        BN_ULONG high, low, ret, ta = (a);                                     \
+        low = (w) * ta;                                                        \
+        high = BN_UMULT_HIGH(w, ta);                                           \
+        ret = low + (c);                                                       \
+        (c) = high;                                                            \
+        (c) += (ret < low);                                                    \
+        (r) = ret;                                                             \
+    }
 
 #define sqr(r0, r1, a)                                                         \
-  {                                                                            \
-    BN_ULONG tmp = (a);                                                        \
-    (r0) = tmp * tmp;                                                          \
-    (r1) = BN_UMULT_HIGH(tmp, tmp);                                            \
-  }
+    {                                                                          \
+        BN_ULONG tmp = (a);                                                    \
+        (r0) = tmp * tmp;                                                      \
+        (r1) = BN_UMULT_HIGH(tmp, tmp);                                        \
+    }
 
 #else
 /*************************************************************
@@ -575,77 +578,77 @@ unsigned __int64 _umul128(unsigned __int64 a, unsigned __int64 b,
 #define LL2HBITS(a) ((BN_ULLONG)((a) & BN_MASKl) << BN_BITS2)
 
 #define mul64(l, h, bl, bh)                                                    \
-  {                                                                            \
-    BN_ULONG m, m1, lt, ht;                                                    \
+    {                                                                          \
+        BN_ULONG m, m1, lt, ht;                                                \
                                                                                \
-    lt = l;                                                                    \
-    ht = h;                                                                    \
-    m = (bh) * (lt);                                                           \
-    lt = (bl) * (lt);                                                          \
-    m1 = (bl) * (ht);                                                          \
-    ht = (bh) * (ht);                                                          \
-    m = (m + m1) & BN_MASK2;                                                   \
-    ht += L2HBITS((BN_ULONG)(m < m1));                                         \
-    ht += HBITS(m);                                                            \
-    m1 = L2HBITS(m);                                                           \
-    lt = (lt + m1) & BN_MASK2;                                                 \
-    ht += (lt < m1);                                                           \
-    (l) = lt;                                                                  \
-    (h) = ht;                                                                  \
-  }
+        lt = l;                                                                \
+        ht = h;                                                                \
+        m = (bh) * (lt);                                                       \
+        lt = (bl) * (lt);                                                      \
+        m1 = (bl) * (ht);                                                      \
+        ht = (bh) * (ht);                                                      \
+        m = (m + m1) & BN_MASK2;                                               \
+        ht += L2HBITS((BN_ULONG)(m < m1));                                     \
+        ht += HBITS(m);                                                        \
+        m1 = L2HBITS(m);                                                       \
+        lt = (lt + m1) & BN_MASK2;                                             \
+        ht += (lt < m1);                                                       \
+        (l) = lt;                                                              \
+        (h) = ht;                                                              \
+    }
 
 #define sqr64(lo, ho, in)                                                      \
-  {                                                                            \
-    BN_ULONG l, h, m;                                                          \
+    {                                                                          \
+        BN_ULONG l, h, m;                                                      \
                                                                                \
-    h = (in);                                                                  \
-    l = LBITS(h);                                                              \
-    h = HBITS(h);                                                              \
-    m = (l) * (h);                                                             \
-    l *= l;                                                                    \
-    h *= h;                                                                    \
-    h += (m & BN_MASK2h1) >> (BN_BITS4 - 1);                                   \
-    m = (m & BN_MASK2l) << (BN_BITS4 + 1);                                     \
-    l = (l + m) & BN_MASK2;                                                    \
-    h += (l < m);                                                              \
-    (lo) = l;                                                                  \
-    (ho) = h;                                                                  \
-  }
+        h = (in);                                                              \
+        l = LBITS(h);                                                          \
+        h = HBITS(h);                                                          \
+        m = (l) * (h);                                                         \
+        l *= l;                                                                \
+        h *= h;                                                                \
+        h += (m & BN_MASK2h1) >> (BN_BITS4 - 1);                               \
+        m = (m & BN_MASK2l) << (BN_BITS4 + 1);                                 \
+        l = (l + m) & BN_MASK2;                                                \
+        h += (l < m);                                                          \
+        (lo) = l;                                                              \
+        (ho) = h;                                                              \
+    }
 
 #define mul_add(r, a, bl, bh, c)                                               \
-  {                                                                            \
-    BN_ULONG l, h;                                                             \
+    {                                                                          \
+        BN_ULONG l, h;                                                         \
                                                                                \
-    h = (a);                                                                   \
-    l = LBITS(h);                                                              \
-    h = HBITS(h);                                                              \
-    mul64(l, h, (bl), (bh));                                                   \
+        h = (a);                                                               \
+        l = LBITS(h);                                                          \
+        h = HBITS(h);                                                          \
+        mul64(l, h, (bl), (bh));                                               \
                                                                                \
-    /* non-multiply part */                                                    \
-    l = (l + (c)) & BN_MASK2;                                                  \
-    h += (l < (c));                                                            \
-    (c) = (r);                                                                 \
-    l = (l + (c)) & BN_MASK2;                                                  \
-    h += (l < (c));                                                            \
-    (c) = h & BN_MASK2;                                                        \
-    (r) = l;                                                                   \
-  }
+        /* non-multiply part */                                                \
+        l = (l + (c)) & BN_MASK2;                                              \
+        h += (l < (c));                                                        \
+        (c) = (r);                                                             \
+        l = (l + (c)) & BN_MASK2;                                              \
+        h += (l < (c));                                                        \
+        (c) = h & BN_MASK2;                                                    \
+        (r) = l;                                                               \
+    }
 
 #define mul(r, a, bl, bh, c)                                                   \
-  {                                                                            \
-    BN_ULONG l, h;                                                             \
+    {                                                                          \
+        BN_ULONG l, h;                                                         \
                                                                                \
-    h = (a);                                                                   \
-    l = LBITS(h);                                                              \
-    h = HBITS(h);                                                              \
-    mul64(l, h, (bl), (bh));                                                   \
+        h = (a);                                                               \
+        l = LBITS(h);                                                          \
+        h = HBITS(h);                                                          \
+        mul64(l, h, (bl), (bh));                                               \
                                                                                \
-    /* non-multiply part */                                                    \
-    l += (c);                                                                  \
-    h += ((l & BN_MASK2) < (c));                                               \
-    (c) = h & BN_MASK2;                                                        \
-    (r) = l & BN_MASK2;                                                        \
-  }
+        /* non-multiply part */                                                \
+        l += (c);                                                              \
+        h += ((l & BN_MASK2) < (c));                                           \
+        (c) = h & BN_MASK2;                                                    \
+        (r) = l & BN_MASK2;                                                    \
+    }
 #endif /* !BN_LLONG */
 
 void BN_RECP_CTX_init(BN_RECP_CTX *recp);
@@ -677,13 +680,13 @@ BIGNUM *int_bn_mod_inverse(BIGNUM *in, const BIGNUM *a, const BIGNUM *n,
                            BN_CTX *ctx, int *noinv);
 
 static ossl_inline BIGNUM *bn_expand(BIGNUM *a, int bits) {
-  if (bits > (INT_MAX - BN_BITS2 + 1))
-    return NULL;
+    if (bits > (INT_MAX - BN_BITS2 + 1))
+        return NULL;
 
-  if (((bits + BN_BITS2 - 1) / BN_BITS2) <= (a)->dmax)
-    return a;
+    if (((bits + BN_BITS2 - 1) / BN_BITS2) <= (a)->dmax)
+        return a;
 
-  return bn_expand2((a), (bits + BN_BITS2 - 1) / BN_BITS2);
+    return bn_expand2((a), (bits + BN_BITS2 - 1) / BN_BITS2);
 }
 
 int ossl_bn_check_prime(const BIGNUM *w, int checks, BN_CTX *ctx,

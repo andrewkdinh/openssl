@@ -49,38 +49,38 @@ static STACK_OF(CONF_VALUE) *
 i2v_OSSL_BASIC_ATTR_CONSTRAINTS(X509V3_EXT_METHOD * method,
                                 OSSL_BASIC_ATTR_CONSTRAINTS *battcons,
                                 STACK_OF(CONF_VALUE) * extlist) {
-  X509V3_add_value_bool("authority", battcons->authority, &extlist);
-  X509V3_add_value_int("pathlen", battcons->pathlen, &extlist);
-  return extlist;
+    X509V3_add_value_bool("authority", battcons->authority, &extlist);
+    X509V3_add_value_int("pathlen", battcons->pathlen, &extlist);
+    return extlist;
 }
 
 static OSSL_BASIC_ATTR_CONSTRAINTS *
 v2i_OSSL_BASIC_ATTR_CONSTRAINTS(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
                                 STACK_OF(CONF_VALUE) * values) {
-  OSSL_BASIC_ATTR_CONSTRAINTS *battcons = NULL;
-  CONF_VALUE *val;
-  int i;
+    OSSL_BASIC_ATTR_CONSTRAINTS *battcons = NULL;
+    CONF_VALUE *val;
+    int i;
 
-  if ((battcons = OSSL_BASIC_ATTR_CONSTRAINTS_new()) == NULL) {
-    ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
-    return NULL;
-  }
-  for (i = 0; i < sk_CONF_VALUE_num(values); i++) {
-    val = sk_CONF_VALUE_value(values, i);
-    if (strcmp(val->name, "authority") == 0) {
-      if (!X509V3_get_value_bool(val, &battcons->authority))
-        goto err;
-    } else if (strcmp(val->name, "pathlen") == 0) {
-      if (!X509V3_get_value_int(val, &battcons->pathlen))
-        goto err;
-    } else {
-      ERR_raise(ERR_LIB_X509V3, X509V3_R_INVALID_NAME);
-      X509V3_conf_add_error_name_value(val);
-      goto err;
+    if ((battcons = OSSL_BASIC_ATTR_CONSTRAINTS_new()) == NULL) {
+        ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
+        return NULL;
     }
-  }
-  return battcons;
+    for (i = 0; i < sk_CONF_VALUE_num(values); i++) {
+        val = sk_CONF_VALUE_value(values, i);
+        if (strcmp(val->name, "authority") == 0) {
+            if (!X509V3_get_value_bool(val, &battcons->authority))
+                goto err;
+        } else if (strcmp(val->name, "pathlen") == 0) {
+            if (!X509V3_get_value_int(val, &battcons->pathlen))
+                goto err;
+        } else {
+            ERR_raise(ERR_LIB_X509V3, X509V3_R_INVALID_NAME);
+            X509V3_conf_add_error_name_value(val);
+            goto err;
+        }
+    }
+    return battcons;
 err:
-  OSSL_BASIC_ATTR_CONSTRAINTS_free(battcons);
-  return NULL;
+    OSSL_BASIC_ATTR_CONSTRAINTS_free(battcons);
+    return NULL;
 }

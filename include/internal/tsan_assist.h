@@ -59,12 +59,12 @@
 #define TSAN_QUALIFIER _Atomic
 #define tsan_load(ptr) atomic_load_explicit((ptr), memory_order_relaxed)
 #define tsan_store(ptr, val)                                                   \
-  atomic_store_explicit((ptr), (val), memory_order_relaxed)
+    atomic_store_explicit((ptr), (val), memory_order_relaxed)
 #define tsan_add(ptr, n)                                                       \
-  atomic_fetch_add_explicit((ptr), (n), memory_order_relaxed)
+    atomic_fetch_add_explicit((ptr), (n), memory_order_relaxed)
 #define tsan_ld_acq(ptr) atomic_load_explicit((ptr), memory_order_acquire)
 #define tsan_st_rel(ptr, val)                                                  \
-  atomic_store_explicit((ptr), (val), memory_order_release)
+    atomic_store_explicit((ptr), (val), memory_order_release)
 #endif
 
 #elif defined(__GNUC__) && defined(__ATOMIC_RELAXED)
@@ -104,11 +104,11 @@ __GCC_ATOMIC_POINTER_LOCK_FREE >= 2
 #pragma intrinsic(_InterlockedExchangeAdd64_nf)
 #pragma intrinsic(__iso_volatile_load64, __iso_volatile_store64)
 #define tsan_load(ptr)                                                         \
-  (sizeof(*(ptr)) == 8 ? __iso_volatile_load64(ptr)                            \
-                       : __iso_volatile_load32(ptr))
+    (sizeof(*(ptr)) == 8 ? __iso_volatile_load64(ptr)                          \
+                         : __iso_volatile_load32(ptr))
 #define tsan_store(ptr, val)                                                   \
-  (sizeof(*(ptr)) == 8 ? __iso_volatile_store64((ptr), (val))                  \
-                       : __iso_volatile_store32((ptr), (val)))
+    (sizeof(*(ptr)) == 8 ? __iso_volatile_store64((ptr), (val))                \
+                         : __iso_volatile_store32((ptr), (val)))
 #else
 #define tsan_load(ptr) __iso_volatile_load32(ptr)
 #define tsan_store(ptr, val) __iso_volatile_store32((ptr), (val))
@@ -121,8 +121,8 @@ __GCC_ATOMIC_POINTER_LOCK_FREE >= 2
 #ifdef _WIN64
 #pragma intrinsic(_InterlockedExchangeAdd64)
 #define tsan_add(ptr, n)                                                       \
-  (sizeof(*(ptr)) == 8 ? _InterlockedExchangeAdd64((ptr), (n))                 \
-                       : _InterlockedExchangeAdd((ptr), (n)))
+    (sizeof(*(ptr)) == 8 ? _InterlockedExchangeAdd64((ptr), (n))               \
+                         : _InterlockedExchangeAdd((ptr), (n)))
 #else
 #define tsan_add(ptr, n) _InterlockedExchangeAdd((ptr), (n))
 #endif

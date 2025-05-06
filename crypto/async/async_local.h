@@ -31,46 +31,46 @@ typedef struct async_pool_st async_pool;
 #include "arch/async_null.h"
 
 struct async_ctx_st {
-  async_fibre dispatcher;
-  ASYNC_JOB *currjob;
-  unsigned int blocked;
+    async_fibre dispatcher;
+    ASYNC_JOB *currjob;
+    unsigned int blocked;
 };
 
 struct async_job_st {
-  async_fibre fibrectx;
-  int (*func)(void *);
-  void *funcargs;
-  int ret;
-  int status;
-  ASYNC_WAIT_CTX *waitctx;
-  OSSL_LIB_CTX *libctx;
+    async_fibre fibrectx;
+    int (*func)(void *);
+    void *funcargs;
+    int ret;
+    int status;
+    ASYNC_WAIT_CTX *waitctx;
+    OSSL_LIB_CTX *libctx;
 };
 
 struct fd_lookup_st {
-  const void *key;
-  OSSL_ASYNC_FD fd;
-  void *custom_data;
-  void (*cleanup)(ASYNC_WAIT_CTX *, const void *, OSSL_ASYNC_FD, void *);
-  int add;
-  int del;
-  struct fd_lookup_st *next;
+    const void *key;
+    OSSL_ASYNC_FD fd;
+    void *custom_data;
+    void (*cleanup)(ASYNC_WAIT_CTX *, const void *, OSSL_ASYNC_FD, void *);
+    int add;
+    int del;
+    struct fd_lookup_st *next;
 };
 
 struct async_wait_ctx_st {
-  struct fd_lookup_st *fds;
-  size_t numadd;
-  size_t numdel;
-  ASYNC_callback_fn callback;
-  void *callback_arg;
-  int status;
+    struct fd_lookup_st *fds;
+    size_t numadd;
+    size_t numdel;
+    ASYNC_callback_fn callback;
+    void *callback_arg;
+    int status;
 };
 
 DEFINE_STACK_OF(ASYNC_JOB)
 
 struct async_pool_st {
-  STACK_OF(ASYNC_JOB) * jobs;
-  size_t curr_size;
-  size_t max_size;
+    STACK_OF(ASYNC_JOB) * jobs;
+    size_t curr_size;
+    size_t max_size;
 };
 
 void async_local_cleanup(void);

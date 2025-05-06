@@ -16,16 +16,16 @@
  * legacy function signatures demand.
  */
 static int blake2s_init(BLAKE2S_CTX *C) {
-  BLAKE2S_PARAM P;
+    BLAKE2S_PARAM P;
 
-  ossl_blake2s_param_init(&P);
-  return ossl_blake2s_init(C, &P);
+    ossl_blake2s_param_init(&P);
+    return ossl_blake2s_init(C, &P);
 }
 static int blake2b_init(BLAKE2B_CTX *C) {
-  BLAKE2B_PARAM P;
+    BLAKE2B_PARAM P;
 
-  ossl_blake2b_param_init(&P);
-  return ossl_blake2b_init(C, &P);
+    ossl_blake2b_param_init(&P);
+    return ossl_blake2b_init(C, &P);
 }
 #define blake2s_update ossl_blake2s_update
 #define blake2b_update ossl_blake2b_update

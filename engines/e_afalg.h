@@ -27,15 +27,15 @@
 
 #define ALG_ERR(x, ...) fprintf(stderr, "ALG_ERR: " x, __VA_ARGS__)
 #define ALG_PERR(x, ...)                                                       \
-  do {                                                                         \
-    fprintf(stderr, "ALG_PERR: " x, __VA_ARGS__);                              \
-    perror(NULL);                                                              \
-  } while (0)
+    do {                                                                       \
+        fprintf(stderr, "ALG_PERR: " x, __VA_ARGS__);                          \
+        perror(NULL);                                                          \
+    } while (0)
 #define ALG_PWARN(x, ...)                                                      \
-  do {                                                                         \
-    fprintf(stderr, "ALG_PERR: " x, __VA_ARGS__);                              \
-    perror(NULL);                                                              \
-  } while (0)
+    do {                                                                       \
+        fprintf(stderr, "ALG_PERR: " x, __VA_ARGS__);                          \
+        perror(NULL);                                                          \
+    } while (0)
 
 #ifndef AES_BLOCK_SIZE
 #define AES_BLOCK_SIZE 16
@@ -52,18 +52,18 @@ typedef enum { MODE_UNINIT = 0, MODE_SYNC, MODE_ASYNC } op_mode;
 enum { AES_CBC_128 = 0, AES_CBC_192, AES_CBC_256 };
 
 struct cbc_cipher_handles {
-  int key_size;
-  EVP_CIPHER *_hidden;
+    int key_size;
+    EVP_CIPHER *_hidden;
 };
 
 typedef struct cbc_cipher_handles cbc_handles;
 
 struct afalg_aio_st {
-  int efd;
-  op_mode mode;
-  aio_context_t aio_ctx;
-  struct io_event events[MAX_INFLIGHTS];
-  struct iocb cbt[MAX_INFLIGHTS];
+    int efd;
+    op_mode mode;
+    aio_context_t aio_ctx;
+    struct io_event events[MAX_INFLIGHTS];
+    struct iocb cbt[MAX_INFLIGHTS];
 };
 typedef struct afalg_aio_st afalg_aio;
 
@@ -74,13 +74,13 @@ typedef struct afalg_aio_st afalg_aio;
 #define MAGIC_INIT_NUM 0x1890671
 
 struct afalg_ctx_st {
-  int init_done;
-  int sfd;
-  int bfd;
+    int init_done;
+    int sfd;
+    int bfd;
 #ifdef ALG_ZERO_COPY
-  int zc_pipe[2];
+    int zc_pipe[2];
 #endif
-  afalg_aio aio;
+    afalg_aio aio;
 };
 
 typedef struct afalg_ctx_st afalg_ctx;

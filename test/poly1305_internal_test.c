@@ -17,14 +17,14 @@
 #include "internal/nelem.h"
 
 typedef struct {
-  size_t size;
-  const unsigned char data[1024];
+    size_t size;
+    const unsigned char data[1024];
 } SIZED_DATA;
 
 typedef struct {
-  SIZED_DATA input;
-  SIZED_DATA key;
-  SIZED_DATA expected;
+    SIZED_DATA input;
+    SIZED_DATA key;
+    SIZED_DATA expected;
 } TESTDATA;
 
 /**********************************************************************
@@ -863,69 +863,70 @@ static TESTDATA tests[] = {
    0x00, 0x00, 0x00}}}};
 
 static int test_poly1305(int idx) {
-  POLY1305 poly1305;
-  const TESTDATA test = tests[idx];
-  const unsigned char *in = test.input.data;
-  size_t inlen = test.input.size;
-  const unsigned char *key = test.key.data;
-  const unsigned char *expected = test.expected.data;
-  size_t expectedlen = test.expected.size;
-  unsigned char out[16];
+    POLY1305 poly1305;
+    const TESTDATA test = tests[idx];
+    const unsigned char *in = test.input.data;
+    size_t inlen = test.input.size;
+    const unsigned char *key = test.key.data;
+    const unsigned char *expected = test.expected.data;
+    size_t expectedlen = test.expected.size;
+    unsigned char out[16];
 
-  if (!TEST_size_t_eq(expectedlen, sizeof(out)))
-    return 0;
-
-  Poly1305_Init(&poly1305, key);
-  Poly1305_Update(&poly1305, in, inlen);
-  Poly1305_Final(&poly1305, out);
-
-  if (!TEST_mem_eq(out, expectedlen, expected, expectedlen)) {
-    TEST_info("Poly1305 test #%d failed.", idx);
-    return 0;
-  }
-
-  if (inlen > 16) {
-    Poly1305_Init(&poly1305, key);
-    Poly1305_Update(&poly1305, in, 1);
-    Poly1305_Update(&poly1305, in + 1, inlen - 1);
-    Poly1305_Final(&poly1305, out);
-
-    if (!TEST_mem_eq(out, expectedlen, expected, expectedlen)) {
-      TEST_info("Poly1305 test #%d/1+(N-1) failed.", idx);
-      return 0;
-    }
-  }
-
-  if (inlen > 32) {
-    size_t half = inlen / 2;
-
-    Poly1305_Init(&poly1305, key);
-    Poly1305_Update(&poly1305, in, half);
-    Poly1305_Update(&poly1305, in + half, inlen - half);
-    Poly1305_Final(&poly1305, out);
-
-    if (!TEST_mem_eq(out, expectedlen, expected, expectedlen)) {
-      TEST_info("Poly1305 test #%d/2 failed.", idx);
-      return 0;
-    }
-
-    for (half = 16; half < inlen; half += 16) {
-      Poly1305_Init(&poly1305, key);
-      Poly1305_Update(&poly1305, in, half);
-      Poly1305_Update(&poly1305, in + half, inlen - half);
-      Poly1305_Final(&poly1305, out);
-
-      if (!TEST_mem_eq(out, expectedlen, expected, expectedlen)) {
-        TEST_info("Poly1305 test #%d/%zu+%zu failed.", idx, half, inlen - half);
+    if (!TEST_size_t_eq(expectedlen, sizeof(out)))
         return 0;
-      }
-    }
-  }
 
-  return 1;
+    Poly1305_Init(&poly1305, key);
+    Poly1305_Update(&poly1305, in, inlen);
+    Poly1305_Final(&poly1305, out);
+
+    if (!TEST_mem_eq(out, expectedlen, expected, expectedlen)) {
+        TEST_info("Poly1305 test #%d failed.", idx);
+        return 0;
+    }
+
+    if (inlen > 16) {
+        Poly1305_Init(&poly1305, key);
+        Poly1305_Update(&poly1305, in, 1);
+        Poly1305_Update(&poly1305, in + 1, inlen - 1);
+        Poly1305_Final(&poly1305, out);
+
+        if (!TEST_mem_eq(out, expectedlen, expected, expectedlen)) {
+            TEST_info("Poly1305 test #%d/1+(N-1) failed.", idx);
+            return 0;
+        }
+    }
+
+    if (inlen > 32) {
+        size_t half = inlen / 2;
+
+        Poly1305_Init(&poly1305, key);
+        Poly1305_Update(&poly1305, in, half);
+        Poly1305_Update(&poly1305, in + half, inlen - half);
+        Poly1305_Final(&poly1305, out);
+
+        if (!TEST_mem_eq(out, expectedlen, expected, expectedlen)) {
+            TEST_info("Poly1305 test #%d/2 failed.", idx);
+            return 0;
+        }
+
+        for (half = 16; half < inlen; half += 16) {
+            Poly1305_Init(&poly1305, key);
+            Poly1305_Update(&poly1305, in, half);
+            Poly1305_Update(&poly1305, in + half, inlen - half);
+            Poly1305_Final(&poly1305, out);
+
+            if (!TEST_mem_eq(out, expectedlen, expected, expectedlen)) {
+                TEST_info("Poly1305 test #%d/%zu+%zu failed.", idx, half,
+                          inlen - half);
+                return 0;
+            }
+        }
+    }
+
+    return 1;
 }
 
 int setup_tests(void) {
-  ADD_ALL_TESTS(test_poly1305, OSSL_NELEM(tests));
-  return 1;
+    ADD_ALL_TESTS(test_poly1305, OSSL_NELEM(tests));
+    return 1;
 }

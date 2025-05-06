@@ -34,7 +34,7 @@ typedef unsigned int IDEA_INT;
 #define IDEA_DECRYPT 0
 
 typedef struct idea_key_st {
-  IDEA_INT data[9][6];
+    IDEA_INT data[9][6];
 } IDEA_KEY_SCHEDULE;
 #endif
 #ifndef OPENSSL_NO_DEPRECATED_3_0

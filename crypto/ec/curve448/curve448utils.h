@@ -68,13 +68,13 @@ typedef int64_t c448_dsword_t;
 
 /* Another boolean type used to indicate success or failure. */
 typedef enum {
-  C448_SUCCESS = -1, /**< The operation succeeded. */
-  C448_FAILURE = 0   /**< The operation failed. */
+    C448_SUCCESS = -1, /**< The operation succeeded. */
+    C448_FAILURE = 0   /**< The operation failed. */
 } c448_error_t;
 
 /* Return success if x is true */
 static ossl_inline c448_error_t c448_succeed_if(c448_bool_t x) {
-  return (c448_error_t)x;
+    return (c448_error_t)x;
 }
 
 #endif /* __C448_COMMON_H__ */

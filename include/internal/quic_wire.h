@@ -50,49 +50,49 @@
 /* Low 3 bits of the type contain flags */
 #define OSSL_QUIC_FRAME_TYPE_STREAM 0x08 /* base ID */
 #define OSSL_QUIC_FRAME_TYPE_STREAM_FIN                                        \
-  (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_FIN)
+    (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_FIN)
 #define OSSL_QUIC_FRAME_TYPE_STREAM_LEN                                        \
-  (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_LEN)
+    (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_LEN)
 #define OSSL_QUIC_FRAME_TYPE_STREAM_LEN_FIN                                    \
-  (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_LEN |             \
-   OSSL_QUIC_FRAME_FLAG_STREAM_FIN)
+    (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_LEN |           \
+     OSSL_QUIC_FRAME_FLAG_STREAM_FIN)
 #define OSSL_QUIC_FRAME_TYPE_STREAM_OFF                                        \
-  (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_OFF)
+    (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_OFF)
 #define OSSL_QUIC_FRAME_TYPE_STREAM_OFF_FIN                                    \
-  (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_OFF |             \
-   OSSL_QUIC_FRAME_FLAG_STREAM_FIN)
+    (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_OFF |           \
+     OSSL_QUIC_FRAME_FLAG_STREAM_FIN)
 #define OSSL_QUIC_FRAME_TYPE_STREAM_OFF_LEN                                    \
-  (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_OFF |             \
-   OSSL_QUIC_FRAME_FLAG_STREAM_LEN)
+    (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_OFF |           \
+     OSSL_QUIC_FRAME_FLAG_STREAM_LEN)
 #define OSSL_QUIC_FRAME_TYPE_STREAM_OFF_LEN_FIN                                \
-  (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_OFF |             \
-   OSSL_QUIC_FRAME_FLAG_STREAM_LEN | OSSL_QUIC_FRAME_FLAG_STREAM_FIN)
+    (OSSL_QUIC_FRAME_TYPE_STREAM | OSSL_QUIC_FRAME_FLAG_STREAM_OFF |           \
+     OSSL_QUIC_FRAME_FLAG_STREAM_LEN | OSSL_QUIC_FRAME_FLAG_STREAM_FIN)
 
 #define OSSL_QUIC_FRAME_TYPE_IS_STREAM(x)                                      \
-  (((x) & ~OSSL_QUIC_FRAME_FLAG_STREAM_MASK) == OSSL_QUIC_FRAME_TYPE_STREAM)
+    (((x) & ~OSSL_QUIC_FRAME_FLAG_STREAM_MASK) == OSSL_QUIC_FRAME_TYPE_STREAM)
 #define OSSL_QUIC_FRAME_TYPE_IS_ACK(x)                                         \
-  (((x) & ~(uint64_t)1) == OSSL_QUIC_FRAME_TYPE_ACK_WITHOUT_ECN)
+    (((x) & ~(uint64_t)1) == OSSL_QUIC_FRAME_TYPE_ACK_WITHOUT_ECN)
 #define OSSL_QUIC_FRAME_TYPE_IS_MAX_STREAMS(x)                                 \
-  (((x) & ~(uint64_t)1) == OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_BIDI)
+    (((x) & ~(uint64_t)1) == OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_BIDI)
 #define OSSL_QUIC_FRAME_TYPE_IS_STREAMS_BLOCKED(x)                             \
-  (((x) & ~(uint64_t)1) == OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_BIDI)
+    (((x) & ~(uint64_t)1) == OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_BIDI)
 #define OSSL_QUIC_FRAME_TYPE_IS_CONN_CLOSE(x)                                  \
-  (((x) & ~(uint64_t)1) == OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_TRANSPORT)
+    (((x) & ~(uint64_t)1) == OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_TRANSPORT)
 
 const char *ossl_quic_frame_type_to_string(uint64_t frame_type);
 
 static ossl_unused ossl_inline int
 ossl_quic_frame_type_is_ack_eliciting(uint64_t frame_type) {
-  switch (frame_type) {
-  case OSSL_QUIC_FRAME_TYPE_PADDING:
-  case OSSL_QUIC_FRAME_TYPE_ACK_WITHOUT_ECN:
-  case OSSL_QUIC_FRAME_TYPE_ACK_WITH_ECN:
-  case OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_TRANSPORT:
-  case OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_APP:
-    return 0;
-  default:
-    return 1;
-  }
+    switch (frame_type) {
+    case OSSL_QUIC_FRAME_TYPE_PADDING:
+    case OSSL_QUIC_FRAME_TYPE_ACK_WITHOUT_ECN:
+    case OSSL_QUIC_FRAME_TYPE_ACK_WITH_ECN:
+    case OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_TRANSPORT:
+    case OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_APP:
+        return 0;
+    default:
+        return 1;
+    }
 }
 
 /* QUIC Transport Parameter Types */
@@ -121,35 +121,35 @@ ossl_quic_frame_type_is_ack_eliciting(uint64_t frame_type) {
 
 /* QUIC Frame: ACK */
 typedef struct ossl_quic_ack_range_st {
-  /*
-   * Represents an inclusive range of packet numbers [start, end].
-   * start must be <= end.
-   */
-  QUIC_PN start, end;
+    /*
+     * Represents an inclusive range of packet numbers [start, end].
+     * start must be <= end.
+     */
+    QUIC_PN start, end;
 } OSSL_QUIC_ACK_RANGE;
 
 typedef struct ossl_quic_frame_ack_st {
-  /*
-   * A sequence of packet number ranges [[start, end]...].
-   *
-   * The ranges must be sorted in descending order, for example:
-   *      [ 95, 100]
-   *      [ 90,  92]
-   *      etc.
-   *
-   * As such, ack_ranges[0].end is always the highest packet number
-   * being acknowledged and ack_ranges[num_ack_ranges-1].start is
-   * always the lowest packet number being acknowledged.
-   *
-   * num_ack_ranges must be greater than zero, as an ACK frame must
-   * acknowledge at least one packet number.
-   */
-  OSSL_QUIC_ACK_RANGE *ack_ranges;
-  size_t num_ack_ranges;
+    /*
+     * A sequence of packet number ranges [[start, end]...].
+     *
+     * The ranges must be sorted in descending order, for example:
+     *      [ 95, 100]
+     *      [ 90,  92]
+     *      etc.
+     *
+     * As such, ack_ranges[0].end is always the highest packet number
+     * being acknowledged and ack_ranges[num_ack_ranges-1].start is
+     * always the lowest packet number being acknowledged.
+     *
+     * num_ack_ranges must be greater than zero, as an ACK frame must
+     * acknowledge at least one packet number.
+     */
+    OSSL_QUIC_ACK_RANGE *ack_ranges;
+    size_t num_ack_ranges;
 
-  OSSL_TIME delay_time;
-  uint64_t ect0, ect1, ecnce;
-  unsigned int ecn_present : 1;
+    OSSL_TIME delay_time;
+    uint64_t ect0, ect1, ecnce;
+    unsigned int ecn_present : 1;
 } OSSL_QUIC_FRAME_ACK;
 
 /* Returns 1 if the given frame contains the given PN. */
@@ -157,61 +157,61 @@ int ossl_quic_frame_ack_contains_pn(const OSSL_QUIC_FRAME_ACK *ack, QUIC_PN pn);
 
 /* QUIC Frame: STREAM */
 typedef struct ossl_quic_frame_stream_st {
-  uint64_t stream_id; /* Stream ID */
-  uint64_t offset;    /* Logical offset in stream */
-  uint64_t len;       /* Length of data in bytes */
-  const unsigned char *data;
+    uint64_t stream_id; /* Stream ID */
+    uint64_t offset;    /* Logical offset in stream */
+    uint64_t len;       /* Length of data in bytes */
+    const unsigned char *data;
 
-  /*
-   * On encode, this determines whether the len field should be encoded or
-   * not. If zero, the len field is not encoded and it is assumed the frame
-   * runs to the end of the packet.
-   *
-   * On decode, this determines whether the frame had an explicitly encoded
-   * length. If not set, the frame runs to the end of the packet and len has
-   * been set accordingly.
-   */
-  unsigned int has_explicit_len : 1;
+    /*
+     * On encode, this determines whether the len field should be encoded or
+     * not. If zero, the len field is not encoded and it is assumed the frame
+     * runs to the end of the packet.
+     *
+     * On decode, this determines whether the frame had an explicitly encoded
+     * length. If not set, the frame runs to the end of the packet and len has
+     * been set accordingly.
+     */
+    unsigned int has_explicit_len : 1;
 
-  /* 1 if this is the end of the stream */
-  unsigned int is_fin : 1;
+    /* 1 if this is the end of the stream */
+    unsigned int is_fin : 1;
 } OSSL_QUIC_FRAME_STREAM;
 
 /* QUIC Frame: CRYPTO */
 typedef struct ossl_quic_frame_crypto_st {
-  uint64_t offset; /* Logical offset in stream */
-  uint64_t len;    /* Length of the data in bytes */
-  const unsigned char *data;
+    uint64_t offset; /* Logical offset in stream */
+    uint64_t len;    /* Length of the data in bytes */
+    const unsigned char *data;
 } OSSL_QUIC_FRAME_CRYPTO;
 
 /* QUIC Frame: RESET_STREAM */
 typedef struct ossl_quic_frame_reset_stream_st {
-  uint64_t stream_id;
-  uint64_t app_error_code;
-  uint64_t final_size;
+    uint64_t stream_id;
+    uint64_t app_error_code;
+    uint64_t final_size;
 } OSSL_QUIC_FRAME_RESET_STREAM;
 
 /* QUIC Frame: STOP_SENDING */
 typedef struct ossl_quic_frame_stop_sending_st {
-  uint64_t stream_id;
-  uint64_t app_error_code;
+    uint64_t stream_id;
+    uint64_t app_error_code;
 } OSSL_QUIC_FRAME_STOP_SENDING;
 
 /* QUIC Frame: NEW_CONNECTION_ID */
 typedef struct ossl_quic_frame_new_conn_id_st {
-  uint64_t seq_num;
-  uint64_t retire_prior_to;
-  QUIC_CONN_ID conn_id;
-  QUIC_STATELESS_RESET_TOKEN stateless_reset;
+    uint64_t seq_num;
+    uint64_t retire_prior_to;
+    QUIC_CONN_ID conn_id;
+    QUIC_STATELESS_RESET_TOKEN stateless_reset;
 } OSSL_QUIC_FRAME_NEW_CONN_ID;
 
 /* QUIC Frame: CONNECTION_CLOSE */
 typedef struct ossl_quic_frame_conn_close_st {
-  unsigned int is_app : 1; /* 0: transport error, 1: app error */
-  uint64_t error_code;     /* 62-bit transport or app error code */
-  uint64_t frame_type;     /* transport errors only */
-  char *reason;            /* UTF-8 string, not necessarily zero-terminated */
-  size_t reason_len;       /* Length of reason in bytes */
+    unsigned int is_app : 1; /* 0: transport error, 1: app error */
+    uint64_t error_code;     /* 62-bit transport or app error code */
+    uint64_t frame_type;     /* transport errors only */
+    char *reason;            /* UTF-8 string, not necessarily zero-terminated */
+    size_t reason_len;       /* Length of reason in bytes */
 } OSSL_QUIC_FRAME_CONN_CLOSE;
 
 /*
@@ -741,10 +741,10 @@ int ossl_quic_wire_decode_transport_param_cid(PACKET *pkt, uint64_t *id,
  * Decodes a QUIC transport parameter TLV containing a preferred_address.
  */
 typedef struct quic_preferred_addr_st {
-  uint16_t ipv4_port, ipv6_port;
-  unsigned char ipv4[4], ipv6[16];
-  QUIC_STATELESS_RESET_TOKEN stateless_reset;
-  QUIC_CONN_ID cid;
+    uint16_t ipv4_port, ipv6_port;
+    unsigned char ipv4[4], ipv6[16];
+    QUIC_STATELESS_RESET_TOKEN stateless_reset;
+    QUIC_CONN_ID cid;
 } QUIC_PREFERRED_ADDR;
 
 int ossl_quic_wire_decode_transport_param_preferred_addr(

@@ -76,127 +76,127 @@ static const unsigned char expected_output[] = {
 static char *propq = NULL;
 
 int main(int argc, char **argv) {
-  int ret = EXIT_FAILURE;
-  EVP_CIPHER *aes = NULL;
-  EVP_CIPHER_CTX *aesctx = NULL;
-  EVP_MAC *mac = NULL;
-  EVP_MAC_CTX *mctx = NULL;
-  unsigned char composite_key[32];
-  unsigned char out[16];
-  OSSL_LIB_CTX *library_context = NULL;
-  size_t out_len = 0;
-  int aes_len = 0;
+    int ret = EXIT_FAILURE;
+    EVP_CIPHER *aes = NULL;
+    EVP_CIPHER_CTX *aesctx = NULL;
+    EVP_MAC *mac = NULL;
+    EVP_MAC_CTX *mctx = NULL;
+    unsigned char composite_key[32];
+    unsigned char out[16];
+    OSSL_LIB_CTX *library_context = NULL;
+    size_t out_len = 0;
+    int aes_len = 0;
 
-  library_context = OSSL_LIB_CTX_new();
-  if (library_context == NULL) {
-    fprintf(stderr, "OSSL_LIB_CTX_new() returned NULL\n");
-    goto end;
-  }
+    library_context = OSSL_LIB_CTX_new();
+    if (library_context == NULL) {
+        fprintf(stderr, "OSSL_LIB_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* Fetch the Poly1305 implementation */
-  mac = EVP_MAC_fetch(library_context, "POLY1305", propq);
-  if (mac == NULL) {
-    fprintf(stderr, "EVP_MAC_fetch() returned NULL\n");
-    goto end;
-  }
+    /* Fetch the Poly1305 implementation */
+    mac = EVP_MAC_fetch(library_context, "POLY1305", propq);
+    if (mac == NULL) {
+        fprintf(stderr, "EVP_MAC_fetch() returned NULL\n");
+        goto end;
+    }
 
-  /* Create a context for the Poly1305 operation */
-  mctx = EVP_MAC_CTX_new(mac);
-  if (mctx == NULL) {
-    fprintf(stderr, "EVP_MAC_CTX_new() returned NULL\n");
-    goto end;
-  }
+    /* Create a context for the Poly1305 operation */
+    mctx = EVP_MAC_CTX_new(mac);
+    if (mctx == NULL) {
+        fprintf(stderr, "EVP_MAC_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* Fetch the AES implementation */
-  aes = EVP_CIPHER_fetch(library_context, "AES-128-ECB", propq);
-  if (aes == NULL) {
-    fprintf(stderr, "EVP_CIPHER_fetch() returned NULL\n");
-    goto end;
-  }
+    /* Fetch the AES implementation */
+    aes = EVP_CIPHER_fetch(library_context, "AES-128-ECB", propq);
+    if (aes == NULL) {
+        fprintf(stderr, "EVP_CIPHER_fetch() returned NULL\n");
+        goto end;
+    }
 
-  /* Create a context for AES */
-  aesctx = EVP_CIPHER_CTX_new();
-  if (aesctx == NULL) {
-    fprintf(stderr, "EVP_CIPHER_CTX_new() returned NULL\n");
-    goto end;
-  }
+    /* Create a context for AES */
+    aesctx = EVP_CIPHER_CTX_new();
+    if (aesctx == NULL) {
+        fprintf(stderr, "EVP_CIPHER_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* Initialize the AES cipher with the 128-bit key k */
-  if (!EVP_EncryptInit_ex(aesctx, aes, NULL, test_k, NULL)) {
-    fprintf(stderr, "EVP_EncryptInit_ex() failed\n");
-    goto end;
-  }
+    /* Initialize the AES cipher with the 128-bit key k */
+    if (!EVP_EncryptInit_ex(aesctx, aes, NULL, test_k, NULL)) {
+        fprintf(stderr, "EVP_EncryptInit_ex() failed\n");
+        goto end;
+    }
 
-  /*
-   * Disable padding for the AES cipher. We do not strictly need to do this as
-   * we are encrypting a single block and thus there are no alignment or
-   * padding concerns, but this ensures that the operation below fails if
-   * padding would be required for some reason, which in this circumstance
-   * would indicate an implementation bug.
-   */
-  if (!EVP_CIPHER_CTX_set_padding(aesctx, 0)) {
-    fprintf(stderr, "EVP_CIPHER_CTX_set_padding() failed\n");
-    goto end;
-  }
+    /*
+     * Disable padding for the AES cipher. We do not strictly need to do this as
+     * we are encrypting a single block and thus there are no alignment or
+     * padding concerns, but this ensures that the operation below fails if
+     * padding would be required for some reason, which in this circumstance
+     * would indicate an implementation bug.
+     */
+    if (!EVP_CIPHER_CTX_set_padding(aesctx, 0)) {
+        fprintf(stderr, "EVP_CIPHER_CTX_set_padding() failed\n");
+        goto end;
+    }
 
-  /*
-   * Computes the value AES_k(n) which we need for our Poly1305-AES
-   * computation below.
-   */
-  if (!EVP_EncryptUpdate(aesctx, composite_key + 16, &aes_len, test_n,
-                         sizeof(test_n))) {
-    fprintf(stderr, "EVP_EncryptUpdate() failed\n");
-    goto end;
-  }
+    /*
+     * Computes the value AES_k(n) which we need for our Poly1305-AES
+     * computation below.
+     */
+    if (!EVP_EncryptUpdate(aesctx, composite_key + 16, &aes_len, test_n,
+                           sizeof(test_n))) {
+        fprintf(stderr, "EVP_EncryptUpdate() failed\n");
+        goto end;
+    }
 
-  /*
-   * The Poly1305 provider expects the key r to be passed as the first 16
-   * bytes of the "key" and the processed nonce (that is, AES_k(n)) to be
-   * passed as the second 16 bytes of the "key". We already put the processed
-   * nonce in the correct place above, so copy r into place.
-   */
-  memcpy(composite_key, test_r, 16);
+    /*
+     * The Poly1305 provider expects the key r to be passed as the first 16
+     * bytes of the "key" and the processed nonce (that is, AES_k(n)) to be
+     * passed as the second 16 bytes of the "key". We already put the processed
+     * nonce in the correct place above, so copy r into place.
+     */
+    memcpy(composite_key, test_r, 16);
 
-  /* Initialise the Poly1305 operation */
-  if (!EVP_MAC_init(mctx, composite_key, sizeof(composite_key), NULL)) {
-    fprintf(stderr, "EVP_MAC_init() failed\n");
-    goto end;
-  }
+    /* Initialise the Poly1305 operation */
+    if (!EVP_MAC_init(mctx, composite_key, sizeof(composite_key), NULL)) {
+        fprintf(stderr, "EVP_MAC_init() failed\n");
+        goto end;
+    }
 
-  /* Make one or more calls to process the data to be authenticated */
-  if (!EVP_MAC_update(mctx, test_m, sizeof(test_m))) {
-    fprintf(stderr, "EVP_MAC_update() failed\n");
-    goto end;
-  }
+    /* Make one or more calls to process the data to be authenticated */
+    if (!EVP_MAC_update(mctx, test_m, sizeof(test_m))) {
+        fprintf(stderr, "EVP_MAC_update() failed\n");
+        goto end;
+    }
 
-  /* Make one call to the final to get the MAC */
-  if (!EVP_MAC_final(mctx, out, &out_len, sizeof(out))) {
-    fprintf(stderr, "EVP_MAC_final() failed\n");
-    goto end;
-  }
+    /* Make one call to the final to get the MAC */
+    if (!EVP_MAC_final(mctx, out, &out_len, sizeof(out))) {
+        fprintf(stderr, "EVP_MAC_final() failed\n");
+        goto end;
+    }
 
-  printf("Generated MAC:\n");
-  BIO_dump_indent_fp(stdout, out, out_len, 2);
-  putchar('\n');
+    printf("Generated MAC:\n");
+    BIO_dump_indent_fp(stdout, out, out_len, 2);
+    putchar('\n');
 
-  if (out_len != sizeof(expected_output)) {
-    fprintf(stderr, "Generated MAC has an unexpected length\n");
-    goto end;
-  }
+    if (out_len != sizeof(expected_output)) {
+        fprintf(stderr, "Generated MAC has an unexpected length\n");
+        goto end;
+    }
 
-  if (CRYPTO_memcmp(expected_output, out, sizeof(expected_output)) != 0) {
-    fprintf(stderr, "Generated MAC does not match expected value\n");
-    goto end;
-  }
+    if (CRYPTO_memcmp(expected_output, out, sizeof(expected_output)) != 0) {
+        fprintf(stderr, "Generated MAC does not match expected value\n");
+        goto end;
+    }
 
-  ret = EXIT_SUCCESS;
+    ret = EXIT_SUCCESS;
 end:
-  EVP_CIPHER_CTX_free(aesctx);
-  EVP_CIPHER_free(aes);
-  EVP_MAC_CTX_free(mctx);
-  EVP_MAC_free(mac);
-  OSSL_LIB_CTX_free(library_context);
-  if (ret != EXIT_SUCCESS)
-    ERR_print_errors_fp(stderr);
-  return ret;
+    EVP_CIPHER_CTX_free(aesctx);
+    EVP_CIPHER_free(aes);
+    EVP_MAC_CTX_free(mctx);
+    EVP_MAC_free(mac);
+    OSSL_LIB_CTX_free(library_context);
+    if (ret != EXIT_SUCCESS)
+        ERR_print_errors_fp(stderr);
+    return ret;
 }

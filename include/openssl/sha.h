@@ -35,16 +35,16 @@ extern "C" {
 
 #define SHA_LBLOCK 16
 #define SHA_CBLOCK                                                             \
-  (SHA_LBLOCK * 4) /* SHA treats input data as a                               \
-                    * contiguous array of 32 bit wide                          \
-                    * big-endian values. */
+    (SHA_LBLOCK * 4) /* SHA treats input data as a                             \
+                      * contiguous array of 32 bit wide                        \
+                      * big-endian values. */
 #define SHA_LAST_BLOCK (SHA_CBLOCK - 8)
 
 typedef struct SHAstate_st {
-  SHA_LONG h0, h1, h2, h3, h4;
-  SHA_LONG Nl, Nh;
-  SHA_LONG data[SHA_LBLOCK];
-  unsigned int num;
+    SHA_LONG h0, h1, h2, h3, h4;
+    SHA_LONG Nl, Nh;
+    SHA_LONG data[SHA_LBLOCK];
+    unsigned int num;
 } SHA_CTX;
 
 OSSL_DEPRECATEDIN_3_0 int SHA1_Init(SHA_CTX *c);
@@ -58,15 +58,15 @@ unsigned char *SHA1(const unsigned char *d, size_t n, unsigned char *md);
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 #define SHA256_CBLOCK                                                          \
-  (SHA_LBLOCK * 4) /* SHA-256 treats input data as a                           \
-                    * contiguous array of 32 bit wide                          \
-                    * big-endian values. */
+    (SHA_LBLOCK * 4) /* SHA-256 treats input data as a                         \
+                      * contiguous array of 32 bit wide                        \
+                      * big-endian values. */
 
 typedef struct SHA256state_st {
-  SHA_LONG h[8];
-  SHA_LONG Nl, Nh;
-  SHA_LONG data[SHA_LBLOCK];
-  unsigned int num, md_len;
+    SHA_LONG h[8];
+    SHA_LONG Nl, Nh;
+    SHA_LONG data[SHA_LBLOCK];
+    unsigned int num, md_len;
 } SHA256_CTX;
 
 OSSL_DEPRECATEDIN_3_0 int SHA224_Init(SHA256_CTX *c);
@@ -111,13 +111,13 @@ unsigned char *SHA256(const unsigned char *d, size_t n, unsigned char *md);
 #endif
 
 typedef struct SHA512state_st {
-  SHA_LONG64 h[8];
-  SHA_LONG64 Nl, Nh;
-  union {
-    SHA_LONG64 d[SHA_LBLOCK];
-    unsigned char p[SHA512_CBLOCK];
-  } u;
-  unsigned int num, md_len;
+    SHA_LONG64 h[8];
+    SHA_LONG64 Nl, Nh;
+    union {
+        SHA_LONG64 d[SHA_LBLOCK];
+        unsigned char p[SHA512_CBLOCK];
+    } u;
+    unsigned int num, md_len;
 } SHA512_CTX;
 
 OSSL_DEPRECATEDIN_3_0 int SHA384_Init(SHA512_CTX *c);

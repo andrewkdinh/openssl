@@ -15,18 +15,18 @@
 #define SKEY_TYPE_AES 2     /* AES keys */
 
 struct prov_skey_st {
-  /*
-   * Internal skey implementation,
-   * A symmetric key is basically just a buffer of bytes of
-   * defined length, and a type, that defines, what
-   * cryptosystem the key is meant for (AES, HMAC, etc...)
-   */
-  OSSL_LIB_CTX *libctx;
+    /*
+     * Internal skey implementation,
+     * A symmetric key is basically just a buffer of bytes of
+     * defined length, and a type, that defines, what
+     * cryptosystem the key is meant for (AES, HMAC, etc...)
+     */
+    OSSL_LIB_CTX *libctx;
 
-  int type;
+    int type;
 
-  unsigned char *data;
-  size_t length;
+    unsigned char *data;
+    size_t length;
 };
 
 #endif /* OSSL_CRYPTO_SKEY_H */

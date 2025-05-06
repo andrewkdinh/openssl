@@ -48,46 +48,47 @@ IMPLEMENT_ASN1_ALLOC_FUNCTIONS(POLICY_CONSTRAINTS)
 static STACK_OF(CONF_VALUE) *
 i2v_POLICY_CONSTRAINTS(const X509V3_EXT_METHOD *method, void *a,
                        STACK_OF(CONF_VALUE) * extlist) {
-  POLICY_CONSTRAINTS *pcons = a;
-  X509V3_add_value_int("Require Explicit Policy", pcons->requireExplicitPolicy,
-                       &extlist);
-  X509V3_add_value_int("Inhibit Policy Mapping", pcons->inhibitPolicyMapping,
-                       &extlist);
-  return extlist;
+    POLICY_CONSTRAINTS *pcons = a;
+    X509V3_add_value_int("Require Explicit Policy",
+                         pcons->requireExplicitPolicy, &extlist);
+    X509V3_add_value_int("Inhibit Policy Mapping", pcons->inhibitPolicyMapping,
+                         &extlist);
+    return extlist;
 }
 
 static void *v2i_POLICY_CONSTRAINTS(const X509V3_EXT_METHOD *method,
                                     X509V3_CTX *ctx,
                                     STACK_OF(CONF_VALUE) * values) {
-  POLICY_CONSTRAINTS *pcons = NULL;
-  CONF_VALUE *val;
-  int i;
+    POLICY_CONSTRAINTS *pcons = NULL;
+    CONF_VALUE *val;
+    int i;
 
-  if ((pcons = POLICY_CONSTRAINTS_new()) == NULL) {
-    ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
-    return NULL;
-  }
-  for (i = 0; i < sk_CONF_VALUE_num(values); i++) {
-    val = sk_CONF_VALUE_value(values, i);
-    if (strcmp(val->name, "requireExplicitPolicy") == 0) {
-      if (!X509V3_get_value_int(val, &pcons->requireExplicitPolicy))
-        goto err;
-    } else if (strcmp(val->name, "inhibitPolicyMapping") == 0) {
-      if (!X509V3_get_value_int(val, &pcons->inhibitPolicyMapping))
-        goto err;
-    } else {
-      ERR_raise_data(ERR_LIB_X509V3, X509V3_R_INVALID_NAME, "%s", val->name);
-      goto err;
+    if ((pcons = POLICY_CONSTRAINTS_new()) == NULL) {
+        ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
+        return NULL;
     }
-  }
-  if (pcons->inhibitPolicyMapping == NULL &&
-      pcons->requireExplicitPolicy == NULL) {
-    ERR_raise(ERR_LIB_X509V3, X509V3_R_ILLEGAL_EMPTY_EXTENSION);
-    goto err;
-  }
+    for (i = 0; i < sk_CONF_VALUE_num(values); i++) {
+        val = sk_CONF_VALUE_value(values, i);
+        if (strcmp(val->name, "requireExplicitPolicy") == 0) {
+            if (!X509V3_get_value_int(val, &pcons->requireExplicitPolicy))
+                goto err;
+        } else if (strcmp(val->name, "inhibitPolicyMapping") == 0) {
+            if (!X509V3_get_value_int(val, &pcons->inhibitPolicyMapping))
+                goto err;
+        } else {
+            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_INVALID_NAME, "%s",
+                           val->name);
+            goto err;
+        }
+    }
+    if (pcons->inhibitPolicyMapping == NULL &&
+        pcons->requireExplicitPolicy == NULL) {
+        ERR_raise(ERR_LIB_X509V3, X509V3_R_ILLEGAL_EMPTY_EXTENSION);
+        goto err;
+    }
 
-  return pcons;
+    return pcons;
 err:
-  POLICY_CONSTRAINTS_free(pcons);
-  return NULL;
+    POLICY_CONSTRAINTS_free(pcons);
+    return NULL;
 }

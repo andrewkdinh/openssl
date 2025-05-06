@@ -84,8 +84,8 @@ size_t ppc_aes_gcm_decrypt(const unsigned char *in, unsigned char *out,
                            size_t len, const void *key, unsigned char ivec[16],
                            u64 *Xi);
 #define AES_GCM_ASM_PPC(gctx)                                                  \
-  ((gctx)->ctr == aes_p8_ctr32_encrypt_blocks &&                               \
-   (gctx)->gcm.funcs.ghash == gcm_ghash_p8)
+    ((gctx)->ctr == aes_p8_ctr32_encrypt_blocks &&                             \
+     (gctx)->gcm.funcs.ghash == gcm_ghash_p8)
 void gcm_ghash_p8(u64 Xi[2], const u128 Htable[16], const u8 *inp, size_t len);
 #endif /* OPENSSL_SYS_AIX || OPENSSL_SYS_MACOSX */
 #endif /* PPC */
@@ -112,20 +112,20 @@ void gcm_ghash_p8(u64 Xi[2], const u128 Htable[16], const u8 *inp, size_t len);
 #define HWAES_xts_encrypt aes_v8_xts_encrypt
 #define HWAES_xts_decrypt aes_v8_xts_decrypt
 #define HWAES_CBC_HMAC_SHA1_ETM_CAPABLE                                        \
-  (HWAES_CAPABLE && (OPENSSL_armcap_P & ARMV8_SHA1))
+    (HWAES_CAPABLE && (OPENSSL_armcap_P & ARMV8_SHA1))
 #define HWAES_CBC_HMAC_SHA256_ETM_CAPABLE                                      \
-  (HWAES_CAPABLE && (OPENSSL_armcap_P & ARMV8_SHA256))
+    (HWAES_CAPABLE && (OPENSSL_armcap_P & ARMV8_SHA256))
 #define HWAES_CBC_HMAC_SHA512_ETM_CAPABLE                                      \
-  (HWAES_CAPABLE && (OPENSSL_armcap_P & ARMV8_SHA512))
+    (HWAES_CAPABLE && (OPENSSL_armcap_P & ARMV8_SHA512))
 #ifndef __AARCH64EB__
 #define AES_CBC_HMAC_SHA_ETM_CAPABLE 1
 #endif
 #endif
 #define HWAES_ctr32_encrypt_blocks aes_v8_ctr32_encrypt_blocks
 #define HWAES_ctr32_encrypt_blocks_unroll12_eor3                               \
-  aes_v8_ctr32_encrypt_blocks_unroll12_eor3
+    aes_v8_ctr32_encrypt_blocks_unroll12_eor3
 #define AES_PMULL_CAPABLE                                                      \
-  ((OPENSSL_armcap_P & ARMV8_PMULL) && (OPENSSL_armcap_P & ARMV8_AES))
+    ((OPENSSL_armcap_P & ARMV8_PMULL) && (OPENSSL_armcap_P & ARMV8_AES))
 #define AES_UNROLL12_EOR3_CAPABLE (OPENSSL_armcap_P & ARMV8_UNROLL12_EOR3)
 #define AES_GCM_ENC_BYTES 512
 #define AES_GCM_DEC_BYTES 512
@@ -133,9 +133,9 @@ void gcm_ghash_p8(u64 Xi[2], const u128 Htable[16], const u8 *inp, size_t len);
 #define AES_gcm_encrypt armv8_aes_gcm_encrypt
 #define AES_gcm_decrypt armv8_aes_gcm_decrypt
 #define AES_GCM_ASM(gctx)                                                      \
-  (((gctx)->ctr == aes_v8_ctr32_encrypt_blocks_unroll12_eor3 ||                \
-    (gctx)->ctr == aes_v8_ctr32_encrypt_blocks) &&                             \
-   (gctx)->gcm.funcs.ghash == gcm_ghash_v8)
+    (((gctx)->ctr == aes_v8_ctr32_encrypt_blocks_unroll12_eor3 ||              \
+      (gctx)->ctr == aes_v8_ctr32_encrypt_blocks) &&                           \
+     (gctx)->gcm.funcs.ghash == gcm_ghash_v8)
 /* The [unroll8_eor3_]aes_gcm_(enc|dec)_(128|192|256)_kernel() functions
  * take input length in BITS and return number of BYTES processed */
 size_t aes_gcm_enc_128_kernel(const uint8_t *plaintext,
@@ -315,8 +315,8 @@ void gcm_ghash_avx(u64 Xi[2], const u128 Htable[16], const u8 *in, size_t len);
 #define AES_gcm_encrypt aesni_gcm_encrypt
 #define AES_gcm_decrypt aesni_gcm_decrypt
 #define AES_GCM_ASM(ctx)                                                       \
-  (ctx->ctr == aesni_ctr32_encrypt_blocks &&                                   \
-   ctx->gcm.funcs.ghash == gcm_ghash_avx)
+    (ctx->ctr == aesni_ctr32_encrypt_blocks &&                                 \
+     ctx->gcm.funcs.ghash == gcm_ghash_avx)
 #endif
 
 #elif defined(AES_ASM) && (defined(__sparc) || defined(__sparc__))
@@ -399,11 +399,11 @@ void aes256_t4_xts_decrypt(const unsigned char *in, unsigned char *out,
 
 /* Most modes of operation need km for partial block processing. */
 #define S390X_aes_128_CAPABLE                                                  \
-  (OPENSSL_s390xcap_P.km[0] & S390X_CAPBIT(S390X_AES_128))
+    (OPENSSL_s390xcap_P.km[0] & S390X_CAPBIT(S390X_AES_128))
 #define S390X_aes_192_CAPABLE                                                  \
-  (OPENSSL_s390xcap_P.km[0] & S390X_CAPBIT(S390X_AES_192))
+    (OPENSSL_s390xcap_P.km[0] & S390X_CAPBIT(S390X_AES_192))
 #define S390X_aes_256_CAPABLE                                                  \
-  (OPENSSL_s390xcap_P.km[0] & S390X_CAPBIT(S390X_AES_256))
+    (OPENSSL_s390xcap_P.km[0] & S390X_CAPBIT(S390X_AES_256))
 
 #define S390X_aes_128_cbc_CAPABLE 1 /* checked by callee */
 #define S390X_aes_192_cbc_CAPABLE 1
@@ -414,30 +414,30 @@ void aes256_t4_xts_decrypt(const unsigned char *in, unsigned char *out,
 #define S390X_aes_256_ecb_CAPABLE S390X_aes_256_CAPABLE
 
 #define S390X_aes_128_ofb_CAPABLE                                              \
-  (S390X_aes_128_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmo[0] & S390X_CAPBIT(S390X_AES_128)))
+    (S390X_aes_128_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmo[0] & S390X_CAPBIT(S390X_AES_128)))
 #define S390X_aes_192_ofb_CAPABLE                                              \
-  (S390X_aes_192_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmo[0] & S390X_CAPBIT(S390X_AES_192)))
+    (S390X_aes_192_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmo[0] & S390X_CAPBIT(S390X_AES_192)))
 #define S390X_aes_256_ofb_CAPABLE                                              \
-  (S390X_aes_256_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmo[0] & S390X_CAPBIT(S390X_AES_256)))
+    (S390X_aes_256_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmo[0] & S390X_CAPBIT(S390X_AES_256)))
 
 #define S390X_aes_128_cfb_CAPABLE                                              \
-  (S390X_aes_128_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_128)))
+    (S390X_aes_128_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_128)))
 #define S390X_aes_192_cfb_CAPABLE                                              \
-  (S390X_aes_192_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_192)))
+    (S390X_aes_192_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_192)))
 #define S390X_aes_256_cfb_CAPABLE                                              \
-  (S390X_aes_256_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_256)))
+    (S390X_aes_256_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_256)))
 #define S390X_aes_128_cfb8_CAPABLE                                             \
-  (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_128))
+    (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_128))
 #define S390X_aes_192_cfb8_CAPABLE                                             \
-  (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_192))
+    (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_192))
 #define S390X_aes_256_cfb8_CAPABLE                                             \
-  (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_256))
+    (OPENSSL_s390xcap_P.kmf[0] & S390X_CAPBIT(S390X_AES_256))
 #define S390X_aes_128_cfb1_CAPABLE 0
 #define S390X_aes_192_cfb1_CAPABLE 0
 #define S390X_aes_256_cfb1_CAPABLE 0
@@ -450,24 +450,24 @@ void aes256_t4_xts_decrypt(const unsigned char *in, unsigned char *out,
 #define S390X_aes_256_xts_CAPABLE 1
 
 #define S390X_aes_128_gcm_CAPABLE                                              \
-  (S390X_aes_128_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kma[0] & S390X_CAPBIT(S390X_AES_128)))
+    (S390X_aes_128_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kma[0] & S390X_CAPBIT(S390X_AES_128)))
 #define S390X_aes_192_gcm_CAPABLE                                              \
-  (S390X_aes_192_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kma[0] & S390X_CAPBIT(S390X_AES_192)))
+    (S390X_aes_192_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kma[0] & S390X_CAPBIT(S390X_AES_192)))
 #define S390X_aes_256_gcm_CAPABLE                                              \
-  (S390X_aes_256_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kma[0] & S390X_CAPBIT(S390X_AES_256)))
+    (S390X_aes_256_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kma[0] & S390X_CAPBIT(S390X_AES_256)))
 
 #define S390X_aes_128_ccm_CAPABLE                                              \
-  (S390X_aes_128_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmac[0] & S390X_CAPBIT(S390X_AES_128)))
+    (S390X_aes_128_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmac[0] & S390X_CAPBIT(S390X_AES_128)))
 #define S390X_aes_192_ccm_CAPABLE                                              \
-  (S390X_aes_192_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmac[0] & S390X_CAPBIT(S390X_AES_192)))
+    (S390X_aes_192_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmac[0] & S390X_CAPBIT(S390X_AES_192)))
 #define S390X_aes_256_ccm_CAPABLE                                              \
-  (S390X_aes_256_CAPABLE &&                                                    \
-   (OPENSSL_s390xcap_P.kmac[0] & S390X_CAPBIT(S390X_AES_256)))
+    (S390X_aes_256_CAPABLE &&                                                  \
+     (OPENSSL_s390xcap_P.kmac[0] & S390X_CAPBIT(S390X_AES_256)))
 #define S390X_CCM_AAD_FLAG 0x40
 
 #ifndef OPENSSL_NO_OCB
@@ -556,8 +556,8 @@ void gcm_ghash_rv64i_zvkg(u64 Xi[2], const u128 Htable[16], const u8 *inp,
 #define AES_gcm_encrypt rv64i_zvkb_zvkg_zvkned_aes_gcm_encrypt
 #define AES_gcm_decrypt rv64i_zvkb_zvkg_zvkned_aes_gcm_decrypt
 #define AES_GCM_ASM(ctx)                                                       \
-  (ctx->ctr == rv64i_zvkb_zvkned_ctr32_encrypt_blocks &&                       \
-   ctx->gcm.funcs.ghash == gcm_ghash_rv64i_zvkg)
+    (ctx->ctr == rv64i_zvkb_zvkned_ctr32_encrypt_blocks &&                     \
+     ctx->gcm.funcs.ghash == gcm_ghash_rv64i_zvkg)
 
 #elif defined(OPENSSL_CPUID_OBJ) && defined(__riscv) && __riscv_xlen == 32
 /* RISC-V 32 support */

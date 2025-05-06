@@ -24,15 +24,15 @@
  */
 typedef struct rio_poll_builder_st {
 #if RIO_POLL_METHOD == RIO_POLL_METHOD_NONE
-  int unused_dummy; /* make microsoft compiler happy */
+    int unused_dummy; /* make microsoft compiler happy */
 #elif RIO_POLL_METHOD == RIO_POLL_METHOD_SELECT
-  fd_set rfd, wfd, efd;
-  int hwm_fd;
+    fd_set rfd, wfd, efd;
+    int hwm_fd;
 #elif RIO_POLL_METHOD == RIO_POLL_METHOD_POLL
 #define RIO_NUM_STACK_PFDS 32
-  struct pollfd *pfd_heap;
-  struct pollfd pfds[RIO_NUM_STACK_PFDS];
-  size_t pfd_num, pfd_alloc;
+    struct pollfd *pfd_heap;
+    struct pollfd pfds[RIO_NUM_STACK_PFDS];
+    size_t pfd_num, pfd_alloc;
 #else
 #error Unknown RIO poll method
 #endif

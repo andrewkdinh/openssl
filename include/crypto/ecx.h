@@ -47,28 +47,29 @@
 #define ED448_SIGSIZE 114
 
 typedef enum {
-  ECX_KEY_TYPE_X25519,
-  ECX_KEY_TYPE_X448,
-  ECX_KEY_TYPE_ED25519,
-  ECX_KEY_TYPE_ED448
+    ECX_KEY_TYPE_X25519,
+    ECX_KEY_TYPE_X448,
+    ECX_KEY_TYPE_ED25519,
+    ECX_KEY_TYPE_ED448
 } ECX_KEY_TYPE;
 
 #define KEYTYPE2NID(type)                                                      \
-  ((type) == ECX_KEY_TYPE_X25519                                               \
-   ? EVP_PKEY_X25519                                                           \
-   : ((type) == ECX_KEY_TYPE_X448                                              \
-      ? EVP_PKEY_X448                                                          \
-      : ((type) == ECX_KEY_TYPE_ED25519 ? EVP_PKEY_ED25519 : EVP_PKEY_ED448)))
+    ((type) == ECX_KEY_TYPE_X25519                                             \
+     ? EVP_PKEY_X25519                                                         \
+     : ((type) == ECX_KEY_TYPE_X448                                            \
+        ? EVP_PKEY_X448                                                        \
+        : ((type) == ECX_KEY_TYPE_ED25519 ? EVP_PKEY_ED25519                   \
+                                          : EVP_PKEY_ED448)))
 
 struct ecx_key_st {
-  OSSL_LIB_CTX *libctx;
-  char *propq;
-  unsigned int haspubkey : 1;
-  unsigned char pubkey[MAX_KEYLEN];
-  unsigned char *privkey;
-  size_t keylen;
-  ECX_KEY_TYPE type;
-  CRYPTO_REF_COUNT references;
+    OSSL_LIB_CTX *libctx;
+    char *propq;
+    unsigned int haspubkey : 1;
+    unsigned char pubkey[MAX_KEYLEN];
+    unsigned char *privkey;
+    size_t keylen;
+    ECX_KEY_TYPE type;
+    CRYPTO_REF_COUNT references;
 };
 
 size_t ossl_ecx_key_length(ECX_KEY_TYPE type);

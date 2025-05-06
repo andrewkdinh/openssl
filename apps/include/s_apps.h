@@ -16,7 +16,7 @@
 #define PROTOCOL "tcp"
 
 #define SSL_VERSION_ALLOWS_RENEGOTIATION(s)                                    \
-  (SSL_is_dtls(s) || (SSL_version(s) < TLS1_3_VERSION))
+    (SSL_is_dtls(s) || (SSL_version(s) < TLS1_3_VERSION))
 
 typedef int (*do_server_cb)(int s, int stype, int prot, unsigned char *context);
 void get_sock_info_address(int asock, char **hostname, char **service);
@@ -86,12 +86,12 @@ void ssl_print_secure_renegotiation_notes(BIO *bio, SSL *s);
 #ifndef OPENSSL_NO_SRP
 /* The client side SRP context that we pass to all SRP related callbacks */
 typedef struct srp_arg_st {
-  char *srppassin;
-  char *srplogin;
-  int msg;      /* copy from c_msg */
-  int debug;    /* copy from c_debug */
-  int amp;      /* allow more groups */
-  int strength; /* minimal size for N */
+    char *srppassin;
+    char *srplogin;
+    int msg;      /* copy from c_msg */
+    int debug;    /* copy from c_debug */
+    int amp;      /* allow more groups */
+    int strength; /* minimal size for N */
 } SRP_ARG;
 
 int set_up_srp_arg(SSL_CTX *ctx, SRP_ARG *srp_arg, int srp_lateuser, int c_msg,
@@ -100,9 +100,9 @@ void set_up_dummy_srp(SSL_CTX *ctx);
 
 /* The server side SRP context that we pass to all SRP related callbacks */
 typedef struct srpsrvparm_st {
-  char *login;
-  SRP_VBASE *vb;
-  SRP_user_pwd *user;
+    char *login;
+    SRP_VBASE *vb;
+    SRP_user_pwd *user;
 } srpsrvparm;
 
 int set_up_srp_verifier_file(SSL_CTX *ctx, srpsrvparm *srp_callback_parm,

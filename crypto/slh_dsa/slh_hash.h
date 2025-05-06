@@ -16,7 +16,7 @@
 #include "internal/packet.h"
 
 #define SLH_HASH_FUNC_DECLARE(ctx, hashf)                                      \
-  const SLH_HASH_FUNC *hashf = ctx->hash_func
+    const SLH_HASH_FUNC *hashf = ctx->hash_func
 
 #define SLH_HASH_FN_DECLARE(hashf, t) OSSL_SLH_HASHFUNC_##t *t = hashf->t
 
@@ -54,12 +54,12 @@ typedef int(OSSL_SLH_HASHFUNC_T)(SLH_DSA_HASH_CTX *ctx, const uint8_t *pk_seed,
                                  size_t m1_len, uint8_t *out, size_t out_len);
 
 typedef struct slh_hash_func_st {
-  OSSL_SLH_HASHFUNC_H_MSG *H_MSG;
-  OSSL_SLH_HASHFUNC_PRF *PRF;
-  OSSL_SLH_HASHFUNC_PRF_MSG *PRF_MSG;
-  OSSL_SLH_HASHFUNC_F *F;
-  OSSL_SLH_HASHFUNC_H *H;
-  OSSL_SLH_HASHFUNC_T *T;
+    OSSL_SLH_HASHFUNC_H_MSG *H_MSG;
+    OSSL_SLH_HASHFUNC_PRF *PRF;
+    OSSL_SLH_HASHFUNC_PRF_MSG *PRF_MSG;
+    OSSL_SLH_HASHFUNC_F *F;
+    OSSL_SLH_HASHFUNC_H *H;
+    OSSL_SLH_HASHFUNC_T *T;
 } SLH_HASH_FUNC;
 
 const SLH_HASH_FUNC *ossl_slh_get_hash_fn(int is_shake);

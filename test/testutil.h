@@ -55,12 +55,12 @@
  * Simple parameterized tests. Calls test_function(idx) for each 0 <= idx < num.
  */
 #define ADD_ALL_TESTS(test_function, num)                                      \
-  add_all_tests(#test_function, test_function, num, 1)
+    add_all_tests(#test_function, test_function, num, 1)
 /*
  * A variant of the same without TAP output.
  */
 #define ADD_ALL_TESTS_NOSUBTEST(test_function, num)                            \
-  add_all_tests(#test_function, test_function, num, 0)
+    add_all_tests(#test_function, test_function, num, 0)
 
 /*-
  * Test cases that share common setup should use the helper
@@ -97,17 +97,17 @@
  *      }
  */
 #define SETUP_TEST_FIXTURE(TEST_FIXTURE_TYPE, set_up)                          \
-  TEST_FIXTURE_TYPE *fixture = set_up(TEST_CASE_NAME);                         \
-  int result = 0;                                                              \
+    TEST_FIXTURE_TYPE *fixture = set_up(TEST_CASE_NAME);                       \
+    int result = 0;                                                            \
                                                                                \
-  if (fixture == NULL)                                                         \
-  return 0
+    if (fixture == NULL)                                                       \
+    return 0
 
 #define EXECUTE_TEST(execute_func, tear_down)                                  \
-  if (fixture != NULL) {                                                       \
-    result = execute_func(fixture);                                            \
-    tear_down(fixture);                                                        \
-  }
+    if (fixture != NULL) {                                                     \
+        result = execute_func(fixture);                                        \
+        tear_down(fixture);                                                    \
+    }
 
 /*
  * TEST_CASE_NAME is defined as the name of the test case function where
@@ -127,39 +127,39 @@
 
 /* The default test enum which should be common to all tests */
 #define OPT_TEST_ENUM                                                          \
-  OPT_TEST_HELP = 500, OPT_TEST_LIST, OPT_TEST_SINGLE, OPT_TEST_ITERATION,     \
-  OPT_TEST_INDENT, OPT_TEST_SEED
+    OPT_TEST_HELP = 500, OPT_TEST_LIST, OPT_TEST_SINGLE, OPT_TEST_ITERATION,   \
+    OPT_TEST_INDENT, OPT_TEST_SEED
 
 /* The Default test OPTIONS common to all tests (without a usage string) */
 #define OPT_TEST_OPTIONS                                                       \
-  {OPT_HELP_STR, 1, '-', "Valid options are:\n"},                              \
-  {"help", OPT_TEST_HELP, '-', "Display this summary"},                        \
-  {"list", OPT_TEST_LIST, '-', "Display the list of tests available"},         \
-  {"test", OPT_TEST_SINGLE, 's', "Run a single test by id or name"},           \
-  {"iter", OPT_TEST_ITERATION, 'n', "Run a single iteration of a test"},       \
-  {"indent", OPT_TEST_INDENT, 'p', "Number of tabs added to output"},          \
-  {"seed", OPT_TEST_SEED, 'n', "Seed value to randomize tests with"}
+    {OPT_HELP_STR, 1, '-', "Valid options are:\n"},                            \
+    {"help", OPT_TEST_HELP, '-', "Display this summary"},                      \
+    {"list", OPT_TEST_LIST, '-', "Display the list of tests available"},       \
+    {"test", OPT_TEST_SINGLE, 's', "Run a single test by id or name"},         \
+    {"iter", OPT_TEST_ITERATION, 'n', "Run a single iteration of a test"},     \
+    {"indent", OPT_TEST_INDENT, 'p', "Number of tabs added to output"},        \
+    {"seed", OPT_TEST_SEED, 'n', "Seed value to randomize tests with"}
 
 /* The Default test OPTIONS common to all tests starting with an additional
  * usage string */
 #define OPT_TEST_OPTIONS_WITH_EXTRA_USAGE(usage)                               \
-  {OPT_HELP_STR, 1, '-', "Usage: %s [options] " usage}, OPT_TEST_OPTIONS
+    {OPT_HELP_STR, 1, '-', "Usage: %s [options] " usage}, OPT_TEST_OPTIONS
 
 /* The Default test OPTIONS common to all tests with an default usage string */
 #define OPT_TEST_OPTIONS_DEFAULT_USAGE                                         \
-  {OPT_HELP_STR, 1, '-', "Usage: %s [options]\n"}, OPT_TEST_OPTIONS
+    {OPT_HELP_STR, 1, '-', "Usage: %s [options]\n"}, OPT_TEST_OPTIONS
 
 /*
  * Optional Cases that need to be ignored by the test app when using opt_next(),
  * (that are handled internally).
  */
 #define OPT_TEST_CASES                                                         \
-  OPT_TEST_HELP:                                                               \
-  case OPT_TEST_LIST:                                                          \
-  case OPT_TEST_SINGLE:                                                        \
-  case OPT_TEST_ITERATION:                                                     \
-  case OPT_TEST_INDENT:                                                        \
-  case OPT_TEST_SEED
+    OPT_TEST_HELP:                                                             \
+    case OPT_TEST_LIST:                                                        \
+    case OPT_TEST_SINGLE:                                                      \
+    case OPT_TEST_ITERATION:                                                   \
+    case OPT_TEST_INDENT:                                                      \
+    case OPT_TEST_SEED
 
 /*
  * Tests that use test_get_argument() that dont have any additional options
@@ -176,12 +176,12 @@
  *  (3) case OPT_TEST_CASES: break; inside the opt_next() handling code.
  */
 #define OPT_TEST_DECLARE_USAGE(usage_str)                                      \
-  const OPTIONS *test_get_options(void) {                                      \
-    enum { OPT_TEST_ENUM };                                                    \
-    static const OPTIONS options[] = {                                         \
-    OPT_TEST_OPTIONS_WITH_EXTRA_USAGE(usage_str), {NULL}};                     \
-    return options;                                                            \
-  }
+    const OPTIONS *test_get_options(void) {                                    \
+        enum { OPT_TEST_ENUM };                                                \
+        static const OPTIONS options[] = {                                     \
+        OPT_TEST_OPTIONS_WITH_EXTRA_USAGE(usage_str), {NULL}};                 \
+        return options;                                                        \
+    }
 
 /*
  * Used to read non optional command line values that follow after the options.
@@ -297,16 +297,16 @@ const OPTIONS *test_get_options(void);
 #endif
 
 #define DECLARE_COMPARISON(type, name, opname)                                 \
-  int test_##name##_##opname(const char *, int, const char *, const char *,    \
-                             const type, const type);
+    int test_##name##_##opname(const char *, int, const char *, const char *,  \
+                               const type, const type);
 
 #define DECLARE_COMPARISONS(type, name)                                        \
-  DECLARE_COMPARISON(type, name, eq)                                           \
-  DECLARE_COMPARISON(type, name, ne)                                           \
-  DECLARE_COMPARISON(type, name, lt)                                           \
-  DECLARE_COMPARISON(type, name, le)                                           \
-  DECLARE_COMPARISON(type, name, gt)                                           \
-  DECLARE_COMPARISON(type, name, ge)
+    DECLARE_COMPARISON(type, name, eq)                                         \
+    DECLARE_COMPARISON(type, name, ne)                                         \
+    DECLARE_COMPARISON(type, name, lt)                                         \
+    DECLARE_COMPARISON(type, name, le)                                         \
+    DECLARE_COMPARISON(type, name, gt)                                         \
+    DECLARE_COMPARISON(type, name, ge)
 
 DECLARE_COMPARISONS(int, int)
 DECLARE_COMPARISONS(unsigned int, uint)
@@ -473,17 +473,17 @@ void test_perror(const char *s);
 #define TEST_int64_t_ge(a, b) test_int64_t_ge(__FILE__, __LINE__, #a, #b, a, b)
 
 #define TEST_uint64_t_eq(a, b)                                                 \
-  test_uint64_t_eq(__FILE__, __LINE__, #a, #b, a, b)
+    test_uint64_t_eq(__FILE__, __LINE__, #a, #b, a, b)
 #define TEST_uint64_t_ne(a, b)                                                 \
-  test_uint64_t_ne(__FILE__, __LINE__, #a, #b, a, b)
+    test_uint64_t_ne(__FILE__, __LINE__, #a, #b, a, b)
 #define TEST_uint64_t_lt(a, b)                                                 \
-  test_uint64_t_lt(__FILE__, __LINE__, #a, #b, a, b)
+    test_uint64_t_lt(__FILE__, __LINE__, #a, #b, a, b)
 #define TEST_uint64_t_le(a, b)                                                 \
-  test_uint64_t_le(__FILE__, __LINE__, #a, #b, a, b)
+    test_uint64_t_le(__FILE__, __LINE__, #a, #b, a, b)
 #define TEST_uint64_t_gt(a, b)                                                 \
-  test_uint64_t_gt(__FILE__, __LINE__, #a, #b, a, b)
+    test_uint64_t_gt(__FILE__, __LINE__, #a, #b, a, b)
 #define TEST_uint64_t_ge(a, b)                                                 \
-  test_uint64_t_ge(__FILE__, __LINE__, #a, #b, a, b)
+    test_uint64_t_ge(__FILE__, __LINE__, #a, #b, a, b)
 
 #define TEST_size_t_eq(a, b) test_size_t_eq(__FILE__, __LINE__, #a, #b, a, b)
 #define TEST_size_t_ne(a, b) test_size_t_ne(__FILE__, __LINE__, #a, #b, a, b)
@@ -514,18 +514,18 @@ void test_perror(const char *s);
 #define TEST_str_eq(a, b) test_str_eq(__FILE__, __LINE__, #a, #b, a, b)
 #define TEST_str_ne(a, b) test_str_ne(__FILE__, __LINE__, #a, #b, a, b)
 #define TEST_strn_eq(a, b, n)                                                  \
-  test_strn_eq(__FILE__, __LINE__, #a, #b, a, n, b, n)
+    test_strn_eq(__FILE__, __LINE__, #a, #b, a, n, b, n)
 #define TEST_strn_ne(a, b, n)                                                  \
-  test_strn_ne(__FILE__, __LINE__, #a, #b, a, n, b, n)
+    test_strn_ne(__FILE__, __LINE__, #a, #b, a, n, b, n)
 #define TEST_strn2_eq(a, m, b, n)                                              \
-  test_strn_eq(__FILE__, __LINE__, #a, #b, a, m, b, n)
+    test_strn_eq(__FILE__, __LINE__, #a, #b, a, m, b, n)
 #define TEST_strn2_ne(a, m, b, n)                                              \
-  test_strn_ne(__FILE__, __LINE__, #a, #b, a, m, b, n)
+    test_strn_ne(__FILE__, __LINE__, #a, #b, a, m, b, n)
 
 #define TEST_mem_eq(a, m, b, n)                                                \
-  test_mem_eq(__FILE__, __LINE__, #a, #b, a, m, b, n)
+    test_mem_eq(__FILE__, __LINE__, #a, #b, a, m, b, n)
 #define TEST_mem_ne(a, m, b, n)                                                \
-  test_mem_ne(__FILE__, __LINE__, #a, #b, a, m, b, n)
+    test_mem_ne(__FILE__, __LINE__, #a, #b, a, m, b, n)
 
 #define TEST_true(a) test_true(__FILE__, __LINE__, #a, (a) != 0)
 #define TEST_false(a) test_false(__FILE__, __LINE__, #a, (a) != 0)
@@ -545,7 +545,7 @@ void test_perror(const char *s);
 #define TEST_BN_eq_one(a) test_BN_eq_one(__FILE__, __LINE__, #a, a)
 #define TEST_BN_eq_word(a, w) test_BN_eq_word(__FILE__, __LINE__, #a, #w, a, w)
 #define TEST_BN_abs_eq_word(a, w)                                              \
-  test_BN_abs_eq_word(__FILE__, __LINE__, #a, #w, a, w)
+    test_BN_abs_eq_word(__FILE__, __LINE__, #a, #w, a, w)
 #define TEST_BN_odd(a) test_BN_odd(__FILE__, __LINE__, #a, a)
 #define TEST_BN_even(a) test_BN_even(__FILE__, __LINE__, #a, a)
 
@@ -586,21 +586,21 @@ void test_output_memory(const char *name, const unsigned char *m, size_t l);
 #define TESTMAXPAIRS 150
 
 typedef struct pair_st {
-  char *key;
-  char *value;
+    char *key;
+    char *value;
 } PAIR;
 
 typedef struct stanza_st {
-  const char *test_file; /* Input file name */
-  BIO *fp;               /* Input file */
-  int curr;              /* Current line in file */
-  int start;             /* Line where test starts */
-  int errors;            /* Error count */
-  int numtests;          /* Number of tests */
-  int numskip;           /* Number of skipped tests */
-  int numpairs;
-  PAIR pairs[TESTMAXPAIRS];
-  BIO *key; /* temp memory BIO for reading in keys */
+    const char *test_file; /* Input file name */
+    BIO *fp;               /* Input file */
+    int curr;              /* Current line in file */
+    int start;             /* Line where test starts */
+    int errors;            /* Error count */
+    int numtests;          /* Number of tests */
+    int numskip;           /* Number of skipped tests */
+    int numpairs;
+    PAIR pairs[TESTMAXPAIRS];
+    BIO *key; /* temp memory BIO for reading in keys */
 } STANZA;
 
 /*

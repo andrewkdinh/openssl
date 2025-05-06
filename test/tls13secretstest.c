@@ -116,32 +116,32 @@ static int full_hash = 0;
 /* Give a hash of the currently set handshake */
 int ssl_handshake_hash(SSL_CONNECTION *s, unsigned char *out, size_t outlen,
                        size_t *hashlen) {
-  if (sizeof(hs_start_hash) > outlen ||
-      sizeof(hs_full_hash) != sizeof(hs_start_hash))
-    return 0;
+    if (sizeof(hs_start_hash) > outlen ||
+        sizeof(hs_full_hash) != sizeof(hs_start_hash))
+        return 0;
 
-  if (full_hash) {
-    memcpy(out, hs_full_hash, sizeof(hs_full_hash));
-    *hashlen = sizeof(hs_full_hash);
-  } else {
-    memcpy(out, hs_start_hash, sizeof(hs_start_hash));
-    *hashlen = sizeof(hs_start_hash);
-  }
+    if (full_hash) {
+        memcpy(out, hs_full_hash, sizeof(hs_full_hash));
+        *hashlen = sizeof(hs_full_hash);
+    } else {
+        memcpy(out, hs_start_hash, sizeof(hs_start_hash));
+        *hashlen = sizeof(hs_start_hash);
+    }
 
-  return 1;
+    return 1;
 }
 
 const EVP_MD *ssl_handshake_md(SSL_CONNECTION *s) { return EVP_sha256(); }
 
 int ssl_cipher_get_evp_cipher(SSL_CTX *ctx, const SSL_CIPHER *sslc,
                               const EVP_CIPHER **enc) {
-  return 0;
+    return 0;
 }
 
 int ssl_cipher_get_evp_md_mac(SSL_CTX *ctx, const SSL_CIPHER *sslc,
                               const EVP_MD **md, int *mac_pkey_type,
                               size_t *mac_secret_size) {
-  return 0;
+    return 0;
 }
 
 int ssl_cipher_get_evp(SSL_CTX *ctx, const SSL_SESSION *s,
@@ -150,14 +150,14 @@ int ssl_cipher_get_evp(SSL_CTX *ctx, const SSL_SESSION *s,
                        SSL_COMP **comp, int use_etm)
 
 {
-  return 0;
+    return 0;
 }
 
 int tls1_alert_code(int code) { return code; }
 
 int ssl_log_secret(SSL_CONNECTION *sc, const char *label, const uint8_t *secret,
                    size_t secret_len) {
-  return 1;
+    return 1;
 }
 
 const EVP_MD *ssl_md(SSL_CTX *ctx, int idx) { return EVP_sha256(); }
@@ -183,7 +183,7 @@ int ssl_set_new_record_layer(SSL_CONNECTION *s, int version, int direction,
                              const EVP_CIPHER *ciph, size_t taglen, int mactype,
                              const EVP_MD *md, const SSL_COMP *comp,
                              const EVP_MD *kdfdigest) {
-  return 0;
+    return 0;
 }
 
 /* End of mocked out code */
@@ -193,173 +193,173 @@ static int test_secret(SSL_CONNECTION *s, unsigned char *prk,
                        const unsigned char *ref_secret,
                        const unsigned char *ref_key,
                        const unsigned char *ref_iv) {
-  size_t hashsize;
-  unsigned char gensecret[EVP_MAX_MD_SIZE];
-  unsigned char hash[EVP_MAX_MD_SIZE];
-  unsigned char key[KEYLEN];
-  unsigned char iv[IVLEN];
-  const EVP_MD *md = ssl_handshake_md(s);
+    size_t hashsize;
+    unsigned char gensecret[EVP_MAX_MD_SIZE];
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned char key[KEYLEN];
+    unsigned char iv[IVLEN];
+    const EVP_MD *md = ssl_handshake_md(s);
 
-  if (!ssl_handshake_hash(s, hash, sizeof(hash), &hashsize)) {
-    TEST_error("Failed to get hash");
-    return 0;
-  }
+    if (!ssl_handshake_hash(s, hash, sizeof(hash), &hashsize)) {
+        TEST_error("Failed to get hash");
+        return 0;
+    }
 
-  if (!tls13_hkdf_expand(s, md, prk, label, labellen, hash, hashsize, gensecret,
-                         hashsize, 1)) {
-    TEST_error("Secret generation failed");
-    return 0;
-  }
+    if (!tls13_hkdf_expand(s, md, prk, label, labellen, hash, hashsize,
+                           gensecret, hashsize, 1)) {
+        TEST_error("Secret generation failed");
+        return 0;
+    }
 
-  if (!TEST_mem_eq(gensecret, hashsize, ref_secret, hashsize))
-    return 0;
+    if (!TEST_mem_eq(gensecret, hashsize, ref_secret, hashsize))
+        return 0;
 
-  if (!tls13_derive_key(s, md, gensecret, key, KEYLEN)) {
-    TEST_error("Key generation failed");
-    return 0;
-  }
+    if (!tls13_derive_key(s, md, gensecret, key, KEYLEN)) {
+        TEST_error("Key generation failed");
+        return 0;
+    }
 
-  if (!TEST_mem_eq(key, KEYLEN, ref_key, KEYLEN))
-    return 0;
+    if (!TEST_mem_eq(key, KEYLEN, ref_key, KEYLEN))
+        return 0;
 
-  if (!tls13_derive_iv(s, md, gensecret, iv, IVLEN)) {
-    TEST_error("IV generation failed");
-    return 0;
-  }
+    if (!tls13_derive_iv(s, md, gensecret, iv, IVLEN)) {
+        TEST_error("IV generation failed");
+        return 0;
+    }
 
-  if (!TEST_mem_eq(iv, IVLEN, ref_iv, IVLEN))
-    return 0;
+    if (!TEST_mem_eq(iv, IVLEN, ref_iv, IVLEN))
+        return 0;
 
-  return 1;
+    return 1;
 }
 
 static int test_handshake_secrets(void) {
-  SSL_CTX *ctx = NULL;
-  SSL *ssl = NULL;
-  SSL_CONNECTION *s;
-  int ret = 0;
-  size_t hashsize;
-  unsigned char out_master_secret[EVP_MAX_MD_SIZE];
-  size_t master_secret_length;
+    SSL_CTX *ctx = NULL;
+    SSL *ssl = NULL;
+    SSL_CONNECTION *s;
+    int ret = 0;
+    size_t hashsize;
+    unsigned char out_master_secret[EVP_MAX_MD_SIZE];
+    size_t master_secret_length;
 
-  ctx = SSL_CTX_new(TLS_method());
-  if (!TEST_ptr(ctx))
-    goto err;
+    ctx = SSL_CTX_new(TLS_method());
+    if (!TEST_ptr(ctx))
+        goto err;
 
-  ssl = SSL_new(ctx);
-  if (!TEST_ptr(ssl) || !TEST_ptr(s = SSL_CONNECTION_FROM_SSL_ONLY(ssl)))
-    goto err;
+    ssl = SSL_new(ctx);
+    if (!TEST_ptr(ssl) || !TEST_ptr(s = SSL_CONNECTION_FROM_SSL_ONLY(ssl)))
+        goto err;
 
-  s->session = SSL_SESSION_new();
-  if (!TEST_ptr(s->session))
-    goto err;
+    s->session = SSL_SESSION_new();
+    if (!TEST_ptr(s->session))
+        goto err;
 
-  if (!TEST_true(tls13_generate_secret(s, ssl_handshake_md(s), NULL, NULL, 0,
-                                       (unsigned char *)&s->early_secret))) {
-    TEST_info("Early secret generation failed");
-    goto err;
-  }
+    if (!TEST_true(tls13_generate_secret(s, ssl_handshake_md(s), NULL, NULL, 0,
+                                         (unsigned char *)&s->early_secret))) {
+        TEST_info("Early secret generation failed");
+        goto err;
+    }
 
-  if (!TEST_mem_eq(s->early_secret, sizeof(early_secret), early_secret,
-                   sizeof(early_secret))) {
-    TEST_info("Early secret does not match");
-    goto err;
-  }
+    if (!TEST_mem_eq(s->early_secret, sizeof(early_secret), early_secret,
+                     sizeof(early_secret))) {
+        TEST_info("Early secret does not match");
+        goto err;
+    }
 
-  if (!TEST_true(
-      tls13_generate_handshake_secret(s, ecdhe_secret, sizeof(ecdhe_secret)))) {
-    TEST_info("Handshake secret generation failed");
-    goto err;
-  }
+    if (!TEST_true(tls13_generate_handshake_secret(s, ecdhe_secret,
+                                                   sizeof(ecdhe_secret)))) {
+        TEST_info("Handshake secret generation failed");
+        goto err;
+    }
 
-  if (!TEST_mem_eq(s->handshake_secret, sizeof(handshake_secret),
-                   handshake_secret, sizeof(handshake_secret)))
-    goto err;
+    if (!TEST_mem_eq(s->handshake_secret, sizeof(handshake_secret),
+                     handshake_secret, sizeof(handshake_secret)))
+        goto err;
 
-  hashsize = EVP_MD_get_size(ssl_handshake_md(s));
-  if (!TEST_size_t_eq(sizeof(client_hts), hashsize))
-    goto err;
-  if (!TEST_size_t_eq(sizeof(client_hts_key), KEYLEN))
-    goto err;
-  if (!TEST_size_t_eq(sizeof(client_hts_iv), IVLEN))
-    goto err;
+    hashsize = EVP_MD_get_size(ssl_handshake_md(s));
+    if (!TEST_size_t_eq(sizeof(client_hts), hashsize))
+        goto err;
+    if (!TEST_size_t_eq(sizeof(client_hts_key), KEYLEN))
+        goto err;
+    if (!TEST_size_t_eq(sizeof(client_hts_iv), IVLEN))
+        goto err;
 
-  if (!TEST_true(test_secret(
-      s, s->handshake_secret, (unsigned char *)client_hts_label,
-      strlen(client_hts_label), client_hts, client_hts_key, client_hts_iv))) {
-    TEST_info("Client handshake secret test failed");
-    goto err;
-  }
+    if (!TEST_true(test_secret(
+        s, s->handshake_secret, (unsigned char *)client_hts_label,
+        strlen(client_hts_label), client_hts, client_hts_key, client_hts_iv))) {
+        TEST_info("Client handshake secret test failed");
+        goto err;
+    }
 
-  if (!TEST_size_t_eq(sizeof(server_hts), hashsize))
-    goto err;
-  if (!TEST_size_t_eq(sizeof(server_hts_key), KEYLEN))
-    goto err;
-  if (!TEST_size_t_eq(sizeof(server_hts_iv), IVLEN))
-    goto err;
+    if (!TEST_size_t_eq(sizeof(server_hts), hashsize))
+        goto err;
+    if (!TEST_size_t_eq(sizeof(server_hts_key), KEYLEN))
+        goto err;
+    if (!TEST_size_t_eq(sizeof(server_hts_iv), IVLEN))
+        goto err;
 
-  if (!TEST_true(test_secret(
-      s, s->handshake_secret, (unsigned char *)server_hts_label,
-      strlen(server_hts_label), server_hts, server_hts_key, server_hts_iv))) {
-    TEST_info("Server handshake secret test failed");
-    goto err;
-  }
+    if (!TEST_true(test_secret(
+        s, s->handshake_secret, (unsigned char *)server_hts_label,
+        strlen(server_hts_label), server_hts, server_hts_key, server_hts_iv))) {
+        TEST_info("Server handshake secret test failed");
+        goto err;
+    }
 
-  /*
-   * Ensure the mocked out ssl_handshake_hash() returns the full handshake
-   * hash.
-   */
-  full_hash = 1;
+    /*
+     * Ensure the mocked out ssl_handshake_hash() returns the full handshake
+     * hash.
+     */
+    full_hash = 1;
 
-  if (!TEST_true(tls13_generate_master_secret(s, out_master_secret,
-                                              s->handshake_secret, hashsize,
-                                              &master_secret_length))) {
-    TEST_info("Master secret generation failed");
-    goto err;
-  }
+    if (!TEST_true(tls13_generate_master_secret(s, out_master_secret,
+                                                s->handshake_secret, hashsize,
+                                                &master_secret_length))) {
+        TEST_info("Master secret generation failed");
+        goto err;
+    }
 
-  if (!TEST_mem_eq(out_master_secret, master_secret_length, master_secret,
-                   sizeof(master_secret))) {
-    TEST_info("Master secret does not match");
-    goto err;
-  }
+    if (!TEST_mem_eq(out_master_secret, master_secret_length, master_secret,
+                     sizeof(master_secret))) {
+        TEST_info("Master secret does not match");
+        goto err;
+    }
 
-  if (!TEST_size_t_eq(sizeof(client_ats), hashsize))
-    goto err;
-  if (!TEST_size_t_eq(sizeof(client_ats_key), KEYLEN))
-    goto err;
-  if (!TEST_size_t_eq(sizeof(client_ats_iv), IVLEN))
-    goto err;
+    if (!TEST_size_t_eq(sizeof(client_ats), hashsize))
+        goto err;
+    if (!TEST_size_t_eq(sizeof(client_ats_key), KEYLEN))
+        goto err;
+    if (!TEST_size_t_eq(sizeof(client_ats_iv), IVLEN))
+        goto err;
 
-  if (!TEST_true(test_secret(
-      s, out_master_secret, (unsigned char *)client_ats_label,
-      strlen(client_ats_label), client_ats, client_ats_key, client_ats_iv))) {
-    TEST_info("Client application data secret test failed");
-    goto err;
-  }
+    if (!TEST_true(test_secret(
+        s, out_master_secret, (unsigned char *)client_ats_label,
+        strlen(client_ats_label), client_ats, client_ats_key, client_ats_iv))) {
+        TEST_info("Client application data secret test failed");
+        goto err;
+    }
 
-  if (!TEST_size_t_eq(sizeof(server_ats), hashsize))
-    goto err;
-  if (!TEST_size_t_eq(sizeof(server_ats_key), KEYLEN))
-    goto err;
-  if (!TEST_size_t_eq(sizeof(server_ats_iv), IVLEN))
-    goto err;
+    if (!TEST_size_t_eq(sizeof(server_ats), hashsize))
+        goto err;
+    if (!TEST_size_t_eq(sizeof(server_ats_key), KEYLEN))
+        goto err;
+    if (!TEST_size_t_eq(sizeof(server_ats_iv), IVLEN))
+        goto err;
 
-  if (!TEST_true(test_secret(
-      s, out_master_secret, (unsigned char *)server_ats_label,
-      strlen(server_ats_label), server_ats, server_ats_key, server_ats_iv))) {
-    TEST_info("Server application data secret test failed");
-    goto err;
-  }
+    if (!TEST_true(test_secret(
+        s, out_master_secret, (unsigned char *)server_ats_label,
+        strlen(server_ats_label), server_ats, server_ats_key, server_ats_iv))) {
+        TEST_info("Server application data secret test failed");
+        goto err;
+    }
 
-  ret = 1;
+    ret = 1;
 err:
-  SSL_free(ssl);
-  SSL_CTX_free(ctx);
-  return ret;
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
+    return ret;
 }
 
 int setup_tests(void) {
-  ADD_TEST(test_handshake_secrets);
-  return 1;
+    ADD_TEST(test_handshake_secrets);
+    return 1;
 }

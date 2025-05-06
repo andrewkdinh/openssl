@@ -97,15 +97,15 @@ static const unsigned char crldata[] = {
  * signing to be different from the alg within the loaded cert.
  */
 static int test_x509_tbs_cache(void) {
-  int ret;
-  X509 *x = NULL;
-  const unsigned char *p = certdata;
+    int ret;
+    X509 *x = NULL;
+    const unsigned char *p = certdata;
 
-  ret = TEST_ptr(x = d2i_X509(NULL, &p, sizeof(certdata))) &&
-        TEST_int_gt(X509_sign(x, privkey, signmd), 0) &&
-        TEST_int_eq(X509_verify(x, pubkey), 1);
-  X509_free(x);
-  return ret;
+    ret = TEST_ptr(x = d2i_X509(NULL, &p, sizeof(certdata))) &&
+          TEST_int_gt(X509_sign(x, privkey, signmd), 0) &&
+          TEST_int_eq(X509_verify(x, pubkey), 1);
+    X509_free(x);
+    return ret;
 }
 
 /*
@@ -114,112 +114,113 @@ static int test_x509_tbs_cache(void) {
  * signing to be different from the alg within the loaded cert.
  */
 static int test_x509_crl_tbs_cache(void) {
-  int ret;
-  X509_CRL *crl = NULL;
-  const unsigned char *p = crldata;
+    int ret;
+    X509_CRL *crl = NULL;
+    const unsigned char *p = crldata;
 
-  ret = TEST_ptr(crl = d2i_X509_CRL(NULL, &p, sizeof(crldata))) &&
-        TEST_int_gt(X509_CRL_sign(crl, privkey, signmd), 0) &&
-        TEST_int_eq(X509_CRL_verify(crl, pubkey), 1);
+    ret = TEST_ptr(crl = d2i_X509_CRL(NULL, &p, sizeof(crldata))) &&
+          TEST_int_gt(X509_CRL_sign(crl, privkey, signmd), 0) &&
+          TEST_int_eq(X509_CRL_verify(crl, pubkey), 1);
 
-  X509_CRL_free(crl);
-  return ret;
+    X509_CRL_free(crl);
+    return ret;
 }
 
 static int test_asn1_item_verify(void) {
-  int ret = 0;
-  BIO *bio = NULL;
-  X509 *x509 = NULL;
-  const char *certfile;
-  const ASN1_BIT_STRING *sig = NULL;
-  const X509_ALGOR *alg = NULL;
-  EVP_PKEY *pkey;
+    int ret = 0;
+    BIO *bio = NULL;
+    X509 *x509 = NULL;
+    const char *certfile;
+    const ASN1_BIT_STRING *sig = NULL;
+    const X509_ALGOR *alg = NULL;
+    EVP_PKEY *pkey;
 #ifndef OPENSSL_NO_DEPRECATED_3_0
-  RSA *rsa = NULL;
+    RSA *rsa = NULL;
 #endif
 
-  if (!TEST_ptr(certfile = test_get_argument(0)) ||
-      !TEST_ptr(bio = BIO_new_file(certfile, "r")) ||
-      !TEST_ptr(x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL)) ||
-      !TEST_ptr(pkey = X509_get0_pubkey(x509)))
-    goto err;
+    if (!TEST_ptr(certfile = test_get_argument(0)) ||
+        !TEST_ptr(bio = BIO_new_file(certfile, "r")) ||
+        !TEST_ptr(x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL)) ||
+        !TEST_ptr(pkey = X509_get0_pubkey(x509)))
+        goto err;
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
-  /* Issue #24575 requires legacy key but the test is useful anyway */
-  if (!TEST_ptr(rsa = EVP_PKEY_get1_RSA(pkey)))
-    goto err;
+    /* Issue #24575 requires legacy key but the test is useful anyway */
+    if (!TEST_ptr(rsa = EVP_PKEY_get1_RSA(pkey)))
+        goto err;
 
-  if (!TEST_int_gt(EVP_PKEY_set1_RSA(pkey, rsa), 0))
-    goto err;
+    if (!TEST_int_gt(EVP_PKEY_set1_RSA(pkey, rsa), 0))
+        goto err;
 #endif
 
-  X509_get0_signature(&sig, &alg, x509);
+    X509_get0_signature(&sig, &alg, x509);
 
-  if (!TEST_int_gt(ASN1_item_verify(ASN1_ITEM_rptr(X509_CINF),
-                                    (X509_ALGOR *)alg, (ASN1_BIT_STRING *)sig,
-                                    &x509->cert_info, pkey),
-                   0))
-    goto err;
+    if (!TEST_int_gt(ASN1_item_verify(ASN1_ITEM_rptr(X509_CINF),
+                                      (X509_ALGOR *)alg, (ASN1_BIT_STRING *)sig,
+                                      &x509->cert_info, pkey),
+                     0))
+        goto err;
 
-  ERR_set_mark();
-  if (!TEST_int_lt(ASN1_item_verify(ASN1_ITEM_rptr(X509_CINF),
-                                    (X509_ALGOR *)alg, (ASN1_BIT_STRING *)sig,
-                                    NULL, pkey),
-                   0)) {
-    ERR_clear_last_mark();
-    goto err;
-  }
-  ERR_pop_to_mark();
+    ERR_set_mark();
+    if (!TEST_int_lt(ASN1_item_verify(ASN1_ITEM_rptr(X509_CINF),
+                                      (X509_ALGOR *)alg, (ASN1_BIT_STRING *)sig,
+                                      NULL, pkey),
+                     0)) {
+        ERR_clear_last_mark();
+        goto err;
+    }
+    ERR_pop_to_mark();
 
-  ret = 1;
+    ret = 1;
 
 err:
 #ifndef OPENSSL_NO_DEPRECATED_3_0
-  RSA_free(rsa);
+    RSA_free(rsa);
 #endif
-  X509_free(x509);
-  BIO_free(bio);
-  return ret;
+    X509_free(x509);
+    BIO_free(bio);
+    return ret;
 }
 
 OPT_TEST_DECLARE_USAGE("<pss-self-signed-cert.pem>\n")
 
 int setup_tests(void) {
-  const unsigned char *p;
-  int cnt;
+    const unsigned char *p;
+    int cnt;
 
-  cnt = test_get_argument_count();
-  if (cnt != 1) {
-    TEST_error("Must specify a certificate file self-signed with RSA-PSS.\n");
-    return 0;
-  }
+    cnt = test_get_argument_count();
+    if (cnt != 1) {
+        TEST_error(
+        "Must specify a certificate file self-signed with RSA-PSS.\n");
+        return 0;
+    }
 
-  p = pubkeydata;
-  pubkey = d2i_PUBKEY(NULL, &p, sizeof(pubkeydata));
+    p = pubkeydata;
+    pubkey = d2i_PUBKEY(NULL, &p, sizeof(pubkeydata));
 
-  p = privkeydata;
-  privkey = d2i_PrivateKey(EVP_PKEY_EC, NULL, &p, sizeof(privkeydata));
+    p = privkeydata;
+    privkey = d2i_PrivateKey(EVP_PKEY_EC, NULL, &p, sizeof(privkeydata));
 
-  if (pubkey == NULL || privkey == NULL) {
-    BIO_printf(bio_err, "Failed to create keys\n");
-    return 0;
-  }
+    if (pubkey == NULL || privkey == NULL) {
+        BIO_printf(bio_err, "Failed to create keys\n");
+        return 0;
+    }
 
-  /* Note this digest is different from the certificate digest */
-  signmd = EVP_MD_fetch(NULL, "SHA384", NULL);
-  if (signmd == NULL) {
-    BIO_printf(bio_err, "Failed to fetch digest\n");
-    return 0;
-  }
+    /* Note this digest is different from the certificate digest */
+    signmd = EVP_MD_fetch(NULL, "SHA384", NULL);
+    if (signmd == NULL) {
+        BIO_printf(bio_err, "Failed to fetch digest\n");
+        return 0;
+    }
 
-  ADD_TEST(test_x509_tbs_cache);
-  ADD_TEST(test_x509_crl_tbs_cache);
-  ADD_TEST(test_asn1_item_verify);
-  return 1;
+    ADD_TEST(test_x509_tbs_cache);
+    ADD_TEST(test_x509_crl_tbs_cache);
+    ADD_TEST(test_asn1_item_verify);
+    return 1;
 }
 
 void cleanup_tests(void) {
-  EVP_MD_free(signmd);
-  EVP_PKEY_free(pubkey);
-  EVP_PKEY_free(privkey);
+    EVP_MD_free(signmd);
+    EVP_PKEY_free(pubkey);
+    EVP_PKEY_free(privkey);
 }

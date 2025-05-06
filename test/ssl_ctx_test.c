@@ -11,13 +11,13 @@
 #include <openssl/ssl.h>
 
 typedef struct {
-  int proto;
-  int min_version;
-  int max_version;
-  int min_ok;
-  int max_ok;
-  int expected_min;
-  int expected_max;
+    int proto;
+    int min_version;
+    int max_version;
+    int min_ok;
+    int max_ok;
+    int expected_min;
+    int expected_max;
 } version_test;
 
 #define PROTO_TLS 0
@@ -77,69 +77,71 @@ static const version_test version_testdata[] = {
 };
 
 static int test_set_min_max_version(int idx_tst) {
-  SSL_CTX *ctx = NULL;
-  SSL *ssl = NULL;
-  int testresult = 0;
-  version_test t = version_testdata[idx_tst];
-  const SSL_METHOD *meth = NULL;
+    SSL_CTX *ctx = NULL;
+    SSL *ssl = NULL;
+    int testresult = 0;
+    version_test t = version_testdata[idx_tst];
+    const SSL_METHOD *meth = NULL;
 
-  switch (t.proto) {
-  case PROTO_TLS:
-    meth = TLS_client_method();
-    break;
+    switch (t.proto) {
+    case PROTO_TLS:
+        meth = TLS_client_method();
+        break;
 
 #ifndef OPENSSL_NO_DTLS
-  case PROTO_DTLS:
-    meth = DTLS_client_method();
-    break;
+    case PROTO_DTLS:
+        meth = DTLS_client_method();
+        break;
 #endif
 
 #ifndef OPENSSL_NO_QUIC
-  case PROTO_QUIC:
-    meth = OSSL_QUIC_client_method();
-    break;
+    case PROTO_QUIC:
+        meth = OSSL_QUIC_client_method();
+        break;
 #endif
-  }
+    }
 
-  if (meth == NULL)
-    return TEST_skip("Protocol not supported");
+    if (meth == NULL)
+        return TEST_skip("Protocol not supported");
 
-  ctx = SSL_CTX_new(meth);
-  if (ctx == NULL)
-    goto end;
+    ctx = SSL_CTX_new(meth);
+    if (ctx == NULL)
+        goto end;
 
-  ssl = SSL_new(ctx);
-  if (ssl == NULL)
-    goto end;
+    ssl = SSL_new(ctx);
+    if (ssl == NULL)
+        goto end;
 
-  if (!TEST_int_eq(SSL_CTX_set_min_proto_version(ctx, t.min_version), t.min_ok))
-    goto end;
-  if (!TEST_int_eq(SSL_CTX_set_max_proto_version(ctx, t.max_version), t.max_ok))
-    goto end;
-  if (!TEST_int_eq(SSL_CTX_get_min_proto_version(ctx), t.expected_min))
-    goto end;
-  if (!TEST_int_eq(SSL_CTX_get_max_proto_version(ctx), t.expected_max))
-    goto end;
+    if (!TEST_int_eq(SSL_CTX_set_min_proto_version(ctx, t.min_version),
+                     t.min_ok))
+        goto end;
+    if (!TEST_int_eq(SSL_CTX_set_max_proto_version(ctx, t.max_version),
+                     t.max_ok))
+        goto end;
+    if (!TEST_int_eq(SSL_CTX_get_min_proto_version(ctx), t.expected_min))
+        goto end;
+    if (!TEST_int_eq(SSL_CTX_get_max_proto_version(ctx), t.expected_max))
+        goto end;
 
-  if (!TEST_int_eq(SSL_set_min_proto_version(ssl, t.min_version), t.min_ok))
-    goto end;
-  if (!TEST_int_eq(SSL_set_max_proto_version(ssl, t.max_version), t.max_ok))
-    goto end;
-  if (!TEST_int_eq(SSL_get_min_proto_version(ssl), t.expected_min))
-    goto end;
-  if (!TEST_int_eq(SSL_get_max_proto_version(ssl), t.expected_max))
-    goto end;
+    if (!TEST_int_eq(SSL_set_min_proto_version(ssl, t.min_version), t.min_ok))
+        goto end;
+    if (!TEST_int_eq(SSL_set_max_proto_version(ssl, t.max_version), t.max_ok))
+        goto end;
+    if (!TEST_int_eq(SSL_get_min_proto_version(ssl), t.expected_min))
+        goto end;
+    if (!TEST_int_eq(SSL_get_max_proto_version(ssl), t.expected_max))
+        goto end;
 
-  testresult = 1;
+    testresult = 1;
 
 end:
-  SSL_free(ssl);
-  SSL_CTX_free(ctx);
-  return testresult;
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
+    return testresult;
 }
 
 int setup_tests(void) {
-  ADD_ALL_TESTS(test_set_min_max_version,
-                sizeof(version_testdata) / sizeof(version_test));
-  return 1;
+    ADD_ALL_TESTS(test_set_min_max_version,
+                  sizeof(version_testdata) / sizeof(version_test));
+    return 1;
 }

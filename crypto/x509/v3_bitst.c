@@ -44,43 +44,43 @@ EXT_BITSTRING(NID_key_usage, key_usage_type_table);
 STACK_OF(CONF_VALUE) * i2v_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
                                            ASN1_BIT_STRING *bits,
                                            STACK_OF(CONF_VALUE) * ret) {
-  BIT_STRING_BITNAME *bnam;
-  for (bnam = method->usr_data; bnam->lname; bnam++) {
-    if (ASN1_BIT_STRING_get_bit(bits, bnam->bitnum))
-      X509V3_add_value(bnam->lname, NULL, &ret);
-  }
-  return ret;
+    BIT_STRING_BITNAME *bnam;
+    for (bnam = method->usr_data; bnam->lname; bnam++) {
+        if (ASN1_BIT_STRING_get_bit(bits, bnam->bitnum))
+            X509V3_add_value(bnam->lname, NULL, &ret);
+    }
+    return ret;
 }
 
 ASN1_BIT_STRING *v2i_ASN1_BIT_STRING(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
                                      STACK_OF(CONF_VALUE) * nval) {
-  CONF_VALUE *val;
-  ASN1_BIT_STRING *bs;
-  int i;
-  BIT_STRING_BITNAME *bnam;
-  if ((bs = ASN1_BIT_STRING_new()) == NULL) {
-    ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
-    return NULL;
-  }
-  for (i = 0; i < sk_CONF_VALUE_num(nval); i++) {
-    val = sk_CONF_VALUE_value(nval, i);
-    for (bnam = method->usr_data; bnam->lname; bnam++) {
-      if (strcmp(bnam->sname, val->name) == 0 ||
-          strcmp(bnam->lname, val->name) == 0) {
-        if (!ASN1_BIT_STRING_set_bit(bs, bnam->bitnum, 1)) {
-          ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
-          ASN1_BIT_STRING_free(bs);
-          return NULL;
+    CONF_VALUE *val;
+    ASN1_BIT_STRING *bs;
+    int i;
+    BIT_STRING_BITNAME *bnam;
+    if ((bs = ASN1_BIT_STRING_new()) == NULL) {
+        ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
+        return NULL;
+    }
+    for (i = 0; i < sk_CONF_VALUE_num(nval); i++) {
+        val = sk_CONF_VALUE_value(nval, i);
+        for (bnam = method->usr_data; bnam->lname; bnam++) {
+            if (strcmp(bnam->sname, val->name) == 0 ||
+                strcmp(bnam->lname, val->name) == 0) {
+                if (!ASN1_BIT_STRING_set_bit(bs, bnam->bitnum, 1)) {
+                    ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
+                    ASN1_BIT_STRING_free(bs);
+                    return NULL;
+                }
+                break;
+            }
         }
-        break;
-      }
+        if (!bnam->lname) {
+            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_UNKNOWN_BIT_STRING_ARGUMENT,
+                           "%s", val->name);
+            ASN1_BIT_STRING_free(bs);
+            return NULL;
+        }
     }
-    if (!bnam->lname) {
-      ERR_raise_data(ERR_LIB_X509V3, X509V3_R_UNKNOWN_BIT_STRING_ARGUMENT, "%s",
-                     val->name);
-      ASN1_BIT_STRING_free(bs);
-      return NULL;
-    }
-  }
-  return bs;
+    return bs;
 }

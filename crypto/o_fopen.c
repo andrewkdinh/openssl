@@ -36,84 +36,85 @@
 #endif
 
 FILE *openssl_fopen(const char *filename, const char *mode) {
-  FILE *file = NULL;
+    FILE *file = NULL;
 #if defined(_WIN32) && defined(CP_UTF8)
-  int sz, len_0;
-  DWORD flags;
+    int sz, len_0;
+    DWORD flags;
 #endif
 
-  if (filename == NULL)
-    return NULL;
-#if defined(_WIN32) && defined(CP_UTF8)
-  len_0 = (int)strlen(filename) + 1;
-
-  /*
-   * Basically there are three cases to cover: a) filename is
-   * pure ASCII string; b) actual UTF-8 encoded string and
-   * c) locale-ized string, i.e. one containing 8-bit
-   * characters that are meaningful in current system locale.
-   * If filename is pure ASCII or real UTF-8 encoded string,
-   * MultiByteToWideChar succeeds and _wfopen works. If
-   * filename is locale-ized string, chances are that
-   * MultiByteToWideChar fails reporting
-   * ERROR_NO_UNICODE_TRANSLATION, in which case we fall
-   * back to fopen...
-   */
-  if ((sz = MultiByteToWideChar(CP_UTF8, (flags = MB_ERR_INVALID_CHARS),
-                                filename, len_0, NULL, 0)) > 0 ||
-      (GetLastError() == ERROR_INVALID_FLAGS &&
-       (sz = MultiByteToWideChar(CP_UTF8, (flags = 0), filename, len_0, NULL,
-                                 0)) > 0)) {
-    WCHAR wmode[8];
-    WCHAR *wfilename = _alloca(sz * sizeof(WCHAR));
-
-    if (MultiByteToWideChar(CP_UTF8, flags, filename, len_0, wfilename, sz) &&
-        MultiByteToWideChar(CP_UTF8, 0, mode, strlen(mode) + 1, wmode,
-                            OSSL_NELEM(wmode)) &&
-        (file = _wfopen(wfilename, wmode)) == NULL &&
-        (errno == ENOENT || errno == EBADF)) {
-      /*
-       * UTF-8 decode succeeded, but no file, filename
-       * could still have been locale-ized...
-       */
-      file = fopen(filename, mode);
-    }
-  } else if (GetLastError() == ERROR_NO_UNICODE_TRANSLATION) {
-    file = fopen(filename, mode);
-  }
-#elif defined(__DJGPP__)
-  {
-    char *newname = NULL;
-
-    if (pathconf(filename, _PC_NAME_MAX) <= 12) { /* 8.3 file system? */
-      char *iterator;
-      char lastchar;
-
-      if ((newname = OPENSSL_malloc(strlen(filename) + 1)) == NULL)
+    if (filename == NULL)
         return NULL;
+#if defined(_WIN32) && defined(CP_UTF8)
+    len_0 = (int)strlen(filename) + 1;
 
-      for (iterator = newname, lastchar = '\0'; *filename;
-           filename++, iterator++) {
-        if (lastchar == '/' && filename[0] == '.' && filename[1] != '.' &&
-            filename[1] != '/') {
-          /* Leading dots are not permitted in plain DOS. */
-          *iterator = '_';
-        } else {
-          *iterator = *filename;
+    /*
+     * Basically there are three cases to cover: a) filename is
+     * pure ASCII string; b) actual UTF-8 encoded string and
+     * c) locale-ized string, i.e. one containing 8-bit
+     * characters that are meaningful in current system locale.
+     * If filename is pure ASCII or real UTF-8 encoded string,
+     * MultiByteToWideChar succeeds and _wfopen works. If
+     * filename is locale-ized string, chances are that
+     * MultiByteToWideChar fails reporting
+     * ERROR_NO_UNICODE_TRANSLATION, in which case we fall
+     * back to fopen...
+     */
+    if ((sz = MultiByteToWideChar(CP_UTF8, (flags = MB_ERR_INVALID_CHARS),
+                                  filename, len_0, NULL, 0)) > 0 ||
+        (GetLastError() == ERROR_INVALID_FLAGS &&
+         (sz = MultiByteToWideChar(CP_UTF8, (flags = 0), filename, len_0, NULL,
+                                   0)) > 0)) {
+        WCHAR wmode[8];
+        WCHAR *wfilename = _alloca(sz * sizeof(WCHAR));
+
+        if (MultiByteToWideChar(CP_UTF8, flags, filename, len_0, wfilename,
+                                sz) &&
+            MultiByteToWideChar(CP_UTF8, 0, mode, strlen(mode) + 1, wmode,
+                                OSSL_NELEM(wmode)) &&
+            (file = _wfopen(wfilename, wmode)) == NULL &&
+            (errno == ENOENT || errno == EBADF)) {
+            /*
+             * UTF-8 decode succeeded, but no file, filename
+             * could still have been locale-ized...
+             */
+            file = fopen(filename, mode);
         }
-        lastchar = *filename;
-      }
-      *iterator = '\0';
-      filename = newname;
+    } else if (GetLastError() == ERROR_NO_UNICODE_TRANSLATION) {
+        file = fopen(filename, mode);
     }
-    file = fopen(filename, mode);
+#elif defined(__DJGPP__)
+    {
+        char *newname = NULL;
 
-    OPENSSL_free(newname);
-  }
+        if (pathconf(filename, _PC_NAME_MAX) <= 12) { /* 8.3 file system? */
+            char *iterator;
+            char lastchar;
+
+            if ((newname = OPENSSL_malloc(strlen(filename) + 1)) == NULL)
+                return NULL;
+
+            for (iterator = newname, lastchar = '\0'; *filename;
+                 filename++, iterator++) {
+                if (lastchar == '/' && filename[0] == '.' &&
+                    filename[1] != '.' && filename[1] != '/') {
+                    /* Leading dots are not permitted in plain DOS. */
+                    *iterator = '_';
+                } else {
+                    *iterator = *filename;
+                }
+                lastchar = *filename;
+            }
+            *iterator = '\0';
+            filename = newname;
+        }
+        file = fopen(filename, mode);
+
+        OPENSSL_free(newname);
+    }
 #else
-  file = fopen(filename, mode);
+    file = fopen(filename, mode);
 #endif
-  return file;
+    return file;
 }
 
 #else

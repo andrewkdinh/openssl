@@ -40,10 +40,10 @@ extern "C" {
 #define MD4_LBLOCK (MD4_CBLOCK / 4)
 
 typedef struct MD4state_st {
-  MD4_LONG A, B, C, D;
-  MD4_LONG Nl, Nh;
-  MD4_LONG data[MD4_LBLOCK];
-  unsigned int num;
+    MD4_LONG A, B, C, D;
+    MD4_LONG Nl, Nh;
+    MD4_LONG data[MD4_LBLOCK];
+    unsigned int num;
 } MD4_CTX;
 #endif
 #ifndef OPENSSL_NO_DEPRECATED_3_0

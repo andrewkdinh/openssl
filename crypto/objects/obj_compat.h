@@ -14,25 +14,25 @@
 #define OBJ_id_tc26_cipher_gostr3412_2015_magma_ctracpkm OBJ_magma_ctr_acpkm
 
 #define SN_id_tc26_cipher_gostr3412_2015_magma_ctracpkm_omac                   \
-  SN_magma_ctr_acpkm_omac
+    SN_magma_ctr_acpkm_omac
 #define NID_id_tc26_cipher_gostr3412_2015_magma_ctracpkm_omac                  \
-  NID_magma_ctr_acpkm_omac
+    NID_magma_ctr_acpkm_omac
 #define OBJ_id_tc26_cipher_gostr3412_2015_magma_ctracpkm_omac                  \
-  OBJ_magma_ctr_acpkm_omac
+    OBJ_magma_ctr_acpkm_omac
 
 #define SN_id_tc26_cipher_gostr3412_2015_kuznyechik_ctracpkm                   \
-  SN_kuznyechik_ctr_acpkm
+    SN_kuznyechik_ctr_acpkm
 #define NID_id_tc26_cipher_gostr3412_2015_kuznyechik_ctracpkm                  \
-  NID_kuznyechik_ctr_acpkm
+    NID_kuznyechik_ctr_acpkm
 #define OBJ_id_tc26_cipher_gostr3412_2015_kuznyechik_ctracpkm                  \
-  OBJ_kuznyechik_ctr_acpkm
+    OBJ_kuznyechik_ctr_acpkm
 
 #define SN_id_tc26_cipher_gostr3412_2015_kuznyechik_ctracpkm_omac              \
-  SN_kuznyechik_ctr_acpkm_omac
+    SN_kuznyechik_ctr_acpkm_omac
 #define NID_id_tc26_cipher_gostr3412_2015_kuznyechik_ctracpkm_omac             \
-  NID_kuznyechik_ctr_acpkm_omac
+    NID_kuznyechik_ctr_acpkm_omac
 #define OBJ_id_tc26_cipher_gostr3412_2015_kuznyechik_ctracpkm_omac             \
-  OBJ_kuznyechik_ctr_acpkm_omac
+    OBJ_kuznyechik_ctr_acpkm_omac
 
 #define SN_id_tc26_wrap_gostr3412_2015_magma_kexp15 SN_magma_kexp15
 #define NID_id_tc26_wrap_gostr3412_2015_magma_kexp15 NID_magma_kexp15

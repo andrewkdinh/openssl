@@ -36,55 +36,55 @@
 #define QRL_EL_STATE_DISCARDED 4     /* Discarded (terminal state) */
 
 typedef struct ossl_qrl_enc_level_st {
-  /*
-   * Cryptographic context used to apply and remove header protection from
-   * packet headers.
-   */
-  QUIC_HDR_PROTECTOR hpr;
+    /*
+     * Cryptographic context used to apply and remove header protection from
+     * packet headers.
+     */
+    QUIC_HDR_PROTECTOR hpr;
 
-  /* Hash function used for key derivation. */
-  EVP_MD *md;
+    /* Hash function used for key derivation. */
+    EVP_MD *md;
 
-  /* Context used for packet body ciphering. One for each keyslot. */
-  EVP_CIPHER_CTX *cctx[2];
+    /* Context used for packet body ciphering. One for each keyslot. */
+    EVP_CIPHER_CTX *cctx[2];
 
-  OSSL_LIB_CTX *libctx;
-  const char *propq;
+    OSSL_LIB_CTX *libctx;
+    const char *propq;
 
-  /*
-   * Key epoch, essentially the number of times we have done a key update.
-   *
-   * The least significant bit of this is therefore by definition the current
-   * Key Phase bit value.
-   */
-  uint64_t key_epoch;
+    /*
+     * Key epoch, essentially the number of times we have done a key update.
+     *
+     * The least significant bit of this is therefore by definition the current
+     * Key Phase bit value.
+     */
+    uint64_t key_epoch;
 
-  /* Usage counter. The caller maintains this. Used by TX side only. */
-  uint64_t op_count;
+    /* Usage counter. The caller maintains this. Used by TX side only. */
+    uint64_t op_count;
 
-  /* QRL_SUITE_* value. */
-  uint32_t suite_id;
+    /* QRL_SUITE_* value. */
+    uint32_t suite_id;
 
-  /* Length of authentication tag. */
-  uint32_t tag_len;
+    /* Length of authentication tag. */
+    uint32_t tag_len;
 
-  /* Current EL state. */
-  unsigned char state; /* QRL_EL_STATE_* */
+    /* Current EL state. */
+    unsigned char state; /* QRL_EL_STATE_* */
 
-  /* 1 if for TX, else RX. Initialised when secret provided. */
-  unsigned char is_tx;
+    /* 1 if for TX, else RX. Initialised when secret provided. */
+    unsigned char is_tx;
 
-  /* IV used to construct nonces used for AEAD packet body ciphering. */
-  unsigned char iv[2][EVP_MAX_IV_LENGTH];
+    /* IV used to construct nonces used for AEAD packet body ciphering. */
+    unsigned char iv[2][EVP_MAX_IV_LENGTH];
 
-  /*
-   * Secret for next key epoch.
-   */
-  unsigned char ku[EVP_MAX_KEY_LENGTH];
+    /*
+     * Secret for next key epoch.
+     */
+    unsigned char ku[EVP_MAX_KEY_LENGTH];
 } OSSL_QRL_ENC_LEVEL;
 
 typedef struct ossl_qrl_enc_level_set_st {
-  OSSL_QRL_ENC_LEVEL el[QUIC_ENC_LEVEL_NUM];
+    OSSL_QRL_ENC_LEVEL el[QUIC_ENC_LEVEL_NUM];
 } OSSL_QRL_ENC_LEVEL_SET;
 
 /*

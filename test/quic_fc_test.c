@@ -12,185 +12,187 @@
 #include "testutil.h"
 
 static int test_txfc(int is_stream) {
-  int testresult = 0;
-  QUIC_TXFC conn_txfc, stream_txfc, *txfc, *parent_txfc;
+    int testresult = 0;
+    QUIC_TXFC conn_txfc, stream_txfc, *txfc, *parent_txfc;
 
-  if (!TEST_true(ossl_quic_txfc_init(&conn_txfc, 0)))
-    goto err;
+    if (!TEST_true(ossl_quic_txfc_init(&conn_txfc, 0)))
+        goto err;
 
-  if (is_stream && !TEST_true(ossl_quic_txfc_init(&stream_txfc, &conn_txfc)))
-    goto err;
+    if (is_stream && !TEST_true(ossl_quic_txfc_init(&stream_txfc, &conn_txfc)))
+        goto err;
 
-  txfc = is_stream ? &stream_txfc : &conn_txfc;
-  parent_txfc = is_stream ? &conn_txfc : NULL;
+    txfc = is_stream ? &stream_txfc : &conn_txfc;
+    parent_txfc = is_stream ? &conn_txfc : NULL;
 
-  if (!TEST_true(ossl_quic_txfc_bump_cwm(txfc, 2000)))
-    goto err;
+    if (!TEST_true(ossl_quic_txfc_bump_cwm(txfc, 2000)))
+        goto err;
 
-  if (is_stream && !TEST_true(ossl_quic_txfc_bump_cwm(parent_txfc, 2000)))
-    goto err;
+    if (is_stream && !TEST_true(ossl_quic_txfc_bump_cwm(parent_txfc, 2000)))
+        goto err;
 
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 0))
-    goto err;
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 0))
+        goto err;
 
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_cwm(txfc), 2000))
-    goto err;
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_cwm(txfc), 2000))
+        goto err;
 
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 2000))
-    goto err;
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 2000))
+        goto err;
 
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 100), 1900))
-    goto err;
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 100), 1900))
+        goto err;
 
-  if (is_stream) {
-    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 2000))
-      goto err;
+    if (is_stream) {
+        if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 2000))
+            goto err;
 
-    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 100), 1900))
-      goto err;
-  }
-
-  if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-    goto err;
-
-  if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 500)))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 1500))
-    goto err;
-
-  if (is_stream && !TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 1500))
-    goto err;
-
-  if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 500))
-    goto err;
-
-  if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 100)))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 600))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 1400))
-    goto err;
-
-  if (is_stream && !TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 1400))
-    goto err;
-
-  if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-    goto err;
-
-  if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 1400)))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 0))
-    goto err;
-
-  if (is_stream && !TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 0))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 2000))
-    goto err;
-
-  if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-    goto err;
-
-  if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-    goto err;
-
-  if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 1)))
-    goto err;
-
-  if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-    goto err;
-
-  if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-    goto err;
-
-  if (!TEST_false(ossl_quic_txfc_consume_credit(txfc, 1)))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_cwm(txfc), 2000))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 2000))
-    goto err;
-
-  if (!TEST_false(ossl_quic_txfc_bump_cwm(txfc, 2000)))
-    goto err;
-
-  if (!TEST_true(ossl_quic_txfc_bump_cwm(txfc, 2500)))
-    goto err;
-
-  if (is_stream && !TEST_true(ossl_quic_txfc_bump_cwm(parent_txfc, 2400)))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_cwm(txfc), 2500))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 2000))
-    goto err;
-
-  if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 500))
-    goto err;
-
-  if (is_stream)
-    ossl_quic_txfc_has_become_blocked(parent_txfc, 1);
-
-  if (is_stream) {
-    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 400), 0))
-      goto err;
-
-    if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 399)))
-      goto err;
+        if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 100), 1900))
+            goto err;
+    }
 
     if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-      goto err;
+        goto err;
 
-    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 1))
-      goto err;
+    if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 500)))
+        goto err;
 
-    if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 1)))
-      goto err;
-
-    if (!TEST_true(ossl_quic_txfc_has_become_blocked(parent_txfc, 0)))
-      goto err;
-
-    if (!TEST_true(ossl_quic_txfc_has_become_blocked(parent_txfc, 1)))
-      goto err;
-
-    if (!TEST_false(ossl_quic_txfc_has_become_blocked(parent_txfc, 0)))
-      goto err;
-  } else {
-    if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 499)))
-      goto err;
-
-    if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-      goto err;
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 1500))
+        goto err;
 
     if (is_stream &&
-        !TEST_false(ossl_quic_txfc_has_become_blocked(parent_txfc, 0)))
-      goto err;
-
-    if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 1)))
-      goto err;
-
-    if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-      goto err;
-
-    if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 1)))
-      goto err;
+        !TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 1500))
+        goto err;
 
     if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
-      goto err;
-  }
+        goto err;
 
-  testresult = 1;
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 500))
+        goto err;
+
+    if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 100)))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 600))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 1400))
+        goto err;
+
+    if (is_stream &&
+        !TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 1400))
+        goto err;
+
+    if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+        goto err;
+
+    if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 1400)))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 0))
+        goto err;
+
+    if (is_stream && !TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 0))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 2000))
+        goto err;
+
+    if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+        goto err;
+
+    if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+        goto err;
+
+    if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 1)))
+        goto err;
+
+    if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+        goto err;
+
+    if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+        goto err;
+
+    if (!TEST_false(ossl_quic_txfc_consume_credit(txfc, 1)))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_cwm(txfc), 2000))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 2000))
+        goto err;
+
+    if (!TEST_false(ossl_quic_txfc_bump_cwm(txfc, 2000)))
+        goto err;
+
+    if (!TEST_true(ossl_quic_txfc_bump_cwm(txfc, 2500)))
+        goto err;
+
+    if (is_stream && !TEST_true(ossl_quic_txfc_bump_cwm(parent_txfc, 2400)))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_cwm(txfc), 2500))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_swm(txfc), 2000))
+        goto err;
+
+    if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit_local(txfc, 0), 500))
+        goto err;
+
+    if (is_stream)
+        ossl_quic_txfc_has_become_blocked(parent_txfc, 1);
+
+    if (is_stream) {
+        if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 400), 0))
+            goto err;
+
+        if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 399)))
+            goto err;
+
+        if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+            goto err;
+
+        if (!TEST_uint64_t_eq(ossl_quic_txfc_get_credit(txfc, 0), 1))
+            goto err;
+
+        if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 1)))
+            goto err;
+
+        if (!TEST_true(ossl_quic_txfc_has_become_blocked(parent_txfc, 0)))
+            goto err;
+
+        if (!TEST_true(ossl_quic_txfc_has_become_blocked(parent_txfc, 1)))
+            goto err;
+
+        if (!TEST_false(ossl_quic_txfc_has_become_blocked(parent_txfc, 0)))
+            goto err;
+    } else {
+        if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 499)))
+            goto err;
+
+        if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+            goto err;
+
+        if (is_stream &&
+            !TEST_false(ossl_quic_txfc_has_become_blocked(parent_txfc, 0)))
+            goto err;
+
+        if (!TEST_true(ossl_quic_txfc_consume_credit(txfc, 1)))
+            goto err;
+
+        if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+            goto err;
+
+        if (!TEST_true(ossl_quic_txfc_has_become_blocked(txfc, 1)))
+            goto err;
+
+        if (!TEST_false(ossl_quic_txfc_has_become_blocked(txfc, 0)))
+            goto err;
+    }
+
+    testresult = 1;
 err:
-  return testresult;
+    return testresult;
 }
 
 static OSSL_TIME cur_time;
@@ -202,7 +204,7 @@ static OSSL_TIME fake_now(void *arg) { return cur_time; }
 #define RX_OPC_INIT_STREAM 2 /* arg0=initial window, arg1=max window */
 #define RX_OPC_RX 3          /* arg0=end, arg1=is_fin */
 #define RX_OPC_RETIRE                                                          \
-  4 /* arg0=num_bytes, arg1=rtt in OSSL_TIME ticks, expect_fail */
+    4 /* arg0=num_bytes, arg1=rtt in OSSL_TIME ticks, expect_fail */
 #define RX_OPC_CHECK_CWM_CONN 5        /* arg0=expected */
 #define RX_OPC_CHECK_CWM_STREAM 6      /* arg0=expected */
 #define RX_OPC_CHECK_SWM_CONN 7        /* arg0=expected */
@@ -217,60 +219,60 @@ static OSSL_TIME fake_now(void *arg) { return cur_time; }
 #define RX_OPC_MSG 16
 
 struct rx_test_op {
-  unsigned char op;
-  size_t stream_idx;
-  uint64_t arg0, arg1;
-  unsigned char expect_fail;
-  const char *msg;
+    unsigned char op;
+    size_t stream_idx;
+    uint64_t arg0, arg1;
+    unsigned char expect_fail;
+    const char *msg;
 };
 
 #define RX_OP_END {RX_OPC_END}
 #define RX_OP_INIT_CONN(init_window_size, max_window_size)                     \
-  {RX_OPC_INIT_CONN, 0, (init_window_size), (max_window_size)},
+    {RX_OPC_INIT_CONN, 0, (init_window_size), (max_window_size)},
 #define RX_OP_INIT_STREAM(stream_idx, init_window_size, max_window_size)       \
-  {RX_OPC_INIT_STREAM, (stream_idx), (init_window_size), (max_window_size)},
+    {RX_OPC_INIT_STREAM, (stream_idx), (init_window_size), (max_window_size)},
 #define RX_OP_RX(stream_idx, end, is_fin)                                      \
-  {RX_OPC_RX, (stream_idx), (end), (is_fin)},
+    {RX_OPC_RX, (stream_idx), (end), (is_fin)},
 #define RX_OP_RETIRE(stream_idx, num_bytes, rtt, expect_fail)                  \
-  {RX_OPC_RETIRE, (stream_idx), (num_bytes), (rtt), (expect_fail)},
+    {RX_OPC_RETIRE, (stream_idx), (num_bytes), (rtt), (expect_fail)},
 #define RX_OP_CHECK_CWM_CONN(expected) {RX_OPC_CHECK_CWM_CONN, 0, (expected)},
 #define RX_OP_CHECK_CWM_STREAM(stream_id, expected)                            \
-  {RX_OPC_CHECK_CWM_STREAM, (stream_id), (expected)},
+    {RX_OPC_CHECK_CWM_STREAM, (stream_id), (expected)},
 #define RX_OP_CHECK_SWM_CONN(expected) {RX_OPC_CHECK_SWM_CONN, 0, (expected)},
 #define RX_OP_CHECK_SWM_STREAM(stream_id, expected)                            \
-  {RX_OPC_CHECK_SWM_STREAM, (stream_id), (expected)},
+    {RX_OPC_CHECK_SWM_STREAM, (stream_id), (expected)},
 #define RX_OP_CHECK_RWM_CONN(expected) {RX_OPC_CHECK_RWM_CONN, 0, (expected)},
 #define RX_OP_CHECK_RWM_STREAM(stream_id, expected)                            \
-  {RX_OPC_CHECK_RWM_STREAM, (stream_id), (expected)},
+    {RX_OPC_CHECK_RWM_STREAM, (stream_id), (expected)},
 #define RX_OP_CHECK_CHANGED_CONN(expected, clear)                              \
-  {RX_OPC_CHECK_CHANGED_CONN, 0, (expected), (clear)},
+    {RX_OPC_CHECK_CHANGED_CONN, 0, (expected), (clear)},
 #define RX_OP_CHECK_CHANGED_STREAM(stream_id, expected, clear)                 \
-  {RX_OPC_CHECK_CHANGED_STREAM, (stream_id), (expected), (clear)},
+    {RX_OPC_CHECK_CHANGED_STREAM, (stream_id), (expected), (clear)},
 #define RX_OP_CHECK_ERROR_CONN(expected, clear)                                \
-  {RX_OPC_CHECK_ERROR_CONN, 0, (expected), (clear)},
+    {RX_OPC_CHECK_ERROR_CONN, 0, (expected), (clear)},
 #define RX_OP_CHECK_ERROR_STREAM(stream_id, expected, clear)                   \
-  {RX_OPC_CHECK_ERROR_STREAM, (stream_id), (expected), (clear)},
+    {RX_OPC_CHECK_ERROR_STREAM, (stream_id), (expected), (clear)},
 #define RX_OP_STEP_TIME(t) {RX_OPC_STEP_TIME, 0, (t)},
 #define RX_OP_MSG(msg) {RX_OPC_MSG, 0, 0, 0, 0, (msg)},
 
 #define RX_OP_INIT(init_window_size, max_window_size)                          \
-  RX_OP_INIT_CONN(init_window_size, max_window_size)                           \
-  RX_OP_INIT_STREAM(0, init_window_size, max_window_size)
+    RX_OP_INIT_CONN(init_window_size, max_window_size)                         \
+    RX_OP_INIT_STREAM(0, init_window_size, max_window_size)
 #define RX_OP_CHECK_CWM(expected)                                              \
-  RX_OP_CHECK_CWM_CONN(expected)                                               \
-  RX_OP_CHECK_CWM_STREAM(0, expected)
+    RX_OP_CHECK_CWM_CONN(expected)                                             \
+    RX_OP_CHECK_CWM_STREAM(0, expected)
 #define RX_OP_CHECK_SWM(expected)                                              \
-  RX_OP_CHECK_SWM_CONN(expected)                                               \
-  RX_OP_CHECK_SWM_STREAM(0, expected)
+    RX_OP_CHECK_SWM_CONN(expected)                                             \
+    RX_OP_CHECK_SWM_STREAM(0, expected)
 #define RX_OP_CHECK_RWM(expected)                                              \
-  RX_OP_CHECK_RWM_CONN(expected)                                               \
-  RX_OP_CHECK_RWM_STREAM(0, expected)
+    RX_OP_CHECK_RWM_CONN(expected)                                             \
+    RX_OP_CHECK_RWM_STREAM(0, expected)
 #define RX_OP_CHECK_CHANGED(expected, clear)                                   \
-  RX_OP_CHECK_CHANGED_CONN(expected, clear)                                    \
-  RX_OP_CHECK_CHANGED_STREAM(0, expected, clear)
+    RX_OP_CHECK_CHANGED_CONN(expected, clear)                                  \
+    RX_OP_CHECK_CHANGED_STREAM(0, expected, clear)
 #define RX_OP_CHECK_ERROR(expected, clear)                                     \
-  RX_OP_CHECK_ERROR_CONN(expected, clear)                                      \
-  RX_OP_CHECK_ERROR_STREAM(0, expected, clear)
+    RX_OP_CHECK_ERROR_CONN(expected, clear)                                    \
+    RX_OP_CHECK_ERROR_STREAM(0, expected, clear)
 
 #define INIT_WINDOW_SIZE (1 * 1024 * 1024)
 #define INIT_S_WINDOW_SIZE (384 * 1024)
@@ -416,157 +418,158 @@ static const struct rx_test_op *rx_scripts[] = {rx_script_1, rx_script_2};
 
 static int run_rxfc_script(const struct rx_test_op *script) {
 #define MAX_STREAMS 3
-  int testresult = 0;
-  const struct rx_test_op *op = script;
-  QUIC_RXFC conn_rxfc = {0}, stream_rxfc[MAX_STREAMS] = {0}; /* coverity */
-  char stream_init_done[MAX_STREAMS] = {0};
-  int conn_init_done = 0;
+    int testresult = 0;
+    const struct rx_test_op *op = script;
+    QUIC_RXFC conn_rxfc = {0}, stream_rxfc[MAX_STREAMS] = {0}; /* coverity */
+    char stream_init_done[MAX_STREAMS] = {0};
+    int conn_init_done = 0;
 
-  cur_time = ossl_time_zero();
+    cur_time = ossl_time_zero();
 
-  for (; op->op != RX_OPC_END; ++op) {
-    switch (op->op) {
-    case RX_OPC_INIT_CONN:
-      if (!TEST_true(ossl_quic_rxfc_init(&conn_rxfc, 0, op->arg0, op->arg1,
-                                         fake_now, NULL)))
-        goto err;
+    for (; op->op != RX_OPC_END; ++op) {
+        switch (op->op) {
+        case RX_OPC_INIT_CONN:
+            if (!TEST_true(ossl_quic_rxfc_init(&conn_rxfc, 0, op->arg0,
+                                               op->arg1, fake_now, NULL)))
+                goto err;
 
-      conn_init_done = 1;
-      break;
+            conn_init_done = 1;
+            break;
 
-    case RX_OPC_INIT_STREAM:
-      if (!TEST_size_t_lt(op->stream_idx, OSSL_NELEM(stream_rxfc)) ||
-          !TEST_true(conn_init_done))
-        goto err;
+        case RX_OPC_INIT_STREAM:
+            if (!TEST_size_t_lt(op->stream_idx, OSSL_NELEM(stream_rxfc)) ||
+                !TEST_true(conn_init_done))
+                goto err;
 
-      if (!TEST_true(ossl_quic_rxfc_init(&stream_rxfc[op->stream_idx],
-                                         &conn_rxfc, op->arg0, op->arg1,
-                                         fake_now, NULL)))
-        goto err;
+            if (!TEST_true(ossl_quic_rxfc_init(&stream_rxfc[op->stream_idx],
+                                               &conn_rxfc, op->arg0, op->arg1,
+                                               fake_now, NULL)))
+                goto err;
 
-      stream_init_done[op->stream_idx] = 1;
-      break;
+            stream_init_done[op->stream_idx] = 1;
+            break;
 
-    case RX_OPC_RX:
-      if (!TEST_true(conn_init_done &&
-                     op->stream_idx < OSSL_NELEM(stream_rxfc) &&
-                     stream_init_done[op->stream_idx]))
-        goto err;
+        case RX_OPC_RX:
+            if (!TEST_true(conn_init_done &&
+                           op->stream_idx < OSSL_NELEM(stream_rxfc) &&
+                           stream_init_done[op->stream_idx]))
+                goto err;
 
-      if (!TEST_true(ossl_quic_rxfc_on_rx_stream_frame(
-          &stream_rxfc[op->stream_idx], op->arg0, (int)op->arg1)))
-        goto err;
+            if (!TEST_true(ossl_quic_rxfc_on_rx_stream_frame(
+                &stream_rxfc[op->stream_idx], op->arg0, (int)op->arg1)))
+                goto err;
 
-      break;
+            break;
 
-    case RX_OPC_RETIRE:
-      if (!TEST_true(conn_init_done &&
-                     op->stream_idx < OSSL_NELEM(stream_rxfc) &&
-                     stream_init_done[op->stream_idx]))
-        goto err;
+        case RX_OPC_RETIRE:
+            if (!TEST_true(conn_init_done &&
+                           op->stream_idx < OSSL_NELEM(stream_rxfc) &&
+                           stream_init_done[op->stream_idx]))
+                goto err;
 
-      if (!TEST_int_eq(ossl_quic_rxfc_on_retire(&stream_rxfc[op->stream_idx],
-                                                op->arg0,
-                                                ossl_ticks2time(op->arg1)),
-                       !op->expect_fail))
-        goto err;
+            if (!TEST_int_eq(
+                ossl_quic_rxfc_on_retire(&stream_rxfc[op->stream_idx], op->arg0,
+                                         ossl_ticks2time(op->arg1)),
+                !op->expect_fail))
+                goto err;
 
-      break;
-    case RX_OPC_CHECK_CWM_CONN:
-      if (!TEST_true(conn_init_done))
-        goto err;
-      if (!TEST_uint64_t_eq(ossl_quic_rxfc_get_cwm(&conn_rxfc), op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_CWM_STREAM:
-      if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
-                     stream_init_done[op->stream_idx]))
-        goto err;
-      if (!TEST_uint64_t_eq(
-          ossl_quic_rxfc_get_cwm(&stream_rxfc[op->stream_idx]), op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_SWM_CONN:
-      if (!TEST_true(conn_init_done))
-        goto err;
-      if (!TEST_uint64_t_eq(ossl_quic_rxfc_get_swm(&conn_rxfc), op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_SWM_STREAM:
-      if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
-                     stream_init_done[op->stream_idx]))
-        goto err;
-      if (!TEST_uint64_t_eq(
-          ossl_quic_rxfc_get_swm(&stream_rxfc[op->stream_idx]), op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_RWM_CONN:
-      if (!TEST_true(conn_init_done))
-        goto err;
-      if (!TEST_uint64_t_eq(ossl_quic_rxfc_get_rwm(&conn_rxfc), op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_RWM_STREAM:
-      if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
-                     stream_init_done[op->stream_idx]))
-        goto err;
-      if (!TEST_uint64_t_eq(
-          ossl_quic_rxfc_get_rwm(&stream_rxfc[op->stream_idx]), op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_CHANGED_CONN:
-      if (!TEST_true(conn_init_done))
-        goto err;
-      if (!TEST_int_eq(
-          ossl_quic_rxfc_has_cwm_changed(&conn_rxfc, (int)op->arg1),
-          (int)op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_CHANGED_STREAM:
-      if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
-                     stream_init_done[op->stream_idx]))
-        goto err;
-      if (!TEST_int_eq(ossl_quic_rxfc_has_cwm_changed(
-                       &stream_rxfc[op->stream_idx], (int)op->arg1),
-                       (int)op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_ERROR_CONN:
-      if (!TEST_true(conn_init_done))
-        goto err;
-      if (!TEST_int_eq(ossl_quic_rxfc_get_error(&conn_rxfc, (int)op->arg1),
-                       (int)op->arg0))
-        goto err;
-      break;
-    case RX_OPC_CHECK_ERROR_STREAM:
-      if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
-                     stream_init_done[op->stream_idx]))
-        goto err;
-      if (!TEST_int_eq(
-          ossl_quic_rxfc_get_error(&stream_rxfc[op->stream_idx], (int)op->arg1),
-          (int)op->arg0))
-        goto err;
-      break;
-    case RX_OPC_STEP_TIME:
-      cur_time = ossl_time_add(cur_time, ossl_ticks2time(op->arg0));
-      break;
-    case RX_OPC_MSG:
-      fprintf(stderr, "# %s\n", op->msg);
-      break;
-    default:
-      goto err;
+            break;
+        case RX_OPC_CHECK_CWM_CONN:
+            if (!TEST_true(conn_init_done))
+                goto err;
+            if (!TEST_uint64_t_eq(ossl_quic_rxfc_get_cwm(&conn_rxfc), op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_CWM_STREAM:
+            if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
+                           stream_init_done[op->stream_idx]))
+                goto err;
+            if (!TEST_uint64_t_eq(
+                ossl_quic_rxfc_get_cwm(&stream_rxfc[op->stream_idx]), op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_SWM_CONN:
+            if (!TEST_true(conn_init_done))
+                goto err;
+            if (!TEST_uint64_t_eq(ossl_quic_rxfc_get_swm(&conn_rxfc), op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_SWM_STREAM:
+            if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
+                           stream_init_done[op->stream_idx]))
+                goto err;
+            if (!TEST_uint64_t_eq(
+                ossl_quic_rxfc_get_swm(&stream_rxfc[op->stream_idx]), op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_RWM_CONN:
+            if (!TEST_true(conn_init_done))
+                goto err;
+            if (!TEST_uint64_t_eq(ossl_quic_rxfc_get_rwm(&conn_rxfc), op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_RWM_STREAM:
+            if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
+                           stream_init_done[op->stream_idx]))
+                goto err;
+            if (!TEST_uint64_t_eq(
+                ossl_quic_rxfc_get_rwm(&stream_rxfc[op->stream_idx]), op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_CHANGED_CONN:
+            if (!TEST_true(conn_init_done))
+                goto err;
+            if (!TEST_int_eq(
+                ossl_quic_rxfc_has_cwm_changed(&conn_rxfc, (int)op->arg1),
+                (int)op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_CHANGED_STREAM:
+            if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
+                           stream_init_done[op->stream_idx]))
+                goto err;
+            if (!TEST_int_eq(ossl_quic_rxfc_has_cwm_changed(
+                             &stream_rxfc[op->stream_idx], (int)op->arg1),
+                             (int)op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_ERROR_CONN:
+            if (!TEST_true(conn_init_done))
+                goto err;
+            if (!TEST_int_eq(
+                ossl_quic_rxfc_get_error(&conn_rxfc, (int)op->arg1),
+                (int)op->arg0))
+                goto err;
+            break;
+        case RX_OPC_CHECK_ERROR_STREAM:
+            if (!TEST_true(op->stream_idx < OSSL_NELEM(stream_rxfc) &&
+                           stream_init_done[op->stream_idx]))
+                goto err;
+            if (!TEST_int_eq(ossl_quic_rxfc_get_error(
+                             &stream_rxfc[op->stream_idx], (int)op->arg1),
+                             (int)op->arg0))
+                goto err;
+            break;
+        case RX_OPC_STEP_TIME:
+            cur_time = ossl_time_add(cur_time, ossl_ticks2time(op->arg0));
+            break;
+        case RX_OPC_MSG:
+            fprintf(stderr, "# %s\n", op->msg);
+            break;
+        default:
+            goto err;
+        }
     }
-  }
 
-  testresult = 1;
+    testresult = 1;
 err:
-  return testresult;
+    return testresult;
 }
 
 static int test_rxfc(int idx) { return run_rxfc_script(rx_scripts[idx]); }
 
 int setup_tests(void) {
-  ADD_ALL_TESTS(test_txfc, 2);
-  ADD_ALL_TESTS(test_rxfc, OSSL_NELEM(rx_scripts));
-  return 1;
+    ADD_ALL_TESTS(test_txfc, 2);
+    ADD_ALL_TESTS(test_rxfc, OSSL_NELEM(rx_scripts));
+    return 1;
 }

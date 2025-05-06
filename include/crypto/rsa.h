@@ -18,13 +18,13 @@
 #define RSA_MIN_MODULUS_BITS 512
 
 typedef struct rsa_pss_params_30_st {
-  int hash_algorithm_nid;
-  struct {
-    int algorithm_nid; /* Currently always NID_mgf1 */
     int hash_algorithm_nid;
-  } mask_gen;
-  int salt_len;
-  int trailer_field;
+    struct {
+        int algorithm_nid; /* Currently always NID_mgf1 */
+        int hash_algorithm_nid;
+    } mask_gen;
+    int salt_len;
+    int trailer_field;
 } RSA_PSS_PARAMS_30;
 
 RSA_PSS_PARAMS_30 *ossl_rsa_get0_pss_params_30(RSA *r);

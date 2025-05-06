@@ -26,15 +26,15 @@ ASN1_SEQUENCE(PKCS12) = {ASN1_SIMPLE(PKCS12, version, ASN1_INTEGER),
 
                         PKCS12
                         * PKCS12_new(void) {
-  return (PKCS12 *)ASN1_item_new(ASN1_ITEM_rptr(PKCS12));
+    return (PKCS12 *)ASN1_item_new(ASN1_ITEM_rptr(PKCS12));
 }
 
 void PKCS12_free(PKCS12 *p12) {
-  if (p12 != NULL && p12->authsafes != NULL) {
-    OPENSSL_free(p12->authsafes->ctx.propq);
-    p12->authsafes->ctx.propq = NULL;
-  }
-  ASN1_item_free((ASN1_VALUE *)p12, ASN1_ITEM_rptr(PKCS12));
+    if (p12 != NULL && p12->authsafes != NULL) {
+        OPENSSL_free(p12->authsafes->ctx.propq);
+        p12->authsafes->ctx.propq = NULL;
+    }
+    ASN1_item_free((ASN1_VALUE *)p12, ASN1_ITEM_rptr(PKCS12));
 }
 
 ASN1_SEQUENCE(

@@ -23,8 +23,8 @@
 #include "internal/nelem.h"
 
 typedef struct {
-  const char *input;
-  const unsigned char expected[MDC2_DIGEST_LENGTH];
+    const char *input;
+    const unsigned char expected[MDC2_DIGEST_LENGTH];
 } TESTDATA;
 
 /**********************************************************************
@@ -44,25 +44,25 @@ static TESTDATA tests[] = {{"Now is the time for all ",
  ***/
 
 static int test_mdc2(int idx) {
-  unsigned char md[MDC2_DIGEST_LENGTH];
-  MDC2_CTX c;
-  const TESTDATA testdata = tests[idx];
+    unsigned char md[MDC2_DIGEST_LENGTH];
+    MDC2_CTX c;
+    const TESTDATA testdata = tests[idx];
 
-  MDC2_Init(&c);
-  MDC2_Update(&c, (const unsigned char *)testdata.input,
-              strlen(testdata.input));
-  MDC2_Final(&(md[0]), &c);
+    MDC2_Init(&c);
+    MDC2_Update(&c, (const unsigned char *)testdata.input,
+                strlen(testdata.input));
+    MDC2_Final(&(md[0]), &c);
 
-  if (!TEST_mem_eq(testdata.expected, MDC2_DIGEST_LENGTH, md,
-                   MDC2_DIGEST_LENGTH)) {
-    TEST_info("mdc2 test %d: unexpected output", idx);
-    return 0;
-  }
+    if (!TEST_mem_eq(testdata.expected, MDC2_DIGEST_LENGTH, md,
+                     MDC2_DIGEST_LENGTH)) {
+        TEST_info("mdc2 test %d: unexpected output", idx);
+        return 0;
+    }
 
-  return 1;
+    return 1;
 }
 
 int setup_tests(void) {
-  ADD_ALL_TESTS(test_mdc2, OSSL_NELEM(tests));
-  return 1;
+    ADD_ALL_TESTS(test_mdc2, OSSL_NELEM(tests));
+    return 1;
 }

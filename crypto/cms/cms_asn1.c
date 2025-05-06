@@ -46,14 +46,14 @@ ASN1_NDEF_EXP_OPT(CMS_EncapsulatedContentInfo, eContent, ASN1_OCTET_STRING_NDEF,
 /* Minor tweak to operation: free up signer key, cert */
 static int cms_si_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                      void *exarg) {
-  if (operation == ASN1_OP_FREE_POST) {
-    CMS_SignerInfo *si = (CMS_SignerInfo *)*pval;
-    EVP_PKEY_free(si->pkey);
-    X509_free(si->signer);
-    EVP_MD_CTX_free(si->mctx);
-    EVP_PKEY_CTX_free(si->pctx);
-  }
-  return 1;
+    if (operation == ASN1_OP_FREE_POST) {
+        CMS_SignerInfo *si = (CMS_SignerInfo *)*pval;
+        EVP_PKEY_free(si->pkey);
+        X509_free(si->signer);
+        EVP_MD_CTX_free(si->mctx);
+        EVP_PKEY_CTX_free(si->pctx);
+    }
+    return 1;
 }
 
 ASN1_SEQUENCE_cb(CMS_SignerInfo, cms_si_cb) =
@@ -94,11 +94,11 @@ ASN1_SEQUENCE(CMS_OriginatorInfo) =
 
 static int cms_ec_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                      void *exarg) {
-  CMS_EncryptedContentInfo *ec = (CMS_EncryptedContentInfo *)*pval;
+    CMS_EncryptedContentInfo *ec = (CMS_EncryptedContentInfo *)*pval;
 
-  if (operation == ASN1_OP_FREE_POST)
-    OPENSSL_clear_free(ec->key, ec->keylen);
-  return 1;
+    if (operation == ASN1_OP_FREE_POST)
+        OPENSSL_clear_free(ec->key, ec->keylen);
+    return 1;
 }
 
 ASN1_NDEF_SEQUENCE_cb(CMS_EncryptedContentInfo, cms_ec_cb) =
@@ -136,11 +136,11 @@ ASN1_CHOICE(CMS_KeyAgreeRecipientIdentifier) =
 
 static int cms_rek_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                       void *exarg) {
-  CMS_RecipientEncryptedKey *rek = (CMS_RecipientEncryptedKey *)*pval;
-  if (operation == ASN1_OP_FREE_POST) {
-    EVP_PKEY_free(rek->pkey);
-  }
-  return 1;
+    CMS_RecipientEncryptedKey *rek = (CMS_RecipientEncryptedKey *)*pval;
+    if (operation == ASN1_OP_FREE_POST) {
+        EVP_PKEY_free(rek->pkey);
+    }
+    return 1;
 }
 
 ASN1_SEQUENCE_cb(CMS_RecipientEncryptedKey, cms_rek_cb) =
@@ -165,18 +165,18 @@ ASN1_CHOICE(CMS_OriginatorIdentifierOrKey) =
 
 static int cms_kari_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                        void *exarg) {
-  CMS_KeyAgreeRecipientInfo *kari = (CMS_KeyAgreeRecipientInfo *)*pval;
-  if (operation == ASN1_OP_NEW_POST) {
-    kari->ctx = EVP_CIPHER_CTX_new();
-    if (kari->ctx == NULL)
-      return 0;
-    EVP_CIPHER_CTX_set_flags(kari->ctx, EVP_CIPHER_CTX_FLAG_WRAP_ALLOW);
-    kari->pctx = NULL;
-  } else if (operation == ASN1_OP_FREE_POST) {
-    EVP_PKEY_CTX_free(kari->pctx);
-    EVP_CIPHER_CTX_free(kari->ctx);
-  }
-  return 1;
+    CMS_KeyAgreeRecipientInfo *kari = (CMS_KeyAgreeRecipientInfo *)*pval;
+    if (operation == ASN1_OP_NEW_POST) {
+        kari->ctx = EVP_CIPHER_CTX_new();
+        if (kari->ctx == NULL)
+            return 0;
+        EVP_CIPHER_CTX_set_flags(kari->ctx, EVP_CIPHER_CTX_FLAG_WRAP_ALLOW);
+        kari->pctx = NULL;
+    } else if (operation == ASN1_OP_FREE_POST) {
+        EVP_PKEY_CTX_free(kari->pctx);
+        EVP_CIPHER_CTX_free(kari->ctx);
+    }
+    return 1;
 }
 
 ASN1_SEQUENCE_cb(CMS_KeyAgreeRecipientInfo, cms_kari_cb) =
@@ -218,22 +218,22 @@ ASN1_SEQUENCE(CMS_OtherRecipientInfo) =
 /* Free up RecipientInfo additional data */
 static int cms_ri_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                      void *exarg) {
-  if (operation == ASN1_OP_FREE_PRE) {
-    CMS_RecipientInfo *ri = (CMS_RecipientInfo *)*pval;
-    if (ri->type == CMS_RECIPINFO_TRANS) {
-      CMS_KeyTransRecipientInfo *ktri = ri->d.ktri;
-      EVP_PKEY_free(ktri->pkey);
-      X509_free(ktri->recip);
-      EVP_PKEY_CTX_free(ktri->pctx);
-    } else if (ri->type == CMS_RECIPINFO_KEK) {
-      CMS_KEKRecipientInfo *kekri = ri->d.kekri;
-      OPENSSL_clear_free(kekri->key, kekri->keylen);
-    } else if (ri->type == CMS_RECIPINFO_PASS) {
-      CMS_PasswordRecipientInfo *pwri = ri->d.pwri;
-      OPENSSL_clear_free(pwri->pass, pwri->passlen);
+    if (operation == ASN1_OP_FREE_PRE) {
+        CMS_RecipientInfo *ri = (CMS_RecipientInfo *)*pval;
+        if (ri->type == CMS_RECIPINFO_TRANS) {
+            CMS_KeyTransRecipientInfo *ktri = ri->d.ktri;
+            EVP_PKEY_free(ktri->pkey);
+            X509_free(ktri->recip);
+            EVP_PKEY_CTX_free(ktri->pctx);
+        } else if (ri->type == CMS_RECIPINFO_KEK) {
+            CMS_KEKRecipientInfo *kekri = ri->d.kekri;
+            OPENSSL_clear_free(kekri->key, kekri->keylen);
+        } else if (ri->type == CMS_RECIPINFO_PASS) {
+            CMS_PasswordRecipientInfo *pwri = ri->d.pwri;
+            OPENSSL_clear_free(pwri->pass, pwri->passlen);
+        }
     }
-  }
-  return 1;
+    return 1;
 }
 
 ASN1_CHOICE_cb(CMS_RecipientInfo, cms_ri_cb) =
@@ -328,35 +328,35 @@ ADB_ENTRY(NID_id_smime_ct_compressedData,
 /* CMS streaming support */
 static int cms_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                   void *exarg) {
-  ASN1_STREAM_ARG *sarg = exarg;
-  CMS_ContentInfo *cms = NULL;
-  if (pval)
-    cms = (CMS_ContentInfo *)*pval;
-  else
+    ASN1_STREAM_ARG *sarg = exarg;
+    CMS_ContentInfo *cms = NULL;
+    if (pval)
+        cms = (CMS_ContentInfo *)*pval;
+    else
+        return 1;
+    switch (operation) {
+
+    case ASN1_OP_STREAM_PRE:
+        if (CMS_stream(&sarg->boundary, cms) <= 0)
+            return 0;
+        /* fall through */
+    case ASN1_OP_DETACHED_PRE:
+        sarg->ndef_bio = CMS_dataInit(cms, sarg->out);
+        if (!sarg->ndef_bio)
+            return 0;
+        break;
+
+    case ASN1_OP_STREAM_POST:
+    case ASN1_OP_DETACHED_POST:
+        if (CMS_dataFinal(cms, sarg->ndef_bio) <= 0)
+            return 0;
+        break;
+
+    case ASN1_OP_FREE_POST:
+        OPENSSL_free(cms->ctx.propq);
+        break;
+    }
     return 1;
-  switch (operation) {
-
-  case ASN1_OP_STREAM_PRE:
-    if (CMS_stream(&sarg->boundary, cms) <= 0)
-      return 0;
-    /* fall through */
-  case ASN1_OP_DETACHED_PRE:
-    sarg->ndef_bio = CMS_dataInit(cms, sarg->out);
-    if (!sarg->ndef_bio)
-      return 0;
-    break;
-
-  case ASN1_OP_STREAM_POST:
-  case ASN1_OP_DETACHED_POST:
-    if (CMS_dataFinal(cms, sarg->ndef_bio) <= 0)
-      return 0;
-    break;
-
-  case ASN1_OP_FREE_POST:
-    OPENSSL_free(cms->ctx.propq);
-    break;
-  }
-  return 1;
 }
 
 ASN1_NDEF_SEQUENCE_cb(CMS_ContentInfo, cms_cb) =
@@ -408,9 +408,9 @@ ASN1_SEQUENCE(CMS_Receipt) =
  */
 
 typedef struct {
-  X509_ALGOR *keyInfo;
-  ASN1_OCTET_STRING *entityUInfo;
-  ASN1_OCTET_STRING *suppPubInfo;
+    X509_ALGOR *keyInfo;
+    ASN1_OCTET_STRING *entityUInfo;
+    ASN1_OCTET_STRING *suppPubInfo;
 } CMS_SharedInfo;
 
 ASN1_SEQUENCE(CMS_SharedInfo) =
@@ -422,27 +422,27 @@ ASN1_EXP_OPT(CMS_SharedInfo, suppPubInfo, ASN1_OCTET_STRING, 2),
 
 int CMS_SharedInfo_encode(unsigned char **pder, X509_ALGOR *kekalg,
                           ASN1_OCTET_STRING *ukm, int keylen) {
-  union {
-    CMS_SharedInfo *pecsi;
-    ASN1_VALUE *a;
-  } intsi = {NULL};
+    union {
+        CMS_SharedInfo *pecsi;
+        ASN1_VALUE *a;
+    } intsi = {NULL};
 
-  ASN1_OCTET_STRING oklen;
-  unsigned char kl[4];
-  CMS_SharedInfo ecsi;
+    ASN1_OCTET_STRING oklen;
+    unsigned char kl[4];
+    CMS_SharedInfo ecsi;
 
-  keylen <<= 3;
-  kl[0] = (keylen >> 24) & 0xff;
-  kl[1] = (keylen >> 16) & 0xff;
-  kl[2] = (keylen >> 8) & 0xff;
-  kl[3] = keylen & 0xff;
-  oklen.length = 4;
-  oklen.data = kl;
-  oklen.type = V_ASN1_OCTET_STRING;
-  oklen.flags = 0;
-  ecsi.keyInfo = kekalg;
-  ecsi.entityUInfo = ukm;
-  ecsi.suppPubInfo = &oklen;
-  intsi.pecsi = &ecsi;
-  return ASN1_item_i2d(intsi.a, pder, ASN1_ITEM_rptr(CMS_SharedInfo));
+    keylen <<= 3;
+    kl[0] = (keylen >> 24) & 0xff;
+    kl[1] = (keylen >> 16) & 0xff;
+    kl[2] = (keylen >> 8) & 0xff;
+    kl[3] = keylen & 0xff;
+    oklen.length = 4;
+    oklen.data = kl;
+    oklen.type = V_ASN1_OCTET_STRING;
+    oklen.flags = 0;
+    ecsi.keyInfo = kekalg;
+    ecsi.entityUInfo = ukm;
+    ecsi.suppPubInfo = &oklen;
+    intsi.pecsi = &ecsi;
+    return ASN1_item_i2d(intsi.a, pder, ASN1_ITEM_rptr(CMS_SharedInfo));
 }

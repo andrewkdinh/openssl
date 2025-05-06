@@ -13,9 +13,9 @@
 #include "crypto/dh.h"
 
 typedef struct dh_name2id_st {
-  const char *name;
-  int id;
-  int type;
+    const char *name;
+    int id;
+    int type;
 } DH_GENTYPE_NAME2ID;
 
 /* Indicates that the paramgen_type can be used for either DH or DHX */
@@ -36,24 +36,24 @@ static const DH_GENTYPE_NAME2ID dhtype2id[] = {
 };
 
 const char *ossl_dh_gen_type_id2name(int id) {
-  size_t i;
+    size_t i;
 
-  for (i = 0; i < OSSL_NELEM(dhtype2id); ++i) {
-    if (dhtype2id[i].id == id)
-      return dhtype2id[i].name;
-  }
-  return NULL;
+    for (i = 0; i < OSSL_NELEM(dhtype2id); ++i) {
+        if (dhtype2id[i].id == id)
+            return dhtype2id[i].name;
+    }
+    return NULL;
 }
 
 #ifndef OPENSSL_NO_DH
 int ossl_dh_gen_type_name2id(const char *name, int type) {
-  size_t i;
+    size_t i;
 
-  for (i = 0; i < OSSL_NELEM(dhtype2id); ++i) {
-    if ((dhtype2id[i].type == TYPE_ANY || type == dhtype2id[i].type) &&
-        strcmp(dhtype2id[i].name, name) == 0)
-      return dhtype2id[i].id;
-  }
-  return -1;
+    for (i = 0; i < OSSL_NELEM(dhtype2id); ++i) {
+        if ((dhtype2id[i].type == TYPE_ANY || type == dhtype2id[i].type) &&
+            strcmp(dhtype2id[i].name, name) == 0)
+            return dhtype2id[i].id;
+    }
+    return -1;
 }
 #endif

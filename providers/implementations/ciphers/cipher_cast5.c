@@ -26,25 +26,25 @@ static OSSL_FUNC_cipher_freectx_fn cast5_freectx;
 static OSSL_FUNC_cipher_dupctx_fn cast5_dupctx;
 
 static void cast5_freectx(void *vctx) {
-  PROV_CAST_CTX *ctx = (PROV_CAST_CTX *)vctx;
+    PROV_CAST_CTX *ctx = (PROV_CAST_CTX *)vctx;
 
-  ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
-  OPENSSL_clear_free(ctx, sizeof(*ctx));
+    ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
+    OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
 static void *cast5_dupctx(void *ctx) {
-  PROV_CAST_CTX *in = (PROV_CAST_CTX *)ctx;
-  PROV_CAST_CTX *ret;
+    PROV_CAST_CTX *in = (PROV_CAST_CTX *)ctx;
+    PROV_CAST_CTX *ret;
 
-  if (!ossl_prov_is_running())
-    return NULL;
+    if (!ossl_prov_is_running())
+        return NULL;
 
-  ret = OPENSSL_malloc(sizeof(*ret));
-  if (ret == NULL)
-    return NULL;
-  *ret = *in;
+    ret = OPENSSL_malloc(sizeof(*ret));
+    if (ret == NULL)
+        return NULL;
+    *ret = *in;
 
-  return ret;
+    return ret;
 }
 
 /* ossl_cast5128ecb_functions */

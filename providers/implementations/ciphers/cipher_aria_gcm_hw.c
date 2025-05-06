@@ -15,11 +15,12 @@
 
 static int aria_gcm_initkey(PROV_GCM_CTX *ctx, const unsigned char *key,
                             size_t keylen) {
-  PROV_ARIA_GCM_CTX *actx = (PROV_ARIA_GCM_CTX *)ctx;
-  ARIA_KEY *ks = &actx->ks.ks;
+    PROV_ARIA_GCM_CTX *actx = (PROV_ARIA_GCM_CTX *)ctx;
+    ARIA_KEY *ks = &actx->ks.ks;
 
-  GCM_HW_SET_KEY_CTR_FN(ks, ossl_aria_set_encrypt_key, ossl_aria_encrypt, NULL);
-  return 1;
+    GCM_HW_SET_KEY_CTR_FN(ks, ossl_aria_set_encrypt_key, ossl_aria_encrypt,
+                          NULL);
+    return 1;
 }
 
 static const PROV_GCM_HW aria_gcm = {

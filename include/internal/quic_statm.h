@@ -17,13 +17,13 @@
 #ifndef OPENSSL_NO_QUIC
 
 struct ossl_statm_st {
-  OSSL_TIME smoothed_rtt, latest_rtt, min_rtt, rtt_variance;
-  char have_first_sample;
+    OSSL_TIME smoothed_rtt, latest_rtt, min_rtt, rtt_variance;
+    char have_first_sample;
 };
 
 typedef struct ossl_rtt_info_st {
-  /* As defined in RFC 9002. */
-  OSSL_TIME smoothed_rtt, latest_rtt, rtt_variance, min_rtt;
+    /* As defined in RFC 9002. */
+    OSSL_TIME smoothed_rtt, latest_rtt, rtt_variance, min_rtt;
 } OSSL_RTT_INFO;
 
 int ossl_statm_init(OSSL_STATM *statm);

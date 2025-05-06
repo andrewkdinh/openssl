@@ -22,25 +22,25 @@
 #define HASH_TRANSFORM ossl_sm3_transform
 #define HASH_FINAL ossl_sm3_final
 #define HASH_MAKE_STRING(c, s)                                                 \
-  do {                                                                         \
-    unsigned long ll;                                                          \
-    ll = (c)->A;                                                               \
-    (void)HOST_l2c(ll, (s));                                                   \
-    ll = (c)->B;                                                               \
-    (void)HOST_l2c(ll, (s));                                                   \
-    ll = (c)->C;                                                               \
-    (void)HOST_l2c(ll, (s));                                                   \
-    ll = (c)->D;                                                               \
-    (void)HOST_l2c(ll, (s));                                                   \
-    ll = (c)->E;                                                               \
-    (void)HOST_l2c(ll, (s));                                                   \
-    ll = (c)->F;                                                               \
-    (void)HOST_l2c(ll, (s));                                                   \
-    ll = (c)->G;                                                               \
-    (void)HOST_l2c(ll, (s));                                                   \
-    ll = (c)->H;                                                               \
-    (void)HOST_l2c(ll, (s));                                                   \
-  } while (0)
+    do {                                                                       \
+        unsigned long ll;                                                      \
+        ll = (c)->A;                                                           \
+        (void)HOST_l2c(ll, (s));                                               \
+        ll = (c)->B;                                                           \
+        (void)HOST_l2c(ll, (s));                                               \
+        ll = (c)->C;                                                           \
+        (void)HOST_l2c(ll, (s));                                               \
+        ll = (c)->D;                                                           \
+        (void)HOST_l2c(ll, (s));                                               \
+        ll = (c)->E;                                                           \
+        (void)HOST_l2c(ll, (s));                                               \
+        ll = (c)->F;                                                           \
+        (void)HOST_l2c(ll, (s));                                               \
+        ll = (c)->G;                                                           \
+        (void)HOST_l2c(ll, (s));                                               \
+        ll = (c)->H;                                                           \
+        (void)HOST_l2c(ll, (s));                                               \
+    } while (0)
 
 #if defined(OPENSSL_SM3_ASM)
 #if defined(__aarch64__) || defined(_M_ARM64)
@@ -55,14 +55,14 @@ void ossl_hwsm3_block_data_order(SM3_CTX *c, const void *p, size_t num);
 #endif
 #if (defined(__x86_64) || defined(__x86_64__) || defined(_M_X64))
 #define HWSM3_CAPABLE                                                          \
-  ((OPENSSL_ia32cap_P[2] & (1 << 5)) && (OPENSSL_ia32cap_P[5] & (1 << 1)))
+    ((OPENSSL_ia32cap_P[2] & (1 << 5)) && (OPENSSL_ia32cap_P[5] & (1 << 1)))
 void ossl_hwsm3_block_data_order(SM3_CTX *c, const void *p, size_t num);
 #endif
 #endif
 
 #if defined(HWSM3_CAPABLE)
 #define HASH_BLOCK_DATA_ORDER                                                  \
-  (HWSM3_CAPABLE ? ossl_hwsm3_block_data_order : ossl_sm3_block_data_order)
+    (HWSM3_CAPABLE ? ossl_hwsm3_block_data_order : ossl_sm3_block_data_order)
 #else
 #define HASH_BLOCK_DATA_ORDER ossl_sm3_block_data_order
 #endif
@@ -77,17 +77,17 @@ void ossl_sm3_transform(SM3_CTX *c, const unsigned char *data);
 !defined(OPENSSL_NO_INLINE_ASM)
 #if defined(__riscv_zksh)
 #define P0(x)                                                                  \
-  ({                                                                           \
-    MD32_REG_T ret;                                                            \
-    asm("sm3p0 %0, %1" : "=r"(ret) : "r"(x));                                  \
-    ret;                                                                       \
-  })
+    ({                                                                         \
+        MD32_REG_T ret;                                                        \
+        asm("sm3p0 %0, %1" : "=r"(ret) : "r"(x));                              \
+        ret;                                                                   \
+    })
 #define P1(x)                                                                  \
-  ({                                                                           \
-    MD32_REG_T ret;                                                            \
-    asm("sm3p1 %0, %1" : "=r"(ret) : "r"(x));                                  \
-    ret;                                                                       \
-  })
+    ({                                                                         \
+        MD32_REG_T ret;                                                        \
+        asm("sm3p1 %0, %1" : "=r"(ret) : "r"(x));                              \
+        ret;                                                                   \
+    })
 #endif
 #endif
 #endif
@@ -106,26 +106,26 @@ void ossl_sm3_transform(SM3_CTX *c, const unsigned char *data);
 #define GG1(X, Y, Z) ((Z ^ (X & (Y ^ Z))))
 
 #define EXPAND(W0, W7, W13, W3, W10)                                           \
-  (P1(W0 ^ W7 ^ ROTATE(W13, 15)) ^ ROTATE(W3, 7) ^ W10)
+    (P1(W0 ^ W7 ^ ROTATE(W13, 15)) ^ ROTATE(W3, 7) ^ W10)
 
 #define RND(A, B, C, D, E, F, G, H, TJ, Wi, Wj, FF, GG)                        \
-  do {                                                                         \
-    const SM3_WORD A12 = ROTATE(A, 12);                                        \
-    const SM3_WORD A12_SM = A12 + E + TJ;                                      \
-    const SM3_WORD SS1 = ROTATE(A12_SM, 7);                                    \
-    const SM3_WORD TT1 = FF(A, B, C) + D + (SS1 ^ A12) + (Wj);                 \
-    const SM3_WORD TT2 = GG(E, F, G) + H + SS1 + Wi;                           \
-    B = ROTATE(B, 9);                                                          \
-    D = TT1;                                                                   \
-    F = ROTATE(F, 19);                                                         \
-    H = P0(TT2);                                                               \
-  } while (0)
+    do {                                                                       \
+        const SM3_WORD A12 = ROTATE(A, 12);                                    \
+        const SM3_WORD A12_SM = A12 + E + TJ;                                  \
+        const SM3_WORD SS1 = ROTATE(A12_SM, 7);                                \
+        const SM3_WORD TT1 = FF(A, B, C) + D + (SS1 ^ A12) + (Wj);             \
+        const SM3_WORD TT2 = GG(E, F, G) + H + SS1 + Wi;                       \
+        B = ROTATE(B, 9);                                                      \
+        D = TT1;                                                               \
+        F = ROTATE(F, 19);                                                     \
+        H = P0(TT2);                                                           \
+    } while (0)
 
 #define R1(A, B, C, D, E, F, G, H, TJ, Wi, Wj)                                 \
-  RND(A, B, C, D, E, F, G, H, TJ, Wi, Wj, FF0, GG0)
+    RND(A, B, C, D, E, F, G, H, TJ, Wi, Wj, FF0, GG0)
 
 #define R2(A, B, C, D, E, F, G, H, TJ, Wi, Wj)                                 \
-  RND(A, B, C, D, E, F, G, H, TJ, Wi, Wj, FF1, GG1)
+    RND(A, B, C, D, E, F, G, H, TJ, Wi, Wj, FF1, GG1)
 
 #define SM3_A 0x7380166fUL
 #define SM3_B 0x4914b2b9UL

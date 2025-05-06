@@ -64,11 +64,11 @@ static const ML_DSA_PARAMS ml_dsa_params[] = {
  * @brief A getter to convert an algorithm name into a ML_DSA_PARAMS object
  */
 const ML_DSA_PARAMS *ossl_ml_dsa_params_get(int evp_type) {
-  const ML_DSA_PARAMS *p;
+    const ML_DSA_PARAMS *p;
 
-  for (p = ml_dsa_params; p->alg != NULL; ++p) {
-    if (p->evp_type == evp_type)
-      return p;
-  }
-  return NULL;
+    for (p = ml_dsa_params; p->alg != NULL; ++p) {
+        if (p->evp_type == evp_type)
+            return p;
+    }
+    return NULL;
 }

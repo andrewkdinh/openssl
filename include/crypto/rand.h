@@ -81,7 +81,7 @@
  * files listed in DEVRANDOM did not return enough randomness.
  */
 #define DEVRANDOM_EGD                                                          \
-  "/var/run/egd-pool", "/dev/egd-pool", "/etc/egd-pool", "/etc/entropy"
+    "/var/run/egd-pool", "/dev/egd-pool", "/etc/egd-pool", "/etc/entropy"
 #endif
 
 void ossl_rand_cleanup_int(void);

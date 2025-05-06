@@ -22,17 +22,17 @@
 #define ML_DSA_Q_INV 58728449       /* q^-1 satisfies: q^-1 * q = 1 mod 2^32 */
 #define ML_DSA_Q_NEG_INV 4236238847 /* Inverse of -q modulo 2^32 */
 #define ML_DSA_DEGREE_INV_MONTGOMERY                                           \
-  41978 /* Inverse of 256 mod q, in Montgomery form. */
+    41978 /* Inverse of 256 mod q, in Montgomery form. */
 
 #define ML_DSA_D_BITS                                                          \
-  13 /* The number of bits dropped from the public vector t */
+    13 /* The number of bits dropped from the public vector t */
 #define ML_DSA_NUM_POLY_COEFFICIENTS                                           \
-  256                       /* The number of coefficients in the polynomials */
+    256                     /* The number of coefficients in the polynomials */
 #define ML_DSA_RHO_BYTES 32 /* p = Public Random Seed */
 #define ML_DSA_PRIV_SEED_BYTES 64 /* p' = Private random seed */
 #define ML_DSA_K_BYTES 32         /* K = Private random seed for signing */
 #define ML_DSA_TR_BYTES                                                        \
-  64 /* Size of the Hash of the public key used for signing */
+    64 /* Size of the Hash of the public key used for signing */
 #define ML_DSA_RHO_PRIME_BYTES 64 /* private random seed size */
 
 /*
@@ -113,8 +113,8 @@ int ossl_ml_dsa_poly_decode_expand_mask(POLY *out, const uint8_t *in,
  * @returns the difference in the range 0..q-1
  */
 static ossl_inline ossl_unused uint32_t reduce_once(uint32_t x) {
-  return constant_time_select_32(constant_time_lt_32(x, ML_DSA_Q), x,
-                                 x - ML_DSA_Q);
+    return constant_time_select_32(constant_time_lt_32(x, ML_DSA_Q), x,
+                                   x - ML_DSA_Q);
 }
 
 /*
@@ -129,7 +129,7 @@ static ossl_inline ossl_unused uint32_t reduce_once(uint32_t x) {
  * @returns The value (q + a - b) mod q
  */
 static ossl_inline ossl_unused uint32_t mod_sub(uint32_t a, uint32_t b) {
-  return reduce_once(ML_DSA_Q + a - b);
+    return reduce_once(ML_DSA_Q + a - b);
 }
 
 /*
@@ -137,7 +137,8 @@ static ossl_inline ossl_unused uint32_t mod_sub(uint32_t a, uint32_t b) {
  * i.e. return is_positive(x) ? x : -x;
  */
 static ossl_inline ossl_unused uint32_t abs_signed(uint32_t x) {
-  return constant_time_select_32(constant_time_lt_32(x, 0x80000000), x, 0u - x);
+    return constant_time_select_32(constant_time_lt_32(x, 0x80000000), x,
+                                   0u - x);
 }
 
 /*
@@ -145,8 +146,8 @@ static ossl_inline ossl_unused uint32_t abs_signed(uint32_t x) {
  * i.e return x > (q - 1) / 2 ? q - x : x;
  */
 static ossl_inline ossl_unused uint32_t abs_mod_prime(uint32_t x) {
-  return constant_time_select_32(constant_time_lt_32(ML_DSA_Q_MINUS1_DIV2, x),
-                                 ML_DSA_Q - x, x);
+    return constant_time_select_32(constant_time_lt_32(ML_DSA_Q_MINUS1_DIV2, x),
+                                   ML_DSA_Q - x, x);
 }
 
 /*
@@ -154,7 +155,7 @@ static ossl_inline ossl_unused uint32_t abs_mod_prime(uint32_t x) {
  * i.e return x < y ? y : x;
  */
 static ossl_inline ossl_unused uint32_t maximum(uint32_t x, uint32_t y) {
-  return constant_time_select_int(constant_time_lt(x, y), y, x);
+    return constant_time_select_int(constant_time_lt(x, y), y, x);
 }
 
 #endif /* OSSL_CRYPTO_ML_DSA_LOCAL_H */

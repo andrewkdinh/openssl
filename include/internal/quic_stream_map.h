@@ -32,7 +32,7 @@
 typedef struct quic_stream_list_node_st QUIC_STREAM_LIST_NODE;
 
 struct quic_stream_list_node_st {
-  QUIC_STREAM_LIST_NODE *prev, *next;
+    QUIC_STREAM_LIST_NODE *prev, *next;
 };
 
 /*
@@ -78,245 +78,245 @@ struct quic_stream_list_node_st {
 #define QUIC_RSTREAM_STATE_RESET_READ 6  /* /                    */
 
 struct quic_stream_st {
-  QUIC_STREAM_LIST_NODE active_node; /* for use by QUIC_STREAM_MAP */
-  QUIC_STREAM_LIST_NODE
-  accept_node; /* accept queue of remotely-created streams */
-  QUIC_STREAM_LIST_NODE
-  ready_for_gc_node; /* queue of streams now ready for GC */
+    QUIC_STREAM_LIST_NODE active_node; /* for use by QUIC_STREAM_MAP */
+    QUIC_STREAM_LIST_NODE
+    accept_node; /* accept queue of remotely-created streams */
+    QUIC_STREAM_LIST_NODE
+    ready_for_gc_node; /* queue of streams now ready for GC */
 
-  /* Temporary link used by TXP. */
-  QUIC_STREAM *txp_next;
+    /* Temporary link used by TXP. */
+    QUIC_STREAM *txp_next;
 
-  /*
-   * QUIC Stream ID. Do not assume that this encodes a type as this is a
-   * version-specific property and may change between QUIC versions; instead,
-   * use the type field.
-   */
-  uint64_t id;
+    /*
+     * QUIC Stream ID. Do not assume that this encodes a type as this is a
+     * version-specific property and may change between QUIC versions; instead,
+     * use the type field.
+     */
+    uint64_t id;
 
-  /*
-   * Application Error Code (AEC) used for STOP_SENDING frame.
-   * This is only valid if stop_sending is 1.
-   */
-  uint64_t stop_sending_aec;
+    /*
+     * Application Error Code (AEC) used for STOP_SENDING frame.
+     * This is only valid if stop_sending is 1.
+     */
+    uint64_t stop_sending_aec;
 
-  /*
-   * Application Error Code (AEC) used for RESET_STREAM frame.
-   * This is only valid if reset_stream is 1.
-   */
-  uint64_t reset_stream_aec;
+    /*
+     * Application Error Code (AEC) used for RESET_STREAM frame.
+     * This is only valid if reset_stream is 1.
+     */
+    uint64_t reset_stream_aec;
 
-  /*
-   * Application Error Code (AEC) for incoming STOP_SENDING frame.
-   * This is only valid if peer_stop_sending is 1.
-   */
-  uint64_t peer_stop_sending_aec;
+    /*
+     * Application Error Code (AEC) for incoming STOP_SENDING frame.
+     * This is only valid if peer_stop_sending is 1.
+     */
+    uint64_t peer_stop_sending_aec;
 
-  /*
-   * Application Error Code (AEC) for incoming RESET_STREAM frame.
-   * This is only valid if peer_reset_stream is 1.
-   */
-  uint64_t peer_reset_stream_aec;
+    /*
+     * Application Error Code (AEC) for incoming RESET_STREAM frame.
+     * This is only valid if peer_reset_stream is 1.
+     */
+    uint64_t peer_reset_stream_aec;
 
-  /* Temporary value used by TXP. */
-  uint64_t txp_txfc_new_credit_consumed;
+    /* Temporary value used by TXP. */
+    uint64_t txp_txfc_new_credit_consumed;
 
-  /*
-   * The final size of the send stream. Although this information can be
-   * discerned from a QUIC_SSTREAM, it is stored separately as we need to keep
-   * track of this even if we have thrown away the QUIC_SSTREAM. Use
-   * ossl_quic_stream_send_get_final_size to determine if this contain a
-   * valid value or if there is no final size yet for a sending part.
-   *
-   * For the receive part, the final size is tracked by the stream-level RXFC;
-   * use ossl_quic_stream_recv_get_final_size or
-   * ossl_quic_rxfc_get_final_size.
-   */
-  uint64_t send_final_size;
+    /*
+     * The final size of the send stream. Although this information can be
+     * discerned from a QUIC_SSTREAM, it is stored separately as we need to keep
+     * track of this even if we have thrown away the QUIC_SSTREAM. Use
+     * ossl_quic_stream_send_get_final_size to determine if this contain a
+     * valid value or if there is no final size yet for a sending part.
+     *
+     * For the receive part, the final size is tracked by the stream-level RXFC;
+     * use ossl_quic_stream_recv_get_final_size or
+     * ossl_quic_rxfc_get_final_size.
+     */
+    uint64_t send_final_size;
 
-  /*
-   * Send stream part and receive stream part buffer management objects.
-   *
-   * DO NOT test these pointers (sstream, rstream) for NULL. Determine the
-   * state of the send or receive stream part first using the appropriate
-   * function; then the invariant of that state guarantees that sstream or
-   * rstream either is or is not NULL respectively, therefore there is no
-   * valid use case for testing these pointers for NULL. In particular, a
-   * stream with a send part can still have sstream as NULL, and a stream with
-   * a receive part can still have rstream as NULL. QUIC_SSTREAM and
-   * QUIC_RSTREAM are stream buffer resource management objects which exist
-   * only when they need to for buffer management purposes. The existence or
-   * non-existence of a QUIC_SSTREAM or QUIC_RSTREAM object does not
-   * correspond with whether a stream's respective send or receive part
-   * logically exists or not.
-   */
-  QUIC_SSTREAM *sstream; /* NULL if RX-only */
-  QUIC_RSTREAM *rstream; /* NULL if TX only */
+    /*
+     * Send stream part and receive stream part buffer management objects.
+     *
+     * DO NOT test these pointers (sstream, rstream) for NULL. Determine the
+     * state of the send or receive stream part first using the appropriate
+     * function; then the invariant of that state guarantees that sstream or
+     * rstream either is or is not NULL respectively, therefore there is no
+     * valid use case for testing these pointers for NULL. In particular, a
+     * stream with a send part can still have sstream as NULL, and a stream with
+     * a receive part can still have rstream as NULL. QUIC_SSTREAM and
+     * QUIC_RSTREAM are stream buffer resource management objects which exist
+     * only when they need to for buffer management purposes. The existence or
+     * non-existence of a QUIC_SSTREAM or QUIC_RSTREAM object does not
+     * correspond with whether a stream's respective send or receive part
+     * logically exists or not.
+     */
+    QUIC_SSTREAM *sstream; /* NULL if RX-only */
+    QUIC_RSTREAM *rstream; /* NULL if TX only */
 
-  /* Stream-level flow control managers. */
-  QUIC_TXFC txfc; /* NULL if RX-only */
-  QUIC_RXFC rxfc; /* NULL if TX-only */
+    /* Stream-level flow control managers. */
+    QUIC_TXFC txfc; /* NULL if RX-only */
+    QUIC_RXFC rxfc; /* NULL if TX-only */
 
-  unsigned int type : 8; /* QUIC_STREAM_INITIATOR_*, QUIC_STREAM_DIR_* */
+    unsigned int type : 8; /* QUIC_STREAM_INITIATOR_*, QUIC_STREAM_DIR_* */
 
-  unsigned int send_state : 8; /* QUIC_SSTREAM_STATE_* */
-  unsigned int recv_state : 8; /* QUIC_RSTREAM_STATE_* */
+    unsigned int send_state : 8; /* QUIC_SSTREAM_STATE_* */
+    unsigned int recv_state : 8; /* QUIC_RSTREAM_STATE_* */
 
-  /* 1 iff this QUIC_STREAM is on the active queue (invariant). */
-  unsigned int active : 1;
+    /* 1 iff this QUIC_STREAM is on the active queue (invariant). */
+    unsigned int active : 1;
 
-  /*
-   * This is a copy of the QUIC connection as_server value, indicating
-   * whether we are locally operating as a server or not. Having this
-   * significantly simplifies stream type determination relative to our
-   * perspective. It never changes after a QUIC_STREAM is created and is the
-   * same for all QUIC_STREAMS under a QUIC_STREAM_MAP.
-   */
-  unsigned int as_server : 1;
+    /*
+     * This is a copy of the QUIC connection as_server value, indicating
+     * whether we are locally operating as a server or not. Having this
+     * significantly simplifies stream type determination relative to our
+     * perspective. It never changes after a QUIC_STREAM is created and is the
+     * same for all QUIC_STREAMS under a QUIC_STREAM_MAP.
+     */
+    unsigned int as_server : 1;
 
-  /*
-   * Has STOP_SENDING been requested (by us)? Note that this is not the same
-   * as want_stop_sending below, as a STOP_SENDING frame may already have been
-   * sent and fully acknowledged.
-   */
-  unsigned int stop_sending : 1;
+    /*
+     * Has STOP_SENDING been requested (by us)? Note that this is not the same
+     * as want_stop_sending below, as a STOP_SENDING frame may already have been
+     * sent and fully acknowledged.
+     */
+    unsigned int stop_sending : 1;
 
-  /*
-   * Has RESET_STREAM been requested (by us)? Works identically to
-   * STOP_SENDING for transmission purposes.
-   */
-  /* Has our peer sent a STOP_SENDING frame? */
-  unsigned int peer_stop_sending : 1;
+    /*
+     * Has RESET_STREAM been requested (by us)? Works identically to
+     * STOP_SENDING for transmission purposes.
+     */
+    /* Has our peer sent a STOP_SENDING frame? */
+    unsigned int peer_stop_sending : 1;
 
-  /* Temporary flags used by TXP. */
-  unsigned int txp_sent_fc : 1;
-  unsigned int txp_sent_stop_sending : 1;
-  unsigned int txp_sent_reset_stream : 1;
-  unsigned int txp_drained : 1;
-  unsigned int txp_blocked : 1;
+    /* Temporary flags used by TXP. */
+    unsigned int txp_sent_fc : 1;
+    unsigned int txp_sent_stop_sending : 1;
+    unsigned int txp_sent_reset_stream : 1;
+    unsigned int txp_drained : 1;
+    unsigned int txp_blocked : 1;
 
-  /* Frame regeneration flags. */
-  unsigned int want_max_stream_data : 1; /* used for regen only */
-  unsigned int want_stop_sending : 1;    /* used for gen or regen */
-  unsigned int want_reset_stream : 1;    /* used for gen or regen */
+    /* Frame regeneration flags. */
+    unsigned int want_max_stream_data : 1; /* used for regen only */
+    unsigned int want_stop_sending : 1;    /* used for gen or regen */
+    unsigned int want_reset_stream : 1;    /* used for gen or regen */
 
-  /* Flags set when frames *we* sent were acknowledged. */
-  unsigned int acked_stop_sending : 1;
+    /* Flags set when frames *we* sent were acknowledged. */
+    unsigned int acked_stop_sending : 1;
 
-  /*
-   * The stream's XSO has been deleted. Pending GC.
-   *
-   * Here is how stream deletion works:
-   *
-   *   - A QUIC_STREAM cannot be deleted until it is neither in the accept
-   *     queue nor has an associated XSO. This condition occurs when and only
-   *     when deleted is true.
-   *
-   *   - Once this is the case (i.e., no user-facing API object exposing the
-   *     stream), we can delete the stream once we determine that all of our
-   *     protocol obligations requiring us to keep the QUIC_STREAM around have
-   *     been met.
-   *
-   *     The following frames relate to the streams layer for a specific
-   *     stream:
-   *
-   *          STREAM
-   *
-   *              RX Obligations:
-   *                  Ignore for a deleted stream.
-   *
-   *                  (This is different from our obligation for a
-   *                  locally-initiated stream ID we have not created yet,
-   *                  which we must treat as a protocol error. This can be
-   *                  distinguished via a simple monotonic counter.)
-   *
-   *              TX Obligations:
-   *                  None, once we've decided to (someday) delete the stream.
-   *
-   *          STOP_SENDING
-   *
-   *              We cannot delete the stream until we have finished informing
-   *              the peer that we are not going to be listening to it
-   *              anymore.
-   *
-   *              RX Obligations:
-   *                  When we delete a stream we must have already had a FIN
-   *                  or RESET_STREAM we transmitted acknowledged by the peer.
-   *                  Thus we can ignore STOP_SENDING frames for deleted
-   *                  streams (if they occur, they are probably just
-   *                  retransmissions).
-   *
-   *              TX Obligations:
-   *                  _Acknowledged_ receipt of a STOP_SENDING frame by the
-   *                  peer (unless the peer's send part has already FIN'd).
-   *
-   *          RESET_STREAM
-   *
-   *              We cannot delete the stream until we have finished informing
-   *              the peer that we are not going to be transmitting on it
-   *              anymore.
-   *
-   *              RX Obligations:
-   *                  This indicates the peer is not going to send any more
-   *                  data on the stream. We don't need to care about this
-   *                  since once a stream is marked for deletion we don't care
-   *                  about any data it does send. We can ignore this for
-   *                  deleted streams. The important criterion is that the
-   *                  peer has been successfully delivered our STOP_SENDING
-   *                  frame.
-   *
-   *              TX Obligations:
-   *                  _Acknowledged_ receipt of a RESET_STREAM frame or FIN by
-   *                  the peer.
-   *
-   *          MAX_STREAM_DATA
-   *
-   *              RX Obligations:
-   *                 Ignore. Since we are not going to be sending any more
-   *                 data on a stream once it has been marked for deletion,
-   *                 we don't need to care about flow control information.
-   *
-   *              TX Obligations:
-   *                  None.
-   *
-   *     In other words, our protocol obligation is simply:
-   *
-   *       - either:
-   *         - the peer has acknowledged receipt of a STOP_SENDING frame sent
-   *            by us; -or-
-   *         - we have received a FIN and all preceding segments from the peer
-   *
-   *            [NOTE: The actual criterion required here is simply 'we have
-   *            received a FIN from the peer'. However, due to reordering and
-   *            retransmissions we might subsequently receive non-FIN segments
-   *            out of order. The FIN means we know the peer will stop
-   *            transmitting on the stream at *some* point, but by sending
-   *            STOP_SENDING we can avoid these needless retransmissions we
-   *            will just ignore anyway. In actuality we could just handle all
-   *            cases by sending a STOP_SENDING. The strategy we choose is to
-   *            only avoid sending a STOP_SENDING and rely on a received FIN
-   *            when we have received all preceding data, as this makes it
-   *            reasonably certain no benefit would be gained by sending
-   *            STOP_SENDING.]
-   *
-   *            TODO(QUIC FUTURE): Implement the latter case (currently we
-                                   just always do STOP_SENDING).
-   *
-   *         and;
-   *
-   *       - we have drained our send stream (for a finished send stream)
-   *         and got acknowledgement all parts of it including the FIN, or
-   *         sent a RESET_STREAM frame and got acknowledgement of that frame.
-   *
-   *      Once these conditions are met, we can GC the QUIC_STREAM.
-   *
-   */
-  unsigned int deleted : 1;
-  /* Set to 1 once the above conditions are actually met. */
-  unsigned int ready_for_gc : 1;
-  /* Set to 1 if this is currently counted in the shutdown flush stream count.
-   */
-  unsigned int shutdown_flush : 1;
+    /*
+     * The stream's XSO has been deleted. Pending GC.
+     *
+     * Here is how stream deletion works:
+     *
+     *   - A QUIC_STREAM cannot be deleted until it is neither in the accept
+     *     queue nor has an associated XSO. This condition occurs when and only
+     *     when deleted is true.
+     *
+     *   - Once this is the case (i.e., no user-facing API object exposing the
+     *     stream), we can delete the stream once we determine that all of our
+     *     protocol obligations requiring us to keep the QUIC_STREAM around have
+     *     been met.
+     *
+     *     The following frames relate to the streams layer for a specific
+     *     stream:
+     *
+     *          STREAM
+     *
+     *              RX Obligations:
+     *                  Ignore for a deleted stream.
+     *
+     *                  (This is different from our obligation for a
+     *                  locally-initiated stream ID we have not created yet,
+     *                  which we must treat as a protocol error. This can be
+     *                  distinguished via a simple monotonic counter.)
+     *
+     *              TX Obligations:
+     *                  None, once we've decided to (someday) delete the stream.
+     *
+     *          STOP_SENDING
+     *
+     *              We cannot delete the stream until we have finished informing
+     *              the peer that we are not going to be listening to it
+     *              anymore.
+     *
+     *              RX Obligations:
+     *                  When we delete a stream we must have already had a FIN
+     *                  or RESET_STREAM we transmitted acknowledged by the peer.
+     *                  Thus we can ignore STOP_SENDING frames for deleted
+     *                  streams (if they occur, they are probably just
+     *                  retransmissions).
+     *
+     *              TX Obligations:
+     *                  _Acknowledged_ receipt of a STOP_SENDING frame by the
+     *                  peer (unless the peer's send part has already FIN'd).
+     *
+     *          RESET_STREAM
+     *
+     *              We cannot delete the stream until we have finished informing
+     *              the peer that we are not going to be transmitting on it
+     *              anymore.
+     *
+     *              RX Obligations:
+     *                  This indicates the peer is not going to send any more
+     *                  data on the stream. We don't need to care about this
+     *                  since once a stream is marked for deletion we don't care
+     *                  about any data it does send. We can ignore this for
+     *                  deleted streams. The important criterion is that the
+     *                  peer has been successfully delivered our STOP_SENDING
+     *                  frame.
+     *
+     *              TX Obligations:
+     *                  _Acknowledged_ receipt of a RESET_STREAM frame or FIN by
+     *                  the peer.
+     *
+     *          MAX_STREAM_DATA
+     *
+     *              RX Obligations:
+     *                 Ignore. Since we are not going to be sending any more
+     *                 data on a stream once it has been marked for deletion,
+     *                 we don't need to care about flow control information.
+     *
+     *              TX Obligations:
+     *                  None.
+     *
+     *     In other words, our protocol obligation is simply:
+     *
+     *       - either:
+     *         - the peer has acknowledged receipt of a STOP_SENDING frame sent
+     *            by us; -or-
+     *         - we have received a FIN and all preceding segments from the peer
+     *
+     *            [NOTE: The actual criterion required here is simply 'we have
+     *            received a FIN from the peer'. However, due to reordering and
+     *            retransmissions we might subsequently receive non-FIN segments
+     *            out of order. The FIN means we know the peer will stop
+     *            transmitting on the stream at *some* point, but by sending
+     *            STOP_SENDING we can avoid these needless retransmissions we
+     *            will just ignore anyway. In actuality we could just handle all
+     *            cases by sending a STOP_SENDING. The strategy we choose is to
+     *            only avoid sending a STOP_SENDING and rely on a received FIN
+     *            when we have received all preceding data, as this makes it
+     *            reasonably certain no benefit would be gained by sending
+     *            STOP_SENDING.]
+     *
+     *            TODO(QUIC FUTURE): Implement the latter case (currently we
+                                     just always do STOP_SENDING).
+     *
+     *         and;
+     *
+     *       - we have drained our send stream (for a finished send stream)
+     *         and got acknowledgement all parts of it including the FIN, or
+     *         sent a RESET_STREAM frame and got acknowledgement of that frame.
+     *
+     *      Once these conditions are met, we can GC the QUIC_STREAM.
+     *
+     */
+    unsigned int deleted : 1;
+    /* Set to 1 once the above conditions are actually met. */
+    unsigned int ready_for_gc : 1;
+    /* Set to 1 if this is currently counted in the shutdown flush stream count.
+     */
+    unsigned int shutdown_flush : 1;
 };
 
 #define QUIC_STREAM_INITIATOR_CLIENT 0
@@ -335,7 +335,8 @@ void ossl_quic_stream_check(const QUIC_STREAM *s);
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_is_server_init(const QUIC_STREAM *s) {
-  return (s->type & QUIC_STREAM_INITIATOR_MASK) == QUIC_STREAM_INITIATOR_SERVER;
+    return (s->type & QUIC_STREAM_INITIATOR_MASK) ==
+           QUIC_STREAM_INITIATOR_SERVER;
 }
 
 /*
@@ -343,13 +344,13 @@ ossl_quic_stream_is_server_init(const QUIC_STREAM *s) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_is_bidi(const QUIC_STREAM *s) {
-  return (s->type & QUIC_STREAM_DIR_MASK) == QUIC_STREAM_DIR_BIDI;
+    return (s->type & QUIC_STREAM_DIR_MASK) == QUIC_STREAM_DIR_BIDI;
 }
 
 /* Returns 1 if the QUIC_STREAM was locally initiated. */
 static ossl_inline ossl_unused int
 ossl_quic_stream_is_local_init(const QUIC_STREAM *s) {
-  return ossl_quic_stream_is_server_init(s) == s->as_server;
+    return ossl_quic_stream_is_server_init(s) == s->as_server;
 }
 
 /*
@@ -361,7 +362,7 @@ ossl_quic_stream_is_local_init(const QUIC_STREAM *s) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_has_send(const QUIC_STREAM *s) {
-  return s->send_state != QUIC_SSTREAM_STATE_NONE;
+    return s->send_state != QUIC_SSTREAM_STATE_NONE;
 }
 
 /*
@@ -374,7 +375,7 @@ ossl_quic_stream_has_send(const QUIC_STREAM *s) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_has_recv(const QUIC_STREAM *s) {
-  return s->recv_state != QUIC_RSTREAM_STATE_NONE;
+    return s->recv_state != QUIC_RSTREAM_STATE_NONE;
 }
 
 /*
@@ -396,14 +397,14 @@ ossl_quic_stream_has_recv(const QUIC_STREAM *s) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_has_send_buffer(const QUIC_STREAM *s) {
-  switch (s->send_state) {
-  case QUIC_SSTREAM_STATE_READY:
-  case QUIC_SSTREAM_STATE_SEND:
-  case QUIC_SSTREAM_STATE_DATA_SENT:
-    return 1;
-  default:
-    return 0;
-  }
+    switch (s->send_state) {
+    case QUIC_SSTREAM_STATE_READY:
+    case QUIC_SSTREAM_STATE_SEND:
+    case QUIC_SSTREAM_STATE_DATA_SENT:
+        return 1;
+    default:
+        return 0;
+    }
 }
 
 /*
@@ -412,8 +413,8 @@ ossl_quic_stream_has_send_buffer(const QUIC_STREAM *s) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_send_is_reset(const QUIC_STREAM *s) {
-  return s->send_state == QUIC_SSTREAM_STATE_RESET_SENT ||
-         s->send_state == QUIC_SSTREAM_STATE_RESET_RECVD;
+    return s->send_state == QUIC_SSTREAM_STATE_RESET_SENT ||
+           s->send_state == QUIC_SSTREAM_STATE_RESET_RECVD;
 }
 
 /*
@@ -429,14 +430,14 @@ ossl_quic_stream_send_is_reset(const QUIC_STREAM *s) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_has_recv_buffer(const QUIC_STREAM *s) {
-  switch (s->recv_state) {
-  case QUIC_RSTREAM_STATE_RECV:
-  case QUIC_RSTREAM_STATE_SIZE_KNOWN:
-  case QUIC_RSTREAM_STATE_DATA_RECVD:
-    return 1;
-  default:
-    return 0;
-  }
+    switch (s->recv_state) {
+    case QUIC_RSTREAM_STATE_RECV:
+    case QUIC_RSTREAM_STATE_SIZE_KNOWN:
+    case QUIC_RSTREAM_STATE_DATA_RECVD:
+        return 1;
+    default:
+        return 0;
+    }
 }
 
 /*
@@ -445,8 +446,8 @@ ossl_quic_stream_has_recv_buffer(const QUIC_STREAM *s) {
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_recv_is_reset(const QUIC_STREAM *s) {
-  return s->recv_state == QUIC_RSTREAM_STATE_RESET_RECVD ||
-         s->recv_state == QUIC_RSTREAM_STATE_RESET_READ;
+    return s->recv_state == QUIC_RSTREAM_STATE_RESET_RECVD ||
+           s->recv_state == QUIC_RSTREAM_STATE_RESET_READ;
 }
 
 /*
@@ -458,25 +459,25 @@ ossl_quic_stream_recv_is_reset(const QUIC_STREAM *s) {
 static ossl_inline ossl_unused int
 ossl_quic_stream_send_get_final_size(const QUIC_STREAM *s,
                                      uint64_t *final_size) {
-  switch (s->send_state) {
-  default:
-  case QUIC_SSTREAM_STATE_NONE:
-    return 0;
-  case QUIC_SSTREAM_STATE_SEND:
-    /*
-     * SEND may or may not have had a FIN - even if we have a FIN we do not
-     * move to DATA_SENT until we have actually sent all the data. So
-     * ask the QUIC_SSTREAM.
-     */
-    return ossl_quic_sstream_get_final_size(s->sstream, final_size);
-  case QUIC_SSTREAM_STATE_DATA_SENT:
-  case QUIC_SSTREAM_STATE_DATA_RECVD:
-  case QUIC_SSTREAM_STATE_RESET_SENT:
-  case QUIC_SSTREAM_STATE_RESET_RECVD:
-    if (final_size != NULL)
-      *final_size = s->send_final_size;
-    return 1;
-  }
+    switch (s->send_state) {
+    default:
+    case QUIC_SSTREAM_STATE_NONE:
+        return 0;
+    case QUIC_SSTREAM_STATE_SEND:
+        /*
+         * SEND may or may not have had a FIN - even if we have a FIN we do not
+         * move to DATA_SENT until we have actually sent all the data. So
+         * ask the QUIC_SSTREAM.
+         */
+        return ossl_quic_sstream_get_final_size(s->sstream, final_size);
+    case QUIC_SSTREAM_STATE_DATA_SENT:
+    case QUIC_SSTREAM_STATE_DATA_RECVD:
+    case QUIC_SSTREAM_STATE_RESET_SENT:
+    case QUIC_SSTREAM_STATE_RESET_RECVD:
+        if (final_size != NULL)
+            *final_size = s->send_final_size;
+        return 1;
+    }
 }
 
 /*
@@ -488,23 +489,23 @@ ossl_quic_stream_send_get_final_size(const QUIC_STREAM *s,
 static ossl_inline ossl_unused int
 ossl_quic_stream_recv_get_final_size(const QUIC_STREAM *s,
                                      uint64_t *final_size) {
-  switch (s->recv_state) {
-  default:
-    assert(0);
-  case QUIC_RSTREAM_STATE_NONE:
-  case QUIC_RSTREAM_STATE_RECV:
-    return 0;
+    switch (s->recv_state) {
+    default:
+        assert(0);
+    case QUIC_RSTREAM_STATE_NONE:
+    case QUIC_RSTREAM_STATE_RECV:
+        return 0;
 
-  case QUIC_RSTREAM_STATE_SIZE_KNOWN:
-  case QUIC_RSTREAM_STATE_DATA_RECVD:
-  case QUIC_RSTREAM_STATE_DATA_READ:
-  case QUIC_RSTREAM_STATE_RESET_RECVD:
-  case QUIC_RSTREAM_STATE_RESET_READ:
-    if (!ossl_assert(ossl_quic_rxfc_get_final_size(&s->rxfc, final_size)))
-      return 0;
+    case QUIC_RSTREAM_STATE_SIZE_KNOWN:
+    case QUIC_RSTREAM_STATE_DATA_RECVD:
+    case QUIC_RSTREAM_STATE_DATA_READ:
+    case QUIC_RSTREAM_STATE_RESET_RECVD:
+    case QUIC_RSTREAM_STATE_RESET_READ:
+        if (!ossl_assert(ossl_quic_rxfc_get_final_size(&s->rxfc, final_size)))
+            return 0;
 
-    return 1;
-  }
+        return 1;
+    }
 }
 
 /*
@@ -513,33 +514,33 @@ ossl_quic_stream_recv_get_final_size(const QUIC_STREAM *s,
  */
 static ossl_inline ossl_unused int
 ossl_quic_stream_recv_pending(const QUIC_STREAM *s, int include_fin) {
-  size_t avail;
-  int fin = 0;
+    size_t avail;
+    int fin = 0;
 
-  switch (s->recv_state) {
-  default:
-    assert(0);
-  case QUIC_RSTREAM_STATE_NONE:
-    return 0;
+    switch (s->recv_state) {
+    default:
+        assert(0);
+    case QUIC_RSTREAM_STATE_NONE:
+        return 0;
 
-  case QUIC_RSTREAM_STATE_RECV:
-  case QUIC_RSTREAM_STATE_SIZE_KNOWN:
-  case QUIC_RSTREAM_STATE_DATA_RECVD:
-    if (!ossl_quic_rstream_available(s->rstream, &avail, &fin))
-      avail = 0;
+    case QUIC_RSTREAM_STATE_RECV:
+    case QUIC_RSTREAM_STATE_SIZE_KNOWN:
+    case QUIC_RSTREAM_STATE_DATA_RECVD:
+        if (!ossl_quic_rstream_available(s->rstream, &avail, &fin))
+            avail = 0;
 
-    if (avail == 0 && include_fin && fin)
-      avail = 1;
+        if (avail == 0 && include_fin && fin)
+            avail = 1;
 
-    return avail;
+        return avail;
 
-  case QUIC_RSTREAM_STATE_RESET_RECVD:
-    return include_fin;
+    case QUIC_RSTREAM_STATE_RESET_RECVD:
+        return include_fin;
 
-  case QUIC_RSTREAM_STATE_DATA_READ:
-  case QUIC_RSTREAM_STATE_RESET_READ:
-    return 0;
-  }
+    case QUIC_RSTREAM_STATE_DATA_READ:
+    case QUIC_RSTREAM_STATE_RESET_READ:
+        return 0;
+    }
 }
 
 /*
@@ -554,18 +555,18 @@ ossl_quic_stream_recv_pending(const QUIC_STREAM *s, int include_fin) {
  *
  */
 struct quic_stream_map_st {
-  LHASH_OF(QUIC_STREAM) * map;
-  QUIC_STREAM_LIST_NODE active_list;
-  QUIC_STREAM_LIST_NODE accept_list;
-  QUIC_STREAM_LIST_NODE ready_for_gc_list;
-  size_t rr_stepping, rr_counter;
-  size_t num_accept_bidi, num_accept_uni, num_shutdown_flush;
-  QUIC_STREAM *rr_cur;
-  uint64_t (*get_stream_limit_cb)(int uni, void *arg);
-  void *get_stream_limit_cb_arg;
-  QUIC_RXFC *max_streams_bidi_rxfc;
-  QUIC_RXFC *max_streams_uni_rxfc;
-  int is_server;
+    LHASH_OF(QUIC_STREAM) * map;
+    QUIC_STREAM_LIST_NODE active_list;
+    QUIC_STREAM_LIST_NODE accept_list;
+    QUIC_STREAM_LIST_NODE ready_for_gc_list;
+    size_t rr_stepping, rr_counter;
+    size_t num_accept_bidi, num_accept_uni, num_shutdown_flush;
+    QUIC_STREAM *rr_cur;
+    uint64_t (*get_stream_limit_cb)(int uni, void *arg);
+    void *get_stream_limit_cb_arg;
+    QUIC_RXFC *max_streams_bidi_rxfc;
+    QUIC_RXFC *max_streams_uni_rxfc;
+    int is_server;
 };
 
 /*
@@ -891,8 +892,8 @@ int ossl_quic_stream_map_is_shutdown_flush_finished(QUIC_STREAM_MAP *qsm);
  *
  */
 typedef struct quic_stream_iter_st {
-  QUIC_STREAM_MAP *qsm;
-  QUIC_STREAM *first_stream, *stream;
+    QUIC_STREAM_MAP *qsm;
+    QUIC_STREAM *first_stream, *stream;
 } QUIC_STREAM_ITER;
 
 /*

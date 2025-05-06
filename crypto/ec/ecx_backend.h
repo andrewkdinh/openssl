@@ -10,10 +10,10 @@
 #define ISX448(id) ((id) == EVP_PKEY_X448)
 #define IS25519(id) ((id) == EVP_PKEY_X25519 || (id) == EVP_PKEY_ED25519)
 #define KEYLENID(id)                                                           \
-  (IS25519(id) ? X25519_KEYLEN                                                 \
-               : ((id) == EVP_PKEY_X448 ? X448_KEYLEN : ED448_KEYLEN))
+    (IS25519(id) ? X25519_KEYLEN                                               \
+                 : ((id) == EVP_PKEY_X448 ? X448_KEYLEN : ED448_KEYLEN))
 #define KEYNID2TYPE(id)                                                        \
-  (IS25519(id)                                                                 \
-   ? ((id) == EVP_PKEY_X25519 ? ECX_KEY_TYPE_X25519 : ECX_KEY_TYPE_ED25519)    \
-   : ((id) == EVP_PKEY_X448 ? ECX_KEY_TYPE_X448 : ECX_KEY_TYPE_ED448))
+    (IS25519(id)                                                               \
+     ? ((id) == EVP_PKEY_X25519 ? ECX_KEY_TYPE_X25519 : ECX_KEY_TYPE_ED25519)  \
+     : ((id) == EVP_PKEY_X448 ? ECX_KEY_TYPE_X448 : ECX_KEY_TYPE_ED448))
 #define KEYLEN(p) KEYLENID((p)->ameth->pkey_id)

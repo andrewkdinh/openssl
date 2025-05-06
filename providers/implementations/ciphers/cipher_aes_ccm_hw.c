@@ -18,31 +18,31 @@
 #include "cipher_aes_ccm.h"
 
 #define AES_HW_CCM_SET_KEY_FN(fn_set_enc_key, fn_blk, fn_ccm_enc, fn_ccm_dec)  \
-  fn_set_enc_key(key, keylen * 8, &actx->ccm.ks.ks);                           \
-  CRYPTO_ccm128_init(&ctx->ccm_ctx, ctx->m, ctx->l, &actx->ccm.ks.ks,          \
-                     (block128_f)fn_blk);                                      \
-  ctx->str = ctx->enc ? (ccm128_f)fn_ccm_enc : (ccm128_f)fn_ccm_dec;           \
-  ctx->key_set = 1;
+    fn_set_enc_key(key, keylen * 8, &actx->ccm.ks.ks);                         \
+    CRYPTO_ccm128_init(&ctx->ccm_ctx, ctx->m, ctx->l, &actx->ccm.ks.ks,        \
+                       (block128_f)fn_blk);                                    \
+    ctx->str = ctx->enc ? (ccm128_f)fn_ccm_enc : (ccm128_f)fn_ccm_dec;         \
+    ctx->key_set = 1;
 
 static int ccm_generic_aes_initkey(PROV_CCM_CTX *ctx, const unsigned char *key,
                                    size_t keylen) {
-  PROV_AES_CCM_CTX *actx = (PROV_AES_CCM_CTX *)ctx;
+    PROV_AES_CCM_CTX *actx = (PROV_AES_CCM_CTX *)ctx;
 
 #ifdef HWAES_CAPABLE
-  if (HWAES_CAPABLE) {
-    AES_HW_CCM_SET_KEY_FN(HWAES_set_encrypt_key, HWAES_encrypt, NULL, NULL);
-  } else
+    if (HWAES_CAPABLE) {
+        AES_HW_CCM_SET_KEY_FN(HWAES_set_encrypt_key, HWAES_encrypt, NULL, NULL);
+    } else
 #endif /* HWAES_CAPABLE */
 
 #ifdef VPAES_CAPABLE
-  if (VPAES_CAPABLE) {
-    AES_HW_CCM_SET_KEY_FN(vpaes_set_encrypt_key, vpaes_encrypt, NULL, NULL);
-  } else
+    if (VPAES_CAPABLE) {
+        AES_HW_CCM_SET_KEY_FN(vpaes_set_encrypt_key, vpaes_encrypt, NULL, NULL);
+    } else
 #endif
-  {
-    AES_HW_CCM_SET_KEY_FN(AES_set_encrypt_key, AES_encrypt, NULL, NULL)
-  }
-  return 1;
+    {
+        AES_HW_CCM_SET_KEY_FN(AES_set_encrypt_key, AES_encrypt, NULL, NULL)
+    }
+    return 1;
 }
 
 static const PROV_CCM_HW aes_ccm = {

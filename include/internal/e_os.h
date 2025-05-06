@@ -110,10 +110,10 @@
 #define strlen(s) _strlen31(s)
 /* cut strings to 2GB */
 static __inline unsigned int _strlen31(const char *str) {
-  unsigned int len = 0;
-  while (*str && len < 0x80000000U)
-    str++, len++;
-  return len & 0x7FFFFFFF;
+    unsigned int len = 0;
+    while (*str && len < 0x80000000U)
+        str++, len++;
+    return len & 0x7FFFFFFF;
 }
 #endif /* def(_WIN64) */
 #include <malloc.h>
@@ -283,17 +283,17 @@ inline int nssgetpid(void);
 #include <cextdecs.h(PROCESSHANDLE_GETMINE_)>
 #include <cextdecs.h(PROCESSHANDLE_DECOMPOSE_)>
 inline int nssgetpid(void) {
-  short phandle[10] = {0};
-  union pseudo_pid {
-    struct {
-      short cpu;
-      short pin;
-    } cpu_pin;
-    int ppid;
-  } ppid = {0};
-  PROCESSHANDLE_GETMINE_(phandle);
-  PROCESSHANDLE_DECOMPOSE_(phandle, &ppid.cpu_pin.cpu, &ppid.cpu_pin.pin);
-  return ppid.ppid;
+    short phandle[10] = {0};
+    union pseudo_pid {
+        struct {
+            short cpu;
+            short pin;
+        } cpu_pin;
+        int ppid;
+    } ppid = {0};
+    PROCESSHANDLE_GETMINE_(phandle);
+    PROCESSHANDLE_DECOMPOSE_(phandle, &ppid.cpu_pin.cpu, &ppid.cpu_pin.pin);
+    return ppid.ppid;
 }
 #define getpid(a) nssgetpid(a)
 #endif /* NSSGETPID_MACRO */

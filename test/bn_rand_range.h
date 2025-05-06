@@ -11,9 +11,9 @@
  */
 
 static const struct {
-  unsigned int range;
-  unsigned int iterations;
-  double critical;
+    unsigned int range;
+    unsigned int iterations;
+    double critical;
 } rand_range_cases[] = {
 {2, 200, 3.841459},
 {3, 300, 5.991465},

@@ -25,26 +25,26 @@
  */
 
 typedef struct ossl_qrx_args_st {
-  OSSL_LIB_CTX *libctx;
-  const char *propq;
+    OSSL_LIB_CTX *libctx;
+    const char *propq;
 
-  /* Demux which owns the URXEs passed to us. */
-  QUIC_DEMUX *demux;
+    /* Demux which owns the URXEs passed to us. */
+    QUIC_DEMUX *demux;
 
-  /* Length of connection IDs used in short-header packets in bytes. */
-  size_t short_conn_id_len;
+    /* Length of connection IDs used in short-header packets in bytes. */
+    size_t short_conn_id_len;
 
-  /*
-   * Maximum number of deferred datagrams buffered at any one time.
-   * Suggested value: 32.
-   */
-  size_t max_deferred;
+    /*
+     * Maximum number of deferred datagrams buffered at any one time.
+     * Suggested value: 32.
+     */
+    size_t max_deferred;
 
-  /* Initial reference PN used for RX. */
-  QUIC_PN init_largest_pn[QUIC_PN_SPACE_NUM];
+    /* Initial reference PN used for RX. */
+    QUIC_PN init_largest_pn[QUIC_PN_SPACE_NUM];
 
-  /* Initial key phase. For debugging use only; always 0 in real use. */
-  unsigned char init_key_phase_bit;
+    /* Initial key phase. For debugging use only; always 0 in real use. */
+    unsigned char init_key_phase_bit;
 } OSSL_QRX_ARGS;
 
 /* Instantiates a new QRX. */
@@ -180,57 +180,57 @@ int ossl_qrx_discard_enc_level(OSSL_QRX *qrx, uint32_t enc_level);
 
 /* Information about a received packet. */
 struct ossl_qrx_pkt_st {
-  /*
-   * Points to a logical representation of the decoded QUIC packet header. The
-   * data and len fields point to the decrypted QUIC payload (i.e., to a
-   * sequence of zero or more (potentially malformed) frames to be decoded).
-   */
-  QUIC_PKT_HDR *hdr;
+    /*
+     * Points to a logical representation of the decoded QUIC packet header. The
+     * data and len fields point to the decrypted QUIC payload (i.e., to a
+     * sequence of zero or more (potentially malformed) frames to be decoded).
+     */
+    QUIC_PKT_HDR *hdr;
 
-  /*
-   * Address the packet was received from. If this is not available for this
-   * packet, this field is NULL (but this can only occur for manually injected
-   * packets).
-   */
-  const BIO_ADDR *peer;
+    /*
+     * Address the packet was received from. If this is not available for this
+     * packet, this field is NULL (but this can only occur for manually injected
+     * packets).
+     */
+    const BIO_ADDR *peer;
 
-  /*
-   * Local address the packet was sent to. If this is not available for this
-   * packet, this field is NULL.
-   */
-  const BIO_ADDR *local;
+    /*
+     * Local address the packet was sent to. If this is not available for this
+     * packet, this field is NULL.
+     */
+    const BIO_ADDR *local;
 
-  /*
-   * This is the length of the datagram which contained this packet. Note that
-   * the datagram may have contained other packets than this. The intended use
-   * for this is so that the user can enforce minimum datagram sizes (e.g. for
-   * datagrams containing INITIAL packets), as required by RFC 9000.
-   */
-  size_t datagram_len;
+    /*
+     * This is the length of the datagram which contained this packet. Note that
+     * the datagram may have contained other packets than this. The intended use
+     * for this is so that the user can enforce minimum datagram sizes (e.g. for
+     * datagrams containing INITIAL packets), as required by RFC 9000.
+     */
+    size_t datagram_len;
 
-  /* The PN which was decoded for the packet, if the packet has a PN field. */
-  QUIC_PN pn;
+    /* The PN which was decoded for the packet, if the packet has a PN field. */
+    QUIC_PN pn;
 
-  /*
-   * Time the packet was received, or ossl_time_zero() if the demuxer is not
-   * using a now() function.
-   */
-  OSSL_TIME time;
+    /*
+     * Time the packet was received, or ossl_time_zero() if the demuxer is not
+     * using a now() function.
+     */
+    OSSL_TIME time;
 
-  /* The QRX which was used to receive the packet. */
-  OSSL_QRX *qrx;
+    /* The QRX which was used to receive the packet. */
+    OSSL_QRX *qrx;
 
-  /*
-   * The key epoch the packet was received with. Always 0 for non-1-RTT
-   * packets.
-   */
-  uint64_t key_epoch;
+    /*
+     * The key epoch the packet was received with. Always 0 for non-1-RTT
+     * packets.
+     */
+    uint64_t key_epoch;
 
-  /*
-   * This monotonically increases with each datagram received.
-   * It is for diagnostic use only.
-   */
-  uint64_t datagram_id;
+    /*
+     * This monotonically increases with each datagram received.
+     * It is for diagnostic use only.
+     */
+    uint64_t datagram_id;
 };
 
 /*

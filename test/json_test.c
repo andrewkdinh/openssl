@@ -14,50 +14,50 @@
 #include "internal/json_enc.h"
 
 struct helper {
-  OSSL_JSON_ENC j;
-  int init;
-  uint32_t flags;
-  BIO *mem_bio;
+    OSSL_JSON_ENC j;
+    int init;
+    uint32_t flags;
+    BIO *mem_bio;
 };
 
 static int helper_ensure(struct helper *h) {
-  if (h->init)
+    if (h->init)
+        return 1;
+
+    if (!TEST_ptr(h->mem_bio = BIO_new(BIO_s_mem())))
+        return 0;
+
+    if (!ossl_json_init(&h->j, h->mem_bio, h->flags)) {
+        BIO_free_all(h->mem_bio);
+        h->mem_bio = NULL;
+        return 0;
+    }
+
+    h->init = 1;
     return 1;
-
-  if (!TEST_ptr(h->mem_bio = BIO_new(BIO_s_mem())))
-    return 0;
-
-  if (!ossl_json_init(&h->j, h->mem_bio, h->flags)) {
-    BIO_free_all(h->mem_bio);
-    h->mem_bio = NULL;
-    return 0;
-  }
-
-  h->init = 1;
-  return 1;
 }
 
 static void helper_cleanup(struct helper *h) {
-  BIO_free_all(h->mem_bio);
-  h->mem_bio = NULL;
+    BIO_free_all(h->mem_bio);
+    h->mem_bio = NULL;
 
-  if (h->init) {
-    ossl_json_cleanup(&h->j);
-    h->init = 0;
-  }
+    if (h->init) {
+        ossl_json_cleanup(&h->j);
+        h->init = 0;
+    }
 }
 
 static void helper_set_flags(struct helper *h, uint32_t flags) {
-  helper_cleanup(h);
-  h->flags = flags;
+    helper_cleanup(h);
+    h->flags = flags;
 }
 
 struct script_word {
-  void *p;
-  uint64_t u64;
-  int64_t i64;
-  double d;
-  void (*fp)(void);
+    void *p;
+    uint64_t u64;
+    int64_t i64;
+    double d;
+    void (*fp)(void);
 };
 
 #define OP_P(x) {(x)},
@@ -67,26 +67,26 @@ struct script_word {
 #define OP_FP(x) {NULL, 0, 0, 0, (void (*)(void))(x)},
 
 struct script_info {
-  const char *name, *title;
-  const struct script_word *words;
-  size_t num_words;
-  const char *expected_output;
-  size_t expected_output_len;
+    const char *name, *title;
+    const struct script_word *words;
+    size_t num_words;
+    const char *expected_output;
+    size_t expected_output_len;
 };
 
 typedef const struct script_info *(*info_func)(void);
 
 enum {
-  OPK_END,
-  OPK_CALL,         /* (OSSL_JSON_ENC *) */
-  OPK_CALL_P,       /* (OSSL_JSON_ENC *, const void *) */
-  OPK_CALL_I,       /* (OSSL_JSON_ENC *, int) */
-  OPK_CALL_U64,     /* (OSSL_JSON_ENC *, uint64_t) */
-  OPK_CALL_I64,     /* (OSSL_JSON_ENC *, int64_t) */
-  OPK_CALL_D,       /* (OSSL_JSON_ENC *, double) */
-  OPK_CALL_PZ,      /* (OSSL_JSON_ENC *, const void *, size_t) */
-  OPK_ASSERT_ERROR, /* (OSSL_JSON_ENC *, int expect_error) */
-  OPK_INIT_FLAGS    /* (uint32_t flags) */
+    OPK_END,
+    OPK_CALL,         /* (OSSL_JSON_ENC *) */
+    OPK_CALL_P,       /* (OSSL_JSON_ENC *, const void *) */
+    OPK_CALL_I,       /* (OSSL_JSON_ENC *, int) */
+    OPK_CALL_U64,     /* (OSSL_JSON_ENC *, uint64_t) */
+    OPK_CALL_I64,     /* (OSSL_JSON_ENC *, int64_t) */
+    OPK_CALL_D,       /* (OSSL_JSON_ENC *, double) */
+    OPK_CALL_PZ,      /* (OSSL_JSON_ENC *, const void *, size_t) */
+    OPK_ASSERT_ERROR, /* (OSSL_JSON_ENC *, int expect_error) */
+    OPK_INIT_FLAGS    /* (uint32_t flags) */
 };
 
 typedef void (*fp_type)(OSSL_JSON_ENC *);
@@ -122,21 +122,21 @@ typedef void (*fp_pz_type)(OSSL_JSON_ENC *, const void *, size_t);
 #define OPJ_STR_HEX(x, xl) OP_CALL_PZ(ossl_json_str_hex, (x), (xl))
 
 #define BEGIN_SCRIPT(name, title, flags)                                       \
-  static const struct script_info *get_script_##name(void) {                   \
-    static const char script_name[] = #name;                                   \
-    static const char script_title[] = #title;                                 \
+    static const struct script_info *get_script_##name(void) {                 \
+        static const char script_name[] = #name;                               \
+        static const char script_title[] = #title;                             \
                                                                                \
-    static const struct script_word script_words[] = { OP_INIT_FLAGS(flags)
+        static const struct script_word script_words[] = { OP_INIT_FLAGS(flags)
 
 #define END_SCRIPT_EXPECTING(s, slen)                                          \
-  OP_END()                                                                     \
-  }                                                                            \
-  ;                                                                            \
-  static const struct script_info script_info = {                              \
-  script_name, script_title, script_words, OSSL_NELEM(script_words),           \
-  (s),         (slen)};                                                        \
-  return &script_info;                                                         \
-  }
+    OP_END()                                                                   \
+    }                                                                          \
+    ;                                                                          \
+    static const struct script_info script_info = {                            \
+    script_name, script_title, script_words, OSSL_NELEM(script_words),         \
+    (s),         (slen)};                                                      \
+    return &script_info;                                                       \
+    }
 
 #ifdef OPENSSL_SYS_VMS
 /*
@@ -504,14 +504,14 @@ SCRIPT(multi_item) SCRIPT(seq)};
 
 /* Test runner. */
 static int run_script(const struct script_info *info) {
-  int ok = 0, asserted = -1;
-  const struct script_word *words = info->words;
-  size_t wp = 0;
-  struct script_word w;
-  struct helper h = {0};
-  BUF_MEM *bufp = NULL;
+    int ok = 0, asserted = -1;
+    const struct script_word *words = info->words;
+    size_t wp = 0;
+    struct script_word w;
+    struct helper h = {0};
+    BUF_MEM *bufp = NULL;
 
-  TEST_info("running script '%s' (%s)", info->name, info->title);
+    TEST_info("running script '%s' (%s)", info->name, info->title);
 
 #define GET_WORD() (w = words[wp++])
 #define GET_U64() (GET_WORD().u64)
@@ -519,129 +519,129 @@ static int run_script(const struct script_info *info) {
 #define GET_FP() (GET_WORD().fp)
 #define GET_P() (GET_WORD().p)
 
-  for (;;)
-    switch (GET_U64()) {
-    case OPK_END:
-      goto stop;
-    case OPK_INIT_FLAGS:
-      helper_set_flags(&h, (uint32_t)GET_U64());
-      break;
-    case OPK_CALL: {
-      fp_type f = (fp_type)GET_FP();
+    for (;;)
+        switch (GET_U64()) {
+        case OPK_END:
+            goto stop;
+        case OPK_INIT_FLAGS:
+            helper_set_flags(&h, (uint32_t)GET_U64());
+            break;
+        case OPK_CALL: {
+            fp_type f = (fp_type)GET_FP();
 
-      if (!TEST_true(helper_ensure(&h)))
-        goto err;
+            if (!TEST_true(helper_ensure(&h)))
+                goto err;
 
-      f(&h.j);
-      break;
-    }
-    case OPK_CALL_I: {
-      fp_i_type f = (fp_i_type)GET_FP();
+            f(&h.j);
+            break;
+        }
+        case OPK_CALL_I: {
+            fp_i_type f = (fp_i_type)GET_FP();
 
-      if (!TEST_true(helper_ensure(&h)))
-        goto err;
+            if (!TEST_true(helper_ensure(&h)))
+                goto err;
 
-      f(&h.j, (int)GET_I64());
-      break;
-    }
-    case OPK_CALL_U64: {
-      fp_u64_type f = (fp_u64_type)GET_FP();
+            f(&h.j, (int)GET_I64());
+            break;
+        }
+        case OPK_CALL_U64: {
+            fp_u64_type f = (fp_u64_type)GET_FP();
 
-      if (!TEST_true(helper_ensure(&h)))
-        goto err;
+            if (!TEST_true(helper_ensure(&h)))
+                goto err;
 
-      f(&h.j, GET_U64());
-      break;
-    }
-    case OPK_CALL_I64: {
-      fp_i64_type f = (fp_i64_type)GET_FP();
+            f(&h.j, GET_U64());
+            break;
+        }
+        case OPK_CALL_I64: {
+            fp_i64_type f = (fp_i64_type)GET_FP();
 
-      if (!TEST_true(helper_ensure(&h)))
-        goto err;
+            if (!TEST_true(helper_ensure(&h)))
+                goto err;
 
-      f(&h.j, GET_I64());
-      break;
-    }
-    case OPK_CALL_P: {
-      fp_p_type f = (fp_p_type)GET_FP();
+            f(&h.j, GET_I64());
+            break;
+        }
+        case OPK_CALL_P: {
+            fp_p_type f = (fp_p_type)GET_FP();
 
-      if (!TEST_true(helper_ensure(&h)))
-        goto err;
+            if (!TEST_true(helper_ensure(&h)))
+                goto err;
 
-      f(&h.j, GET_P());
-      break;
-    }
-    case OPK_CALL_PZ: {
-      fp_pz_type f = (fp_pz_type)GET_FP();
-      void *p;
-      uint64_t u64;
+            f(&h.j, GET_P());
+            break;
+        }
+        case OPK_CALL_PZ: {
+            fp_pz_type f = (fp_pz_type)GET_FP();
+            void *p;
+            uint64_t u64;
 
-      if (!TEST_true(helper_ensure(&h)))
-        goto err;
+            if (!TEST_true(helper_ensure(&h)))
+                goto err;
 
-      p = GET_P();
-      u64 = GET_U64();
-      f(&h.j, p, (size_t)u64);
-      break;
-    }
-    case OPK_ASSERT_ERROR: {
-      if (!TEST_true(helper_ensure(&h)))
-        goto err;
+            p = GET_P();
+            u64 = GET_U64();
+            f(&h.j, p, (size_t)u64);
+            break;
+        }
+        case OPK_ASSERT_ERROR: {
+            if (!TEST_true(helper_ensure(&h)))
+                goto err;
 
-      asserted = (int)GET_U64();
-      if (!TEST_int_eq(ossl_json_in_error(&h.j), asserted))
-        goto err;
+            asserted = (int)GET_U64();
+            if (!TEST_int_eq(ossl_json_in_error(&h.j), asserted))
+                goto err;
 
-      break;
-    }
+            break;
+        }
 #define OP_ASSERT_ERROR(err) OP_U64(OPK_ASSERT_ERROR) OP_U64(err)
 
-    default:
-      TEST_error("unknown opcode");
-      goto err;
-    }
+        default:
+            TEST_error("unknown opcode");
+            goto err;
+        }
 stop:
 
-  if (!TEST_true(helper_ensure(&h)))
-    goto err;
+    if (!TEST_true(helper_ensure(&h)))
+        goto err;
 
-  if (!TEST_true(ossl_json_flush(&h.j)))
-    goto err;
+    if (!TEST_true(ossl_json_flush(&h.j)))
+        goto err;
 
-  /* Implicit error check if not done explicitly. */
-  if (asserted < 0 && !TEST_false(ossl_json_in_error(&h.j)))
-    goto err;
+    /* Implicit error check if not done explicitly. */
+    if (asserted < 0 && !TEST_false(ossl_json_in_error(&h.j)))
+        goto err;
 
-  if (!TEST_true(BIO_get_mem_ptr(h.mem_bio, &bufp)))
-    goto err;
+    if (!TEST_true(BIO_get_mem_ptr(h.mem_bio, &bufp)))
+        goto err;
 
-  if (!TEST_mem_eq(bufp->data, bufp->length, info->expected_output,
-                   info->expected_output_len == SIZE_MAX
-                   ? strlen(info->expected_output)
-                   : info->expected_output_len))
-    goto err;
+    if (!TEST_mem_eq(bufp->data, bufp->length, info->expected_output,
+                     info->expected_output_len == SIZE_MAX
+                     ? strlen(info->expected_output)
+                     : info->expected_output_len))
+        goto err;
 
-  ok = 1;
+    ok = 1;
 err:
-  if (!ok)
-    TEST_error("script '%s' failed", info->name);
+    if (!ok)
+        TEST_error("script '%s' failed", info->name);
 
-  helper_cleanup(&h);
-  return ok;
+    helper_cleanup(&h);
+    return ok;
 }
 
 static int test_json_enc(void) {
-  int ok = 1;
-  size_t i;
+    int ok = 1;
+    size_t i;
 
-  for (i = 0; i < OSSL_NELEM(scripts); ++i)
-    if (!TEST_true(run_script(scripts[i]())))
-      ok = 0;
+    for (i = 0; i < OSSL_NELEM(scripts); ++i)
+        if (!TEST_true(run_script(scripts[i]())))
+            ok = 0;
 
-  return ok;
+    return ok;
 }
 
 int setup_tests(void) {
-  ADD_TEST(test_json_enc);
-  return 1;
+    ADD_TEST(test_json_enc);
+    return 1;
 }

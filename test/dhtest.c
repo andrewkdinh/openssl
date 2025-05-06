@@ -35,266 +35,267 @@
 static int cb(int p, int n, BN_GENCB *arg);
 
 static int dh_test(void) {
-  DH *dh = NULL;
-  BIGNUM *p = NULL, *q = NULL, *g = NULL;
-  const BIGNUM *p2, *q2, *g2;
-  BIGNUM *priv_key = NULL;
-  const BIGNUM *pub_key2, *priv_key2;
-  BN_GENCB *_cb = NULL;
-  DH *a = NULL;
-  DH *b = NULL;
-  DH *c = NULL;
-  const BIGNUM *ap = NULL, *ag = NULL, *apub_key = NULL;
-  const BIGNUM *bpub_key = NULL, *bpriv_key = NULL;
-  BIGNUM *bp = NULL, *bg = NULL, *cpriv_key = NULL;
-  unsigned char *abuf = NULL;
-  unsigned char *bbuf = NULL;
-  unsigned char *cbuf = NULL;
-  int i, alen, blen, clen, aout, bout, cout;
-  int ret = 0;
+    DH *dh = NULL;
+    BIGNUM *p = NULL, *q = NULL, *g = NULL;
+    const BIGNUM *p2, *q2, *g2;
+    BIGNUM *priv_key = NULL;
+    const BIGNUM *pub_key2, *priv_key2;
+    BN_GENCB *_cb = NULL;
+    DH *a = NULL;
+    DH *b = NULL;
+    DH *c = NULL;
+    const BIGNUM *ap = NULL, *ag = NULL, *apub_key = NULL;
+    const BIGNUM *bpub_key = NULL, *bpriv_key = NULL;
+    BIGNUM *bp = NULL, *bg = NULL, *cpriv_key = NULL;
+    unsigned char *abuf = NULL;
+    unsigned char *bbuf = NULL;
+    unsigned char *cbuf = NULL;
+    int i, alen, blen, clen, aout, bout, cout;
+    int ret = 0;
 
-  if (!TEST_ptr(dh = DH_new()) || !TEST_ptr(p = BN_new()) ||
-      !TEST_ptr(q = BN_new()) || !TEST_ptr(g = BN_new()) ||
-      !TEST_ptr(priv_key = BN_new()))
-    goto err1;
+    if (!TEST_ptr(dh = DH_new()) || !TEST_ptr(p = BN_new()) ||
+        !TEST_ptr(q = BN_new()) || !TEST_ptr(g = BN_new()) ||
+        !TEST_ptr(priv_key = BN_new()))
+        goto err1;
 
-  /*
-   * I) basic tests
-   */
+    /*
+     * I) basic tests
+     */
 
-  /* using a small predefined Sophie Germain DH group with generator 3 */
-  if (!TEST_true(BN_set_word(p, 4079L)) || !TEST_true(BN_set_word(q, 2039L)) ||
-      !TEST_true(BN_set_word(g, 3L)) || !TEST_true(DH_set0_pqg(dh, p, q, g)))
-    goto err1;
+    /* using a small predefined Sophie Germain DH group with generator 3 */
+    if (!TEST_true(BN_set_word(p, 4079L)) ||
+        !TEST_true(BN_set_word(q, 2039L)) || !TEST_true(BN_set_word(g, 3L)) ||
+        !TEST_true(DH_set0_pqg(dh, p, q, g)))
+        goto err1;
 
-  /* check fails, because p is way too small */
-  if (!TEST_true(DH_check(dh, &i)))
-    goto err2;
-  i ^= DH_MODULUS_TOO_SMALL;
-  if (!TEST_false(i & DH_CHECK_P_NOT_PRIME) ||
-      !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME) ||
-      !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR) ||
-      !TEST_false(i & DH_NOT_SUITABLE_GENERATOR) ||
-      !TEST_false(i & DH_CHECK_Q_NOT_PRIME) ||
-      !TEST_false(i & DH_CHECK_INVALID_Q_VALUE) ||
-      !TEST_false(i & DH_CHECK_INVALID_J_VALUE) ||
-      !TEST_false(i & DH_MODULUS_TOO_SMALL) ||
-      !TEST_false(i & DH_MODULUS_TOO_LARGE) || !TEST_false(i))
-    goto err2;
+    /* check fails, because p is way too small */
+    if (!TEST_true(DH_check(dh, &i)))
+        goto err2;
+    i ^= DH_MODULUS_TOO_SMALL;
+    if (!TEST_false(i & DH_CHECK_P_NOT_PRIME) ||
+        !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME) ||
+        !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR) ||
+        !TEST_false(i & DH_NOT_SUITABLE_GENERATOR) ||
+        !TEST_false(i & DH_CHECK_Q_NOT_PRIME) ||
+        !TEST_false(i & DH_CHECK_INVALID_Q_VALUE) ||
+        !TEST_false(i & DH_CHECK_INVALID_J_VALUE) ||
+        !TEST_false(i & DH_MODULUS_TOO_SMALL) ||
+        !TEST_false(i & DH_MODULUS_TOO_LARGE) || !TEST_false(i))
+        goto err2;
 
-  /* test the combined getter for p, q, and g */
-  DH_get0_pqg(dh, &p2, &q2, &g2);
-  if (!TEST_ptr_eq(p2, p) || !TEST_ptr_eq(q2, q) || !TEST_ptr_eq(g2, g))
-    goto err2;
+    /* test the combined getter for p, q, and g */
+    DH_get0_pqg(dh, &p2, &q2, &g2);
+    if (!TEST_ptr_eq(p2, p) || !TEST_ptr_eq(q2, q) || !TEST_ptr_eq(g2, g))
+        goto err2;
 
-  /* test the simple getters for p, q, and g */
-  if (!TEST_ptr_eq(DH_get0_p(dh), p2) || !TEST_ptr_eq(DH_get0_q(dh), q2) ||
-      !TEST_ptr_eq(DH_get0_g(dh), g2))
-    goto err2;
+    /* test the simple getters for p, q, and g */
+    if (!TEST_ptr_eq(DH_get0_p(dh), p2) || !TEST_ptr_eq(DH_get0_q(dh), q2) ||
+        !TEST_ptr_eq(DH_get0_g(dh), g2))
+        goto err2;
 
-  /* set the private key only*/
-  if (!TEST_true(BN_set_word(priv_key, 1234L)) ||
-      !TEST_true(DH_set0_key(dh, NULL, priv_key)))
-    goto err2;
+    /* set the private key only*/
+    if (!TEST_true(BN_set_word(priv_key, 1234L)) ||
+        !TEST_true(DH_set0_key(dh, NULL, priv_key)))
+        goto err2;
 
-  /* test the combined getter for pub_key and priv_key */
-  DH_get0_key(dh, &pub_key2, &priv_key2);
-  if (!TEST_ptr_eq(pub_key2, NULL) || !TEST_ptr_eq(priv_key2, priv_key))
-    goto err3;
+    /* test the combined getter for pub_key and priv_key */
+    DH_get0_key(dh, &pub_key2, &priv_key2);
+    if (!TEST_ptr_eq(pub_key2, NULL) || !TEST_ptr_eq(priv_key2, priv_key))
+        goto err3;
 
-  /* test the simple getters for pub_key and priv_key */
-  if (!TEST_ptr_eq(DH_get0_pub_key(dh), pub_key2) ||
-      !TEST_ptr_eq(DH_get0_priv_key(dh), priv_key2))
-    goto err3;
+    /* test the simple getters for pub_key and priv_key */
+    if (!TEST_ptr_eq(DH_get0_pub_key(dh), pub_key2) ||
+        !TEST_ptr_eq(DH_get0_priv_key(dh), priv_key2))
+        goto err3;
 
-  /* now generate a key pair (expect failure since modulus is too small) */
-  if (!TEST_false(DH_generate_key(dh)))
-    goto err3;
+    /* now generate a key pair (expect failure since modulus is too small) */
+    if (!TEST_false(DH_generate_key(dh)))
+        goto err3;
 
-  /* We'll have a stale error on the queue from the above test so clear it */
-  ERR_clear_error();
+    /* We'll have a stale error on the queue from the above test so clear it */
+    ERR_clear_error();
 
-  if (!TEST_ptr(BN_copy(q, p)) || !TEST_true(BN_add(q, q, BN_value_one())))
-    goto err3;
+    if (!TEST_ptr(BN_copy(q, p)) || !TEST_true(BN_add(q, q, BN_value_one())))
+        goto err3;
 
-  if (!TEST_true(DH_check(dh, &i)))
-    goto err3;
-  if (!TEST_true(i & DH_CHECK_INVALID_Q_VALUE) ||
-      !TEST_false(i & DH_CHECK_Q_NOT_PRIME))
-    goto err3;
+    if (!TEST_true(DH_check(dh, &i)))
+        goto err3;
+    if (!TEST_true(i & DH_CHECK_INVALID_Q_VALUE) ||
+        !TEST_false(i & DH_CHECK_Q_NOT_PRIME))
+        goto err3;
 
-  /* Modulus of size: dh check max modulus bits + 1 */
-  if (!TEST_true(BN_set_word(p, 1)) ||
-      !TEST_true(BN_lshift(p, p, OPENSSL_DH_CHECK_MAX_MODULUS_BITS)))
-    goto err3;
+    /* Modulus of size: dh check max modulus bits + 1 */
+    if (!TEST_true(BN_set_word(p, 1)) ||
+        !TEST_true(BN_lshift(p, p, OPENSSL_DH_CHECK_MAX_MODULUS_BITS)))
+        goto err3;
 
-  /*
-   * We expect no checks at all for an excessively large modulus
-   */
-  if (!TEST_false(DH_check(dh, &i)))
-    goto err3;
+    /*
+     * We expect no checks at all for an excessively large modulus
+     */
+    if (!TEST_false(DH_check(dh, &i)))
+        goto err3;
 
-  /* We'll have a stale error on the queue from the above test so clear it */
-  ERR_clear_error();
+    /* We'll have a stale error on the queue from the above test so clear it */
+    ERR_clear_error();
 
-  /*
-   * II) key generation
-   */
+    /*
+     * II) key generation
+     */
 
-  /* generate a DH group ... */
-  if (!TEST_ptr(_cb = BN_GENCB_new()))
-    goto err3;
-  BN_GENCB_set(_cb, &cb, NULL);
-  if (!TEST_ptr(a = DH_new()) ||
-      !TEST_true(DH_generate_parameters_ex(a, 512, DH_GENERATOR_5, _cb)))
-    goto err3;
+    /* generate a DH group ... */
+    if (!TEST_ptr(_cb = BN_GENCB_new()))
+        goto err3;
+    BN_GENCB_set(_cb, &cb, NULL);
+    if (!TEST_ptr(a = DH_new()) ||
+        !TEST_true(DH_generate_parameters_ex(a, 512, DH_GENERATOR_5, _cb)))
+        goto err3;
 
-  /* ... and check whether it is valid */
-  if (!TEST_true(DH_check(a, &i)))
-    goto err3;
-  if (!TEST_false(i & DH_CHECK_P_NOT_PRIME) ||
-      !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME) ||
-      !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR) ||
-      !TEST_false(i & DH_NOT_SUITABLE_GENERATOR) ||
-      !TEST_false(i & DH_CHECK_Q_NOT_PRIME) ||
-      !TEST_false(i & DH_CHECK_INVALID_Q_VALUE) ||
-      !TEST_false(i & DH_CHECK_INVALID_J_VALUE) ||
-      !TEST_false(i & DH_MODULUS_TOO_SMALL) ||
-      !TEST_false(i & DH_MODULUS_TOO_LARGE) || !TEST_false(i))
-    goto err3;
+    /* ... and check whether it is valid */
+    if (!TEST_true(DH_check(a, &i)))
+        goto err3;
+    if (!TEST_false(i & DH_CHECK_P_NOT_PRIME) ||
+        !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME) ||
+        !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR) ||
+        !TEST_false(i & DH_NOT_SUITABLE_GENERATOR) ||
+        !TEST_false(i & DH_CHECK_Q_NOT_PRIME) ||
+        !TEST_false(i & DH_CHECK_INVALID_Q_VALUE) ||
+        !TEST_false(i & DH_CHECK_INVALID_J_VALUE) ||
+        !TEST_false(i & DH_MODULUS_TOO_SMALL) ||
+        !TEST_false(i & DH_MODULUS_TOO_LARGE) || !TEST_false(i))
+        goto err3;
 
-  DH_get0_pqg(a, &ap, NULL, &ag);
+    DH_get0_pqg(a, &ap, NULL, &ag);
 
-  /* now create another copy of the DH group for the peer */
-  if (!TEST_ptr(b = DH_new()))
-    goto err3;
+    /* now create another copy of the DH group for the peer */
+    if (!TEST_ptr(b = DH_new()))
+        goto err3;
 
-  if (!TEST_ptr(bp = BN_dup(ap)) || !TEST_ptr(bg = BN_dup(ag)) ||
-      !TEST_true(DH_set0_pqg(b, bp, NULL, bg)))
-    goto err3;
-  bp = bg = NULL;
+    if (!TEST_ptr(bp = BN_dup(ap)) || !TEST_ptr(bg = BN_dup(ag)) ||
+        !TEST_true(DH_set0_pqg(b, bp, NULL, bg)))
+        goto err3;
+    bp = bg = NULL;
 
-  /*
-   * III) simulate a key exchange
-   */
+    /*
+     * III) simulate a key exchange
+     */
 
-  if (!DH_generate_key(a))
-    goto err3;
-  DH_get0_key(a, &apub_key, NULL);
+    if (!DH_generate_key(a))
+        goto err3;
+    DH_get0_key(a, &apub_key, NULL);
 
-  if (!DH_generate_key(b))
-    goto err3;
-  DH_get0_key(b, &bpub_key, &bpriv_key);
+    if (!DH_generate_key(b))
+        goto err3;
+    DH_get0_key(b, &bpub_key, &bpriv_key);
 
-  /* Also test with a private-key-only copy of |b|. */
-  if (!TEST_ptr(c = DHparams_dup(b)) ||
-      !TEST_ptr(cpriv_key = BN_dup(bpriv_key)) ||
-      !TEST_true(DH_set0_key(c, NULL, cpriv_key)))
-    goto err3;
-  cpriv_key = NULL;
+    /* Also test with a private-key-only copy of |b|. */
+    if (!TEST_ptr(c = DHparams_dup(b)) ||
+        !TEST_ptr(cpriv_key = BN_dup(bpriv_key)) ||
+        !TEST_true(DH_set0_key(c, NULL, cpriv_key)))
+        goto err3;
+    cpriv_key = NULL;
 
-  alen = DH_size(a);
-  if (!TEST_ptr(abuf = OPENSSL_malloc(alen)) ||
-      !TEST_true((aout = DH_compute_key(abuf, bpub_key, a)) != -1))
-    goto err3;
+    alen = DH_size(a);
+    if (!TEST_ptr(abuf = OPENSSL_malloc(alen)) ||
+        !TEST_true((aout = DH_compute_key(abuf, bpub_key, a)) != -1))
+        goto err3;
 
-  blen = DH_size(b);
-  if (!TEST_ptr(bbuf = OPENSSL_malloc(blen)) ||
-      !TEST_true((bout = DH_compute_key(bbuf, apub_key, b)) != -1))
-    goto err3;
+    blen = DH_size(b);
+    if (!TEST_ptr(bbuf = OPENSSL_malloc(blen)) ||
+        !TEST_true((bout = DH_compute_key(bbuf, apub_key, b)) != -1))
+        goto err3;
 
-  clen = DH_size(c);
-  if (!TEST_ptr(cbuf = OPENSSL_malloc(clen)) ||
-      !TEST_true((cout = DH_compute_key(cbuf, apub_key, c)) != -1))
-    goto err3;
+    clen = DH_size(c);
+    if (!TEST_ptr(cbuf = OPENSSL_malloc(clen)) ||
+        !TEST_true((cout = DH_compute_key(cbuf, apub_key, c)) != -1))
+        goto err3;
 
-  if (!TEST_true(aout >= 20) || !TEST_mem_eq(abuf, aout, bbuf, bout) ||
-      !TEST_mem_eq(abuf, aout, cbuf, cout))
-    goto err3;
+    if (!TEST_true(aout >= 20) || !TEST_mem_eq(abuf, aout, bbuf, bout) ||
+        !TEST_mem_eq(abuf, aout, cbuf, cout))
+        goto err3;
 
-  ret = 1;
-  goto success;
+    ret = 1;
+    goto success;
 
 err1:
-  /* an error occurred before p,q,g were assigned to dh */
-  BN_free(p);
-  BN_free(q);
-  BN_free(g);
+    /* an error occurred before p,q,g were assigned to dh */
+    BN_free(p);
+    BN_free(q);
+    BN_free(g);
 err2:
-  /* an error occurred before priv_key was assigned to dh */
-  BN_free(priv_key);
+    /* an error occurred before priv_key was assigned to dh */
+    BN_free(priv_key);
 err3:
 success:
-  OPENSSL_free(abuf);
-  OPENSSL_free(bbuf);
-  OPENSSL_free(cbuf);
-  DH_free(b);
-  DH_free(a);
-  DH_free(c);
-  BN_free(bp);
-  BN_free(bg);
-  BN_free(cpriv_key);
-  BN_GENCB_free(_cb);
-  DH_free(dh);
+    OPENSSL_free(abuf);
+    OPENSSL_free(bbuf);
+    OPENSSL_free(cbuf);
+    DH_free(b);
+    DH_free(a);
+    DH_free(c);
+    BN_free(bp);
+    BN_free(bg);
+    BN_free(cpriv_key);
+    BN_GENCB_free(_cb);
+    DH_free(dh);
 
-  return ret;
+    return ret;
 }
 
 static int cb(int p, int n, BN_GENCB *arg) { return 1; }
 
 static int dh_computekey_range_test(void) {
-  int ret = 0, sz;
-  DH *dh = NULL;
-  BIGNUM *p = NULL, *q = NULL, *g = NULL, *pub = NULL, *priv = NULL;
-  unsigned char *buf = NULL;
+    int ret = 0, sz;
+    DH *dh = NULL;
+    BIGNUM *p = NULL, *q = NULL, *g = NULL, *pub = NULL, *priv = NULL;
+    unsigned char *buf = NULL;
 
-  if (!TEST_ptr(p = BN_dup(&ossl_bignum_ffdhe2048_p)) ||
-      !TEST_ptr(q = BN_dup(&ossl_bignum_ffdhe2048_q)) ||
-      !TEST_ptr(g = BN_dup(&ossl_bignum_const_2)) || !TEST_ptr(dh = DH_new()) ||
-      !TEST_true(DH_set0_pqg(dh, p, q, g)))
-    goto err;
-  p = q = g = NULL;
+    if (!TEST_ptr(p = BN_dup(&ossl_bignum_ffdhe2048_p)) ||
+        !TEST_ptr(q = BN_dup(&ossl_bignum_ffdhe2048_q)) ||
+        !TEST_ptr(g = BN_dup(&ossl_bignum_const_2)) ||
+        !TEST_ptr(dh = DH_new()) || !TEST_true(DH_set0_pqg(dh, p, q, g)))
+        goto err;
+    p = q = g = NULL;
 
-  if (!TEST_int_gt(sz = DH_size(dh), 0) ||
-      !TEST_ptr(buf = OPENSSL_malloc(sz)) || !TEST_ptr(pub = BN_new()) ||
-      !TEST_ptr(priv = BN_new()))
-    goto err;
+    if (!TEST_int_gt(sz = DH_size(dh), 0) ||
+        !TEST_ptr(buf = OPENSSL_malloc(sz)) || !TEST_ptr(pub = BN_new()) ||
+        !TEST_ptr(priv = BN_new()))
+        goto err;
 
-  if (!TEST_true(BN_set_word(priv, 1)) ||
-      !TEST_true(DH_set0_key(dh, NULL, priv)))
-    goto err;
-  priv = NULL;
-  if (!TEST_true(BN_set_word(pub, 1)))
-    goto err;
+    if (!TEST_true(BN_set_word(priv, 1)) ||
+        !TEST_true(DH_set0_key(dh, NULL, priv)))
+        goto err;
+    priv = NULL;
+    if (!TEST_true(BN_set_word(pub, 1)))
+        goto err;
 
-  /* Given z = pub ^ priv mod p */
+    /* Given z = pub ^ priv mod p */
 
-  /* Test that z == 1 fails */
-  if (!TEST_int_le(ossl_dh_compute_key(buf, pub, dh), 0))
-    goto err;
-  /* Test that z == 0 fails */
-  if (!TEST_ptr(BN_copy(pub, DH_get0_p(dh))) ||
-      !TEST_int_le(ossl_dh_compute_key(buf, pub, dh), 0))
-    goto err;
-  /* Test that z == p - 1 fails */
-  if (!TEST_true(BN_sub_word(pub, 1)) ||
-      !TEST_int_le(ossl_dh_compute_key(buf, pub, dh), 0))
-    goto err;
-  /* Test that z == p - 2 passes */
-  if (!TEST_true(BN_sub_word(pub, 1)) ||
-      !TEST_int_eq(ossl_dh_compute_key(buf, pub, dh), sz))
-    goto err;
+    /* Test that z == 1 fails */
+    if (!TEST_int_le(ossl_dh_compute_key(buf, pub, dh), 0))
+        goto err;
+    /* Test that z == 0 fails */
+    if (!TEST_ptr(BN_copy(pub, DH_get0_p(dh))) ||
+        !TEST_int_le(ossl_dh_compute_key(buf, pub, dh), 0))
+        goto err;
+    /* Test that z == p - 1 fails */
+    if (!TEST_true(BN_sub_word(pub, 1)) ||
+        !TEST_int_le(ossl_dh_compute_key(buf, pub, dh), 0))
+        goto err;
+    /* Test that z == p - 2 passes */
+    if (!TEST_true(BN_sub_word(pub, 1)) ||
+        !TEST_int_eq(ossl_dh_compute_key(buf, pub, dh), sz))
+        goto err;
 
-  ret = 1;
+    ret = 1;
 err:
-  OPENSSL_free(buf);
-  BN_free(priv);
-  BN_free(pub);
-  BN_free(g);
-  BN_free(q);
-  BN_free(p);
-  DH_free(dh);
-  return ret;
+    OPENSSL_free(buf);
+    BN_free(priv);
+    BN_free(pub);
+    BN_free(g);
+    BN_free(q);
+    BN_free(p);
+    DH_free(dh);
+    return ret;
 }
 
 /* Test data from RFC 5114 */
@@ -496,171 +497,172 @@ static const unsigned char dhtest_2048_256_Z[] = {
 0xF8, 0x46, 0xEC, 0x6D, 0xB0, 0xC2, 0x6C, 0x5D, 0x7C};
 
 typedef struct {
-  DH *(*get_param)(void);
-  const unsigned char *xA;
-  size_t xA_len;
-  const unsigned char *yA;
-  size_t yA_len;
-  const unsigned char *xB;
-  size_t xB_len;
-  const unsigned char *yB;
-  size_t yB_len;
-  const unsigned char *Z;
-  size_t Z_len;
+    DH *(*get_param)(void);
+    const unsigned char *xA;
+    size_t xA_len;
+    const unsigned char *yA;
+    size_t yA_len;
+    const unsigned char *xB;
+    size_t xB_len;
+    const unsigned char *yB;
+    size_t yB_len;
+    const unsigned char *Z;
+    size_t Z_len;
 } rfc5114_td;
 
 #define make_rfc5114_td(pre)                                                   \
-  {DH_get_##pre,                                                               \
-   dhtest_##pre##_xA,                                                          \
-   sizeof(dhtest_##pre##_xA),                                                  \
-   dhtest_##pre##_yA,                                                          \
-   sizeof(dhtest_##pre##_yA),                                                  \
-   dhtest_##pre##_xB,                                                          \
-   sizeof(dhtest_##pre##_xB),                                                  \
-   dhtest_##pre##_yB,                                                          \
-   sizeof(dhtest_##pre##_yB),                                                  \
-   dhtest_##pre##_Z,                                                           \
-   sizeof(dhtest_##pre##_Z)}
+    {DH_get_##pre,                                                             \
+     dhtest_##pre##_xA,                                                        \
+     sizeof(dhtest_##pre##_xA),                                                \
+     dhtest_##pre##_yA,                                                        \
+     sizeof(dhtest_##pre##_yA),                                                \
+     dhtest_##pre##_xB,                                                        \
+     sizeof(dhtest_##pre##_xB),                                                \
+     dhtest_##pre##_yB,                                                        \
+     sizeof(dhtest_##pre##_yB),                                                \
+     dhtest_##pre##_Z,                                                         \
+     sizeof(dhtest_##pre##_Z)}
 
 static const rfc5114_td rfctd[] = {make_rfc5114_td(1024_160),
                                    make_rfc5114_td(2048_224),
                                    make_rfc5114_td(2048_256)};
 
 static int rfc5114_test(void) {
-  int i;
-  DH *dhA = NULL;
-  DH *dhB = NULL;
-  unsigned char *Z1 = NULL;
-  unsigned char *Z2 = NULL;
-  int szA, szB;
-  const rfc5114_td *td = NULL;
-  BIGNUM *priv_key = NULL, *pub_key = NULL;
-  const BIGNUM *pub_key_tmp;
+    int i;
+    DH *dhA = NULL;
+    DH *dhB = NULL;
+    unsigned char *Z1 = NULL;
+    unsigned char *Z2 = NULL;
+    int szA, szB;
+    const rfc5114_td *td = NULL;
+    BIGNUM *priv_key = NULL, *pub_key = NULL;
+    const BIGNUM *pub_key_tmp;
 
-  for (i = 0; i < (int)OSSL_NELEM(rfctd); i++) {
-    td = rfctd + i;
-    /* Set up DH structures setting key components */
-    if (!TEST_ptr(dhA = td->get_param()) || !TEST_ptr(dhB = td->get_param()))
-      goto bad_err;
+    for (i = 0; i < (int)OSSL_NELEM(rfctd); i++) {
+        td = rfctd + i;
+        /* Set up DH structures setting key components */
+        if (!TEST_ptr(dhA = td->get_param()) ||
+            !TEST_ptr(dhB = td->get_param()))
+            goto bad_err;
 
-    if (!TEST_ptr(priv_key = BN_bin2bn(td->xA, td->xA_len, NULL)) ||
-        !TEST_ptr(pub_key = BN_bin2bn(td->yA, td->yA_len, NULL)) ||
-        !TEST_true(DH_set0_key(dhA, pub_key, priv_key)))
-      goto bad_err;
+        if (!TEST_ptr(priv_key = BN_bin2bn(td->xA, td->xA_len, NULL)) ||
+            !TEST_ptr(pub_key = BN_bin2bn(td->yA, td->yA_len, NULL)) ||
+            !TEST_true(DH_set0_key(dhA, pub_key, priv_key)))
+            goto bad_err;
 
-    if (!TEST_ptr(priv_key = BN_bin2bn(td->xB, td->xB_len, NULL)) ||
-        !TEST_ptr(pub_key = BN_bin2bn(td->yB, td->yB_len, NULL)) ||
-        !TEST_true(DH_set0_key(dhB, pub_key, priv_key)))
-      goto bad_err;
-    priv_key = pub_key = NULL;
+        if (!TEST_ptr(priv_key = BN_bin2bn(td->xB, td->xB_len, NULL)) ||
+            !TEST_ptr(pub_key = BN_bin2bn(td->yB, td->yB_len, NULL)) ||
+            !TEST_true(DH_set0_key(dhB, pub_key, priv_key)))
+            goto bad_err;
+        priv_key = pub_key = NULL;
 
-    if (!TEST_int_gt(szA = DH_size(dhA), 0) ||
-        !TEST_int_gt(szB = DH_size(dhB), 0) ||
-        !TEST_size_t_eq(td->Z_len, (size_t)szA) ||
-        !TEST_size_t_eq(td->Z_len, (size_t)szB))
-      goto err;
+        if (!TEST_int_gt(szA = DH_size(dhA), 0) ||
+            !TEST_int_gt(szB = DH_size(dhB), 0) ||
+            !TEST_size_t_eq(td->Z_len, (size_t)szA) ||
+            !TEST_size_t_eq(td->Z_len, (size_t)szB))
+            goto err;
 
-    if (!TEST_ptr(Z1 = OPENSSL_malloc((size_t)szA)) ||
-        !TEST_ptr(Z2 = OPENSSL_malloc((size_t)szB)))
-      goto bad_err;
-    /*
-     * Work out shared secrets using both sides and compare with expected
-     * values.
-     */
-    DH_get0_key(dhB, &pub_key_tmp, NULL);
-    if (!TEST_int_ne(DH_compute_key(Z1, pub_key_tmp, dhA), -1))
-      goto bad_err;
+        if (!TEST_ptr(Z1 = OPENSSL_malloc((size_t)szA)) ||
+            !TEST_ptr(Z2 = OPENSSL_malloc((size_t)szB)))
+            goto bad_err;
+        /*
+         * Work out shared secrets using both sides and compare with expected
+         * values.
+         */
+        DH_get0_key(dhB, &pub_key_tmp, NULL);
+        if (!TEST_int_ne(DH_compute_key(Z1, pub_key_tmp, dhA), -1))
+            goto bad_err;
 
-    DH_get0_key(dhA, &pub_key_tmp, NULL);
-    if (!TEST_int_ne(DH_compute_key(Z2, pub_key_tmp, dhB), -1))
-      goto bad_err;
+        DH_get0_key(dhA, &pub_key_tmp, NULL);
+        if (!TEST_int_ne(DH_compute_key(Z2, pub_key_tmp, dhB), -1))
+            goto bad_err;
 
-    if (!TEST_mem_eq(Z1, td->Z_len, td->Z, td->Z_len) ||
-        !TEST_mem_eq(Z2, td->Z_len, td->Z, td->Z_len))
-      goto err;
+        if (!TEST_mem_eq(Z1, td->Z_len, td->Z, td->Z_len) ||
+            !TEST_mem_eq(Z2, td->Z_len, td->Z, td->Z_len))
+            goto err;
 
-    DH_free(dhA);
-    dhA = NULL;
-    DH_free(dhB);
-    dhB = NULL;
-    OPENSSL_free(Z1);
-    Z1 = NULL;
-    OPENSSL_free(Z2);
-    Z2 = NULL;
-  }
-  return 1;
+        DH_free(dhA);
+        dhA = NULL;
+        DH_free(dhB);
+        dhB = NULL;
+        OPENSSL_free(Z1);
+        Z1 = NULL;
+        OPENSSL_free(Z2);
+        Z2 = NULL;
+    }
+    return 1;
 
 bad_err:
-  DH_free(dhA);
-  DH_free(dhB);
-  BN_free(pub_key);
-  BN_free(priv_key);
-  OPENSSL_free(Z1);
-  OPENSSL_free(Z2);
-  TEST_error("Initialisation error RFC5114 set %d\n", i + 1);
-  return 0;
+    DH_free(dhA);
+    DH_free(dhB);
+    BN_free(pub_key);
+    BN_free(priv_key);
+    OPENSSL_free(Z1);
+    OPENSSL_free(Z2);
+    TEST_error("Initialisation error RFC5114 set %d\n", i + 1);
+    return 0;
 
 err:
-  DH_free(dhA);
-  DH_free(dhB);
-  OPENSSL_free(Z1);
-  OPENSSL_free(Z2);
-  TEST_error("Test failed RFC5114 set %d\n", i + 1);
-  return 0;
+    DH_free(dhA);
+    DH_free(dhB);
+    OPENSSL_free(Z1);
+    OPENSSL_free(Z2);
+    TEST_error("Test failed RFC5114 set %d\n", i + 1);
+    return 0;
 }
 
 static int rfc7919_test(void) {
-  DH *a = NULL, *b = NULL;
-  const BIGNUM *apub_key = NULL, *bpub_key = NULL;
-  unsigned char *abuf = NULL;
-  unsigned char *bbuf = NULL;
-  int i, alen, blen, aout, bout;
-  int ret = 0;
+    DH *a = NULL, *b = NULL;
+    const BIGNUM *apub_key = NULL, *bpub_key = NULL;
+    unsigned char *abuf = NULL;
+    unsigned char *bbuf = NULL;
+    int i, alen, blen, aout, bout;
+    int ret = 0;
 
-  if (!TEST_ptr(a = DH_new_by_nid(NID_ffdhe2048)))
-    goto err;
+    if (!TEST_ptr(a = DH_new_by_nid(NID_ffdhe2048)))
+        goto err;
 
-  if (!DH_check(a, &i))
-    goto err;
-  if (!TEST_false(i & DH_CHECK_P_NOT_PRIME) ||
-      !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME) ||
-      !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR) ||
-      !TEST_false(i & DH_NOT_SUITABLE_GENERATOR) || !TEST_false(i))
-    goto err;
+    if (!DH_check(a, &i))
+        goto err;
+    if (!TEST_false(i & DH_CHECK_P_NOT_PRIME) ||
+        !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME) ||
+        !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR) ||
+        !TEST_false(i & DH_NOT_SUITABLE_GENERATOR) || !TEST_false(i))
+        goto err;
 
-  if (!DH_generate_key(a))
-    goto err;
-  DH_get0_key(a, &apub_key, NULL);
+    if (!DH_generate_key(a))
+        goto err;
+    DH_get0_key(a, &apub_key, NULL);
 
-  /* now create another copy of the DH group for the peer */
-  if (!TEST_ptr(b = DH_new_by_nid(NID_ffdhe2048)))
-    goto err;
+    /* now create another copy of the DH group for the peer */
+    if (!TEST_ptr(b = DH_new_by_nid(NID_ffdhe2048)))
+        goto err;
 
-  if (!DH_generate_key(b))
-    goto err;
-  DH_get0_key(b, &bpub_key, NULL);
+    if (!DH_generate_key(b))
+        goto err;
+    DH_get0_key(b, &bpub_key, NULL);
 
-  alen = DH_size(a);
-  if (!TEST_int_gt(alen, 0) || !TEST_ptr(abuf = OPENSSL_malloc(alen)) ||
-      !TEST_true((aout = DH_compute_key(abuf, bpub_key, a)) != -1))
-    goto err;
+    alen = DH_size(a);
+    if (!TEST_int_gt(alen, 0) || !TEST_ptr(abuf = OPENSSL_malloc(alen)) ||
+        !TEST_true((aout = DH_compute_key(abuf, bpub_key, a)) != -1))
+        goto err;
 
-  blen = DH_size(b);
-  if (!TEST_int_gt(blen, 0) || !TEST_ptr(bbuf = OPENSSL_malloc(blen)) ||
-      !TEST_true((bout = DH_compute_key(bbuf, apub_key, b)) != -1))
-    goto err;
+    blen = DH_size(b);
+    if (!TEST_int_gt(blen, 0) || !TEST_ptr(bbuf = OPENSSL_malloc(blen)) ||
+        !TEST_true((bout = DH_compute_key(bbuf, apub_key, b)) != -1))
+        goto err;
 
-  if (!TEST_true(aout >= 20) || !TEST_mem_eq(abuf, aout, bbuf, bout))
-    goto err;
+    if (!TEST_true(aout >= 20) || !TEST_mem_eq(abuf, aout, bbuf, bout))
+        goto err;
 
-  ret = 1;
+    ret = 1;
 
 err:
-  OPENSSL_free(abuf);
-  OPENSSL_free(bbuf);
-  DH_free(a);
-  DH_free(b);
-  return ret;
+    OPENSSL_free(abuf);
+    OPENSSL_free(bbuf);
+    DH_free(a);
+    DH_free(b);
+    return ret;
 }
 
 static int prime_groups[] = {
@@ -669,130 +671,131 @@ NID_modp_2048, NID_modp_3072, NID_modp_4096, NID_modp_6144,
 };
 
 static int dh_test_prime_groups(int index) {
-  int ok = 0;
-  DH *dh = NULL;
-  const BIGNUM *p, *q, *g;
+    int ok = 0;
+    DH *dh = NULL;
+    const BIGNUM *p, *q, *g;
 
-  if (!TEST_ptr(dh = DH_new_by_nid(prime_groups[index])))
-    goto err;
-  DH_get0_pqg(dh, &p, &q, &g);
-  if (!TEST_ptr(p) || !TEST_ptr(q) || !TEST_ptr(g))
-    goto err;
+    if (!TEST_ptr(dh = DH_new_by_nid(prime_groups[index])))
+        goto err;
+    DH_get0_pqg(dh, &p, &q, &g);
+    if (!TEST_ptr(p) || !TEST_ptr(q) || !TEST_ptr(g))
+        goto err;
 
-  if (!TEST_int_eq(DH_get_nid(dh), prime_groups[index]))
-    goto err;
+    if (!TEST_int_eq(DH_get_nid(dh), prime_groups[index]))
+        goto err;
 
-  /* Since q is set there is no need for the private length to be set */
-  if (!TEST_int_eq((int)DH_get_length(dh), 0))
-    goto err;
+    /* Since q is set there is no need for the private length to be set */
+    if (!TEST_int_eq((int)DH_get_length(dh), 0))
+        goto err;
 
-  ok = 1;
+    ok = 1;
 err:
-  DH_free(dh);
-  return ok;
+    DH_free(dh);
+    return ok;
 }
 
 static int dh_rfc5114_fix_nid_test(void) {
-  int ok = 0;
-  EVP_PKEY_CTX *paramgen_ctx;
+    int ok = 0;
+    EVP_PKEY_CTX *paramgen_ctx;
 
-  /* Run the test. Success is any time the test does not cause a SIGSEGV
-   * interrupt */
-  paramgen_ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_DHX, 0);
-  if (!TEST_ptr(paramgen_ctx))
-    goto err;
-  if (!TEST_int_eq(EVP_PKEY_paramgen_init(paramgen_ctx), 1))
-    goto err;
-  /* Tested function is called here */
-  if (!TEST_int_eq(EVP_PKEY_CTX_set_dhx_rfc5114(paramgen_ctx, 3), 1))
-    goto err;
-  /* Negative test */
-  if (!TEST_int_eq(EVP_PKEY_CTX_set_dhx_rfc5114(paramgen_ctx, 99), 0))
-    goto err;
-  /* If we're still running then the test passed. */
-  ok = 1;
+    /* Run the test. Success is any time the test does not cause a SIGSEGV
+     * interrupt */
+    paramgen_ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_DHX, 0);
+    if (!TEST_ptr(paramgen_ctx))
+        goto err;
+    if (!TEST_int_eq(EVP_PKEY_paramgen_init(paramgen_ctx), 1))
+        goto err;
+    /* Tested function is called here */
+    if (!TEST_int_eq(EVP_PKEY_CTX_set_dhx_rfc5114(paramgen_ctx, 3), 1))
+        goto err;
+    /* Negative test */
+    if (!TEST_int_eq(EVP_PKEY_CTX_set_dhx_rfc5114(paramgen_ctx, 99), 0))
+        goto err;
+    /* If we're still running then the test passed. */
+    ok = 1;
 err:
-  EVP_PKEY_CTX_free(paramgen_ctx);
-  return ok;
+    EVP_PKEY_CTX_free(paramgen_ctx);
+    return ok;
 }
 
 static int dh_set_dh_nid_test(void) {
-  int ok = 0;
-  EVP_PKEY_CTX *paramgen_ctx;
+    int ok = 0;
+    EVP_PKEY_CTX *paramgen_ctx;
 
-  /* Run the test. Success is any time the test does not cause a SIGSEGV
-   * interrupt */
-  paramgen_ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_DH, 0);
-  if (!TEST_ptr(paramgen_ctx))
-    goto err;
-  if (!TEST_int_eq(EVP_PKEY_paramgen_init(paramgen_ctx), 1))
-    goto err;
-  /* Tested function is called here */
-  if (!TEST_int_eq(EVP_PKEY_CTX_set_dh_nid(paramgen_ctx, NID_ffdhe2048), 1))
-    goto err;
-  /* Negative test */
-  if (!TEST_int_eq(EVP_PKEY_CTX_set_dh_nid(paramgen_ctx, NID_secp521r1), 0))
-    goto err;
-  /* If we're still running then the test passed. */
-  ok = 1;
+    /* Run the test. Success is any time the test does not cause a SIGSEGV
+     * interrupt */
+    paramgen_ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_DH, 0);
+    if (!TEST_ptr(paramgen_ctx))
+        goto err;
+    if (!TEST_int_eq(EVP_PKEY_paramgen_init(paramgen_ctx), 1))
+        goto err;
+    /* Tested function is called here */
+    if (!TEST_int_eq(EVP_PKEY_CTX_set_dh_nid(paramgen_ctx, NID_ffdhe2048), 1))
+        goto err;
+    /* Negative test */
+    if (!TEST_int_eq(EVP_PKEY_CTX_set_dh_nid(paramgen_ctx, NID_secp521r1), 0))
+        goto err;
+    /* If we're still running then the test passed. */
+    ok = 1;
 err:
-  EVP_PKEY_CTX_free(paramgen_ctx);
-  return ok;
+    EVP_PKEY_CTX_free(paramgen_ctx);
+    return ok;
 }
 
 static int dh_get_nid(void) {
-  int ok = 0;
-  const BIGNUM *p, *q, *g;
-  BIGNUM *pcpy = NULL, *gcpy = NULL, *qcpy = NULL;
-  DH *dh1 = DH_new_by_nid(NID_ffdhe2048);
-  DH *dh2 = DH_new();
+    int ok = 0;
+    const BIGNUM *p, *q, *g;
+    BIGNUM *pcpy = NULL, *gcpy = NULL, *qcpy = NULL;
+    DH *dh1 = DH_new_by_nid(NID_ffdhe2048);
+    DH *dh2 = DH_new();
 
-  if (!TEST_ptr(dh1) || !TEST_ptr(dh2))
-    goto err;
+    if (!TEST_ptr(dh1) || !TEST_ptr(dh2))
+        goto err;
 
-  /* Set new DH parameters manually using a existing named group's p & g */
-  DH_get0_pqg(dh1, &p, &q, &g);
-  if (!TEST_ptr(p) || !TEST_ptr(q) || !TEST_ptr(g) ||
-      !TEST_ptr(pcpy = BN_dup(p)) || !TEST_ptr(gcpy = BN_dup(g)))
-    goto err;
+    /* Set new DH parameters manually using a existing named group's p & g */
+    DH_get0_pqg(dh1, &p, &q, &g);
+    if (!TEST_ptr(p) || !TEST_ptr(q) || !TEST_ptr(g) ||
+        !TEST_ptr(pcpy = BN_dup(p)) || !TEST_ptr(gcpy = BN_dup(g)))
+        goto err;
 
-  if (!TEST_true(DH_set0_pqg(dh2, pcpy, NULL, gcpy)))
-    goto err;
-  pcpy = gcpy = NULL;
-  /* Test q is set if p and g are provided */
-  if (!TEST_ptr(DH_get0_q(dh2)))
-    goto err;
+    if (!TEST_true(DH_set0_pqg(dh2, pcpy, NULL, gcpy)))
+        goto err;
+    pcpy = gcpy = NULL;
+    /* Test q is set if p and g are provided */
+    if (!TEST_ptr(DH_get0_q(dh2)))
+        goto err;
 
-  /* Test that setting p & g manually returns that it is a named group */
-  if (!TEST_int_eq(DH_get_nid(dh2), NID_ffdhe2048))
-    goto err;
+    /* Test that setting p & g manually returns that it is a named group */
+    if (!TEST_int_eq(DH_get_nid(dh2), NID_ffdhe2048))
+        goto err;
 
-  /* Test that after changing g it is no longer a named group */
-  if (!TEST_ptr(gcpy = BN_dup(BN_value_one())))
-    goto err;
-  if (!TEST_true(DH_set0_pqg(dh2, NULL, NULL, gcpy)))
-    goto err;
-  gcpy = NULL;
-  if (!TEST_int_eq(DH_get_nid(dh2), NID_undef))
-    goto err;
+    /* Test that after changing g it is no longer a named group */
+    if (!TEST_ptr(gcpy = BN_dup(BN_value_one())))
+        goto err;
+    if (!TEST_true(DH_set0_pqg(dh2, NULL, NULL, gcpy)))
+        goto err;
+    gcpy = NULL;
+    if (!TEST_int_eq(DH_get_nid(dh2), NID_undef))
+        goto err;
 
-  /* Test that setting an incorrect q results in this not being a named group */
-  if (!TEST_ptr(pcpy = BN_dup(p)) || !TEST_ptr(qcpy = BN_dup(q)) ||
-      !TEST_ptr(gcpy = BN_dup(g)) || !TEST_int_eq(BN_add_word(qcpy, 2), 1) ||
-      !TEST_true(DH_set0_pqg(dh2, pcpy, qcpy, gcpy)))
-    goto err;
-  pcpy = qcpy = gcpy = NULL;
-  if (!TEST_int_eq(DH_get_nid(dh2), NID_undef))
-    goto err;
+    /* Test that setting an incorrect q results in this not being a named group
+     */
+    if (!TEST_ptr(pcpy = BN_dup(p)) || !TEST_ptr(qcpy = BN_dup(q)) ||
+        !TEST_ptr(gcpy = BN_dup(g)) || !TEST_int_eq(BN_add_word(qcpy, 2), 1) ||
+        !TEST_true(DH_set0_pqg(dh2, pcpy, qcpy, gcpy)))
+        goto err;
+    pcpy = qcpy = gcpy = NULL;
+    if (!TEST_int_eq(DH_get_nid(dh2), NID_undef))
+        goto err;
 
-  ok = 1;
+    ok = 1;
 err:
-  BN_free(pcpy);
-  BN_free(qcpy);
-  BN_free(gcpy);
-  DH_free(dh2);
-  DH_free(dh1);
-  return ok;
+    BN_free(pcpy);
+    BN_free(qcpy);
+    BN_free(gcpy);
+    DH_free(dh2);
+    DH_free(dh1);
+    return ok;
 }
 
 static const unsigned char dh_pub_der[] = {
@@ -845,35 +848,35 @@ static const unsigned char dh_pub_der[] = {
  * Loading a named group should not overwrite the private value length field.
  */
 static int dh_load_pkcs3_namedgroup_privlen_test(void) {
-  int ret, privlen = 0;
-  EVP_PKEY *pkey = NULL;
-  const unsigned char *p = dh_pub_der;
+    int ret, privlen = 0;
+    EVP_PKEY *pkey = NULL;
+    const unsigned char *p = dh_pub_der;
 
-  ret =
-  TEST_ptr(pkey = d2i_PUBKEY_ex(NULL, &p, sizeof(dh_pub_der), NULL, NULL)) &&
-  TEST_true(
-  EVP_PKEY_get_int_param(pkey, OSSL_PKEY_PARAM_DH_PRIV_LEN, &privlen)) &&
-  TEST_int_eq(privlen, 1024);
+    ret =
+    TEST_ptr(pkey = d2i_PUBKEY_ex(NULL, &p, sizeof(dh_pub_der), NULL, NULL)) &&
+    TEST_true(
+    EVP_PKEY_get_int_param(pkey, OSSL_PKEY_PARAM_DH_PRIV_LEN, &privlen)) &&
+    TEST_int_eq(privlen, 1024);
 
-  EVP_PKEY_free(pkey);
-  return ret;
+    EVP_PKEY_free(pkey);
+    return ret;
 }
 
 #endif
 
 int setup_tests(void) {
 #ifdef OPENSSL_NO_DH
-  TEST_note("No DH support");
+    TEST_note("No DH support");
 #else
-  ADD_TEST(dh_test);
-  ADD_TEST(dh_computekey_range_test);
-  ADD_TEST(rfc5114_test);
-  ADD_TEST(rfc7919_test);
-  ADD_ALL_TESTS(dh_test_prime_groups, OSSL_NELEM(prime_groups));
-  ADD_TEST(dh_get_nid);
-  ADD_TEST(dh_load_pkcs3_namedgroup_privlen_test);
-  ADD_TEST(dh_rfc5114_fix_nid_test);
-  ADD_TEST(dh_set_dh_nid_test);
+    ADD_TEST(dh_test);
+    ADD_TEST(dh_computekey_range_test);
+    ADD_TEST(rfc5114_test);
+    ADD_TEST(rfc7919_test);
+    ADD_ALL_TESTS(dh_test_prime_groups, OSSL_NELEM(prime_groups));
+    ADD_TEST(dh_get_nid);
+    ADD_TEST(dh_load_pkcs3_namedgroup_privlen_test);
+    ADD_TEST(dh_rfc5114_fix_nid_test);
+    ADD_TEST(dh_set_dh_nid_test);
 #endif
-  return 1;
+    return 1;
 }

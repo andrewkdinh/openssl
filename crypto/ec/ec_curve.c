@@ -23,16 +23,16 @@
 #include "internal/nelem.h"
 
 typedef struct {
-  int field_type, /* either NID_X9_62_prime_field or
-                   * NID_X9_62_characteristic_two_field */
-  seed_len, param_len;
-  unsigned int cofactor; /* promoted to BN_ULONG */
+    int field_type, /* either NID_X9_62_prime_field or
+                     * NID_X9_62_characteristic_two_field */
+    seed_len, param_len;
+    unsigned int cofactor; /* promoted to BN_ULONG */
 } EC_CURVE_DATA;
 
 /* the nist prime curves */
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 24 * 6];
 } _EC_NIST_PRIME_192 = {
 {NID_X9_62_prime_field, 20, 24, 1},
 {/* seed */
@@ -58,8 +58,8 @@ static const struct {
  0xDE, 0xF8, 0x36, 0x14, 0x6B, 0xC9, 0xB1, 0xB4, 0xD2, 0x28, 0x31}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 28 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 28 * 6];
 } _EC_NIST_PRIME_224 = {
 {NID_X9_62_prime_field, 20, 28, 1},
 {/* seed */
@@ -91,8 +91,8 @@ static const struct {
  0x2A, 0x3D}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 48 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 48 * 6];
 } _EC_NIST_PRIME_384 = {
 {NID_X9_62_prime_field, 20, 48, 1},
 {/* seed */
@@ -130,8 +130,8 @@ static const struct {
  0x7A, 0xEC, 0xEC, 0x19, 0x6A, 0xCC, 0xC5, 0x29, 0x73}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 66 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 66 * 6];
 } _EC_NIST_PRIME_521 = {
 {NID_X9_62_prime_field, 20, 66, 1},
 {/* seed */
@@ -183,8 +183,8 @@ static const struct {
 #ifndef FIPS_MODULE
 /* the x9.62 prime curves (minus the nist prime curves) */
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 24 * 6];
 } _EC_X9_62_PRIME_192V2 = {
 {NID_X9_62_prime_field, 20, 24, 1},
 {/* seed */
@@ -210,8 +210,8 @@ static const struct {
  0xB1, 0xA7, 0x24, 0xDC, 0x80, 0x41, 0x86, 0x48, 0xD8, 0xDD, 0x31}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 24 * 6];
 } _EC_X9_62_PRIME_192V3 = {
 {NID_X9_62_prime_field, 20, 24, 1},
 {/* seed */
@@ -237,8 +237,8 @@ static const struct {
  0x62, 0xD0, 0x31, 0xC8, 0x3F, 0x42, 0x94, 0xF6, 0x40, 0xEC, 0x13}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 30 * 6];
 } _EC_X9_62_PRIME_239V1 = {
 {NID_X9_62_prime_field, 20, 30, 1},
 {/* seed */
@@ -270,8 +270,8 @@ static const struct {
  0x88, 0x90, 0x9D, 0x0B}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 30 * 6];
 } _EC_X9_62_PRIME_239V2 = {
 {NID_X9_62_prime_field, 20, 30, 1},
 {/* seed */
@@ -303,8 +303,8 @@ static const struct {
  0xBC, 0x58, 0x20, 0x63}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 30 * 6];
 } _EC_X9_62_PRIME_239V3 = {
 {NID_X9_62_prime_field, 20, 30, 1},
 {/* seed */
@@ -337,8 +337,8 @@ static const struct {
 #endif /* FIPS_MODULE */
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 32 * 8];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 32 * 8];
 } _EC_X9_62_PRIME_256V1 = {
 {NID_X9_62_prime_field, 20, 32, 1},
 {/* seed */
@@ -380,8 +380,8 @@ static const struct {
 #ifndef FIPS_MODULE
 /* the secg prime curves (minus the nist and x9.62 prime curves) */
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 14 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 14 * 6];
 } _EC_SECG_PRIME_112R1 = {{NID_X9_62_prime_field, 20, 14, 1},
                           {/* seed */
                            0x00, 0xF5, 0x0B, 0x02, 0x8E, 0x4D, 0x69, 0x6E, 0x67,
@@ -407,8 +407,8 @@ static const struct {
                            0xDF, 0xAC, 0x65, 0x61, 0xC5}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 14 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 14 * 6];
 } _EC_SECG_PRIME_112R2 = {{NID_X9_62_prime_field, 20, 14, 4},
                           {/* seed */
                            0x00, 0x27, 0x57, 0xA1, 0x11, 0x4D, 0x69, 0x6E, 0x67,
@@ -434,8 +434,8 @@ static const struct {
                            0xA1, 0x05, 0x20, 0xD0, 0x4B}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 16 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 16 * 6];
 } _EC_SECG_PRIME_128R1 = {{NID_X9_62_prime_field, 20, 16, 1},
                           {/* seed */
                            0x00, 0x0E, 0x0D, 0x4D, 0x69, 0x6E, 0x67, 0x68, 0x75,
@@ -461,8 +461,8 @@ static const struct {
                            0xA3, 0x0D, 0x1B, 0x90, 0x38, 0xA1, 0x15}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 16 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 16 * 6];
 } _EC_SECG_PRIME_128R2 = {{NID_X9_62_prime_field, 20, 16, 4},
                           {/* seed */
                            0x00, 0x4D, 0x69, 0x6E, 0x67, 0x68, 0x75, 0x61, 0x51,
@@ -488,8 +488,8 @@ static const struct {
                            0x00, 0x24, 0x72, 0x06, 0x13, 0xB5, 0xA3}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 21 * 6];
 } _EC_SECG_PRIME_160K1 = {
 {NID_X9_62_prime_field, 0, 21, 1},
 {/* no seed */
@@ -513,8 +513,8 @@ static const struct {
  0x16, 0xDF, 0xAB, 0x9A, 0xCA, 0x16, 0xB6, 0xB3}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 21 * 6];
 } _EC_SECG_PRIME_160R1 = {
 {NID_X9_62_prime_field, 20, 21, 1},
 {/* seed */
@@ -540,8 +540,8 @@ static const struct {
  0xF9, 0x27, 0xAE, 0xD3, 0xCA, 0x75, 0x22, 0x57}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 21 * 6];
 } _EC_SECG_PRIME_160R2 = {
 {NID_X9_62_prime_field, 20, 21, 1},
 {/* seed */
@@ -567,8 +567,8 @@ static const struct {
  0xE7, 0x86, 0xA8, 0x18, 0xF3, 0xA1, 0xA1, 0x6B}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 24 * 6];
 } _EC_SECG_PRIME_192K1 = {
 {NID_X9_62_prime_field, 0, 24, 1},
 {/* no seed */
@@ -592,8 +592,8 @@ static const struct {
  0xF2, 0xFC, 0x17, 0x0F, 0x69, 0x46, 0x6A, 0x74, 0xDE, 0xFD, 0x8D}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 29 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 29 * 6];
 } _EC_SECG_PRIME_224K1 = {
 {NID_X9_62_prime_field, 0, 29, 1},
 {/* no seed */
@@ -623,8 +623,8 @@ static const struct {
  0x9F, 0xB1, 0xF7}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 32 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 32 * 6];
 } _EC_SECG_PRIME_256K1 = {
 {NID_X9_62_prime_field, 0, 32, 1},
 {/* no seed */
@@ -655,8 +655,8 @@ static const struct {
 
 /* some wap/wtls curves */
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 15 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 15 * 6];
 } _EC_WTLS_8 = {{NID_X9_62_prime_field, 0, 15, 1},
                 {/* no seed */
                  /* p */
@@ -679,8 +679,8 @@ static const struct {
                  0x55, 0x1A, 0xD8, 0x37, 0xE9}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 21 * 6];
 } _EC_WTLS_9 = {
 {NID_X9_62_prime_field, 0, 21, 1},
 {/* no seed */
@@ -704,8 +704,8 @@ static const struct {
  0x8A, 0xE0, 0xE2, 0xDE, 0x57, 0x4A, 0xBF, 0x33}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 28 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 28 * 6];
 } _EC_WTLS_12 = {{NID_X9_62_prime_field, 0, 28, 1},
                  {/* no seed */
                   /* p */
@@ -740,8 +740,8 @@ static const struct {
 
 #ifndef FIPS_MODULE
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 15 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 15 * 6];
 } _EC_SECG_CHAR2_113R1 = {{NID_X9_62_characteristic_two_field, 20, 15, 2},
                           {/* seed */
                            0x10, 0xE7, 0x23, 0xAB, 0x14, 0xD6, 0x96, 0xE6, 0x76,
@@ -767,8 +767,8 @@ static const struct {
                            0xCC, 0xEC, 0x8A, 0x39, 0xE5, 0x6F}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 15 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 15 * 6];
 } _EC_SECG_CHAR2_113R2 = {{NID_X9_62_characteristic_two_field, 20, 15, 2},
                           {/* seed */
                            0x10, 0xC0, 0xFB, 0x15, 0x76, 0x08, 0x60, 0xDE, 0xF1,
@@ -794,8 +794,8 @@ static const struct {
                            0x78, 0x9B, 0x24, 0x96, 0xAF, 0x93}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 17 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 17 * 6];
 } _EC_SECG_CHAR2_131R1 = {{NID_X9_62_characteristic_two_field, 20, 17, 2},
                           {/* seed */
                            0x4D, 0x69, 0x6E, 0x67, 0x68, 0x75, 0x61, 0x51, 0x75,
@@ -821,8 +821,8 @@ static const struct {
                            0x31, 0x23, 0x95, 0x3A, 0x94, 0x64, 0xB5, 0x4D}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 17 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 17 * 6];
 } _EC_SECG_CHAR2_131R2 = {{NID_X9_62_characteristic_two_field, 20, 17, 2},
                           {/* seed */
                            0x98, 0x5B, 0xD3, 0xAD, 0xBA, 0xD4, 0xD6, 0x96, 0xE6,
@@ -849,8 +849,8 @@ static const struct {
 #endif /* FIPS_MODULE */
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 21 * 6];
 } _EC_NIST_CHAR2_163K = {
 {NID_X9_62_characteristic_two_field, 0, 21, 2},
 {/* no seed */
@@ -875,8 +875,8 @@ static const struct {
 
 #ifndef FIPS_MODULE
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 21 * 6];
 } _EC_SECG_CHAR2_163R1 = {
 {NID_X9_62_characteristic_two_field, 0, 21, 2},
 {/* p */
@@ -900,8 +900,8 @@ static const struct {
 #endif /* FIPS_MODULE */
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 21 * 6];
 } _EC_NIST_CHAR2_163B = {
 {NID_X9_62_characteristic_two_field, 0, 21, 2},
 {/* p */
@@ -925,8 +925,8 @@ static const struct {
 
 #ifndef FIPS_MODULE
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 25 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 25 * 6];
 } _EC_SECG_CHAR2_193R1 = {
 {NID_X9_62_characteristic_two_field, 20, 25, 2},
 {/* seed */
@@ -952,8 +952,8 @@ static const struct {
  0xC7, 0xF3, 0x4A, 0x77, 0x8F, 0x44, 0x3A, 0xCC, 0x92, 0x0E, 0xBA, 0x49}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 25 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 25 * 6];
 } _EC_SECG_CHAR2_193R2 = {
 {NID_X9_62_characteristic_two_field, 20, 25, 2},
 {/* seed */
@@ -980,8 +980,8 @@ static const struct {
 #endif /* FIPS_MODULE */
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 30 * 6];
 } _EC_NIST_CHAR2_233K = {
 {NID_X9_62_characteristic_two_field, 0, 30, 4},
 {/* no seed */
@@ -1011,8 +1011,8 @@ static const struct {
  0xF1, 0x73, 0xAB, 0xDF}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 30 * 6];
 } _EC_NIST_CHAR2_233B = {
 {NID_X9_62_characteristic_two_field, 20, 30, 2},
 {/* seed */
@@ -1045,8 +1045,8 @@ static const struct {
 
 #ifndef FIPS_MODULE
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 30 * 6];
 } _EC_SECG_CHAR2_239K1 = {
 {NID_X9_62_characteristic_two_field, 0, 30, 4},
 {/* no seed */
@@ -1077,8 +1077,8 @@ static const struct {
 #endif /* FIPS_MODULE */
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 36 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 36 * 6];
 } _EC_NIST_CHAR2_283K = {
 {NID_X9_62_characteristic_two_field, 0, 36, 4},
 {/* no seed */
@@ -1108,8 +1108,8 @@ static const struct {
  0xFF, 0x7F, 0x94, 0x45, 0x1E, 0x06, 0x1E, 0x16, 0x3C, 0x61}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 36 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 36 * 6];
 } _EC_NIST_CHAR2_283B = {
 {NID_X9_62_characteristic_two_field, 20, 36, 2},
 {/* seed */
@@ -1141,8 +1141,8 @@ static const struct {
  0x90, 0x16, 0x5B, 0x04, 0x2A, 0x7C, 0xEF, 0xAD, 0xB3, 0x07}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 52 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 52 * 6];
 } _EC_NIST_CHAR2_409K = {
 {NID_X9_62_characteristic_two_field, 0, 52, 4},
 {/* no seed */
@@ -1178,8 +1178,8 @@ static const struct {
  0xD3, 0xE3, 0xE7, 0xCA, 0x5B, 0x4B, 0x5C, 0x83, 0xB8, 0xE0, 0x1E, 0x5F, 0xCF}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 52 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 52 * 6];
 } _EC_NIST_CHAR2_409B = {
 {NID_X9_62_characteristic_two_field, 20, 52, 2},
 {/* seed */
@@ -1217,8 +1217,8 @@ static const struct {
  0x3C, 0x9E, 0x05, 0x2F, 0x83, 0x81, 0x64, 0xCD, 0x37, 0xD9, 0xA2, 0x11, 0x73}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 72 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 72 * 6];
 } _EC_NIST_CHAR2_571K = {
 {NID_X9_62_characteristic_two_field, 0, 72, 4},
 {/* no seed */
@@ -1266,8 +1266,8 @@ static const struct {
  0xFE, 0x77, 0x8F, 0x63, 0x7C, 0x10, 0x01}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 72 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 72 * 6];
 } _EC_NIST_CHAR2_571B = {
 {NID_X9_62_characteristic_two_field, 20, 72, 2},
 {/* seed */
@@ -1318,8 +1318,8 @@ static const struct {
 
 #ifndef FIPS_MODULE
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 21 * 6];
 } _EC_X9_62_CHAR2_163V1 = {
 {NID_X9_62_characteristic_two_field, 20, 21, 2},
 {/* seed */
@@ -1345,8 +1345,8 @@ static const struct {
  0xC8, 0x82, 0x1C, 0xC7, 0x4D, 0xAE, 0xAF, 0xC1}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 21 * 6];
 } _EC_X9_62_CHAR2_163V2 = {
 {NID_X9_62_characteristic_two_field, 20, 21, 2},
 {/* seed */
@@ -1372,8 +1372,8 @@ static const struct {
  0xE1, 0x15, 0x1A, 0xDB, 0xB7, 0x8F, 0x10, 0xA7}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 21 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 21 * 6];
 } _EC_X9_62_CHAR2_163V3 = {
 {NID_X9_62_characteristic_two_field, 20, 21, 2},
 {/* seed */
@@ -1399,8 +1399,8 @@ static const struct {
  0x14, 0x0F, 0x11, 0x0A, 0xFF, 0x96, 0x13, 0x09}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 23 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 23 * 6];
 } _EC_X9_62_CHAR2_176V1 = {
 {NID_X9_62_characteristic_two_field, 0, 23, 0xFF6E},
 {/* no seed */
@@ -1424,8 +1424,8 @@ static const struct {
  0x99, 0xD6, 0x2B, 0x0A, 0x19, 0xCE, 0x06, 0xFE, 0x26, 0xAD}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 24 * 6];
 } _EC_X9_62_CHAR2_191V1 = {
 {NID_X9_62_characteristic_two_field, 20, 24, 2},
 {/* seed */
@@ -1451,8 +1451,8 @@ static const struct {
  0xA2, 0x0E, 0x90, 0xC3, 0x90, 0x67, 0xC8, 0x93, 0xBB, 0xB9, 0xA5}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 24 * 6];
 } _EC_X9_62_CHAR2_191V2 = {
 {NID_X9_62_characteristic_two_field, 20, 24, 4},
 {/* seed */
@@ -1478,8 +1478,8 @@ static const struct {
  0x50, 0x8C, 0xB8, 0x9F, 0x65, 0x28, 0x24, 0xE0, 0x6B, 0x81, 0x73}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 24 * 6];
 } _EC_X9_62_CHAR2_191V3 = {
 {NID_X9_62_characteristic_two_field, 20, 24, 6},
 {/* seed */
@@ -1505,8 +1505,8 @@ static const struct {
  0x0C, 0x0B, 0x19, 0x68, 0x12, 0xBF, 0xB6, 0x28, 0x8A, 0x3E, 0xA3}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 27 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 27 * 6];
 } _EC_X9_62_CHAR2_208W1 = {
 {NID_X9_62_characteristic_two_field, 0, 27, 0xFE48},
 {/* no seed */
@@ -1536,8 +1536,8 @@ static const struct {
  0x9D}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 30 * 6];
 } _EC_X9_62_CHAR2_239V1 = {
 {NID_X9_62_characteristic_two_field, 20, 30, 4},
 {/* seed */
@@ -1569,8 +1569,8 @@ static const struct {
  0xD6, 0x66, 0xE4, 0x47}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 30 * 6];
 } _EC_X9_62_CHAR2_239V2 = {
 {NID_X9_62_characteristic_two_field, 20, 30, 6},
 {/* seed */
@@ -1602,8 +1602,8 @@ static const struct {
  0x46, 0x24, 0x52, 0x2D}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 30 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 30 * 6];
 } _EC_X9_62_CHAR2_239V3 = {
 {NID_X9_62_characteristic_two_field, 20, 30, 0xA},
 {/* seed */
@@ -1635,8 +1635,8 @@ static const struct {
  0x8A, 0x0E, 0x4C, 0xFF}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 35 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 35 * 6];
 } _EC_X9_62_CHAR2_272W1 = {
 {NID_X9_62_characteristic_two_field, 0, 35, 0xFF06},
 {/* no seed */
@@ -1666,8 +1666,8 @@ static const struct {
  0x99, 0x8A, 0x16, 0x7B, 0x8F, 0x1E, 0x62, 0x95, 0x21}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 39 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 39 * 6];
 } _EC_X9_62_CHAR2_304W1 = {
 {NID_X9_62_characteristic_two_field, 0, 39, 0xFE2E},
 {/* no seed */
@@ -1697,8 +1697,8 @@ static const struct {
  0x17, 0x3F, 0x8F, 0xB5, 0x61, 0xDA, 0x68, 0x99, 0x16, 0x44, 0x43, 0x05, 0x1D}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[20 + 45 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[20 + 45 * 6];
 } _EC_X9_62_CHAR2_359V1 = {
 {NID_X9_62_characteristic_two_field, 20, 45, 0x4C},
 {/* seed */
@@ -1736,8 +1736,8 @@ static const struct {
  0x74, 0xF4, 0x90, 0x75, 0x8D, 0x3B}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 47 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 47 * 6];
 } _EC_X9_62_CHAR2_368W1 = {
 {NID_X9_62_characteristic_two_field, 0, 47, 0xFF70},
 {/* no seed */
@@ -1773,8 +1773,8 @@ static const struct {
  0xF1, 0x31, 0xE9, 0xCF, 0xCE, 0x5B, 0xD9, 0x67}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 54 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 54 * 6];
 } _EC_X9_62_CHAR2_431R1 = {
 {NID_X9_62_characteristic_two_field, 0, 54, 0x2760},
 {/* no seed */
@@ -1816,8 +1816,8 @@ static const struct {
  0x4A, 0x91}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 15 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 15 * 6];
 } _EC_WTLS_1 = {{NID_X9_62_characteristic_two_field, 0, 15, 2},
                 {/* no seed */
                  /* p */
@@ -1846,8 +1846,8 @@ static const struct {
  * is not suitable for ECDSA.
  */
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 20 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 20 * 6];
 } _EC_IPSEC_155_ID3 = {
 {NID_X9_62_characteristic_two_field, 0, 20, 3},
 {/* no seed */
@@ -1876,8 +1876,8 @@ static const struct {
  * is not suitable for ECDSA.
  */
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 24 * 6];
 } _EC_IPSEC_185_ID4 = {
 {NID_X9_62_characteristic_two_field, 0, 24, 2},
 {/* no seed */
@@ -1912,8 +1912,8 @@ static const struct {
 
 #ifndef FIPS_MODULE
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 20 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 20 * 6];
 } _EC_brainpoolP160r1 = {
 {NID_X9_62_prime_field, 0, 20, 1},
 {/* no seed */
@@ -1937,8 +1937,8 @@ static const struct {
  0x50, 0x29, 0x40, 0x9E, 0x60, 0xFC, 0x09}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 20 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 20 * 6];
 } _EC_brainpoolP160t1 = {
 {NID_X9_62_prime_field, 0, 20, 1},
 {/* no seed */
@@ -1962,8 +1962,8 @@ static const struct {
  0x50, 0x29, 0x40, 0x9E, 0x60, 0xFC, 0x09}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 24 * 6];
 } _EC_brainpoolP192r1 = {
 {NID_X9_62_prime_field, 0, 24, 1},
 {/* no seed */
@@ -1987,8 +1987,8 @@ static const struct {
  0x9E, 0x91, 0x6B, 0x5B, 0xE8, 0xF1, 0x02, 0x9A, 0xC4, 0xAC, 0xC1}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 24 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 24 * 6];
 } _EC_brainpoolP192t1 = {
 {NID_X9_62_prime_field, 0, 24, 1},
 {/* no seed */
@@ -2012,8 +2012,8 @@ static const struct {
  0x9E, 0x91, 0x6B, 0x5B, 0xE8, 0xF1, 0x02, 0x9A, 0xC4, 0xAC, 0xC1}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 28 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 28 * 6];
 } _EC_brainpoolP224r1 = {
 {NID_X9_62_prime_field, 0, 28, 1},
 {/* no seed */
@@ -2043,8 +2043,8 @@ static const struct {
  0x93, 0x9F}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 28 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 28 * 6];
 } _EC_brainpoolP224t1 = {
 {NID_X9_62_prime_field, 0, 28, 1},
 {/* no seed */
@@ -2074,8 +2074,8 @@ static const struct {
  0x93, 0x9F}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 32 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 32 * 6];
 } _EC_brainpoolP256r1 = {
 {NID_X9_62_prime_field, 0, 32, 1},
 {/* no seed */
@@ -2105,8 +2105,8 @@ static const struct {
  0x0E, 0x82, 0x97, 0x48, 0x56, 0xA7}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 32 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 32 * 6];
 } _EC_brainpoolP256t1 = {
 {NID_X9_62_prime_field, 0, 32, 1},
 {/* no seed */
@@ -2136,8 +2136,8 @@ static const struct {
  0x0E, 0x82, 0x97, 0x48, 0x56, 0xA7}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 40 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 40 * 6];
 } _EC_brainpoolP320r1 = {
 {NID_X9_62_prime_field, 0, 40, 1},
 {/* no seed */
@@ -2173,8 +2173,8 @@ static const struct {
  0x11}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 40 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 40 * 6];
 } _EC_brainpoolP320t1 = {
 {NID_X9_62_prime_field, 0, 40, 1},
 {/* no seed */
@@ -2210,8 +2210,8 @@ static const struct {
  0x11}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 48 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 48 * 6];
 } _EC_brainpoolP384r1 = {
 {NID_X9_62_prime_field, 0, 48, 1},
 {/* no seed */
@@ -2247,8 +2247,8 @@ static const struct {
  0x10, 0x3B, 0x88, 0x32, 0x02, 0xE9, 0x04, 0x65, 0x65}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 48 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 48 * 6];
 } _EC_brainpoolP384t1 = {
 {NID_X9_62_prime_field, 0, 48, 1},
 {/* no seed */
@@ -2284,8 +2284,8 @@ static const struct {
  0x10, 0x3B, 0x88, 0x32, 0x02, 0xE9, 0x04, 0x65, 0x65}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 64 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 64 * 6];
 } _EC_brainpoolP512r1 = {
 {NID_X9_62_prime_field, 0, 64, 1},
 {/* no seed */
@@ -2327,8 +2327,8 @@ static const struct {
  0x08, 0x5D, 0xDA, 0xDD, 0xB5, 0x87, 0x96, 0x82, 0x9C, 0xA9, 0x00, 0x69}};
 
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 64 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 64 * 6];
 } _EC_brainpoolP512t1 = {
 {NID_X9_62_prime_field, 0, 64, 1},
 {/* no seed */
@@ -2372,8 +2372,8 @@ static const struct {
 
 #if !defined(OPENSSL_NO_SM2) && !defined(FIPS_MODULE)
 static const struct {
-  EC_CURVE_DATA h;
-  unsigned char data[0 + 32 * 6];
+    EC_CURVE_DATA h;
+    unsigned char data[0 + 32 * 6];
 } _EC_sm2p256v1 = {{NID_X9_62_prime_field, 0, 32, 1},
                    {
                    /* no seed */
@@ -2580,10 +2580,10 @@ static const struct {
 #endif /* OPENSSL_NO_SM2 */
 
 typedef struct _ec_list_element_st {
-  int nid;
-  const EC_CURVE_DATA *data;
-  const EC_METHOD *(*meth)(void);
-  const char *comment;
+    int nid;
+    const EC_CURVE_DATA *data;
+    const EC_METHOD *(*meth)(void);
+    const char *comment;
 } ec_list_element;
 
 #ifdef FIPS_MODULE
@@ -2889,224 +2889,225 @@ static const ec_list_element curve_list[] = {
 #define curve_list_length OSSL_NELEM(curve_list)
 
 static const ec_list_element *ec_curve_nid2curve(int nid) {
-  size_t i;
+    size_t i;
 
-  if (nid <= 0)
+    if (nid <= 0)
+        return NULL;
+
+    for (i = 0; i < curve_list_length; i++) {
+        if (curve_list[i].nid == nid)
+            return &curve_list[i];
+    }
     return NULL;
-
-  for (i = 0; i < curve_list_length; i++) {
-    if (curve_list[i].nid == nid)
-      return &curve_list[i];
-  }
-  return NULL;
 }
 
 static EC_GROUP *ec_group_new_from_data(OSSL_LIB_CTX *libctx, const char *propq,
                                         const ec_list_element curve) {
-  EC_GROUP *group = NULL;
-  EC_POINT *P = NULL;
-  BN_CTX *ctx = NULL;
-  BIGNUM *p = NULL, *a = NULL, *b = NULL, *x = NULL, *y = NULL, *order = NULL;
-  int ok = 0;
-  int seed_len, param_len;
-  const EC_METHOD *meth;
-  const EC_CURVE_DATA *data;
-  const unsigned char *params;
+    EC_GROUP *group = NULL;
+    EC_POINT *P = NULL;
+    BN_CTX *ctx = NULL;
+    BIGNUM *p = NULL, *a = NULL, *b = NULL, *x = NULL, *y = NULL, *order = NULL;
+    int ok = 0;
+    int seed_len, param_len;
+    const EC_METHOD *meth;
+    const EC_CURVE_DATA *data;
+    const unsigned char *params;
 
-  /* If no curve data curve method must handle everything */
-  if (curve.data == NULL)
-    return ossl_ec_group_new_ex(libctx, propq,
-                                curve.meth != NULL ? curve.meth() : NULL);
+    /* If no curve data curve method must handle everything */
+    if (curve.data == NULL)
+        return ossl_ec_group_new_ex(libctx, propq,
+                                    curve.meth != NULL ? curve.meth() : NULL);
 
-  if ((ctx = BN_CTX_new_ex(libctx)) == NULL) {
-    ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
-    goto err;
-  }
-
-  data = curve.data;
-  seed_len = data->seed_len;
-  param_len = data->param_len;
-  params = (const unsigned char *)(data + 1); /* skip header */
-
-  if (curve.meth != NULL) {
-    meth = curve.meth();
-    if ((group = ossl_ec_group_new_ex(libctx, propq, meth)) == NULL) {
-      ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
-      goto err;
+    if ((ctx = BN_CTX_new_ex(libctx)) == NULL) {
+        ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
+        goto err;
     }
-    if (group->meth->group_full_init != NULL) {
-      if (!group->meth->group_full_init(group, params)) {
+
+    data = curve.data;
+    seed_len = data->seed_len;
+    param_len = data->param_len;
+    params = (const unsigned char *)(data + 1); /* skip header */
+
+    if (curve.meth != NULL) {
+        meth = curve.meth();
+        if ((group = ossl_ec_group_new_ex(libctx, propq, meth)) == NULL) {
+            ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
+            goto err;
+        }
+        if (group->meth->group_full_init != NULL) {
+            if (!group->meth->group_full_init(group, params)) {
+                ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
+                goto err;
+            }
+            EC_GROUP_set_curve_name(group, curve.nid);
+            BN_CTX_free(ctx);
+            return group;
+        }
+    }
+
+    params += seed_len; /* skip seed */
+
+    if ((p = BN_bin2bn(params + 0 * param_len, param_len, NULL)) == NULL ||
+        (a = BN_bin2bn(params + 1 * param_len, param_len, NULL)) == NULL ||
+        (b = BN_bin2bn(params + 2 * param_len, param_len, NULL)) == NULL) {
+        ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
+        goto err;
+    }
+
+    if (group != NULL) {
+        if (group->meth->group_set_curve(group, p, a, b, ctx) == 0) {
+            ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
+            goto err;
+        }
+    } else if (data->field_type == NID_X9_62_prime_field) {
+        if ((group = EC_GROUP_new_curve_GFp(p, a, b, ctx)) == NULL) {
+            ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
+            goto err;
+        }
+    }
+#ifndef OPENSSL_NO_EC2M
+    else { /* field_type ==
+            * NID_X9_62_characteristic_two_field */
+
+        if ((group = EC_GROUP_new_curve_GF2m(p, a, b, ctx)) == NULL) {
+            ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
+            goto err;
+        }
+    }
+#endif
+
+    EC_GROUP_set_curve_name(group, curve.nid);
+
+    if ((P = EC_POINT_new(group)) == NULL) {
         ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
         goto err;
-      }
-      EC_GROUP_set_curve_name(group, curve.nid);
-      BN_CTX_free(ctx);
-      return group;
     }
-  }
 
-  params += seed_len; /* skip seed */
-
-  if ((p = BN_bin2bn(params + 0 * param_len, param_len, NULL)) == NULL ||
-      (a = BN_bin2bn(params + 1 * param_len, param_len, NULL)) == NULL ||
-      (b = BN_bin2bn(params + 2 * param_len, param_len, NULL)) == NULL) {
-    ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
-    goto err;
-  }
-
-  if (group != NULL) {
-    if (group->meth->group_set_curve(group, p, a, b, ctx) == 0) {
-      ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
-      goto err;
+    if ((x = BN_bin2bn(params + 3 * param_len, param_len, NULL)) == NULL ||
+        (y = BN_bin2bn(params + 4 * param_len, param_len, NULL)) == NULL) {
+        ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
+        goto err;
     }
-  } else if (data->field_type == NID_X9_62_prime_field) {
-    if ((group = EC_GROUP_new_curve_GFp(p, a, b, ctx)) == NULL) {
-      ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
-      goto err;
+    if (!EC_POINT_set_affine_coordinates(group, P, x, y, ctx)) {
+        ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
+        goto err;
     }
-  }
-#ifndef OPENSSL_NO_EC2M
-  else { /* field_type ==
-          * NID_X9_62_characteristic_two_field */
-
-    if ((group = EC_GROUP_new_curve_GF2m(p, a, b, ctx)) == NULL) {
-      ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
-      goto err;
+    if ((order = BN_bin2bn(params + 5 * param_len, param_len, NULL)) == NULL ||
+        !BN_set_word(x, (BN_ULONG)data->cofactor)) {
+        ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
+        goto err;
     }
-  }
-#endif
-
-  EC_GROUP_set_curve_name(group, curve.nid);
-
-  if ((P = EC_POINT_new(group)) == NULL) {
-    ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
-    goto err;
-  }
-
-  if ((x = BN_bin2bn(params + 3 * param_len, param_len, NULL)) == NULL ||
-      (y = BN_bin2bn(params + 4 * param_len, param_len, NULL)) == NULL) {
-    ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
-    goto err;
-  }
-  if (!EC_POINT_set_affine_coordinates(group, P, x, y, ctx)) {
-    ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
-    goto err;
-  }
-  if ((order = BN_bin2bn(params + 5 * param_len, param_len, NULL)) == NULL ||
-      !BN_set_word(x, (BN_ULONG)data->cofactor)) {
-    ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
-    goto err;
-  }
-  if (!EC_GROUP_set_generator(group, P, order, x)) {
-    ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
-    goto err;
-  }
-  if (seed_len) {
-    if (!EC_GROUP_set_seed(group, params - seed_len, seed_len)) {
-      ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
-      goto err;
+    if (!EC_GROUP_set_generator(group, P, order, x)) {
+        ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
+        goto err;
     }
-  }
+    if (seed_len) {
+        if (!EC_GROUP_set_seed(group, params - seed_len, seed_len)) {
+            ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
+            goto err;
+        }
+    }
 
 #ifndef FIPS_MODULE
-  if (EC_GROUP_get_asn1_flag(group) == OPENSSL_EC_NAMED_CURVE) {
-    /*
-     * Some curves don't have an associated OID: for those we should not
-     * default to `OPENSSL_EC_NAMED_CURVE` encoding of parameters and
-     * instead set the ASN1 flag to `OPENSSL_EC_EXPLICIT_CURVE`.
-     *
-     * Note that `OPENSSL_EC_NAMED_CURVE` is set as the default ASN1 flag on
-     * `EC_GROUP_new()`, when we don't have enough elements to determine if
-     * an OID for the curve name actually exists.
-     * We could implement this check on `EC_GROUP_set_curve_name()` but
-     * overloading the simple setter with this lookup could have a negative
-     * performance impact and unexpected consequences.
-     */
-    ASN1_OBJECT *asn1obj = OBJ_nid2obj(curve.nid);
+    if (EC_GROUP_get_asn1_flag(group) == OPENSSL_EC_NAMED_CURVE) {
+        /*
+         * Some curves don't have an associated OID: for those we should not
+         * default to `OPENSSL_EC_NAMED_CURVE` encoding of parameters and
+         * instead set the ASN1 flag to `OPENSSL_EC_EXPLICIT_CURVE`.
+         *
+         * Note that `OPENSSL_EC_NAMED_CURVE` is set as the default ASN1 flag on
+         * `EC_GROUP_new()`, when we don't have enough elements to determine if
+         * an OID for the curve name actually exists.
+         * We could implement this check on `EC_GROUP_set_curve_name()` but
+         * overloading the simple setter with this lookup could have a negative
+         * performance impact and unexpected consequences.
+         */
+        ASN1_OBJECT *asn1obj = OBJ_nid2obj(curve.nid);
 
-    if (asn1obj == NULL) {
-      ERR_raise(ERR_LIB_EC, ERR_R_OBJ_LIB);
-      goto err;
+        if (asn1obj == NULL) {
+            ERR_raise(ERR_LIB_EC, ERR_R_OBJ_LIB);
+            goto err;
+        }
+        if (OBJ_length(asn1obj) == 0)
+            EC_GROUP_set_asn1_flag(group, OPENSSL_EC_EXPLICIT_CURVE);
+
+        ASN1_OBJECT_free(asn1obj);
     }
-    if (OBJ_length(asn1obj) == 0)
-      EC_GROUP_set_asn1_flag(group, OPENSSL_EC_EXPLICIT_CURVE);
-
-    ASN1_OBJECT_free(asn1obj);
-  }
 #else
-  /*
-   * Inside the FIPS module we do not support explicit curves anyway
-   * so the above check is not necessary.
-   *
-   * Skipping it is also necessary because `OBJ_length()` and
-   * `ASN1_OBJECT_free()` are not available within the FIPS module
-   * boundaries.
-   */
+    /*
+     * Inside the FIPS module we do not support explicit curves anyway
+     * so the above check is not necessary.
+     *
+     * Skipping it is also necessary because `OBJ_length()` and
+     * `ASN1_OBJECT_free()` are not available within the FIPS module
+     * boundaries.
+     */
 #endif
 
-  ok = 1;
+    ok = 1;
 err:
-  if (!ok) {
-    EC_GROUP_free(group);
-    group = NULL;
-  }
-  EC_POINT_free(P);
-  BN_CTX_free(ctx);
-  BN_free(p);
-  BN_free(a);
-  BN_free(b);
-  BN_free(order);
-  BN_free(x);
-  BN_free(y);
-  return group;
+    if (!ok) {
+        EC_GROUP_free(group);
+        group = NULL;
+    }
+    EC_POINT_free(P);
+    BN_CTX_free(ctx);
+    BN_free(p);
+    BN_free(a);
+    BN_free(b);
+    BN_free(order);
+    BN_free(x);
+    BN_free(y);
+    return group;
 }
 
 EC_GROUP *EC_GROUP_new_by_curve_name_ex(OSSL_LIB_CTX *libctx, const char *propq,
                                         int nid) {
-  EC_GROUP *ret = NULL;
-  const ec_list_element *curve;
+    EC_GROUP *ret = NULL;
+    const ec_list_element *curve;
 
-  if ((curve = ec_curve_nid2curve(nid)) == NULL ||
-      (ret = ec_group_new_from_data(libctx, propq, *curve)) == NULL) {
+    if ((curve = ec_curve_nid2curve(nid)) == NULL ||
+        (ret = ec_group_new_from_data(libctx, propq, *curve)) == NULL) {
 #ifndef FIPS_MODULE
-    ERR_raise_data(ERR_LIB_EC, EC_R_UNKNOWN_GROUP, "name=%s", OBJ_nid2sn(nid));
+        ERR_raise_data(ERR_LIB_EC, EC_R_UNKNOWN_GROUP, "name=%s",
+                       OBJ_nid2sn(nid));
 #else
-    ERR_raise(ERR_LIB_EC, EC_R_UNKNOWN_GROUP);
+        ERR_raise(ERR_LIB_EC, EC_R_UNKNOWN_GROUP);
 #endif
-    return NULL;
-  }
+        return NULL;
+    }
 
-  return ret;
+    return ret;
 }
 
 #ifndef FIPS_MODULE
 EC_GROUP *EC_GROUP_new_by_curve_name(int nid) {
-  return EC_GROUP_new_by_curve_name_ex(NULL, NULL, nid);
+    return EC_GROUP_new_by_curve_name_ex(NULL, NULL, nid);
 }
 #endif
 
 size_t EC_get_builtin_curves(EC_builtin_curve *r, size_t nitems) {
-  size_t i, min;
+    size_t i, min;
 
-  if (r == NULL || nitems == 0)
+    if (r == NULL || nitems == 0)
+        return curve_list_length;
+
+    min = nitems < curve_list_length ? nitems : curve_list_length;
+
+    for (i = 0; i < min; i++) {
+        r[i].nid = curve_list[i].nid;
+        r[i].comment = curve_list[i].comment;
+    }
+
     return curve_list_length;
-
-  min = nitems < curve_list_length ? nitems : curve_list_length;
-
-  for (i = 0; i < min; i++) {
-    r[i].nid = curve_list[i].nid;
-    r[i].comment = curve_list[i].comment;
-  }
-
-  return curve_list_length;
 }
 
 const char *EC_curve_nid2nist(int nid) {
-  return ossl_ec_curve_nid2nist_int(nid);
+    return ossl_ec_curve_nid2nist_int(nid);
 }
 
 int EC_curve_nist2nid(const char *name) {
-  return ossl_ec_curve_nist2nid_int(name);
+    return ossl_ec_curve_nist2nid_int(name);
 }
 
 #define NUM_BN_FIELDS 6
@@ -3119,97 +3120,98 @@ int EC_curve_nist2nid(const char *name) {
  *          if not found. If there was an error it returns -1.
  */
 int ossl_ec_curve_nid_from_params(const EC_GROUP *group, BN_CTX *ctx) {
-  int ret = -1, nid, len, field_type, param_len;
-  size_t i, seed_len;
-  const unsigned char *seed, *params_seed, *params;
-  unsigned char *param_bytes = NULL;
-  const EC_CURVE_DATA *data;
-  const EC_POINT *generator = NULL;
-  const BIGNUM *cofactor = NULL;
-  /* An array of BIGNUMs for (p, a, b, x, y, order) */
-  BIGNUM *bn[NUM_BN_FIELDS] = {NULL, NULL, NULL, NULL, NULL, NULL};
+    int ret = -1, nid, len, field_type, param_len;
+    size_t i, seed_len;
+    const unsigned char *seed, *params_seed, *params;
+    unsigned char *param_bytes = NULL;
+    const EC_CURVE_DATA *data;
+    const EC_POINT *generator = NULL;
+    const BIGNUM *cofactor = NULL;
+    /* An array of BIGNUMs for (p, a, b, x, y, order) */
+    BIGNUM *bn[NUM_BN_FIELDS] = {NULL, NULL, NULL, NULL, NULL, NULL};
 
-  /* Use the optional named curve nid as a search field */
-  nid = EC_GROUP_get_curve_name(group);
-  field_type = EC_GROUP_get_field_type(group);
-  seed_len = EC_GROUP_get_seed_len(group);
-  seed = EC_GROUP_get0_seed(group);
-  cofactor = EC_GROUP_get0_cofactor(group);
+    /* Use the optional named curve nid as a search field */
+    nid = EC_GROUP_get_curve_name(group);
+    field_type = EC_GROUP_get_field_type(group);
+    seed_len = EC_GROUP_get_seed_len(group);
+    seed = EC_GROUP_get0_seed(group);
+    cofactor = EC_GROUP_get0_cofactor(group);
 
-  BN_CTX_start(ctx);
+    BN_CTX_start(ctx);
 
-  /*
-   * The built-in curves contains data fields (p, a, b, x, y, order) that are
-   * all zero-padded to be the same size. The size of the padding is
-   * determined by either the number of bytes in the field modulus (p) or the
-   * EC group order, whichever is larger.
-   */
-  param_len = BN_num_bytes(group->order);
-  len = BN_num_bytes(group->field);
-  if (len > param_len)
-    param_len = len;
+    /*
+     * The built-in curves contains data fields (p, a, b, x, y, order) that are
+     * all zero-padded to be the same size. The size of the padding is
+     * determined by either the number of bytes in the field modulus (p) or the
+     * EC group order, whichever is larger.
+     */
+    param_len = BN_num_bytes(group->order);
+    len = BN_num_bytes(group->field);
+    if (len > param_len)
+        param_len = len;
 
-  /* Allocate space to store the padded data for (p, a, b, x, y, order)  */
-  param_bytes = OPENSSL_malloc(param_len * NUM_BN_FIELDS);
-  if (param_bytes == NULL)
-    goto end;
+    /* Allocate space to store the padded data for (p, a, b, x, y, order)  */
+    param_bytes = OPENSSL_malloc(param_len * NUM_BN_FIELDS);
+    if (param_bytes == NULL)
+        goto end;
 
-  /* Create the bignums */
-  for (i = 0; i < NUM_BN_FIELDS; ++i) {
-    if ((bn[i] = BN_CTX_get(ctx)) == NULL)
-      goto end;
-  }
-  /*
-   * Fill in the bn array with the same values as the internal curves
-   * i.e. the values are p, a, b, x, y, order.
-   */
-  /* Get p, a & b */
-  if (!(EC_GROUP_get_curve(group, bn[0], bn[1], bn[2], ctx) &&
-        ((generator = EC_GROUP_get0_generator(group)) != NULL)
-        /* Get x & y */
-        && EC_POINT_get_affine_coordinates(group, generator, bn[3], bn[4], ctx)
-        /* Get order */
-        && EC_GROUP_get_order(group, bn[5], ctx)))
-    goto end;
-
-  /*
-   * Convert the bignum array to bytes that are joined together to form
-   * a single buffer that contains data for all fields.
-   * (p, a, b, x, y, order) are all zero padded to be the same size.
-   */
-  for (i = 0; i < NUM_BN_FIELDS; ++i) {
-    if (BN_bn2binpad(bn[i], &param_bytes[i * param_len], param_len) <= 0)
-      goto end;
-  }
-
-  for (i = 0; i < curve_list_length; i++) {
-    const ec_list_element curve = curve_list[i];
-
-    data = curve.data;
-    /* Get the raw order byte data */
-    params_seed = (const unsigned char *)(data + 1); /* skip header */
-    params = params_seed + data->seed_len;
-
-    /* Look for unique fields in the fixed curve data */
-    if (data->field_type == field_type && param_len == data->param_len &&
-        (nid <= 0 || nid == curve.nid)
-        /* check the optional cofactor (ignore if its zero) */
-        && (BN_is_zero(cofactor) ||
-            BN_is_word(cofactor, (const BN_ULONG)curve.data->cofactor))
-        /* Check the optional seed (ignore if its not set) */
-        && (data->seed_len == 0 || seed_len == 0 ||
-            ((size_t)data->seed_len == seed_len &&
-             memcmp(params_seed, seed, seed_len) == 0))
-        /* Check that the groups params match the built-in curve params */
-        && memcmp(param_bytes, params, param_len * NUM_BN_FIELDS) == 0) {
-      ret = curve.nid;
-      goto end;
+    /* Create the bignums */
+    for (i = 0; i < NUM_BN_FIELDS; ++i) {
+        if ((bn[i] = BN_CTX_get(ctx)) == NULL)
+            goto end;
     }
-  }
-  /* Gets here if the group was not found */
-  ret = NID_undef;
+    /*
+     * Fill in the bn array with the same values as the internal curves
+     * i.e. the values are p, a, b, x, y, order.
+     */
+    /* Get p, a & b */
+    if (!(EC_GROUP_get_curve(group, bn[0], bn[1], bn[2], ctx) &&
+          ((generator = EC_GROUP_get0_generator(group)) != NULL)
+          /* Get x & y */
+          &&
+          EC_POINT_get_affine_coordinates(group, generator, bn[3], bn[4], ctx)
+          /* Get order */
+          && EC_GROUP_get_order(group, bn[5], ctx)))
+        goto end;
+
+    /*
+     * Convert the bignum array to bytes that are joined together to form
+     * a single buffer that contains data for all fields.
+     * (p, a, b, x, y, order) are all zero padded to be the same size.
+     */
+    for (i = 0; i < NUM_BN_FIELDS; ++i) {
+        if (BN_bn2binpad(bn[i], &param_bytes[i * param_len], param_len) <= 0)
+            goto end;
+    }
+
+    for (i = 0; i < curve_list_length; i++) {
+        const ec_list_element curve = curve_list[i];
+
+        data = curve.data;
+        /* Get the raw order byte data */
+        params_seed = (const unsigned char *)(data + 1); /* skip header */
+        params = params_seed + data->seed_len;
+
+        /* Look for unique fields in the fixed curve data */
+        if (data->field_type == field_type && param_len == data->param_len &&
+            (nid <= 0 || nid == curve.nid)
+            /* check the optional cofactor (ignore if its zero) */
+            && (BN_is_zero(cofactor) ||
+                BN_is_word(cofactor, (const BN_ULONG)curve.data->cofactor))
+            /* Check the optional seed (ignore if its not set) */
+            && (data->seed_len == 0 || seed_len == 0 ||
+                ((size_t)data->seed_len == seed_len &&
+                 memcmp(params_seed, seed, seed_len) == 0))
+            /* Check that the groups params match the built-in curve params */
+            && memcmp(param_bytes, params, param_len * NUM_BN_FIELDS) == 0) {
+            ret = curve.nid;
+            goto end;
+        }
+    }
+    /* Gets here if the group was not found */
+    ret = NID_undef;
 end:
-  OPENSSL_free(param_bytes);
-  BN_CTX_end(ctx);
-  return ret;
+    OPENSSL_free(param_bytes);
+    BN_CTX_end(ctx);
+    return ret;
 }

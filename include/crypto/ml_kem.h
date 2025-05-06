@@ -125,7 +125,7 @@
 #define ML_KEM_KEY_PCT_TYPE (ML_KEM_KEY_RANDOM_PCT | ML_KEM_KEY_FIXED_PCT)
 /* Default provider flags */
 #define ML_KEM_KEY_PROV_FLAGS_DEFAULT                                          \
-  (ML_KEM_KEY_RANDOM_PCT | ML_KEM_KEY_PREFER_SEED | ML_KEM_KEY_RETAIN_SEED)
+    (ML_KEM_KEY_RANDOM_PCT | ML_KEM_KEY_PREFER_SEED | ML_KEM_KEY_RETAIN_SEED)
 
 /*
  * External variant-specific API
@@ -133,20 +133,20 @@
  */
 
 typedef struct {
-  const char *algorithm_name;
-  size_t prvkey_bytes;
-  size_t prvalloc;
-  size_t pubkey_bytes;
-  size_t puballoc;
-  size_t ctext_bytes;
-  size_t vector_bytes;
-  size_t u_vector_bytes;
-  int evp_type;
-  int bits;
-  int rank;
-  int du;
-  int dv;
-  int secbits;
+    const char *algorithm_name;
+    size_t prvkey_bytes;
+    size_t prvalloc;
+    size_t pubkey_bytes;
+    size_t puballoc;
+    size_t ctext_bytes;
+    size_t vector_bytes;
+    size_t u_vector_bytes;
+    int evp_type;
+    int bits;
+    int rank;
+    int du;
+    int dv;
+    int secbits;
 } ML_KEM_VINFO;
 
 /* Retrive global variant-specific parameters */
@@ -154,43 +154,43 @@ const ML_KEM_VINFO *ossl_ml_kem_get_vinfo(int evp_type);
 
 /* Known as ML_KEM_KEY via crypto/types.h */
 typedef struct ossl_ml_kem_key_st {
-  /* Variant metadata, for one of ML-KEM-{512,768,1024} */
-  const ML_KEM_VINFO *vinfo;
+    /* Variant metadata, for one of ML-KEM-{512,768,1024} */
+    const ML_KEM_VINFO *vinfo;
 
-  /*
-   * Library context, initially used to fetch the SHA3 MDs, and later for
-   * random number generation.
-   */
-  OSSL_LIB_CTX *libctx;
+    /*
+     * Library context, initially used to fetch the SHA3 MDs, and later for
+     * random number generation.
+     */
+    OSSL_LIB_CTX *libctx;
 
-  /* Pre-fetched SHA3 */
-  EVP_MD *shake128_md;
-  EVP_MD *shake256_md;
-  EVP_MD *sha3_256_md;
-  EVP_MD *sha3_512_md;
+    /* Pre-fetched SHA3 */
+    EVP_MD *shake128_md;
+    EVP_MD *shake256_md;
+    EVP_MD *sha3_256_md;
+    EVP_MD *sha3_512_md;
 
-  /*
-   * Pointers into variable size storage, initially all NULL. Appropriate
-   * storage is allocated once a public or private key is specified, at
-   * which point the key becomes immutable.
-   */
-  uint8_t *rho;                    /* Public matrix seed */
-  uint8_t *pkhash;                 /* Public key hash */
-  struct ossl_ml_kem_scalar_st *t; /* Public key vector */
-  struct ossl_ml_kem_scalar_st *m; /* Pre-computed pubkey matrix */
-  struct ossl_ml_kem_scalar_st *s; /* Private key secret vector */
-  uint8_t *z;                      /* Private key FO failure secret */
-  uint8_t *d;                      /* Private key seed */
-  int prov_flags;                  /* prefer/retain seed and PCT flags */
+    /*
+     * Pointers into variable size storage, initially all NULL. Appropriate
+     * storage is allocated once a public or private key is specified, at
+     * which point the key becomes immutable.
+     */
+    uint8_t *rho;                    /* Public matrix seed */
+    uint8_t *pkhash;                 /* Public key hash */
+    struct ossl_ml_kem_scalar_st *t; /* Public key vector */
+    struct ossl_ml_kem_scalar_st *m; /* Pre-computed pubkey matrix */
+    struct ossl_ml_kem_scalar_st *s; /* Private key secret vector */
+    uint8_t *z;                      /* Private key FO failure secret */
+    uint8_t *d;                      /* Private key seed */
+    int prov_flags;                  /* prefer/retain seed and PCT flags */
 
-  /*
-   * Fixed-size built-in buffer, which holds the |rho| and the public key
-   * |pkhash| in that order, once we have expanded key material.
-   * With seed-only keys, that are not yet expanded, this instead holds the
-   * |z| and |d| components in that order.
-   */
-  uint8_t seedbuf[64]; /* |rho| + |pkhash| / |z| + |d| */
-  uint8_t *encoded_dk; /* Unparsed P8 private key */
+    /*
+     * Fixed-size built-in buffer, which holds the |rho| and the public key
+     * |pkhash| in that order, once we have expanded key material.
+     * With seed-only keys, that are not yet expanded, this instead holds the
+     * |z| and |d| components in that order.
+     */
+    uint8_t seedbuf[64]; /* |rho| + |pkhash| / |z| + |d| */
+    uint8_t *encoded_dk; /* Unparsed P8 private key */
 } ML_KEM_KEY;
 
 /* The public key is always present, when the private is */
@@ -200,7 +200,7 @@ typedef struct ossl_ml_kem_key_st {
 #define ossl_ml_kem_have_seed(key) ((key)->d != NULL)
 #define ossl_ml_kem_have_dkenc(key) ((key)->encoded_dk != NULL)
 #define ossl_ml_kem_decoded_key(key)                                           \
-  ((key)->encoded_dk != NULL || ((key)->s == NULL && (key)->d != NULL))
+    ((key)->encoded_dk != NULL || ((key)->s == NULL && (key)->d != NULL))
 
 /*
  * ----- ML-KEM key lifecycle

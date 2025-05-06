@@ -42,9 +42,9 @@ int OPENSSL_issetugid(void) { return issetugid(); }
 
 int OPENSSL_issetugid(void) {
 #ifdef OSSL_IMPLEMENT_GETAUXVAL
-  return getauxval(AT_SECURE) != 0;
+    return getauxval(AT_SECURE) != 0;
 #else
-  return getuid() != geteuid() || getgid() != getegid();
+    return getuid() != geteuid() || getgid() != getegid();
 #endif
 }
 #endif

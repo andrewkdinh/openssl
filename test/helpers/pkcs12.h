@@ -26,26 +26,26 @@
 
 /* Holds a set of Attributes */
 typedef struct pkcs12_attr {
-  char *oid;
-  char *value;
+    char *oid;
+    char *value;
 } PKCS12_ATTR;
 
 /* Holds encryption parameters */
 typedef struct pkcs12_enc {
-  int nid;
-  const char *pass;
-  int iter;
+    int nid;
+    const char *pass;
+    int iter;
 } PKCS12_ENC;
 
 /* Set of variables required for constructing the PKCS#12 structure */
 typedef struct pkcs12_builder {
-  const char *filename;
-  int success;
-  BIO *p12bio;
-  STACK_OF(PKCS7) * safes;
-  int safe_idx;
-  STACK_OF(PKCS12_SAFEBAG) * bags;
-  int bag_idx;
+    const char *filename;
+    int success;
+    BIO *p12bio;
+    STACK_OF(PKCS7) * safes;
+    int safe_idx;
+    STACK_OF(PKCS12_SAFEBAG) * bags;
+    int bag_idx;
 } PKCS12_BUILDER;
 
 /* -------------------------------------------------------------------------

@@ -52,10 +52,10 @@ static OSSL_FUNC_kem_settable_ctx_params_fn rsakem_settable_ctx_params;
  * we use that here too.
  */
 typedef struct {
-  OSSL_LIB_CTX *libctx;
-  RSA *rsa;
-  int op;
-  OSSL_FIPS_IND_DECLARE
+    OSSL_LIB_CTX *libctx;
+    RSA *rsa;
+    int op;
+    OSSL_FIPS_IND_DECLARE
 } PROV_RSA_CTX;
 
 static const OSSL_ITEM rsakem_opname_id_map[] = {
@@ -63,115 +63,116 @@ static const OSSL_ITEM rsakem_opname_id_map[] = {
 };
 
 static int name2id(const char *name, const OSSL_ITEM *map, size_t sz) {
-  size_t i;
+    size_t i;
 
-  if (name == NULL)
+    if (name == NULL)
+        return -1;
+
+    for (i = 0; i < sz; ++i) {
+        if (OPENSSL_strcasecmp(map[i].ptr, name) == 0)
+            return map[i].id;
+    }
     return -1;
-
-  for (i = 0; i < sz; ++i) {
-    if (OPENSSL_strcasecmp(map[i].ptr, name) == 0)
-      return map[i].id;
-  }
-  return -1;
 }
 
 static int rsakem_opname2id(const char *name) {
-  return name2id(name, rsakem_opname_id_map, OSSL_NELEM(rsakem_opname_id_map));
+    return name2id(name, rsakem_opname_id_map,
+                   OSSL_NELEM(rsakem_opname_id_map));
 }
 
 static void *rsakem_newctx(void *provctx) {
-  PROV_RSA_CTX *prsactx;
+    PROV_RSA_CTX *prsactx;
 
-  if (!ossl_prov_is_running())
-    return NULL;
+    if (!ossl_prov_is_running())
+        return NULL;
 
-  prsactx = OPENSSL_zalloc(sizeof(PROV_RSA_CTX));
-  if (prsactx == NULL)
-    return NULL;
-  prsactx->libctx = PROV_LIBCTX_OF(provctx);
-  prsactx->op = KEM_OP_RSASVE;
-  OSSL_FIPS_IND_INIT(prsactx)
+    prsactx = OPENSSL_zalloc(sizeof(PROV_RSA_CTX));
+    if (prsactx == NULL)
+        return NULL;
+    prsactx->libctx = PROV_LIBCTX_OF(provctx);
+    prsactx->op = KEM_OP_RSASVE;
+    OSSL_FIPS_IND_INIT(prsactx)
 
-  return prsactx;
+    return prsactx;
 }
 
 static void rsakem_freectx(void *vprsactx) {
-  PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
+    PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
 
-  RSA_free(prsactx->rsa);
-  OPENSSL_free(prsactx);
+    RSA_free(prsactx->rsa);
+    OPENSSL_free(prsactx);
 }
 
 static void *rsakem_dupctx(void *vprsactx) {
-  PROV_RSA_CTX *srcctx = (PROV_RSA_CTX *)vprsactx;
-  PROV_RSA_CTX *dstctx;
+    PROV_RSA_CTX *srcctx = (PROV_RSA_CTX *)vprsactx;
+    PROV_RSA_CTX *dstctx;
 
-  if (!ossl_prov_is_running())
-    return NULL;
+    if (!ossl_prov_is_running())
+        return NULL;
 
-  dstctx = OPENSSL_zalloc(sizeof(*srcctx));
-  if (dstctx == NULL)
-    return NULL;
+    dstctx = OPENSSL_zalloc(sizeof(*srcctx));
+    if (dstctx == NULL)
+        return NULL;
 
-  *dstctx = *srcctx;
-  if (dstctx->rsa != NULL && !RSA_up_ref(dstctx->rsa)) {
-    OPENSSL_free(dstctx);
-    return NULL;
-  }
-  return dstctx;
+    *dstctx = *srcctx;
+    if (dstctx->rsa != NULL && !RSA_up_ref(dstctx->rsa)) {
+        OPENSSL_free(dstctx);
+        return NULL;
+    }
+    return dstctx;
 }
 
 static int rsakem_init(void *vprsactx, void *vrsa, const OSSL_PARAM params[],
                        int operation, const char *desc) {
-  PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
-  int protect = 0;
+    PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
+    int protect = 0;
 
-  if (!ossl_prov_is_running())
-    return 0;
+    if (!ossl_prov_is_running())
+        return 0;
 
-  if (prsactx == NULL || vrsa == NULL)
-    return 0;
+    if (prsactx == NULL || vrsa == NULL)
+        return 0;
 
-  if (!ossl_rsa_key_op_get_protect(vrsa, operation, &protect))
-    return 0;
-  if (!RSA_up_ref(vrsa))
-    return 0;
-  RSA_free(prsactx->rsa);
-  prsactx->rsa = vrsa;
+    if (!ossl_rsa_key_op_get_protect(vrsa, operation, &protect))
+        return 0;
+    if (!RSA_up_ref(vrsa))
+        return 0;
+    RSA_free(prsactx->rsa);
+    prsactx->rsa = vrsa;
 
-  OSSL_FIPS_IND_SET_APPROVED(prsactx)
-  if (!rsakem_set_ctx_params(prsactx, params))
-    return 0;
+    OSSL_FIPS_IND_SET_APPROVED(prsactx)
+    if (!rsakem_set_ctx_params(prsactx, params))
+        return 0;
 #ifdef FIPS_MODULE
-  if (!ossl_fips_ind_rsa_key_check(OSSL_FIPS_IND_GET(prsactx),
-                                   OSSL_FIPS_IND_SETTABLE0, prsactx->libctx,
-                                   prsactx->rsa, desc, protect))
-    return 0;
+    if (!ossl_fips_ind_rsa_key_check(OSSL_FIPS_IND_GET(prsactx),
+                                     OSSL_FIPS_IND_SETTABLE0, prsactx->libctx,
+                                     prsactx->rsa, desc, protect))
+        return 0;
 #endif
-  return 1;
+    return 1;
 }
 
 static int rsakem_encapsulate_init(void *vprsactx, void *vrsa,
                                    const OSSL_PARAM params[]) {
-  return rsakem_init(vprsactx, vrsa, params, EVP_PKEY_OP_ENCAPSULATE,
-                     "RSA Encapsulate Init");
+    return rsakem_init(vprsactx, vrsa, params, EVP_PKEY_OP_ENCAPSULATE,
+                       "RSA Encapsulate Init");
 }
 
 static int rsakem_decapsulate_init(void *vprsactx, void *vrsa,
                                    const OSSL_PARAM params[]) {
-  return rsakem_init(vprsactx, vrsa, params, EVP_PKEY_OP_DECAPSULATE,
-                     "RSA Decapsulate Init");
+    return rsakem_init(vprsactx, vrsa, params, EVP_PKEY_OP_DECAPSULATE,
+                       "RSA Decapsulate Init");
 }
 
 static int rsakem_get_ctx_params(void *vprsactx, OSSL_PARAM *params) {
-  PROV_RSA_CTX *ctx = (PROV_RSA_CTX *)vprsactx;
+    PROV_RSA_CTX *ctx = (PROV_RSA_CTX *)vprsactx;
 
-  if (ctx == NULL)
-    return 0;
+    if (ctx == NULL)
+        return 0;
 
-  if (!OSSL_FIPS_IND_GET_CTX_PARAM(ctx, params))
-    return 0;
-  return 1;
+    if (!OSSL_FIPS_IND_GET_CTX_PARAM(ctx, params))
+        return 0;
+    return 1;
 }
 
 static const OSSL_PARAM known_gettable_rsakem_ctx_params[] = {
@@ -179,32 +180,32 @@ OSSL_FIPS_IND_GETTABLE_CTX_PARAM() OSSL_PARAM_END};
 
 static const OSSL_PARAM *rsakem_gettable_ctx_params(ossl_unused void *vprsactx,
                                                     ossl_unused void *provctx) {
-  return known_gettable_rsakem_ctx_params;
+    return known_gettable_rsakem_ctx_params;
 }
 
 static int rsakem_set_ctx_params(void *vprsactx, const OSSL_PARAM params[]) {
-  PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
-  const OSSL_PARAM *p;
-  int op;
+    PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
+    const OSSL_PARAM *p;
+    int op;
 
-  if (prsactx == NULL)
-    return 0;
-  if (ossl_param_is_empty(params))
+    if (prsactx == NULL)
+        return 0;
+    if (ossl_param_is_empty(params))
+        return 1;
+
+    if (!OSSL_FIPS_IND_SET_CTX_PARAM(prsactx, OSSL_FIPS_IND_SETTABLE0, params,
+                                     OSSL_KEM_PARAM_FIPS_KEY_CHECK))
+        return 0;
+    p = OSSL_PARAM_locate_const(params, OSSL_KEM_PARAM_OPERATION);
+    if (p != NULL) {
+        if (p->data_type != OSSL_PARAM_UTF8_STRING)
+            return 0;
+        op = rsakem_opname2id(p->data);
+        if (op < 0)
+            return 0;
+        prsactx->op = op;
+    }
     return 1;
-
-  if (!OSSL_FIPS_IND_SET_CTX_PARAM(prsactx, OSSL_FIPS_IND_SETTABLE0, params,
-                                   OSSL_KEM_PARAM_FIPS_KEY_CHECK))
-    return 0;
-  p = OSSL_PARAM_locate_const(params, OSSL_KEM_PARAM_OPERATION);
-  if (p != NULL) {
-    if (p->data_type != OSSL_PARAM_UTF8_STRING)
-      return 0;
-    op = rsakem_opname2id(p->data);
-    if (op < 0)
-      return 0;
-    prsactx->op = op;
-  }
-  return 1;
 }
 
 static const OSSL_PARAM known_settable_rsakem_ctx_params[] = {
@@ -213,7 +214,7 @@ OSSL_FIPS_IND_SETTABLE_CTX_PARAM(OSSL_KEM_PARAM_FIPS_KEY_CHECK) OSSL_PARAM_END};
 
 static const OSSL_PARAM *rsakem_settable_ctx_params(ossl_unused void *vprsactx,
                                                     ossl_unused void *provctx) {
-  return known_settable_rsakem_ctx_params;
+    return known_settable_rsakem_ctx_params;
 }
 
 /*
@@ -223,30 +224,30 @@ static const OSSL_PARAM *rsakem_settable_ctx_params(ossl_unused void *vprsactx,
  * Generate a random in the range 1 < z < (n – 1)
  */
 static int rsasve_gen_rand_bytes(RSA *rsa_pub, unsigned char *out, int outlen) {
-  int ret = 0;
-  BN_CTX *bnctx;
-  BIGNUM *z, *nminus3;
+    int ret = 0;
+    BN_CTX *bnctx;
+    BIGNUM *z, *nminus3;
 
-  bnctx = BN_CTX_secure_new_ex(ossl_rsa_get0_libctx(rsa_pub));
-  if (bnctx == NULL)
-    return 0;
+    bnctx = BN_CTX_secure_new_ex(ossl_rsa_get0_libctx(rsa_pub));
+    if (bnctx == NULL)
+        return 0;
 
-  /*
-   * Generate a random in the range 1 < z < (n – 1).
-   * Since BN_priv_rand_range_ex() returns a value in range 0 <= r < max
-   * We can achieve this by adding 2.. but then we need to subtract 3 from
-   * the upper bound i.e: 2 + (0 <= r < (n - 3))
-   */
-  BN_CTX_start(bnctx);
-  nminus3 = BN_CTX_get(bnctx);
-  z = BN_CTX_get(bnctx);
-  ret =
-  (z != NULL && (BN_copy(nminus3, RSA_get0_n(rsa_pub)) != NULL) &&
-   BN_sub_word(nminus3, 3) && BN_priv_rand_range_ex(z, nminus3, 0, bnctx) &&
-   BN_add_word(z, 2) && (BN_bn2binpad(z, out, outlen) == outlen));
-  BN_CTX_end(bnctx);
-  BN_CTX_free(bnctx);
-  return ret;
+    /*
+     * Generate a random in the range 1 < z < (n – 1).
+     * Since BN_priv_rand_range_ex() returns a value in range 0 <= r < max
+     * We can achieve this by adding 2.. but then we need to subtract 3 from
+     * the upper bound i.e: 2 + (0 <= r < (n - 3))
+     */
+    BN_CTX_start(bnctx);
+    nminus3 = BN_CTX_get(bnctx);
+    z = BN_CTX_get(bnctx);
+    ret =
+    (z != NULL && (BN_copy(nminus3, RSA_get0_n(rsa_pub)) != NULL) &&
+     BN_sub_word(nminus3, 3) && BN_priv_rand_range_ex(z, nminus3, 0, bnctx) &&
+     BN_add_word(z, 2) && (BN_bn2binpad(z, out, outlen) == outlen));
+    BN_CTX_end(bnctx);
+    BN_CTX_free(bnctx);
+    return ret;
 }
 
 /*
@@ -256,55 +257,55 @@ static int rsasve_gen_rand_bytes(RSA *rsa_pub, unsigned char *out, int outlen) {
 static int rsasve_generate(PROV_RSA_CTX *prsactx, unsigned char *out,
                            size_t *outlen, unsigned char *secret,
                            size_t *secretlen) {
-  int ret;
-  size_t nlen;
+    int ret;
+    size_t nlen;
 
-  /* Step (1): nlen = Ceil(len(n)/8) */
-  nlen = RSA_size(prsactx->rsa);
+    /* Step (1): nlen = Ceil(len(n)/8) */
+    nlen = RSA_size(prsactx->rsa);
 
-  if (out == NULL) {
-    if (nlen == 0) {
-      ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
-      return 0;
+    if (out == NULL) {
+        if (nlen == 0) {
+            ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
+            return 0;
+        }
+        if (outlen == NULL && secretlen == NULL)
+            return 0;
+        if (outlen != NULL)
+            *outlen = nlen;
+        if (secretlen != NULL)
+            *secretlen = nlen;
+        return 1;
     }
-    if (outlen == NULL && secretlen == NULL)
-      return 0;
-    if (outlen != NULL)
-      *outlen = nlen;
-    if (secretlen != NULL)
-      *secretlen = nlen;
-    return 1;
-  }
 
-  /*
-   * If outlen is specified, then it must report the length
-   * of the out buffer on input so that we can confirm
-   * its size is sufficent for encapsulation
-   */
-  if (outlen != NULL && *outlen < nlen) {
-    ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_OUTPUT_LENGTH);
-    return 0;
-  }
+    /*
+     * If outlen is specified, then it must report the length
+     * of the out buffer on input so that we can confirm
+     * its size is sufficent for encapsulation
+     */
+    if (outlen != NULL && *outlen < nlen) {
+        ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_OUTPUT_LENGTH);
+        return 0;
+    }
 
-  /*
-   * Step (2): Generate a random byte string z of nlen bytes where
-   *            1 < z < n - 1
-   */
-  if (!rsasve_gen_rand_bytes(prsactx->rsa, secret, nlen))
-    return 0;
+    /*
+     * Step (2): Generate a random byte string z of nlen bytes where
+     *            1 < z < n - 1
+     */
+    if (!rsasve_gen_rand_bytes(prsactx->rsa, secret, nlen))
+        return 0;
 
-  /* Step(3): out = RSAEP((n,e), z) */
-  ret = RSA_public_encrypt(nlen, secret, out, prsactx->rsa, RSA_NO_PADDING);
-  if (ret) {
-    ret = 1;
-    if (outlen != NULL)
-      *outlen = nlen;
-    if (secretlen != NULL)
-      *secretlen = nlen;
-  } else {
-    OPENSSL_cleanse(secret, nlen);
-  }
-  return ret;
+    /* Step(3): out = RSAEP((n,e), z) */
+    ret = RSA_public_encrypt(nlen, secret, out, prsactx->rsa, RSA_NO_PADDING);
+    if (ret) {
+        ret = 1;
+        if (outlen != NULL)
+            *outlen = nlen;
+        if (secretlen != NULL)
+            *secretlen = nlen;
+    } else {
+        OPENSSL_cleanse(secret, nlen);
+    }
+    return ret;
 }
 
 /**
@@ -331,75 +332,75 @@ static int rsasve_generate(PROV_RSA_CTX *prsactx, unsigned char *out,
 static int rsasve_recover(PROV_RSA_CTX *prsactx, unsigned char *out,
                           size_t *outlen, const unsigned char *in,
                           size_t inlen) {
-  size_t nlen;
-  int ret;
+    size_t nlen;
+    int ret;
 
-  /* Step (1): get the byte length of n */
-  nlen = RSA_size(prsactx->rsa);
+    /* Step (1): get the byte length of n */
+    nlen = RSA_size(prsactx->rsa);
 
-  if (out == NULL) {
-    if (nlen == 0) {
-      ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
-      return 0;
+    if (out == NULL) {
+        if (nlen == 0) {
+            ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
+            return 0;
+        }
+        *outlen = nlen;
+        return 1;
     }
-    *outlen = nlen;
-    return 1;
-  }
 
-  /*
-   * Step (2): check the input ciphertext 'inlen' matches the nlen
-   * and that outlen is at least nlen bytes
-   */
-  if (inlen != nlen) {
-    ERR_raise(ERR_LIB_PROV, PROV_R_BAD_LENGTH);
-    return 0;
-  }
+    /*
+     * Step (2): check the input ciphertext 'inlen' matches the nlen
+     * and that outlen is at least nlen bytes
+     */
+    if (inlen != nlen) {
+        ERR_raise(ERR_LIB_PROV, PROV_R_BAD_LENGTH);
+        return 0;
+    }
 
-  /*
-   * If outlen is specified, then it must report the length
-   * of the out buffer, so that we can confirm that it is of
-   * sufficient size to hold the output of decapsulation
-   */
-  if (outlen != NULL && *outlen < nlen) {
-    ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_OUTPUT_LENGTH);
-    return 0;
-  }
+    /*
+     * If outlen is specified, then it must report the length
+     * of the out buffer, so that we can confirm that it is of
+     * sufficient size to hold the output of decapsulation
+     */
+    if (outlen != NULL && *outlen < nlen) {
+        ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_OUTPUT_LENGTH);
+        return 0;
+    }
 
-  /* Step (3): out = RSADP((n,d), in) */
-  ret = RSA_private_decrypt(inlen, in, out, prsactx->rsa, RSA_NO_PADDING);
-  if (ret > 0 && outlen != NULL)
-    *outlen = ret;
-  return ret > 0;
+    /* Step (3): out = RSADP((n,d), in) */
+    ret = RSA_private_decrypt(inlen, in, out, prsactx->rsa, RSA_NO_PADDING);
+    if (ret > 0 && outlen != NULL)
+        *outlen = ret;
+    return ret > 0;
 }
 
 static int rsakem_generate(void *vprsactx, unsigned char *out, size_t *outlen,
                            unsigned char *secret, size_t *secretlen) {
-  PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
+    PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
 
-  if (!ossl_prov_is_running())
-    return 0;
+    if (!ossl_prov_is_running())
+        return 0;
 
-  switch (prsactx->op) {
-  case KEM_OP_RSASVE:
-    return rsasve_generate(prsactx, out, outlen, secret, secretlen);
-  default:
-    return -2;
-  }
+    switch (prsactx->op) {
+    case KEM_OP_RSASVE:
+        return rsasve_generate(prsactx, out, outlen, secret, secretlen);
+    default:
+        return -2;
+    }
 }
 
 static int rsakem_recover(void *vprsactx, unsigned char *out, size_t *outlen,
                           const unsigned char *in, size_t inlen) {
-  PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
+    PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
 
-  if (!ossl_prov_is_running())
-    return 0;
+    if (!ossl_prov_is_running())
+        return 0;
 
-  switch (prsactx->op) {
-  case KEM_OP_RSASVE:
-    return rsasve_recover(prsactx, out, outlen, in, inlen);
-  default:
-    return -2;
-  }
+    switch (prsactx->op) {
+    case KEM_OP_RSASVE:
+        return rsasve_recover(prsactx, out, outlen, in, inlen);
+    default:
+        return -2;
+    }
 }
 
 const OSSL_DISPATCH ossl_rsa_asym_kem_functions[] = {

@@ -20,26 +20,26 @@ int ossl_asn1_utctime_to_tm(struct tm *tm, const ASN1_UTCTIME *d);
 /* ASN1 scan context structure */
 
 struct asn1_sctx_st {
-  /* The ASN1_ITEM associated with this field */
-  const ASN1_ITEM *it;
-  /* If ASN1_TEMPLATE associated with this field */
-  const ASN1_TEMPLATE *tt;
-  /* Various flags associated with field and context */
-  unsigned long flags;
-  /* If SEQUENCE OF or SET OF, field index */
-  int skidx;
-  /* ASN1 depth of field */
-  int depth;
-  /* Structure and field name */
-  const char *sname, *fname;
-  /* If a primitive type the type of underlying field */
-  int prim_type;
-  /* The field value itself */
-  ASN1_VALUE **field;
-  /* Callback to pass information to */
-  int (*scan_cb)(ASN1_SCTX *ctx);
-  /* Context specific application data */
-  void *app_data;
+    /* The ASN1_ITEM associated with this field */
+    const ASN1_ITEM *it;
+    /* If ASN1_TEMPLATE associated with this field */
+    const ASN1_TEMPLATE *tt;
+    /* Various flags associated with field and context */
+    unsigned long flags;
+    /* If SEQUENCE OF or SET OF, field index */
+    int skidx;
+    /* ASN1 depth of field */
+    int depth;
+    /* Structure and field name */
+    const char *sname, *fname;
+    /* If a primitive type the type of underlying field */
+    int prim_type;
+    /* The field value itself */
+    ASN1_VALUE **field;
+    /* Callback to pass information to */
+    int (*scan_cb)(ASN1_SCTX *ctx);
+    /* Context specific application data */
+    void *app_data;
 } /* ASN1_SCTX */;
 
 typedef struct mime_param_st MIME_PARAM;

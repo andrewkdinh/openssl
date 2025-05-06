@@ -43,10 +43,10 @@
  * synchronised correctly with an application's own threads using locking.
  */
 typedef struct quic_thread_assist_st {
-  QUIC_CHANNEL *ch;
-  CRYPTO_CONDVAR *cv;
-  CRYPTO_THREAD *t;
-  int teardown, joined;
+    QUIC_CHANNEL *ch;
+    CRYPTO_CONDVAR *cv;
+    CRYPTO_THREAD *t;
+    int teardown, joined;
 } QUIC_THREAD_ASSIST;
 
 /*

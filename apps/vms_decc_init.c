@@ -34,8 +34,8 @@ int decc_init_done = -1;
 /* Structure to hold a DECC$* feature name and its desired value. */
 
 typedef struct {
-  char *name;
-  int value;
+    char *name;
+    int value;
 } decc_feat_t;
 
 /*
@@ -62,65 +62,69 @@ decc_feat_t decc_feat_array[] = {
 /* LIB$INITIALIZE initialization function. */
 
 static void decc_init(void) {
-  char *openssl_debug_decc_init;
-  int verbose = 0;
-  int feat_index;
-  int feat_value;
-  int feat_value_max;
-  int feat_value_min;
-  int i;
-  int sts;
+    char *openssl_debug_decc_init;
+    int verbose = 0;
+    int feat_index;
+    int feat_value;
+    int feat_value_max;
+    int feat_value_min;
+    int i;
+    int sts;
 
-  /* Get debug option. */
-  openssl_debug_decc_init = getenv("OPENSSL_DEBUG_DECC_INIT");
-  if (openssl_debug_decc_init != NULL) {
-    verbose = strtol(openssl_debug_decc_init, NULL, 10);
-    if (verbose <= 0) {
-      verbose = 1;
-    }
-  }
-
-  /* Set the global flag to indicate that LIB$INITIALIZE worked. */
-  decc_init_done = 1;
-
-  /* Loop through all items in the decc_feat_array[]. */
-
-  for (i = 0; decc_feat_array[i].name != NULL; i++) {
-    /* Get the feature index. */
-    feat_index = decc$feature_get_index(decc_feat_array[i].name);
-    if (feat_index >= 0) {
-      /* Valid item.  Collect its properties. */
-      feat_value = decc$feature_get_value(feat_index, 1);
-      feat_value_min = decc$feature_get_value(feat_index, 2);
-      feat_value_max = decc$feature_get_value(feat_index, 3);
-
-      /* Check the validity of our desired value. */
-      if ((decc_feat_array[i].value >= feat_value_min) &&
-          (decc_feat_array[i].value <= feat_value_max)) {
-        /* Valid value.  Set it if necessary. */
-        if (feat_value != decc_feat_array[i].value) {
-          sts = decc$feature_set_value(feat_index, 1, decc_feat_array[i].value);
-
-          if (verbose > 1) {
-            fprintf(stderr, " %s = %d, sts = %d.\n", decc_feat_array[i].name,
-                    decc_feat_array[i].value, sts);
-          }
+    /* Get debug option. */
+    openssl_debug_decc_init = getenv("OPENSSL_DEBUG_DECC_INIT");
+    if (openssl_debug_decc_init != NULL) {
+        verbose = strtol(openssl_debug_decc_init, NULL, 10);
+        if (verbose <= 0) {
+            verbose = 1;
         }
-      } else {
-        /* Invalid DECC feature value. */
-        fprintf(stderr, " INVALID DECC$FEATURE VALUE, %d: %d <= %s <= %d.\n",
-                feat_value, feat_value_min, decc_feat_array[i].name,
-                feat_value_max);
-      }
-    } else {
-      /* Invalid DECC feature name. */
-      fprintf(stderr, " UNKNOWN DECC$FEATURE: %s.\n", decc_feat_array[i].name);
     }
-  }
 
-  if (verbose > 0) {
-    fprintf(stderr, " DECC_INIT complete.\n");
-  }
+    /* Set the global flag to indicate that LIB$INITIALIZE worked. */
+    decc_init_done = 1;
+
+    /* Loop through all items in the decc_feat_array[]. */
+
+    for (i = 0; decc_feat_array[i].name != NULL; i++) {
+        /* Get the feature index. */
+        feat_index = decc$feature_get_index(decc_feat_array[i].name);
+        if (feat_index >= 0) {
+            /* Valid item.  Collect its properties. */
+            feat_value = decc$feature_get_value(feat_index, 1);
+            feat_value_min = decc$feature_get_value(feat_index, 2);
+            feat_value_max = decc$feature_get_value(feat_index, 3);
+
+            /* Check the validity of our desired value. */
+            if ((decc_feat_array[i].value >= feat_value_min) &&
+                (decc_feat_array[i].value <= feat_value_max)) {
+                /* Valid value.  Set it if necessary. */
+                if (feat_value != decc_feat_array[i].value) {
+                    sts = decc$feature_set_value(feat_index, 1,
+                                                 decc_feat_array[i].value);
+
+                    if (verbose > 1) {
+                        fprintf(stderr, " %s = %d, sts = %d.\n",
+                                decc_feat_array[i].name,
+                                decc_feat_array[i].value, sts);
+                    }
+                }
+            } else {
+                /* Invalid DECC feature value. */
+                fprintf(stderr,
+                        " INVALID DECC$FEATURE VALUE, %d: %d <= %s <= %d.\n",
+                        feat_value, feat_value_min, decc_feat_array[i].name,
+                        feat_value_max);
+            }
+        } else {
+            /* Invalid DECC feature name. */
+            fprintf(stderr, " UNKNOWN DECC$FEATURE: %s.\n",
+                    decc_feat_array[i].name);
+        }
+    }
+
+    if (verbose > 0) {
+        fprintf(stderr, " DECC_INIT complete.\n");
+    }
 }
 
 /* Get "decc_init()" into a valid, loaded LIB$INITIALIZE PSECT. */

@@ -176,20 +176,20 @@ DECLARE_ASN1_ITEM(DHparams)
 #define DH_CHECK_P_NOT_STRONG_PRIME DH_CHECK_P_NOT_SAFE_PRIME
 
 #define d2i_DHparams_fp(fp, x)                                                 \
-  (DH *)ASN1_d2i_fp((char *(*)())DH_new, (char *(*)())d2i_DHparams, (fp),      \
-                    (unsigned char **)(x))
+    (DH *)ASN1_d2i_fp((char *(*)())DH_new, (char *(*)())d2i_DHparams, (fp),    \
+                      (unsigned char **)(x))
 #define i2d_DHparams_fp(fp, x)                                                 \
-  ASN1_i2d_fp(i2d_DHparams, (fp), (unsigned char *)(x))
+    ASN1_i2d_fp(i2d_DHparams, (fp), (unsigned char *)(x))
 #define d2i_DHparams_bio(bp, x) ASN1_d2i_bio_of(DH, DH_new, d2i_DHparams, bp, x)
 #define i2d_DHparams_bio(bp, x) ASN1_i2d_bio_of(DH, i2d_DHparams, bp, x)
 
 #define d2i_DHxparams_fp(fp, x)                                                \
-  (DH *)ASN1_d2i_fp((char *(*)())DH_new, (char *(*)())d2i_DHxparams, (fp),     \
-                    (unsigned char **)(x))
+    (DH *)ASN1_d2i_fp((char *(*)())DH_new, (char *(*)())d2i_DHxparams, (fp),   \
+                      (unsigned char **)(x))
 #define i2d_DHxparams_fp(fp, x)                                                \
-  ASN1_i2d_fp(i2d_DHxparams, (fp), (unsigned char *)(x))
+    ASN1_i2d_fp(i2d_DHxparams, (fp), (unsigned char *)(x))
 #define d2i_DHxparams_bio(bp, x)                                               \
-  ASN1_d2i_bio_of(DH, DH_new, d2i_DHxparams, bp, x)
+    ASN1_d2i_bio_of(DH, DH_new, d2i_DHxparams, bp, x)
 #define i2d_DHxparams_bio(bp, x) ASN1_i2d_bio_of(DH, i2d_DHxparams, bp, x)
 
 DECLARE_ASN1_DUP_FUNCTION_name_attr(OSSL_DEPRECATEDIN_3_0, DH, DHparams)
@@ -209,7 +209,7 @@ OSSL_DEPRECATEDIN_3_0 int DH_size(const DH *dh);
 OSSL_DEPRECATEDIN_3_0 int DH_security_bits(const DH *dh);
 
 #define DH_get_ex_new_index(l, p, newf, dupf, freef)                           \
-  CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_DH, l, p, newf, dupf, freef)
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_DH, l, p, newf, dupf, freef)
 
 OSSL_DEPRECATEDIN_3_0 int DH_set_ex_data(DH *d, int idx, void *arg);
 OSSL_DEPRECATEDIN_3_0 void *DH_get_ex_data(const DH *d, int idx);

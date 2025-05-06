@@ -16,7 +16,7 @@
 #include "internal/cryptlib.h"
 
 typedef union {
-  OSSL_UNION_ALIGN;
+    OSSL_UNION_ALIGN;
 } OSSL_PARAM_ALIGNED_BLOCK;
 
 #define OSSL_PARAM_ALIGN_SIZE sizeof(OSSL_PARAM_ALIGNED_BLOCK)

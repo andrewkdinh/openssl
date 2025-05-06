@@ -14,8 +14,8 @@
 typedef struct qtest_fault QTEST_FAULT;
 
 typedef struct bio_qtest_data {
-  size_t short_conn_id_len;
-  struct qtest_fault *fault;
+    size_t short_conn_id_len;
+    struct qtest_fault *fault;
 } QTEST_DATA;
 
 /*
@@ -24,9 +24,9 @@ typedef struct bio_qtest_data {
  * injector will reconstruct the message to be sent on
  */
 typedef struct qtest_fault_encrypted_extensions {
-  /* EncryptedExtension messages just have an extensions block */
-  unsigned char *extensions;
-  size_t extensionslen;
+    /* EncryptedExtension messages just have an extensions block */
+    unsigned char *extensions;
+    size_t extensionslen;
 } QTEST_ENCRYPTED_EXTENSIONS;
 
 /* Flags for use with qtest_create_quic_objects() */
@@ -262,8 +262,8 @@ int bio_msg_copy(BIO_MSG *dst, BIO_MSG *src);
 #define BIO_CTRL_NOISE_SET_NOW_CB 1005
 
 struct bio_noise_now_cb_st {
-  OSSL_TIME (*now_cb)(void *);
-  void *now_cb_arg;
+    OSSL_TIME (*now_cb)(void *);
+    void *now_cb_arg;
 };
 
 /* BIO filter for simulating a noisy UDP socket */

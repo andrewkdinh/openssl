@@ -96,48 +96,48 @@ IMPLEMENT_ASN1_FUNCTIONS(EXTENDED_KEY_USAGE)
 static STACK_OF(CONF_VALUE) *
 i2v_EXTENDED_KEY_USAGE(const X509V3_EXT_METHOD *method, void *a,
                        STACK_OF(CONF_VALUE) * ext_list) {
-  EXTENDED_KEY_USAGE *eku = a;
-  int i;
-  ASN1_OBJECT *obj;
-  char obj_tmp[80];
-  for (i = 0; i < sk_ASN1_OBJECT_num(eku); i++) {
-    obj = sk_ASN1_OBJECT_value(eku, i);
-    i2t_ASN1_OBJECT(obj_tmp, 80, obj);
-    X509V3_add_value(NULL, obj_tmp, &ext_list);
-  }
-  return ext_list;
+    EXTENDED_KEY_USAGE *eku = a;
+    int i;
+    ASN1_OBJECT *obj;
+    char obj_tmp[80];
+    for (i = 0; i < sk_ASN1_OBJECT_num(eku); i++) {
+        obj = sk_ASN1_OBJECT_value(eku, i);
+        i2t_ASN1_OBJECT(obj_tmp, 80, obj);
+        X509V3_add_value(NULL, obj_tmp, &ext_list);
+    }
+    return ext_list;
 }
 
 static void *v2i_EXTENDED_KEY_USAGE(const X509V3_EXT_METHOD *method,
                                     X509V3_CTX *ctx,
                                     STACK_OF(CONF_VALUE) * nval) {
-  EXTENDED_KEY_USAGE *extku;
-  char *extval;
-  ASN1_OBJECT *objtmp;
-  CONF_VALUE *val;
-  const int num = sk_CONF_VALUE_num(nval);
-  int i;
+    EXTENDED_KEY_USAGE *extku;
+    char *extval;
+    ASN1_OBJECT *objtmp;
+    CONF_VALUE *val;
+    const int num = sk_CONF_VALUE_num(nval);
+    int i;
 
-  extku = sk_ASN1_OBJECT_new_reserve(NULL, num);
-  if (extku == NULL) {
-    ERR_raise(ERR_LIB_X509V3, ERR_R_CRYPTO_LIB);
-    sk_ASN1_OBJECT_free(extku);
-    return NULL;
-  }
-
-  for (i = 0; i < num; i++) {
-    val = sk_CONF_VALUE_value(nval, i);
-    if (val->value)
-      extval = val->value;
-    else
-      extval = val->name;
-    if ((objtmp = OBJ_txt2obj(extval, 0)) == NULL) {
-      sk_ASN1_OBJECT_pop_free(extku, ASN1_OBJECT_free);
-      ERR_raise_data(ERR_LIB_X509V3, X509V3_R_INVALID_OBJECT_IDENTIFIER, "%s",
-                     extval);
-      return NULL;
+    extku = sk_ASN1_OBJECT_new_reserve(NULL, num);
+    if (extku == NULL) {
+        ERR_raise(ERR_LIB_X509V3, ERR_R_CRYPTO_LIB);
+        sk_ASN1_OBJECT_free(extku);
+        return NULL;
     }
-    sk_ASN1_OBJECT_push(extku, objtmp); /* no failure as it was reserved */
-  }
-  return extku;
+
+    for (i = 0; i < num; i++) {
+        val = sk_CONF_VALUE_value(nval, i);
+        if (val->value)
+            extval = val->value;
+        else
+            extval = val->name;
+        if ((objtmp = OBJ_txt2obj(extval, 0)) == NULL) {
+            sk_ASN1_OBJECT_pop_free(extku, ASN1_OBJECT_free);
+            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_INVALID_OBJECT_IDENTIFIER,
+                           "%s", extval);
+            return NULL;
+        }
+        sk_ASN1_OBJECT_push(extku, objtmp); /* no failure as it was reserved */
+    }
+    return extku;
 }

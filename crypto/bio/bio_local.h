@@ -56,12 +56,12 @@
 #define bai_next ai_next
 #else
 struct bio_addrinfo_st {
-  int bai_family;
-  int bai_socktype;
-  int bai_protocol;
-  size_t bai_addrlen;
-  struct sockaddr *bai_addr;
-  struct bio_addrinfo_st *bai_next;
+    int bai_family;
+    int bai_socktype;
+    int bai_protocol;
+    size_t bai_addrlen;
+    struct sockaddr *bai_addr;
+    struct bio_addrinfo_st *bai_next;
 };
 #endif
 #endif
@@ -73,49 +73,49 @@ struct bio_addrinfo_st {
 #include "internal/refcount.h"
 
 typedef struct bio_f_buffer_ctx_struct {
-  /*-
-   * Buffers are setup like this:
-   *
-   * <---------------------- size ----------------------->
-   * +---------------------------------------------------+
-   * | consumed | remaining          | free space        |
-   * +---------------------------------------------------+
-   * <-- off --><------- len ------->
-   */
-  /*- BIO *bio; */ /*
-                    * this is now in the BIO struct
-                    */
-  int ibuf_size;   /* how big is the input buffer */
-  int obuf_size;   /* how big is the output buffer */
-  char *ibuf;      /* the char array */
-  int ibuf_len;    /* how many bytes are in it */
-  int ibuf_off;    /* write/read offset */
-  char *obuf;      /* the char array */
-  int obuf_len;    /* how many bytes are in it */
-  int obuf_off;    /* write/read offset */
+    /*-
+     * Buffers are setup like this:
+     *
+     * <---------------------- size ----------------------->
+     * +---------------------------------------------------+
+     * | consumed | remaining          | free space        |
+     * +---------------------------------------------------+
+     * <-- off --><------- len ------->
+     */
+    /*- BIO *bio; */ /*
+                      * this is now in the BIO struct
+                      */
+    int ibuf_size;   /* how big is the input buffer */
+    int obuf_size;   /* how big is the output buffer */
+    char *ibuf;      /* the char array */
+    int ibuf_len;    /* how many bytes are in it */
+    int ibuf_off;    /* write/read offset */
+    char *obuf;      /* the char array */
+    int obuf_len;    /* how many bytes are in it */
+    int obuf_off;    /* write/read offset */
 } BIO_F_BUFFER_CTX;
 
 struct bio_st {
-  OSSL_LIB_CTX *libctx;
-  const BIO_METHOD *method;
-  /* bio, mode, argp, argi, argl, ret */
+    OSSL_LIB_CTX *libctx;
+    const BIO_METHOD *method;
+    /* bio, mode, argp, argi, argl, ret */
 #ifndef OPENSSL_NO_DEPRECATED_3_0
-  BIO_callback_fn callback;
+    BIO_callback_fn callback;
 #endif
-  BIO_callback_fn_ex callback_ex;
-  char *cb_arg; /* first argument for the callback */
-  int init;
-  int shutdown;
-  int flags; /* extra storage */
-  int retry_reason;
-  int num;
-  void *ptr;
-  struct bio_st *next_bio; /* used by filter BIOs */
-  struct bio_st *prev_bio; /* used by filter BIOs */
-  CRYPTO_REF_COUNT references;
-  uint64_t num_read;
-  uint64_t num_write;
-  CRYPTO_EX_DATA ex_data;
+    BIO_callback_fn_ex callback_ex;
+    char *cb_arg; /* first argument for the callback */
+    int init;
+    int shutdown;
+    int flags; /* extra storage */
+    int retry_reason;
+    int num;
+    void *ptr;
+    struct bio_st *next_bio; /* used by filter BIOs */
+    struct bio_st *prev_bio; /* used by filter BIOs */
+    CRYPTO_REF_COUNT references;
+    uint64_t num_read;
+    uint64_t num_write;
+    CRYPTO_EX_DATA ex_data;
 };
 
 #ifndef OPENSSL_NO_SOCK

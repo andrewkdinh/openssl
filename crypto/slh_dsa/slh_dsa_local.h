@@ -47,11 +47,12 @@
  * ossl_slh_dsa_hash_ctx_dup().
  */
 struct slh_dsa_hash_ctx_st {
-  const SLH_DSA_KEY *key; /* This key is not owned by this object */
-  EVP_MD_CTX *md_ctx;     /* Either SHAKE OR SHA-256 */
-  EVP_MD_CTX *md_big_ctx; /* Either SHA-512 or points to |md_ctx| for SHA-256*/
-  EVP_MAC_CTX *hmac_ctx;  /* required by SHA algorithms for PRFmsg() */
-  int hmac_digest_used;   /* Used for lazy init of hmac_ctx digest */
+    const SLH_DSA_KEY *key; /* This key is not owned by this object */
+    EVP_MD_CTX *md_ctx;     /* Either SHAKE OR SHA-256 */
+    EVP_MD_CTX
+    *md_big_ctx;           /* Either SHA-512 or points to |md_ctx| for SHA-256*/
+    EVP_MAC_CTX *hmac_ctx; /* required by SHA algorithms for PRFmsg() */
+    int hmac_digest_used;  /* Used for lazy init of hmac_ctx digest */
 };
 
 __owur int ossl_slh_wots_pk_gen(SLH_DSA_HASH_CTX *ctx, const uint8_t *sk_seed,

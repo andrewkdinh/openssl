@@ -62,162 +62,162 @@ static OSSL_LIB_CTX *libctx = NULL;
 static const char *propq = NULL;
 
 static int aes_ccm_encrypt(void) {
-  int ret = 0;
-  EVP_CIPHER_CTX *ctx;
-  EVP_CIPHER *cipher = NULL;
-  int outlen, tmplen;
-  size_t ccm_nonce_len = sizeof(ccm_nonce);
-  size_t ccm_tag_len = sizeof(ccm_tag);
-  unsigned char outbuf[1024];
-  unsigned char outtag[16];
-  OSSL_PARAM params[3] = {OSSL_PARAM_END, OSSL_PARAM_END, OSSL_PARAM_END};
+    int ret = 0;
+    EVP_CIPHER_CTX *ctx;
+    EVP_CIPHER *cipher = NULL;
+    int outlen, tmplen;
+    size_t ccm_nonce_len = sizeof(ccm_nonce);
+    size_t ccm_tag_len = sizeof(ccm_tag);
+    unsigned char outbuf[1024];
+    unsigned char outtag[16];
+    OSSL_PARAM params[3] = {OSSL_PARAM_END, OSSL_PARAM_END, OSSL_PARAM_END};
 
-  printf("AES CCM Encrypt:\n");
-  printf("Plaintext:\n");
-  BIO_dump_fp(stdout, ccm_pt, sizeof(ccm_pt));
+    printf("AES CCM Encrypt:\n");
+    printf("Plaintext:\n");
+    BIO_dump_fp(stdout, ccm_pt, sizeof(ccm_pt));
 
-  /* Create a context for the encrypt operation */
-  if ((ctx = EVP_CIPHER_CTX_new()) == NULL)
-    goto err;
+    /* Create a context for the encrypt operation */
+    if ((ctx = EVP_CIPHER_CTX_new()) == NULL)
+        goto err;
 
-  /* Fetch the cipher implementation */
-  if ((cipher = EVP_CIPHER_fetch(libctx, "AES-192-CCM", propq)) == NULL)
-    goto err;
+    /* Fetch the cipher implementation */
+    if ((cipher = EVP_CIPHER_fetch(libctx, "AES-192-CCM", propq)) == NULL)
+        goto err;
 
-  /* Default nonce length for AES-CCM is 7 bytes (56 bits). */
-  params[0] =
-  OSSL_PARAM_construct_size_t(OSSL_CIPHER_PARAM_AEAD_IVLEN, &ccm_nonce_len);
-  /* Set tag length */
-  params[1] = OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG,
-                                                NULL, ccm_tag_len);
+    /* Default nonce length for AES-CCM is 7 bytes (56 bits). */
+    params[0] =
+    OSSL_PARAM_construct_size_t(OSSL_CIPHER_PARAM_AEAD_IVLEN, &ccm_nonce_len);
+    /* Set tag length */
+    params[1] = OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG,
+                                                  NULL, ccm_tag_len);
 
-  /*
-   * Initialise encrypt operation with the cipher & mode,
-   * nonce length and tag length parameters.
-   */
-  if (!EVP_EncryptInit_ex2(ctx, cipher, NULL, NULL, params))
-    goto err;
+    /*
+     * Initialise encrypt operation with the cipher & mode,
+     * nonce length and tag length parameters.
+     */
+    if (!EVP_EncryptInit_ex2(ctx, cipher, NULL, NULL, params))
+        goto err;
 
-  /* Initialise key and nonce */
-  if (!EVP_EncryptInit_ex(ctx, NULL, NULL, ccm_key, ccm_nonce))
-    goto err;
+    /* Initialise key and nonce */
+    if (!EVP_EncryptInit_ex(ctx, NULL, NULL, ccm_key, ccm_nonce))
+        goto err;
 
-  /* Set plaintext length: only needed if AAD is used */
-  if (!EVP_EncryptUpdate(ctx, NULL, &outlen, NULL, sizeof(ccm_pt)))
-    goto err;
+    /* Set plaintext length: only needed if AAD is used */
+    if (!EVP_EncryptUpdate(ctx, NULL, &outlen, NULL, sizeof(ccm_pt)))
+        goto err;
 
-  /* Zero or one call to specify any AAD */
-  if (!EVP_EncryptUpdate(ctx, NULL, &outlen, ccm_adata, sizeof(ccm_adata)))
-    goto err;
+    /* Zero or one call to specify any AAD */
+    if (!EVP_EncryptUpdate(ctx, NULL, &outlen, ccm_adata, sizeof(ccm_adata)))
+        goto err;
 
-  /* Encrypt plaintext: can only be called once */
-  if (!EVP_EncryptUpdate(ctx, outbuf, &outlen, ccm_pt, sizeof(ccm_pt)))
-    goto err;
+    /* Encrypt plaintext: can only be called once */
+    if (!EVP_EncryptUpdate(ctx, outbuf, &outlen, ccm_pt, sizeof(ccm_pt)))
+        goto err;
 
-  /* Output encrypted block */
-  printf("Ciphertext:\n");
-  BIO_dump_fp(stdout, outbuf, outlen);
+    /* Output encrypted block */
+    printf("Ciphertext:\n");
+    BIO_dump_fp(stdout, outbuf, outlen);
 
-  /* Finalise: note get no output for CCM */
-  if (!EVP_EncryptFinal_ex(ctx, NULL, &tmplen))
-    goto err;
+    /* Finalise: note get no output for CCM */
+    if (!EVP_EncryptFinal_ex(ctx, NULL, &tmplen))
+        goto err;
 
-  /* Get tag */
-  params[0] = OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG,
-                                                outtag, ccm_tag_len);
-  params[1] = OSSL_PARAM_construct_end();
+    /* Get tag */
+    params[0] = OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG,
+                                                  outtag, ccm_tag_len);
+    params[1] = OSSL_PARAM_construct_end();
 
-  if (!EVP_CIPHER_CTX_get_params(ctx, params))
-    goto err;
+    if (!EVP_CIPHER_CTX_get_params(ctx, params))
+        goto err;
 
-  /* Output tag */
-  printf("Tag:\n");
-  BIO_dump_fp(stdout, outtag, ccm_tag_len);
+    /* Output tag */
+    printf("Tag:\n");
+    BIO_dump_fp(stdout, outtag, ccm_tag_len);
 
-  ret = 1;
+    ret = 1;
 err:
-  if (!ret)
-    ERR_print_errors_fp(stderr);
+    if (!ret)
+        ERR_print_errors_fp(stderr);
 
-  EVP_CIPHER_free(cipher);
-  EVP_CIPHER_CTX_free(ctx);
+    EVP_CIPHER_free(cipher);
+    EVP_CIPHER_CTX_free(ctx);
 
-  return ret;
+    return ret;
 }
 
 static int aes_ccm_decrypt(void) {
-  int ret = 0;
-  EVP_CIPHER_CTX *ctx;
-  EVP_CIPHER *cipher = NULL;
-  int outlen, rv;
-  unsigned char outbuf[1024];
-  size_t ccm_nonce_len = sizeof(ccm_nonce);
-  OSSL_PARAM params[3] = {OSSL_PARAM_END, OSSL_PARAM_END, OSSL_PARAM_END};
+    int ret = 0;
+    EVP_CIPHER_CTX *ctx;
+    EVP_CIPHER *cipher = NULL;
+    int outlen, rv;
+    unsigned char outbuf[1024];
+    size_t ccm_nonce_len = sizeof(ccm_nonce);
+    OSSL_PARAM params[3] = {OSSL_PARAM_END, OSSL_PARAM_END, OSSL_PARAM_END};
 
-  printf("AES CCM Decrypt:\n");
-  printf("Ciphertext:\n");
-  BIO_dump_fp(stdout, ccm_ct, sizeof(ccm_ct));
+    printf("AES CCM Decrypt:\n");
+    printf("Ciphertext:\n");
+    BIO_dump_fp(stdout, ccm_ct, sizeof(ccm_ct));
 
-  if ((ctx = EVP_CIPHER_CTX_new()) == NULL)
-    goto err;
+    if ((ctx = EVP_CIPHER_CTX_new()) == NULL)
+        goto err;
 
-  /* Fetch the cipher implementation */
-  if ((cipher = EVP_CIPHER_fetch(libctx, "AES-192-CCM", propq)) == NULL)
-    goto err;
+    /* Fetch the cipher implementation */
+    if ((cipher = EVP_CIPHER_fetch(libctx, "AES-192-CCM", propq)) == NULL)
+        goto err;
 
-  /* Set nonce length if default 96 bits is not appropriate */
-  params[0] =
-  OSSL_PARAM_construct_size_t(OSSL_CIPHER_PARAM_AEAD_IVLEN, &ccm_nonce_len);
-  /* Set tag length */
-  params[1] = OSSL_PARAM_construct_octet_string(
-  OSSL_CIPHER_PARAM_AEAD_TAG, (unsigned char *)ccm_tag, sizeof(ccm_tag));
-  /*
-   * Initialise decrypt operation with the cipher & mode,
-   * nonce length and expected tag parameters.
-   */
-  if (!EVP_DecryptInit_ex2(ctx, cipher, NULL, NULL, params))
-    goto err;
+    /* Set nonce length if default 96 bits is not appropriate */
+    params[0] =
+    OSSL_PARAM_construct_size_t(OSSL_CIPHER_PARAM_AEAD_IVLEN, &ccm_nonce_len);
+    /* Set tag length */
+    params[1] = OSSL_PARAM_construct_octet_string(
+    OSSL_CIPHER_PARAM_AEAD_TAG, (unsigned char *)ccm_tag, sizeof(ccm_tag));
+    /*
+     * Initialise decrypt operation with the cipher & mode,
+     * nonce length and expected tag parameters.
+     */
+    if (!EVP_DecryptInit_ex2(ctx, cipher, NULL, NULL, params))
+        goto err;
 
-  /* Specify key and IV */
-  if (!EVP_DecryptInit_ex(ctx, NULL, NULL, ccm_key, ccm_nonce))
-    goto err;
+    /* Specify key and IV */
+    if (!EVP_DecryptInit_ex(ctx, NULL, NULL, ccm_key, ccm_nonce))
+        goto err;
 
-  /* Set ciphertext length: only needed if we have AAD */
-  if (!EVP_DecryptUpdate(ctx, NULL, &outlen, NULL, sizeof(ccm_ct)))
-    goto err;
+    /* Set ciphertext length: only needed if we have AAD */
+    if (!EVP_DecryptUpdate(ctx, NULL, &outlen, NULL, sizeof(ccm_ct)))
+        goto err;
 
-  /* Zero or one call to specify any AAD */
-  if (!EVP_DecryptUpdate(ctx, NULL, &outlen, ccm_adata, sizeof(ccm_adata)))
-    goto err;
+    /* Zero or one call to specify any AAD */
+    if (!EVP_DecryptUpdate(ctx, NULL, &outlen, ccm_adata, sizeof(ccm_adata)))
+        goto err;
 
-  /* Decrypt plaintext, verify tag: can only be called once */
-  rv = EVP_DecryptUpdate(ctx, outbuf, &outlen, ccm_ct, sizeof(ccm_ct));
+    /* Decrypt plaintext, verify tag: can only be called once */
+    rv = EVP_DecryptUpdate(ctx, outbuf, &outlen, ccm_ct, sizeof(ccm_ct));
 
-  /* Output decrypted block: if tag verify failed we get nothing */
-  if (rv > 0) {
-    printf("Tag verify successful!\nPlaintext:\n");
-    BIO_dump_fp(stdout, outbuf, outlen);
-  } else {
-    printf("Tag verify failed!\nPlaintext not available\n");
-    goto err;
-  }
-  ret = 1;
+    /* Output decrypted block: if tag verify failed we get nothing */
+    if (rv > 0) {
+        printf("Tag verify successful!\nPlaintext:\n");
+        BIO_dump_fp(stdout, outbuf, outlen);
+    } else {
+        printf("Tag verify failed!\nPlaintext not available\n");
+        goto err;
+    }
+    ret = 1;
 err:
-  if (!ret)
-    ERR_print_errors_fp(stderr);
+    if (!ret)
+        ERR_print_errors_fp(stderr);
 
-  EVP_CIPHER_free(cipher);
-  EVP_CIPHER_CTX_free(ctx);
+    EVP_CIPHER_free(cipher);
+    EVP_CIPHER_CTX_free(ctx);
 
-  return ret;
+    return ret;
 }
 
 int main(int argc, char **argv) {
-  if (!aes_ccm_encrypt())
-    return EXIT_FAILURE;
+    if (!aes_ccm_encrypt())
+        return EXIT_FAILURE;
 
-  if (!aes_ccm_decrypt())
-    return EXIT_FAILURE;
+    if (!aes_ccm_decrypt())
+        return EXIT_FAILURE;
 
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

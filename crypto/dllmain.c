@@ -27,17 +27,17 @@
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved);
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
-  switch (fdwReason) {
-  case DLL_PROCESS_ATTACH:
-    break;
-  case DLL_THREAD_ATTACH:
-    break;
-  case DLL_THREAD_DETACH:
-    OPENSSL_thread_stop();
-    break;
-  case DLL_PROCESS_DETACH:
-    break;
-  }
-  return TRUE;
+    switch (fdwReason) {
+    case DLL_PROCESS_ATTACH:
+        break;
+    case DLL_THREAD_ATTACH:
+        break;
+    case DLL_THREAD_DETACH:
+        OPENSSL_thread_stop();
+        break;
+    case DLL_PROCESS_DETACH:
+        break;
+    }
+    return TRUE;
 }
 #endif

@@ -41,7 +41,7 @@
 #if _MSC_VER >= 1400
 #define OSSL_DEPRECATED(since) __declspec(deprecated("Since OpenSSL " #since))
 #define OSSL_DEPRECATED_FOR(since, message)                                    \
-  __declspec(deprecated("Since OpenSSL " #since ";" message))
+    __declspec(deprecated("Since OpenSSL " #since ";" message))
 #elif _MSC_VER >= 1310
 #define OSSL_DEPRECATED(since) __declspec(deprecated)
 #define OSSL_DEPRECATED_FOR(since, message) __declspec(deprecated)
@@ -53,9 +53,9 @@
  */
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #define OSSL_DEPRECATED(since)                                                 \
-  __attribute__((deprecated("Since OpenSSL " #since)))
+    __attribute__((deprecated("Since OpenSSL " #since)))
 #define OSSL_DEPRECATED_FOR(since, message)                                    \
-  __attribute__((deprecated("Since OpenSSL " #since ";" message)))
+    __attribute__((deprecated("Since OpenSSL " #since ";" message)))
 #elif __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ > 0)
 #define OSSL_DEPRECATED(since) __attribute__((deprecated))
 #define OSSL_DEPRECATED_FOR(since, message) __attribute__((deprecated))
@@ -114,9 +114,9 @@
 #define OPENSSL_API_LEVEL (OPENSSL_API_COMPAT)
 #else
 #define OPENSSL_API_LEVEL                                                      \
-  (((OPENSSL_API_COMPAT >> 28) & 0xF) * 10000 +                                \
-   ((OPENSSL_API_COMPAT >> 20) & 0xFF) * 100 +                                 \
-   ((OPENSSL_API_COMPAT >> 12) & 0xFF))
+    (((OPENSSL_API_COMPAT >> 28) & 0xF) * 10000 +                              \
+     ((OPENSSL_API_COMPAT >> 20) & 0xFF) * 100 +                               \
+     ((OPENSSL_API_COMPAT >> 12) & 0xFF))
 #endif
 #endif
 
@@ -129,7 +129,7 @@
 #define OPENSSL_API_LEVEL (OPENSSL_CONFIGURED_API)
 #else
 #define OPENSSL_API_LEVEL                                                      \
-  (OPENSSL_VERSION_MAJOR * 10000 + OPENSSL_VERSION_MINOR * 100)
+    (OPENSSL_VERSION_MAJOR * 10000 + OPENSSL_VERSION_MINOR * 100)
 #endif
 #endif
 

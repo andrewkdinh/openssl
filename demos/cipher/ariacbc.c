@@ -50,120 +50,120 @@ static OSSL_LIB_CTX *libctx = NULL;
 static const char *propq = NULL;
 
 static int aria_cbc_encrypt(void) {
-  int ret = 0;
-  EVP_CIPHER_CTX *ctx;
-  EVP_CIPHER *cipher = NULL;
-  int outlen, tmplen;
-  unsigned char outbuf[1024];
+    int ret = 0;
+    EVP_CIPHER_CTX *ctx;
+    EVP_CIPHER *cipher = NULL;
+    int outlen, tmplen;
+    unsigned char outbuf[1024];
 
-  printf("ARIA CBC Encrypt:\n");
-  printf("Plaintext:\n");
-  BIO_dump_fp(stdout, cbc_pt, sizeof(cbc_pt));
+    printf("ARIA CBC Encrypt:\n");
+    printf("Plaintext:\n");
+    BIO_dump_fp(stdout, cbc_pt, sizeof(cbc_pt));
 
-  /* Create a context for the encrypt operation */
-  if ((ctx = EVP_CIPHER_CTX_new()) == NULL)
-    goto err;
+    /* Create a context for the encrypt operation */
+    if ((ctx = EVP_CIPHER_CTX_new()) == NULL)
+        goto err;
 
-  /* Fetch the cipher implementation */
-  if ((cipher = EVP_CIPHER_fetch(libctx, "ARIA-256-CBC", propq)) == NULL)
-    goto err;
+    /* Fetch the cipher implementation */
+    if ((cipher = EVP_CIPHER_fetch(libctx, "ARIA-256-CBC", propq)) == NULL)
+        goto err;
 
-  /*
-   * Initialise an encrypt operation with the cipher/mode, key and IV.
-   * We are not setting any custom params so let params be just NULL.
-   */
-  if (!EVP_EncryptInit_ex2(ctx, cipher, cbc_key, cbc_iv, /* params */ NULL))
-    goto err;
+    /*
+     * Initialise an encrypt operation with the cipher/mode, key and IV.
+     * We are not setting any custom params so let params be just NULL.
+     */
+    if (!EVP_EncryptInit_ex2(ctx, cipher, cbc_key, cbc_iv, /* params */ NULL))
+        goto err;
 
-  /* Encrypt plaintext */
-  if (!EVP_EncryptUpdate(ctx, outbuf, &outlen, cbc_pt, sizeof(cbc_pt)))
-    goto err;
+    /* Encrypt plaintext */
+    if (!EVP_EncryptUpdate(ctx, outbuf, &outlen, cbc_pt, sizeof(cbc_pt)))
+        goto err;
 
-  /* Finalise: there can be some additional output from padding */
-  if (!EVP_EncryptFinal_ex(ctx, outbuf + outlen, &tmplen))
-    goto err;
-  outlen += tmplen;
+    /* Finalise: there can be some additional output from padding */
+    if (!EVP_EncryptFinal_ex(ctx, outbuf + outlen, &tmplen))
+        goto err;
+    outlen += tmplen;
 
-  /* Output encrypted block */
-  printf("Ciphertext (outlen:%d):\n", outlen);
-  BIO_dump_fp(stdout, outbuf, outlen);
+    /* Output encrypted block */
+    printf("Ciphertext (outlen:%d):\n", outlen);
+    BIO_dump_fp(stdout, outbuf, outlen);
 
-  if (sizeof(cbc_ct) == outlen && !CRYPTO_memcmp(outbuf, cbc_ct, outlen))
-    printf("Final ciphertext matches expected ciphertext\n");
-  else
-    printf("Final ciphertext differs from expected ciphertext\n");
+    if (sizeof(cbc_ct) == outlen && !CRYPTO_memcmp(outbuf, cbc_ct, outlen))
+        printf("Final ciphertext matches expected ciphertext\n");
+    else
+        printf("Final ciphertext differs from expected ciphertext\n");
 
-  ret = 1;
+    ret = 1;
 err:
-  if (!ret)
-    ERR_print_errors_fp(stderr);
+    if (!ret)
+        ERR_print_errors_fp(stderr);
 
-  EVP_CIPHER_free(cipher);
-  EVP_CIPHER_CTX_free(ctx);
+    EVP_CIPHER_free(cipher);
+    EVP_CIPHER_CTX_free(ctx);
 
-  return ret;
+    return ret;
 }
 
 static int aria_cbc_decrypt(void) {
-  int ret = 0;
-  EVP_CIPHER_CTX *ctx;
-  EVP_CIPHER *cipher = NULL;
-  int outlen, tmplen;
-  unsigned char outbuf[1024];
+    int ret = 0;
+    EVP_CIPHER_CTX *ctx;
+    EVP_CIPHER *cipher = NULL;
+    int outlen, tmplen;
+    unsigned char outbuf[1024];
 
-  printf("ARIA CBC Decrypt:\n");
-  printf("Ciphertext:\n");
-  BIO_dump_fp(stdout, cbc_ct, sizeof(cbc_ct));
+    printf("ARIA CBC Decrypt:\n");
+    printf("Ciphertext:\n");
+    BIO_dump_fp(stdout, cbc_ct, sizeof(cbc_ct));
 
-  if ((ctx = EVP_CIPHER_CTX_new()) == NULL)
-    goto err;
+    if ((ctx = EVP_CIPHER_CTX_new()) == NULL)
+        goto err;
 
-  /* Fetch the cipher implementation */
-  if ((cipher = EVP_CIPHER_fetch(libctx, "ARIA-256-CBC", propq)) == NULL)
-    goto err;
+    /* Fetch the cipher implementation */
+    if ((cipher = EVP_CIPHER_fetch(libctx, "ARIA-256-CBC", propq)) == NULL)
+        goto err;
 
-  /*
-   * Initialise an encrypt operation with the cipher/mode, key and IV.
-   * We are not setting any custom params so let params be just NULL.
-   */
-  if (!EVP_DecryptInit_ex2(ctx, cipher, cbc_key, cbc_iv, /* params */ NULL))
-    goto err;
+    /*
+     * Initialise an encrypt operation with the cipher/mode, key and IV.
+     * We are not setting any custom params so let params be just NULL.
+     */
+    if (!EVP_DecryptInit_ex2(ctx, cipher, cbc_key, cbc_iv, /* params */ NULL))
+        goto err;
 
-  /* Decrypt plaintext */
-  if (!EVP_DecryptUpdate(ctx, outbuf, &outlen, cbc_ct, sizeof(cbc_ct)))
-    goto err;
+    /* Decrypt plaintext */
+    if (!EVP_DecryptUpdate(ctx, outbuf, &outlen, cbc_ct, sizeof(cbc_ct)))
+        goto err;
 
-  /* Finalise: there can be some additional output from padding */
-  if (!EVP_DecryptFinal_ex(ctx, outbuf + outlen, &tmplen))
-    goto err;
-  outlen += tmplen;
+    /* Finalise: there can be some additional output from padding */
+    if (!EVP_DecryptFinal_ex(ctx, outbuf + outlen, &tmplen))
+        goto err;
+    outlen += tmplen;
 
-  /* Output decrypted block */
-  printf("Plaintext (outlen:%d):\n", outlen);
-  BIO_dump_fp(stdout, outbuf, outlen);
+    /* Output decrypted block */
+    printf("Plaintext (outlen:%d):\n", outlen);
+    BIO_dump_fp(stdout, outbuf, outlen);
 
-  if (sizeof(cbc_pt) == outlen && !CRYPTO_memcmp(outbuf, cbc_pt, outlen))
-    printf("Final plaintext matches original plaintext\n");
-  else
-    printf("Final plaintext differs from original plaintext\n");
+    if (sizeof(cbc_pt) == outlen && !CRYPTO_memcmp(outbuf, cbc_pt, outlen))
+        printf("Final plaintext matches original plaintext\n");
+    else
+        printf("Final plaintext differs from original plaintext\n");
 
-  ret = 1;
+    ret = 1;
 err:
-  if (!ret)
-    ERR_print_errors_fp(stderr);
+    if (!ret)
+        ERR_print_errors_fp(stderr);
 
-  EVP_CIPHER_free(cipher);
-  EVP_CIPHER_CTX_free(ctx);
+    EVP_CIPHER_free(cipher);
+    EVP_CIPHER_CTX_free(ctx);
 
-  return ret;
+    return ret;
 }
 
 int main(int argc, char **argv) {
-  if (!aria_cbc_encrypt())
-    return EXIT_FAILURE;
+    if (!aria_cbc_encrypt())
+        return EXIT_FAILURE;
 
-  if (!aria_cbc_decrypt())
-    return EXIT_FAILURE;
+    if (!aria_cbc_decrypt())
+        return EXIT_FAILURE;
 
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

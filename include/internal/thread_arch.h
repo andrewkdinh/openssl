@@ -69,40 +69,40 @@ typedef CRYPTO_THREAD_RETVAL (*CRYPTO_THREAD_ROUTINE_CB)(void *,
 #define CRYPTO_THREAD_GET_ERROR(THREAD, FLAG) (((THREAD)->state >> 16) & (FLAG))
 
 typedef struct crypto_thread_st {
-  uint32_t state;
-  void *data;
-  CRYPTO_THREAD_ROUTINE routine;
-  CRYPTO_THREAD_RETVAL retval;
-  void *handle;
-  CRYPTO_MUTEX *lock;
-  CRYPTO_MUTEX *statelock;
-  CRYPTO_CONDVAR *condvar;
-  unsigned long thread_id;
-  int joinable;
-  OSSL_LIB_CTX *ctx;
+    uint32_t state;
+    void *data;
+    CRYPTO_THREAD_ROUTINE routine;
+    CRYPTO_THREAD_RETVAL retval;
+    void *handle;
+    CRYPTO_MUTEX *lock;
+    CRYPTO_MUTEX *statelock;
+    CRYPTO_CONDVAR *condvar;
+    unsigned long thread_id;
+    int joinable;
+    OSSL_LIB_CTX *ctx;
 } CRYPTO_THREAD;
 
 #if defined(OPENSSL_THREADS)
 
 #define CRYPTO_THREAD_UNSET_STATE(THREAD, FLAG)                                \
-  do {                                                                         \
-    (THREAD)->state &= ~(FLAG);                                                \
-  } while ((void)0, 0)
+    do {                                                                       \
+        (THREAD)->state &= ~(FLAG);                                            \
+    } while ((void)0, 0)
 
 #define CRYPTO_THREAD_SET_STATE(THREAD, FLAG)                                  \
-  do {                                                                         \
-    (THREAD)->state |= (FLAG);                                                 \
-  } while ((void)0, 0)
+    do {                                                                       \
+        (THREAD)->state |= (FLAG);                                             \
+    } while ((void)0, 0)
 
 #define CRYPTO_THREAD_SET_ERROR(THREAD, FLAG)                                  \
-  do {                                                                         \
-    (THREAD)->state |= ((FLAG) << 16);                                         \
-  } while ((void)0, 0)
+    do {                                                                       \
+        (THREAD)->state |= ((FLAG) << 16);                                     \
+    } while ((void)0, 0)
 
 #define CRYPTO_THREAD_UNSET_ERROR(THREAD, FLAG)                                \
-  do {                                                                         \
-    (THREAD)->state &= ~((FLAG) << 16);                                        \
-  } while ((void)0, 0)
+    do {                                                                       \
+        (THREAD)->state &= ~((FLAG) << 16);                                    \
+    } while ((void)0, 0)
 
 #else
 

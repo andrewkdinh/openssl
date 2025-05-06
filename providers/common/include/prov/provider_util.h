@@ -11,29 +11,29 @@
 #include <openssl/types.h>
 
 typedef struct {
-  /*
-   * References to the underlying cipher implementation.  |cipher| caches
-   * the cipher, always.  |alloc_cipher| only holds a reference to an
-   * explicitly fetched cipher.
-   */
-  const EVP_CIPHER *cipher; /* cipher */
-  EVP_CIPHER *alloc_cipher; /* fetched cipher */
+    /*
+     * References to the underlying cipher implementation.  |cipher| caches
+     * the cipher, always.  |alloc_cipher| only holds a reference to an
+     * explicitly fetched cipher.
+     */
+    const EVP_CIPHER *cipher; /* cipher */
+    EVP_CIPHER *alloc_cipher; /* fetched cipher */
 
-  /* Conditions for legacy EVP_CIPHER uses */
-  ENGINE *engine; /* cipher engine */
+    /* Conditions for legacy EVP_CIPHER uses */
+    ENGINE *engine; /* cipher engine */
 } PROV_CIPHER;
 
 typedef struct {
-  /*
-   * References to the underlying digest implementation.  |md| caches
-   * the digest, always.  |alloc_md| only holds a reference to an explicitly
-   * fetched digest.
-   */
-  const EVP_MD *md; /* digest */
-  EVP_MD *alloc_md; /* fetched digest */
+    /*
+     * References to the underlying digest implementation.  |md| caches
+     * the digest, always.  |alloc_md| only holds a reference to an explicitly
+     * fetched digest.
+     */
+    const EVP_MD *md; /* digest */
+    EVP_MD *alloc_md; /* fetched digest */
 
-  /* Conditions for legacy EVP_MD uses */
-  ENGINE *engine; /* digest engine */
+    /* Conditions for legacy EVP_MD uses */
+    ENGINE *engine; /* digest engine */
 } PROV_DIGEST;
 
 /* Cipher functions */
@@ -123,8 +123,8 @@ int ossl_prov_macctx_load_from_params(EVP_MAC_CTX **macctx,
                                       const char *mdname, OSSL_LIB_CTX *ctx);
 
 typedef struct ag_capable_st {
-  OSSL_ALGORITHM alg;
-  int (*capable)(void);
+    OSSL_ALGORITHM alg;
+    int (*capable)(void);
 } OSSL_ALGORITHM_CAPABLE;
 
 /*

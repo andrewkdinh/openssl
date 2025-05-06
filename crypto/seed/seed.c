@@ -59,9 +59,10 @@
 #if !defined(OPENSSL_SMALL_FOOTPRINT)
 
 #define G_FUNC(v)                                                              \
-  SS[0][(unsigned char)(v) & 0xff] ^ SS[1][(unsigned char)((v) >> 8) & 0xff] ^ \
-  SS[2][(unsigned char)((v) >> 16) & 0xff] ^                                   \
-  SS[3][(unsigned char)((v) >> 24) & 0xff]
+    SS[0][(unsigned char)(v) & 0xff] ^                                         \
+    SS[1][(unsigned char)((v) >> 8) & 0xff] ^                                  \
+    SS[2][(unsigned char)((v) >> 16) & 0xff] ^                                 \
+    SS[3][(unsigned char)((v) >> 24) & 0xff]
 
 static const seed_word SS[4][256] = {
 {0x2989a1a8, 0x05858184, 0x16c6d2d4, 0x13c3d3d0, 0x14445054, 0x1d0d111c,
@@ -283,19 +284,19 @@ static const unsigned char SEED_Sbox[2][256] = {
  0x87, 0xD9, 0x4C, 0x83, 0x8F, 0xCE, 0x3B, 0x4A, 0xB7}};
 
 static unsigned int G_FUNC(unsigned int v) {
-  unsigned int s0, s1, s2, s3, ret;
+    unsigned int s0, s1, s2, s3, ret;
 
-  s0 = SEED_Sbox[0][(unsigned char)(v) & 0xff];
-  s1 = SEED_Sbox[1][(unsigned char)((v) >> 8) & 0xff];
-  s2 = SEED_Sbox[0][(unsigned char)((v) >> 16) & 0xff];
-  s3 = SEED_Sbox[1][(unsigned char)((v) >> 24) & 0xff];
+    s0 = SEED_Sbox[0][(unsigned char)(v) & 0xff];
+    s1 = SEED_Sbox[1][(unsigned char)((v) >> 8) & 0xff];
+    s2 = SEED_Sbox[0][(unsigned char)((v) >> 16) & 0xff];
+    s3 = SEED_Sbox[1][(unsigned char)((v) >> 24) & 0xff];
 
-  ret = ((s0 & 0xFC) ^ (s1 & 0xF3) ^ (s2 & 0xCF) ^ (s3 & 0x3F));
-  ret |= ((s0 & 0xF3) ^ (s1 & 0xCF) ^ (s2 & 0x3F) ^ (s3 & 0xFC)) << 8;
-  ret |= ((s0 & 0xCF) ^ (s1 & 0x3F) ^ (s2 & 0xFC) ^ (s3 & 0xF3)) << 16;
-  ret |= ((s0 & 0x3F) ^ (s1 & 0xFC) ^ (s2 & 0xF3) ^ (s3 & 0xCF)) << 24;
+    ret = ((s0 & 0xFC) ^ (s1 & 0xF3) ^ (s2 & 0xCF) ^ (s3 & 0x3F));
+    ret |= ((s0 & 0xF3) ^ (s1 & 0xCF) ^ (s2 & 0x3F) ^ (s3 & 0xFC)) << 8;
+    ret |= ((s0 & 0xCF) ^ (s1 & 0x3F) ^ (s2 & 0xFC) ^ (s3 & 0xF3)) << 16;
+    ret |= ((s0 & 0x3F) ^ (s1 & 0xFC) ^ (s2 & 0xF3) ^ (s3 & 0xCF)) << 24;
 
-  return ret;
+    return ret;
 }
 #endif
 
@@ -324,148 +325,148 @@ static const seed_word KC[] = {KC0, KC1, KC2,  KC3,  KC4,  KC5,  KC6,  KC7,
 
 void SEED_set_key(const unsigned char rawkey[SEED_KEY_LENGTH],
                   SEED_KEY_SCHEDULE *ks) {
-  seed_word x1, x2, x3, x4;
-  seed_word t0, t1;
+    seed_word x1, x2, x3, x4;
+    seed_word t0, t1;
 
-  char2word(rawkey, x1);
-  char2word(rawkey + 4, x2);
-  char2word(rawkey + 8, x3);
-  char2word(rawkey + 12, x4);
+    char2word(rawkey, x1);
+    char2word(rawkey + 4, x2);
+    char2word(rawkey + 8, x3);
+    char2word(rawkey + 12, x4);
 
-  t0 = (x1 + x3 - KC0) & 0xffffffff;
-  t1 = (x2 - x4 + KC0) & 0xffffffff;
-  KEYUPDATE_TEMP(t0, t1, &ks->data[0]);
-  KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC1);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[2]);
+    t0 = (x1 + x3 - KC0) & 0xffffffff;
+    t1 = (x2 - x4 + KC0) & 0xffffffff;
+    KEYUPDATE_TEMP(t0, t1, &ks->data[0]);
+    KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC1);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[2]);
 
 #if !defined(OPENSSL_SMALL_FOOTPRINT)
-  KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC2);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[4]);
-  KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC3);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[6]);
-  KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC4);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[8]);
-  KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC5);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[10]);
-  KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC6);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[12]);
-  KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC7);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[14]);
-  KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC8);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[16]);
-  KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC9);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[18]);
-  KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC10);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[20]);
-  KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC11);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[22]);
-  KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC12);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[24]);
-  KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC13);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[26]);
-  KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC14);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[28]);
-  KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC15);
-  KEYUPDATE_TEMP(t0, t1, &ks->data[30]);
+    KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC2);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[4]);
+    KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC3);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[6]);
+    KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC4);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[8]);
+    KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC5);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[10]);
+    KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC6);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[12]);
+    KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC7);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[14]);
+    KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC8);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[16]);
+    KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC9);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[18]);
+    KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC10);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[20]);
+    KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC11);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[22]);
+    KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC12);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[24]);
+    KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC13);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[26]);
+    KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC14);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[28]);
+    KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC15);
+    KEYUPDATE_TEMP(t0, t1, &ks->data[30]);
 #else
-  {
-    int i;
-    for (i = 2; i < 16; i += 2) {
-      KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC[i]);
-      KEYUPDATE_TEMP(t0, t1, &ks->data[i * 2]);
-      KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC[i + 1]);
-      KEYUPDATE_TEMP(t0, t1, &ks->data[i * 2 + 2]);
+    {
+        int i;
+        for (i = 2; i < 16; i += 2) {
+            KEYSCHEDULE_UPDATE0(t0, t1, x1, x2, x3, x4, KC[i]);
+            KEYUPDATE_TEMP(t0, t1, &ks->data[i * 2]);
+            KEYSCHEDULE_UPDATE1(t0, t1, x1, x2, x3, x4, KC[i + 1]);
+            KEYUPDATE_TEMP(t0, t1, &ks->data[i * 2 + 2]);
+        }
     }
-  }
 #endif
 }
 
 void SEED_encrypt(const unsigned char s[SEED_BLOCK_SIZE],
                   unsigned char d[SEED_BLOCK_SIZE],
                   const SEED_KEY_SCHEDULE *ks) {
-  seed_word x1, x2, x3, x4;
-  seed_word t0, t1;
+    seed_word x1, x2, x3, x4;
+    seed_word t0, t1;
 
-  char2word(s, x1);
-  char2word(s + 4, x2);
-  char2word(s + 8, x3);
-  char2word(s + 12, x4);
+    char2word(s, x1);
+    char2word(s + 4, x2);
+    char2word(s + 8, x3);
+    char2word(s + 12, x4);
 
 #if !defined(OPENSSL_SMALL_FOOTPRINT)
-  E_SEED(t0, t1, x1, x2, x3, x4, 0);
-  E_SEED(t0, t1, x3, x4, x1, x2, 2);
-  E_SEED(t0, t1, x1, x2, x3, x4, 4);
-  E_SEED(t0, t1, x3, x4, x1, x2, 6);
-  E_SEED(t0, t1, x1, x2, x3, x4, 8);
-  E_SEED(t0, t1, x3, x4, x1, x2, 10);
-  E_SEED(t0, t1, x1, x2, x3, x4, 12);
-  E_SEED(t0, t1, x3, x4, x1, x2, 14);
-  E_SEED(t0, t1, x1, x2, x3, x4, 16);
-  E_SEED(t0, t1, x3, x4, x1, x2, 18);
-  E_SEED(t0, t1, x1, x2, x3, x4, 20);
-  E_SEED(t0, t1, x3, x4, x1, x2, 22);
-  E_SEED(t0, t1, x1, x2, x3, x4, 24);
-  E_SEED(t0, t1, x3, x4, x1, x2, 26);
-  E_SEED(t0, t1, x1, x2, x3, x4, 28);
-  E_SEED(t0, t1, x3, x4, x1, x2, 30);
+    E_SEED(t0, t1, x1, x2, x3, x4, 0);
+    E_SEED(t0, t1, x3, x4, x1, x2, 2);
+    E_SEED(t0, t1, x1, x2, x3, x4, 4);
+    E_SEED(t0, t1, x3, x4, x1, x2, 6);
+    E_SEED(t0, t1, x1, x2, x3, x4, 8);
+    E_SEED(t0, t1, x3, x4, x1, x2, 10);
+    E_SEED(t0, t1, x1, x2, x3, x4, 12);
+    E_SEED(t0, t1, x3, x4, x1, x2, 14);
+    E_SEED(t0, t1, x1, x2, x3, x4, 16);
+    E_SEED(t0, t1, x3, x4, x1, x2, 18);
+    E_SEED(t0, t1, x1, x2, x3, x4, 20);
+    E_SEED(t0, t1, x3, x4, x1, x2, 22);
+    E_SEED(t0, t1, x1, x2, x3, x4, 24);
+    E_SEED(t0, t1, x3, x4, x1, x2, 26);
+    E_SEED(t0, t1, x1, x2, x3, x4, 28);
+    E_SEED(t0, t1, x3, x4, x1, x2, 30);
 #else
-  {
-    int i;
-    for (i = 0; i < 30; i += 4) {
-      E_SEED(t0, t1, x1, x2, x3, x4, i);
-      E_SEED(t0, t1, x3, x4, x1, x2, i + 2);
+    {
+        int i;
+        for (i = 0; i < 30; i += 4) {
+            E_SEED(t0, t1, x1, x2, x3, x4, i);
+            E_SEED(t0, t1, x3, x4, x1, x2, i + 2);
+        }
     }
-  }
 #endif
 
-  word2char(x3, d);
-  word2char(x4, d + 4);
-  word2char(x1, d + 8);
-  word2char(x2, d + 12);
+    word2char(x3, d);
+    word2char(x4, d + 4);
+    word2char(x1, d + 8);
+    word2char(x2, d + 12);
 }
 
 void SEED_decrypt(const unsigned char s[SEED_BLOCK_SIZE],
                   unsigned char d[SEED_BLOCK_SIZE],
                   const SEED_KEY_SCHEDULE *ks) {
-  seed_word x1, x2, x3, x4;
-  seed_word t0, t1;
+    seed_word x1, x2, x3, x4;
+    seed_word t0, t1;
 
-  char2word(s, x1);
-  char2word(s + 4, x2);
-  char2word(s + 8, x3);
-  char2word(s + 12, x4);
+    char2word(s, x1);
+    char2word(s + 4, x2);
+    char2word(s + 8, x3);
+    char2word(s + 12, x4);
 
 #if !defined(OPENSSL_SMALL_FOOTPRINT)
-  E_SEED(t0, t1, x1, x2, x3, x4, 30);
-  E_SEED(t0, t1, x3, x4, x1, x2, 28);
-  E_SEED(t0, t1, x1, x2, x3, x4, 26);
-  E_SEED(t0, t1, x3, x4, x1, x2, 24);
-  E_SEED(t0, t1, x1, x2, x3, x4, 22);
-  E_SEED(t0, t1, x3, x4, x1, x2, 20);
-  E_SEED(t0, t1, x1, x2, x3, x4, 18);
-  E_SEED(t0, t1, x3, x4, x1, x2, 16);
-  E_SEED(t0, t1, x1, x2, x3, x4, 14);
-  E_SEED(t0, t1, x3, x4, x1, x2, 12);
-  E_SEED(t0, t1, x1, x2, x3, x4, 10);
-  E_SEED(t0, t1, x3, x4, x1, x2, 8);
-  E_SEED(t0, t1, x1, x2, x3, x4, 6);
-  E_SEED(t0, t1, x3, x4, x1, x2, 4);
-  E_SEED(t0, t1, x1, x2, x3, x4, 2);
-  E_SEED(t0, t1, x3, x4, x1, x2, 0);
+    E_SEED(t0, t1, x1, x2, x3, x4, 30);
+    E_SEED(t0, t1, x3, x4, x1, x2, 28);
+    E_SEED(t0, t1, x1, x2, x3, x4, 26);
+    E_SEED(t0, t1, x3, x4, x1, x2, 24);
+    E_SEED(t0, t1, x1, x2, x3, x4, 22);
+    E_SEED(t0, t1, x3, x4, x1, x2, 20);
+    E_SEED(t0, t1, x1, x2, x3, x4, 18);
+    E_SEED(t0, t1, x3, x4, x1, x2, 16);
+    E_SEED(t0, t1, x1, x2, x3, x4, 14);
+    E_SEED(t0, t1, x3, x4, x1, x2, 12);
+    E_SEED(t0, t1, x1, x2, x3, x4, 10);
+    E_SEED(t0, t1, x3, x4, x1, x2, 8);
+    E_SEED(t0, t1, x1, x2, x3, x4, 6);
+    E_SEED(t0, t1, x3, x4, x1, x2, 4);
+    E_SEED(t0, t1, x1, x2, x3, x4, 2);
+    E_SEED(t0, t1, x3, x4, x1, x2, 0);
 #else
-  {
-    int i;
-    for (i = 30; i > 0; i -= 4) {
-      E_SEED(t0, t1, x1, x2, x3, x4, i);
-      E_SEED(t0, t1, x3, x4, x1, x2, i - 2);
+    {
+        int i;
+        for (i = 30; i > 0; i -= 4) {
+            E_SEED(t0, t1, x1, x2, x3, x4, i);
+            E_SEED(t0, t1, x3, x4, x1, x2, i - 2);
+        }
     }
-  }
 #endif
 
-  word2char(x3, d);
-  word2char(x4, d + 4);
-  word2char(x1, d + 8);
-  word2char(x2, d + 12);
+    word2char(x3, d);
+    word2char(x4, d + 4);
+    word2char(x1, d + 8);
+    word2char(x2, d + 12);
 }
 
 #endif /* OPENSSL_NO_SEED */

@@ -40,13 +40,13 @@ typedef /* const */ unsigned char const_DES_cblock[8];
  */
 
 typedef struct DES_ks {
-  union {
-    DES_cblock cblock;
-    /*
-     * make sure things are correct size on machines with 8 byte longs
-     */
-    DES_LONG deslong[2];
-  } ks[16];
+    union {
+        DES_cblock cblock;
+        /*
+         * make sure things are correct size on machines with 8 byte longs
+         */
+        DES_LONG deslong[2];
+    } ks[16];
 } DES_key_schedule;
 
 #define DES_KEY_SZ (sizeof(DES_cblock))
@@ -59,16 +59,16 @@ typedef struct DES_ks {
 #define DES_PCBC_MODE 1
 
 #define DES_ecb2_encrypt(i, o, k1, k2, e)                                      \
-  DES_ecb3_encrypt((i), (o), (k1), (k2), (k1), (e))
+    DES_ecb3_encrypt((i), (o), (k1), (k2), (k1), (e))
 
 #define DES_ede2_cbc_encrypt(i, o, l, k1, k2, iv, e)                           \
-  DES_ede3_cbc_encrypt((i), (o), (l), (k1), (k2), (k1), (iv), (e))
+    DES_ede3_cbc_encrypt((i), (o), (l), (k1), (k2), (k1), (iv), (e))
 
 #define DES_ede2_cfb64_encrypt(i, o, l, k1, k2, iv, n, e)                      \
-  DES_ede3_cfb64_encrypt((i), (o), (l), (k1), (k2), (k1), (iv), (n), (e))
+    DES_ede3_cfb64_encrypt((i), (o), (l), (k1), (k2), (k1), (iv), (n), (e))
 
 #define DES_ede2_ofb64_encrypt(i, o, l, k1, k2, iv, n)                         \
-  DES_ede3_ofb64_encrypt((i), (o), (l), (k1), (k2), (k1), (iv), (n))
+    DES_ede3_ofb64_encrypt((i), (o), (l), (k1), (k2), (k1), (iv), (n))
 
 #define DES_fixup_key_parity DES_set_odd_parity
 #endif

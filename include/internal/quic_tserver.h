@@ -35,14 +35,14 @@
 typedef struct quic_tserver_st QUIC_TSERVER;
 
 typedef struct quic_tserver_args_st {
-  OSSL_LIB_CTX *libctx;
-  const char *propq;
-  SSL_CTX *ctx;
-  BIO *net_rbio, *net_wbio;
-  OSSL_TIME (*now_cb)(void *arg);
-  void *now_cb_arg;
-  const unsigned char *alpn;
-  size_t alpnlen;
+    OSSL_LIB_CTX *libctx;
+    const char *propq;
+    SSL_CTX *ctx;
+    BIO *net_rbio, *net_wbio;
+    OSSL_TIME (*now_cb)(void *arg);
+    void *now_cb_arg;
+    const unsigned char *alpn;
+    size_t alpnlen;
 } QUIC_TSERVER_ARGS;
 
 QUIC_TSERVER *ossl_quic_tserver_new(const QUIC_TSERVER_ARGS *args,

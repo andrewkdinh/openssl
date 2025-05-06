@@ -82,11 +82,11 @@
 #define OSSL_SLH_DSA_256F_SIG_BYTES 49856
 
 #define OSSL_SLH_PARAMS(name)                                                  \
-  OSSL_SLH_DSA_##name##_N, OSSL_SLH_DSA_##name##_H, OSSL_SLH_DSA_##name##_D,   \
-  OSSL_SLH_DSA_##name##_H_DASH, OSSL_SLH_DSA_##name##_A,                       \
-  OSSL_SLH_DSA_##name##_K, OSSL_SLH_DSA_##name##_M,                            \
-  OSSL_SLH_DSA_##name##_SECURITY_CATEGORY, OSSL_SLH_DSA_##name##_PUB_BYTES,    \
-  OSSL_SLH_DSA_##name##_SIG_BYTES
+    OSSL_SLH_DSA_##name##_N, OSSL_SLH_DSA_##name##_H, OSSL_SLH_DSA_##name##_D, \
+    OSSL_SLH_DSA_##name##_H_DASH, OSSL_SLH_DSA_##name##_A,                     \
+    OSSL_SLH_DSA_##name##_K, OSSL_SLH_DSA_##name##_M,                          \
+    OSSL_SLH_DSA_##name##_SECURITY_CATEGORY, OSSL_SLH_DSA_##name##_PUB_BYTES,  \
+    OSSL_SLH_DSA_##name##_SIG_BYTES
 
 static const SLH_DSA_PARAMS slh_dsa_params[] = {
 {"SLH-DSA-SHA2-128s", NID_SLH_DSA_SHA2_128s, 0, OSSL_SLH_PARAMS(128S),
@@ -114,13 +114,13 @@ static const SLH_DSA_PARAMS slh_dsa_params[] = {
  * @brief A getter to convert an algorithm name into a SLH_DSA_PARAMS object
  */
 const SLH_DSA_PARAMS *ossl_slh_dsa_params_get(const char *alg) {
-  const SLH_DSA_PARAMS *p;
+    const SLH_DSA_PARAMS *p;
 
-  if (alg == NULL)
+    if (alg == NULL)
+        return NULL;
+    for (p = slh_dsa_params; p->alg != NULL; ++p) {
+        if (strcmp(p->alg, alg) == 0)
+            return p;
+    }
     return NULL;
-  for (p = slh_dsa_params; p->alg != NULL; ++p) {
-    if (strcmp(p->alg, alg) == 0)
-      return p;
-  }
-  return NULL;
 }

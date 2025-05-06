@@ -73,89 +73,90 @@ static STACK_OF(CONF_VALUE) *
 i2v_AUTHORITY_INFO_ACCESS(X509V3_EXT_METHOD * method,
                           AUTHORITY_INFO_ACCESS *ainfo,
                           STACK_OF(CONF_VALUE) * ret) {
-  ACCESS_DESCRIPTION *desc;
-  int i, nlen;
-  char objtmp[80], *ntmp;
-  CONF_VALUE *vtmp;
-  STACK_OF(CONF_VALUE) *tret = ret;
+    ACCESS_DESCRIPTION *desc;
+    int i, nlen;
+    char objtmp[80], *ntmp;
+    CONF_VALUE *vtmp;
+    STACK_OF(CONF_VALUE) *tret = ret;
 
-  for (i = 0; i < sk_ACCESS_DESCRIPTION_num(ainfo); i++) {
-    STACK_OF(CONF_VALUE) * tmp;
+    for (i = 0; i < sk_ACCESS_DESCRIPTION_num(ainfo); i++) {
+        STACK_OF(CONF_VALUE) * tmp;
 
-    desc = sk_ACCESS_DESCRIPTION_value(ainfo, i);
-    tmp = i2v_GENERAL_NAME(method, desc->location, tret);
-    if (tmp == NULL) {
-      ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
-      goto err;
+        desc = sk_ACCESS_DESCRIPTION_value(ainfo, i);
+        tmp = i2v_GENERAL_NAME(method, desc->location, tret);
+        if (tmp == NULL) {
+            ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
+            goto err;
+        }
+        tret = tmp;
+        vtmp = sk_CONF_VALUE_value(tret, i);
+        i2t_ASN1_OBJECT(objtmp, sizeof(objtmp), desc->method);
+        nlen = strlen(objtmp) + 3 + strlen(vtmp->name) + 1;
+        ntmp = OPENSSL_malloc(nlen);
+        if (ntmp == NULL)
+            goto err;
+        BIO_snprintf(ntmp, nlen, "%s - %s", objtmp, vtmp->name);
+        OPENSSL_free(vtmp->name);
+        vtmp->name = ntmp;
     }
-    tret = tmp;
-    vtmp = sk_CONF_VALUE_value(tret, i);
-    i2t_ASN1_OBJECT(objtmp, sizeof(objtmp), desc->method);
-    nlen = strlen(objtmp) + 3 + strlen(vtmp->name) + 1;
-    ntmp = OPENSSL_malloc(nlen);
-    if (ntmp == NULL)
-      goto err;
-    BIO_snprintf(ntmp, nlen, "%s - %s", objtmp, vtmp->name);
-    OPENSSL_free(vtmp->name);
-    vtmp->name = ntmp;
-  }
-  if (ret == NULL && tret == NULL)
-    return sk_CONF_VALUE_new_null();
+    if (ret == NULL && tret == NULL)
+        return sk_CONF_VALUE_new_null();
 
-  return tret;
+    return tret;
 err:
-  if (ret == NULL && tret != NULL)
-    sk_CONF_VALUE_pop_free(tret, X509V3_conf_free);
-  return NULL;
+    if (ret == NULL && tret != NULL)
+        sk_CONF_VALUE_pop_free(tret, X509V3_conf_free);
+    return NULL;
 }
 
 static AUTHORITY_INFO_ACCESS *
 v2i_AUTHORITY_INFO_ACCESS(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
                           STACK_OF(CONF_VALUE) * nval) {
-  AUTHORITY_INFO_ACCESS *ainfo = NULL;
-  CONF_VALUE *cnf, ctmp;
-  ACCESS_DESCRIPTION *acc;
-  int i;
-  const int num = sk_CONF_VALUE_num(nval);
-  char *objtmp, *ptmp;
+    AUTHORITY_INFO_ACCESS *ainfo = NULL;
+    CONF_VALUE *cnf, ctmp;
+    ACCESS_DESCRIPTION *acc;
+    int i;
+    const int num = sk_CONF_VALUE_num(nval);
+    char *objtmp, *ptmp;
 
-  if ((ainfo = sk_ACCESS_DESCRIPTION_new_reserve(NULL, num)) == NULL) {
-    ERR_raise(ERR_LIB_X509V3, ERR_R_CRYPTO_LIB);
-    return NULL;
-  }
-  for (i = 0; i < num; i++) {
-    cnf = sk_CONF_VALUE_value(nval, i);
-    if ((acc = ACCESS_DESCRIPTION_new()) == NULL) {
-      ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
-      goto err;
+    if ((ainfo = sk_ACCESS_DESCRIPTION_new_reserve(NULL, num)) == NULL) {
+        ERR_raise(ERR_LIB_X509V3, ERR_R_CRYPTO_LIB);
+        return NULL;
     }
-    sk_ACCESS_DESCRIPTION_push(ainfo, acc); /* Cannot fail due to reserve */
-    ptmp = strchr(cnf->name, ';');
-    if (ptmp == NULL) {
-      ERR_raise(ERR_LIB_X509V3, X509V3_R_INVALID_SYNTAX);
-      goto err;
+    for (i = 0; i < num; i++) {
+        cnf = sk_CONF_VALUE_value(nval, i);
+        if ((acc = ACCESS_DESCRIPTION_new()) == NULL) {
+            ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
+            goto err;
+        }
+        sk_ACCESS_DESCRIPTION_push(ainfo, acc); /* Cannot fail due to reserve */
+        ptmp = strchr(cnf->name, ';');
+        if (ptmp == NULL) {
+            ERR_raise(ERR_LIB_X509V3, X509V3_R_INVALID_SYNTAX);
+            goto err;
+        }
+        ctmp.name = ptmp + 1;
+        ctmp.value = cnf->value;
+        if (!v2i_GENERAL_NAME_ex(acc->location, method, ctx, &ctmp, 0))
+            goto err;
+        if ((objtmp = OPENSSL_strndup(cnf->name, ptmp - cnf->name)) == NULL)
+            goto err;
+        acc->method = OBJ_txt2obj(objtmp, 0);
+        if (!acc->method) {
+            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_BAD_OBJECT, "value=%s",
+                           objtmp);
+            OPENSSL_free(objtmp);
+            goto err;
+        }
+        OPENSSL_free(objtmp);
     }
-    ctmp.name = ptmp + 1;
-    ctmp.value = cnf->value;
-    if (!v2i_GENERAL_NAME_ex(acc->location, method, ctx, &ctmp, 0))
-      goto err;
-    if ((objtmp = OPENSSL_strndup(cnf->name, ptmp - cnf->name)) == NULL)
-      goto err;
-    acc->method = OBJ_txt2obj(objtmp, 0);
-    if (!acc->method) {
-      ERR_raise_data(ERR_LIB_X509V3, X509V3_R_BAD_OBJECT, "value=%s", objtmp);
-      OPENSSL_free(objtmp);
-      goto err;
-    }
-    OPENSSL_free(objtmp);
-  }
-  return ainfo;
+    return ainfo;
 err:
-  sk_ACCESS_DESCRIPTION_pop_free(ainfo, ACCESS_DESCRIPTION_free);
-  return NULL;
+    sk_ACCESS_DESCRIPTION_pop_free(ainfo, ACCESS_DESCRIPTION_free);
+    return NULL;
 }
 
 int i2a_ACCESS_DESCRIPTION(BIO *bp, const ACCESS_DESCRIPTION *a) {
-  i2a_ASN1_OBJECT(bp, a->method);
-  return 2;
+    i2a_ASN1_OBJECT(bp, a->method);
+    return 2;
 }

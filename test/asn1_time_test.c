@@ -21,18 +21,18 @@
 #include "internal/nelem.h"
 
 struct testdata {
-  char *data;         /* TIME string value */
-  int type;           /* GENERALIZED OR UTC */
-  int expected_type;  /* expected type after set/set_string_gmt */
-  int check_result;   /* check result */
-  time_t t;           /* expected time_t*/
-  int cmp_result;     /* comparison to baseline result */
-  int convert_result; /* conversion result */
+    char *data;         /* TIME string value */
+    int type;           /* GENERALIZED OR UTC */
+    int expected_type;  /* expected type after set/set_string_gmt */
+    int check_result;   /* check result */
+    time_t t;           /* expected time_t*/
+    int cmp_result;     /* comparison to baseline result */
+    int convert_result; /* conversion result */
 };
 
 struct TESTDATA_asn1_to_utc {
-  char *input;
-  time_t expected;
+    char *input;
+    time_t expected;
 };
 
 static const struct TESTDATA_asn1_to_utc asn1_to_utc[] = {
@@ -611,164 +611,173 @@ static ASN1_TIME gtime = {15, V_ASN1_GENERALIZEDTIME,
 static time_t gtime_t = 946598400;
 
 static int test_table(struct testdata *tbl, int idx) {
-  int error = 0;
-  ASN1_TIME atime;
-  ASN1_TIME *ptime;
-  struct testdata *td = &tbl[idx];
-  int day, sec;
+    int error = 0;
+    ASN1_TIME atime;
+    ASN1_TIME *ptime;
+    struct testdata *td = &tbl[idx];
+    int day, sec;
 
-  atime.data = (unsigned char *)td->data;
-  atime.length = strlen((char *)atime.data);
-  atime.type = td->type;
-  atime.flags = 0;
+    atime.data = (unsigned char *)td->data;
+    atime.length = strlen((char *)atime.data);
+    atime.type = td->type;
+    atime.flags = 0;
 
-  if (!TEST_int_eq(ASN1_TIME_check(&atime), td->check_result)) {
-    TEST_info("ASN1_TIME_check(%s) unexpected result", atime.data);
-    error = 1;
-  }
-  if (td->check_result == 0)
-    return 1;
+    if (!TEST_int_eq(ASN1_TIME_check(&atime), td->check_result)) {
+        TEST_info("ASN1_TIME_check(%s) unexpected result", atime.data);
+        error = 1;
+    }
+    if (td->check_result == 0)
+        return 1;
 
-  if (!TEST_int_eq(ASN1_TIME_cmp_time_t(&atime, td->t), 0)) {
-    TEST_info("ASN1_TIME_cmp_time_t(%s vs %ld) compare failed", atime.data,
-              (long)td->t);
-    error = 1;
-  }
+    if (!TEST_int_eq(ASN1_TIME_cmp_time_t(&atime, td->t), 0)) {
+        TEST_info("ASN1_TIME_cmp_time_t(%s vs %ld) compare failed", atime.data,
+                  (long)td->t);
+        error = 1;
+    }
 
-  if (!TEST_true(ASN1_TIME_diff(&day, &sec, &atime, &atime))) {
-    TEST_info("ASN1_TIME_diff(%s) to self failed", atime.data);
-    error = 1;
-  }
-  if (!TEST_int_eq(day, 0) || !TEST_int_eq(sec, 0)) {
-    TEST_info("ASN1_TIME_diff(%s) to self not equal", atime.data);
-    error = 1;
-  }
+    if (!TEST_true(ASN1_TIME_diff(&day, &sec, &atime, &atime))) {
+        TEST_info("ASN1_TIME_diff(%s) to self failed", atime.data);
+        error = 1;
+    }
+    if (!TEST_int_eq(day, 0) || !TEST_int_eq(sec, 0)) {
+        TEST_info("ASN1_TIME_diff(%s) to self not equal", atime.data);
+        error = 1;
+    }
 
-  if (!TEST_true(ASN1_TIME_diff(&day, &sec, &gtime, &atime))) {
-    TEST_info("ASN1_TIME_diff(%s) to baseline failed", atime.data);
-    error = 1;
-  } else if (!((td->cmp_result == 0 && TEST_true((day == 0 && sec == 0))) ||
-               (td->cmp_result == -1 && TEST_true((day < 0 || sec < 0))) ||
-               (td->cmp_result == 1 && TEST_true((day > 0 || sec > 0))))) {
-    TEST_info("ASN1_TIME_diff(%s) to baseline bad comparison", atime.data);
-    error = 1;
-  }
+    if (!TEST_true(ASN1_TIME_diff(&day, &sec, &gtime, &atime))) {
+        TEST_info("ASN1_TIME_diff(%s) to baseline failed", atime.data);
+        error = 1;
+    } else if (!((td->cmp_result == 0 && TEST_true((day == 0 && sec == 0))) ||
+                 (td->cmp_result == -1 && TEST_true((day < 0 || sec < 0))) ||
+                 (td->cmp_result == 1 && TEST_true((day > 0 || sec > 0))))) {
+        TEST_info("ASN1_TIME_diff(%s) to baseline bad comparison", atime.data);
+        error = 1;
+    }
 
-  if (!TEST_int_eq(ASN1_TIME_cmp_time_t(&atime, gtime_t), td->cmp_result)) {
-    TEST_info("ASN1_TIME_cmp_time_t(%s) to baseline bad comparison",
-              atime.data);
-    error = 1;
-  }
+    if (!TEST_int_eq(ASN1_TIME_cmp_time_t(&atime, gtime_t), td->cmp_result)) {
+        TEST_info("ASN1_TIME_cmp_time_t(%s) to baseline bad comparison",
+                  atime.data);
+        error = 1;
+    }
 
-  ptime = ASN1_TIME_set(NULL, td->t);
-  if (!TEST_ptr(ptime)) {
-    TEST_info("ASN1_TIME_set(%ld) failed", (long)td->t);
-    error = 1;
-  } else {
-    int local_error = 0;
-    if (!TEST_int_eq(ASN1_TIME_cmp_time_t(ptime, td->t), 0)) {
-      TEST_info("ASN1_TIME_set(%ld) compare failed (%s->%s)", (long)td->t,
-                td->data, ptime->data);
-      local_error = error = 1;
+    ptime = ASN1_TIME_set(NULL, td->t);
+    if (!TEST_ptr(ptime)) {
+        TEST_info("ASN1_TIME_set(%ld) failed", (long)td->t);
+        error = 1;
+    } else {
+        int local_error = 0;
+        if (!TEST_int_eq(ASN1_TIME_cmp_time_t(ptime, td->t), 0)) {
+            TEST_info("ASN1_TIME_set(%ld) compare failed (%s->%s)", (long)td->t,
+                      td->data, ptime->data);
+            local_error = error = 1;
+        }
+        if (!TEST_int_eq(ptime->type, td->expected_type)) {
+            TEST_info("ASN1_TIME_set(%ld) unexpected type", (long)td->t);
+            local_error = error = 1;
+        }
+        if (local_error)
+            TEST_info("ASN1_TIME_set() = %*s", ptime->length, ptime->data);
+        ASN1_TIME_free(ptime);
     }
-    if (!TEST_int_eq(ptime->type, td->expected_type)) {
-      TEST_info("ASN1_TIME_set(%ld) unexpected type", (long)td->t);
-      local_error = error = 1;
-    }
-    if (local_error)
-      TEST_info("ASN1_TIME_set() = %*s", ptime->length, ptime->data);
-    ASN1_TIME_free(ptime);
-  }
 
-  ptime = ASN1_TIME_new();
-  if (!TEST_ptr(ptime)) {
-    TEST_info("ASN1_TIME_new() failed");
-    error = 1;
-  } else {
-    int local_error = 0;
-    if (!TEST_int_eq(ASN1_TIME_set_string(ptime, td->data), td->check_result)) {
-      TEST_info("ASN1_TIME_set_string_gmt(%s) failed", td->data);
-      local_error = error = 1;
+    ptime = ASN1_TIME_new();
+    if (!TEST_ptr(ptime)) {
+        TEST_info("ASN1_TIME_new() failed");
+        error = 1;
+    } else {
+        int local_error = 0;
+        if (!TEST_int_eq(ASN1_TIME_set_string(ptime, td->data),
+                         td->check_result)) {
+            TEST_info("ASN1_TIME_set_string_gmt(%s) failed", td->data);
+            local_error = error = 1;
+        }
+        if (!TEST_int_eq(ASN1_TIME_normalize(ptime), td->check_result)) {
+            TEST_info("ASN1_TIME_normalize(%s) failed", td->data);
+            local_error = error = 1;
+        }
+        if (!TEST_int_eq(ptime->type, td->expected_type)) {
+            TEST_info("ASN1_TIME_set_string_gmt(%s) unexpected type", td->data);
+            local_error = error = 1;
+        }
+        day = sec = 0;
+        if (!TEST_true(ASN1_TIME_diff(&day, &sec, ptime, &atime)) ||
+            !TEST_int_eq(day, 0) || !TEST_int_eq(sec, 0)) {
+            TEST_info("ASN1_TIME_diff(day=%d, sec=%d, %s) after "
+                      "ASN1_TIME_set_string_gmt() failed",
+                      day, sec, td->data);
+            local_error = error = 1;
+        }
+        if (!TEST_int_eq(ASN1_TIME_cmp_time_t(ptime, gtime_t),
+                         td->cmp_result)) {
+            TEST_info(
+            "ASN1_TIME_cmp_time_t(%s) after ASN1_TIME_set_string_gnt() to "
+            "baseline bad comparison",
+            td->data);
+            local_error = error = 1;
+        }
+        if (local_error)
+            TEST_info("ASN1_TIME_set_string_gmt() = %*s", ptime->length,
+                      ptime->data);
+        ASN1_TIME_free(ptime);
     }
-    if (!TEST_int_eq(ASN1_TIME_normalize(ptime), td->check_result)) {
-      TEST_info("ASN1_TIME_normalize(%s) failed", td->data);
-      local_error = error = 1;
-    }
-    if (!TEST_int_eq(ptime->type, td->expected_type)) {
-      TEST_info("ASN1_TIME_set_string_gmt(%s) unexpected type", td->data);
-      local_error = error = 1;
-    }
-    day = sec = 0;
-    if (!TEST_true(ASN1_TIME_diff(&day, &sec, ptime, &atime)) ||
-        !TEST_int_eq(day, 0) || !TEST_int_eq(sec, 0)) {
-      TEST_info("ASN1_TIME_diff(day=%d, sec=%d, %s) after "
-                "ASN1_TIME_set_string_gmt() failed",
-                day, sec, td->data);
-      local_error = error = 1;
-    }
-    if (!TEST_int_eq(ASN1_TIME_cmp_time_t(ptime, gtime_t), td->cmp_result)) {
-      TEST_info("ASN1_TIME_cmp_time_t(%s) after ASN1_TIME_set_string_gnt() to "
-                "baseline bad comparison",
-                td->data);
-      local_error = error = 1;
-    }
-    if (local_error)
-      TEST_info("ASN1_TIME_set_string_gmt() = %*s", ptime->length, ptime->data);
-    ASN1_TIME_free(ptime);
-  }
 
-  ptime = ASN1_TIME_new();
-  if (!TEST_ptr(ptime)) {
-    TEST_info("ASN1_TIME_new() failed");
-    error = 1;
-  } else {
-    int local_error = 0;
-    if (!TEST_int_eq(ASN1_TIME_set_string(ptime, td->data), td->check_result)) {
-      TEST_info("ASN1_TIME_set_string(%s) failed", td->data);
-      local_error = error = 1;
+    ptime = ASN1_TIME_new();
+    if (!TEST_ptr(ptime)) {
+        TEST_info("ASN1_TIME_new() failed");
+        error = 1;
+    } else {
+        int local_error = 0;
+        if (!TEST_int_eq(ASN1_TIME_set_string(ptime, td->data),
+                         td->check_result)) {
+            TEST_info("ASN1_TIME_set_string(%s) failed", td->data);
+            local_error = error = 1;
+        }
+        day = sec = 0;
+        if (!TEST_true(ASN1_TIME_diff(&day, &sec, ptime, &atime)) ||
+            !TEST_int_eq(day, 0) || !TEST_int_eq(sec, 0)) {
+            TEST_info("ASN1_TIME_diff(day=%d, sec=%d, %s) after "
+                      "ASN1_TIME_set_string() failed",
+                      day, sec, td->data);
+            local_error = error = 1;
+        }
+        if (!TEST_int_eq(ASN1_TIME_cmp_time_t(ptime, gtime_t),
+                         td->cmp_result)) {
+            TEST_info(
+            "ASN1_TIME_cmp_time_t(%s) after ASN1_TIME_set_string() to "
+            "baseline bad comparison",
+            td->data);
+            local_error = error = 1;
+        }
+        if (local_error)
+            TEST_info("ASN1_TIME_set_string() = %*s", ptime->length,
+                      ptime->data);
+        ASN1_TIME_free(ptime);
     }
-    day = sec = 0;
-    if (!TEST_true(ASN1_TIME_diff(&day, &sec, ptime, &atime)) ||
-        !TEST_int_eq(day, 0) || !TEST_int_eq(sec, 0)) {
-      TEST_info(
-      "ASN1_TIME_diff(day=%d, sec=%d, %s) after ASN1_TIME_set_string() failed",
-      day, sec, td->data);
-      local_error = error = 1;
-    }
-    if (!TEST_int_eq(ASN1_TIME_cmp_time_t(ptime, gtime_t), td->cmp_result)) {
-      TEST_info("ASN1_TIME_cmp_time_t(%s) after ASN1_TIME_set_string() to "
-                "baseline bad comparison",
-                td->data);
-      local_error = error = 1;
-    }
-    if (local_error)
-      TEST_info("ASN1_TIME_set_string() = %*s", ptime->length, ptime->data);
-    ASN1_TIME_free(ptime);
-  }
 
-  if (td->type == V_ASN1_UTCTIME) {
-    ptime = ASN1_TIME_to_generalizedtime(&atime, NULL);
-    if (td->convert_result == 1 && !TEST_ptr(ptime)) {
-      TEST_info("ASN1_TIME_to_generalizedtime(%s) failed", atime.data);
-      error = 1;
-    } else if (td->convert_result == 0 && !TEST_ptr_null(ptime)) {
-      TEST_info("ASN1_TIME_to_generalizedtime(%s) should have failed",
-                atime.data);
-      error = 1;
+    if (td->type == V_ASN1_UTCTIME) {
+        ptime = ASN1_TIME_to_generalizedtime(&atime, NULL);
+        if (td->convert_result == 1 && !TEST_ptr(ptime)) {
+            TEST_info("ASN1_TIME_to_generalizedtime(%s) failed", atime.data);
+            error = 1;
+        } else if (td->convert_result == 0 && !TEST_ptr_null(ptime)) {
+            TEST_info("ASN1_TIME_to_generalizedtime(%s) should have failed",
+                      atime.data);
+            error = 1;
+        }
+        if (ptime != NULL &&
+            !TEST_int_eq(ASN1_TIME_cmp_time_t(ptime, td->t), 0)) {
+            TEST_info("ASN1_TIME_to_generalizedtime(%s->%s) bad result",
+                      atime.data, ptime->data);
+            error = 1;
+        }
+        ASN1_TIME_free(ptime);
     }
-    if (ptime != NULL && !TEST_int_eq(ASN1_TIME_cmp_time_t(ptime, td->t), 0)) {
-      TEST_info("ASN1_TIME_to_generalizedtime(%s->%s) bad result", atime.data,
-                ptime->data);
-      error = 1;
-    }
-    ASN1_TIME_free(ptime);
-  }
-  /* else cannot simply convert GENERALIZEDTIME to UTCTIME */
+    /* else cannot simply convert GENERALIZEDTIME to UTCTIME */
 
-  if (error)
-    TEST_error("atime=%s", atime.data);
+    if (error)
+        TEST_error("atime=%s", atime.data);
 
-  return !error;
+    return !error;
 }
 
 static int test_table_pos(int idx) { return test_table(tbl_testdata_pos, idx); }
@@ -776,17 +785,17 @@ static int test_table_pos(int idx) { return test_table(tbl_testdata_pos, idx); }
 static int test_table_neg(int idx) { return test_table(tbl_testdata_neg, idx); }
 
 static int test_table_pos_64bit(int idx) {
-  return test_table(tbl_testdata_pos_64bit, idx);
+    return test_table(tbl_testdata_pos_64bit, idx);
 }
 
 static int test_table_neg_64bit(int idx) {
-  return test_table(tbl_testdata_neg_64bit, idx);
+    return test_table(tbl_testdata_neg_64bit, idx);
 }
 
 struct compare_testdata {
-  ASN1_TIME t1;
-  ASN1_TIME t2;
-  int result;
+    ASN1_TIME t1;
+    ASN1_TIME t2;
+    int result;
 };
 
 static unsigned char TODAY_GEN_STR[] = "20170825000000Z";
@@ -795,12 +804,12 @@ static unsigned char TODAY_UTC_STR[] = "170825000000Z";
 static unsigned char TOMORROW_UTC_STR[] = "170826000000Z";
 
 #define TODAY_GEN                                                              \
-  {sizeof(TODAY_GEN_STR) - 1, V_ASN1_GENERALIZEDTIME, TODAY_GEN_STR, 0}
+    {sizeof(TODAY_GEN_STR) - 1, V_ASN1_GENERALIZEDTIME, TODAY_GEN_STR, 0}
 #define TOMORROW_GEN                                                           \
-  {sizeof(TOMORROW_GEN_STR) - 1, V_ASN1_GENERALIZEDTIME, TOMORROW_GEN_STR, 0}
+    {sizeof(TOMORROW_GEN_STR) - 1, V_ASN1_GENERALIZEDTIME, TOMORROW_GEN_STR, 0}
 #define TODAY_UTC {sizeof(TODAY_UTC_STR) - 1, V_ASN1_UTCTIME, TODAY_UTC_STR, 0}
 #define TOMORROW_UTC                                                           \
-  {sizeof(TOMORROW_UTC_STR) - 1, V_ASN1_UTCTIME, TOMORROW_UTC_STR, 0}
+    {sizeof(TOMORROW_UTC_STR) - 1, V_ASN1_UTCTIME, TOMORROW_UTC_STR, 0}
 
 static struct compare_testdata tbl_compare_testdata[] = {
 {TODAY_GEN, TODAY_GEN, 0},       {TODAY_GEN, TODAY_UTC, 0},
@@ -816,82 +825,82 @@ static struct compare_testdata tbl_compare_testdata[] = {
 {TOMORROW_UTC, TOMORROW_GEN, 0}, {TOMORROW_UTC, TOMORROW_UTC, 0}};
 
 static int test_table_compare(int idx) {
-  struct compare_testdata *td = &tbl_compare_testdata[idx];
+    struct compare_testdata *td = &tbl_compare_testdata[idx];
 
-  return TEST_int_eq(ASN1_TIME_compare(&td->t1, &td->t2), td->result);
+    return TEST_int_eq(ASN1_TIME_compare(&td->t1, &td->t2), td->result);
 }
 
 static int test_time_dup(void) {
-  int ret = 0;
-  ASN1_TIME *asn1_time = NULL;
-  ASN1_TIME *asn1_time_dup = NULL;
-  ASN1_TIME *asn1_gentime = NULL;
+    int ret = 0;
+    ASN1_TIME *asn1_time = NULL;
+    ASN1_TIME *asn1_time_dup = NULL;
+    ASN1_TIME *asn1_gentime = NULL;
 
-  asn1_time = ASN1_TIME_adj(NULL, time(NULL), 0, 0);
-  if (asn1_time == NULL) {
-    TEST_info("Internal error.");
-    goto err;
-  }
+    asn1_time = ASN1_TIME_adj(NULL, time(NULL), 0, 0);
+    if (asn1_time == NULL) {
+        TEST_info("Internal error.");
+        goto err;
+    }
 
-  asn1_gentime = ASN1_TIME_to_generalizedtime(asn1_time, NULL);
-  if (asn1_gentime == NULL) {
-    TEST_info("Internal error.");
-    goto err;
-  }
+    asn1_gentime = ASN1_TIME_to_generalizedtime(asn1_time, NULL);
+    if (asn1_gentime == NULL) {
+        TEST_info("Internal error.");
+        goto err;
+    }
 
-  asn1_time_dup = ASN1_TIME_dup(asn1_time);
-  if (!TEST_ptr_ne(asn1_time_dup, NULL)) {
-    TEST_info("ASN1_TIME_dup() failed.");
-    goto err;
-  }
-  if (!TEST_int_eq(ASN1_TIME_compare(asn1_time, asn1_time_dup), 0)) {
-    TEST_info("ASN1_TIME_dup() duplicated non-identical value.");
-    goto err;
-  }
-  ASN1_STRING_free(asn1_time_dup);
+    asn1_time_dup = ASN1_TIME_dup(asn1_time);
+    if (!TEST_ptr_ne(asn1_time_dup, NULL)) {
+        TEST_info("ASN1_TIME_dup() failed.");
+        goto err;
+    }
+    if (!TEST_int_eq(ASN1_TIME_compare(asn1_time, asn1_time_dup), 0)) {
+        TEST_info("ASN1_TIME_dup() duplicated non-identical value.");
+        goto err;
+    }
+    ASN1_STRING_free(asn1_time_dup);
 
-  asn1_time_dup = ASN1_UTCTIME_dup(asn1_time);
-  if (!TEST_ptr_ne(asn1_time_dup, NULL)) {
-    TEST_info("ASN1_UTCTIME_dup() failed.");
-    goto err;
-  }
-  if (!TEST_int_eq(ASN1_TIME_compare(asn1_time, asn1_time_dup), 0)) {
-    TEST_info("ASN1_UTCTIME_dup() duplicated non-identical UTCTIME value.");
-    goto err;
-  }
-  ASN1_STRING_free(asn1_time_dup);
+    asn1_time_dup = ASN1_UTCTIME_dup(asn1_time);
+    if (!TEST_ptr_ne(asn1_time_dup, NULL)) {
+        TEST_info("ASN1_UTCTIME_dup() failed.");
+        goto err;
+    }
+    if (!TEST_int_eq(ASN1_TIME_compare(asn1_time, asn1_time_dup), 0)) {
+        TEST_info("ASN1_UTCTIME_dup() duplicated non-identical UTCTIME value.");
+        goto err;
+    }
+    ASN1_STRING_free(asn1_time_dup);
 
-  asn1_time_dup = ASN1_GENERALIZEDTIME_dup(asn1_gentime);
-  if (!TEST_ptr_ne(asn1_time_dup, NULL)) {
-    TEST_info("ASN1_GENERALIZEDTIME_dup() failed.");
-    goto err;
-  }
-  if (!TEST_int_eq(ASN1_TIME_compare(asn1_gentime, asn1_time_dup), 0)) {
-    TEST_info("ASN1_GENERALIZEDTIME_dup() dup'ed non-identical value.");
-    goto err;
-  }
+    asn1_time_dup = ASN1_GENERALIZEDTIME_dup(asn1_gentime);
+    if (!TEST_ptr_ne(asn1_time_dup, NULL)) {
+        TEST_info("ASN1_GENERALIZEDTIME_dup() failed.");
+        goto err;
+    }
+    if (!TEST_int_eq(ASN1_TIME_compare(asn1_gentime, asn1_time_dup), 0)) {
+        TEST_info("ASN1_GENERALIZEDTIME_dup() dup'ed non-identical value.");
+        goto err;
+    }
 
-  ret = 1;
+    ret = 1;
 err:
-  ASN1_STRING_free(asn1_time);
-  ASN1_STRING_free(asn1_gentime);
-  ASN1_STRING_free(asn1_time_dup);
-  return ret;
+    ASN1_STRING_free(asn1_time);
+    ASN1_STRING_free(asn1_gentime);
+    ASN1_STRING_free(asn1_time_dup);
+    return ret;
 }
 
 static int convert_asn1_to_time_t(int idx) {
-  time_t testdateutc;
+    time_t testdateutc;
 
-  testdateutc = test_asn1_string_to_time_t(asn1_to_utc[idx].input);
+    testdateutc = test_asn1_string_to_time_t(asn1_to_utc[idx].input);
 
-  if (!TEST_time_t_eq(testdateutc, asn1_to_utc[idx].expected)) {
-    TEST_info(
-    "test_asn1_string_to_time_t (%s) failed: expected %lli, got %lli\n",
-    asn1_to_utc[idx].input, (long long int)asn1_to_utc[idx].expected,
-    (long long int)testdateutc);
-    return 0;
-  }
-  return 1;
+    if (!TEST_time_t_eq(testdateutc, asn1_to_utc[idx].expected)) {
+        TEST_info(
+        "test_asn1_string_to_time_t (%s) failed: expected %lli, got %lli\n",
+        asn1_to_utc[idx].input, (long long int)asn1_to_utc[idx].expected,
+        (long long int)testdateutc);
+        return 0;
+    }
+    return 1;
 }
 
 /*
@@ -899,59 +908,60 @@ static int convert_asn1_to_time_t(int idx) {
  * with an integer year close to INT_MAX.
  */
 static int convert_tm_to_asn1_time(void) {
-  /* we need 64 bit time_t */
+    /* we need 64 bit time_t */
 #if ((ULONG_MAX >> 31) >> 31) >= 1
-  time_t t;
-  ASN1_TIME *at;
+    time_t t;
+    ASN1_TIME *at;
 
-  if (sizeof(time_t) * CHAR_BIT >= 64) {
-    t = 67768011791126057ULL;
-    at = ASN1_TIME_set(NULL, t);
-    /*
-     * If ASN1_TIME_set returns NULL, it means it could not handle the input
-     * which is fine for this edge case.
-     */
-    ASN1_STRING_free(at);
-  }
+    if (sizeof(time_t) * CHAR_BIT >= 64) {
+        t = 67768011791126057ULL;
+        at = ASN1_TIME_set(NULL, t);
+        /*
+         * If ASN1_TIME_set returns NULL, it means it could not handle the input
+         * which is fine for this edge case.
+         */
+        ASN1_STRING_free(at);
+    }
 #endif
-  return 1;
+    return 1;
 }
 
 int setup_tests(void) {
-  /*
-   * On platforms where |time_t| is an unsigned integer, t will be a
-   * positive number.
-   *
-   * We check if we're on a platform with a signed |time_t| with '!(t > 0)'
-   * because some compilers are picky if you do 't < 0', or even 't <= 0'
-   * if |t| is unsigned.
-   */
-  time_t t = -1;
-  /*
-   * On some platforms, |time_t| is signed, but a negative value is an
-   * error, and using it with gmtime() or localtime() generates a NULL.
-   * If that is the case, we can't perform tests on negative values.
-   */
-  struct tm *ptm = localtime(&t);
+    /*
+     * On platforms where |time_t| is an unsigned integer, t will be a
+     * positive number.
+     *
+     * We check if we're on a platform with a signed |time_t| with '!(t > 0)'
+     * because some compilers are picky if you do 't < 0', or even 't <= 0'
+     * if |t| is unsigned.
+     */
+    time_t t = -1;
+    /*
+     * On some platforms, |time_t| is signed, but a negative value is an
+     * error, and using it with gmtime() or localtime() generates a NULL.
+     * If that is the case, we can't perform tests on negative values.
+     */
+    struct tm *ptm = localtime(&t);
 
-  ADD_ALL_TESTS(test_table_pos, OSSL_NELEM(tbl_testdata_pos));
-  if (!(t > 0) && ptm != NULL) {
-    TEST_info("Adding negative-sign time_t tests");
-    ADD_ALL_TESTS(test_table_neg, OSSL_NELEM(tbl_testdata_neg));
-  }
-  if (sizeof(time_t) > sizeof(uint32_t)) {
-    TEST_info("Adding 64-bit time_t tests");
-    ADD_ALL_TESTS(test_table_pos_64bit, OSSL_NELEM(tbl_testdata_pos_64bit));
-#ifndef __hpux
+    ADD_ALL_TESTS(test_table_pos, OSSL_NELEM(tbl_testdata_pos));
     if (!(t > 0) && ptm != NULL) {
-      TEST_info("Adding negative-sign 64-bit time_t tests");
-      ADD_ALL_TESTS(test_table_neg_64bit, OSSL_NELEM(tbl_testdata_neg_64bit));
+        TEST_info("Adding negative-sign time_t tests");
+        ADD_ALL_TESTS(test_table_neg, OSSL_NELEM(tbl_testdata_neg));
     }
+    if (sizeof(time_t) > sizeof(uint32_t)) {
+        TEST_info("Adding 64-bit time_t tests");
+        ADD_ALL_TESTS(test_table_pos_64bit, OSSL_NELEM(tbl_testdata_pos_64bit));
+#ifndef __hpux
+        if (!(t > 0) && ptm != NULL) {
+            TEST_info("Adding negative-sign 64-bit time_t tests");
+            ADD_ALL_TESTS(test_table_neg_64bit,
+                          OSSL_NELEM(tbl_testdata_neg_64bit));
+        }
 #endif
-  }
-  ADD_ALL_TESTS(test_table_compare, OSSL_NELEM(tbl_compare_testdata));
-  ADD_TEST(test_time_dup);
-  ADD_ALL_TESTS(convert_asn1_to_time_t, OSSL_NELEM(asn1_to_utc));
-  ADD_TEST(convert_tm_to_asn1_time);
-  return 1;
+    }
+    ADD_ALL_TESTS(test_table_compare, OSSL_NELEM(tbl_compare_testdata));
+    ADD_TEST(test_time_dup);
+    ADD_ALL_TESTS(convert_asn1_to_time_t, OSSL_NELEM(asn1_to_utc));
+    ADD_TEST(convert_tm_to_asn1_time);
+    return 1;
 }

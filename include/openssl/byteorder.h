@@ -94,220 +94,220 @@
 static ossl_inline ossl_unused unsigned char *
 OPENSSL_store_u16_le(unsigned char *out, uint16_t val) {
 #ifdef OSSL_HTOLE16
-  uint16_t t = OSSL_HTOLE16(val);
+    uint16_t t = OSSL_HTOLE16(val);
 
-  memcpy(out, (unsigned char *)&t, 2);
-  return out + 2;
+    memcpy(out, (unsigned char *)&t, 2);
+    return out + 2;
 #else
-  *out++ = (val & 0xff);
-  *out++ = (val >> 8) & 0xff;
-  return out;
+    *out++ = (val & 0xff);
+    *out++ = (val >> 8) & 0xff;
+    return out;
 #endif
 }
 
 static ossl_inline ossl_unused unsigned char *
 OPENSSL_store_u16_be(unsigned char *out, uint16_t val) {
 #ifdef OSSL_HTOBE16
-  uint16_t t = OSSL_HTOBE16(val);
+    uint16_t t = OSSL_HTOBE16(val);
 
-  memcpy(out, (unsigned char *)&t, 2);
-  return out + 2;
+    memcpy(out, (unsigned char *)&t, 2);
+    return out + 2;
 #else
-  *out++ = (val >> 8) & 0xff;
-  *out++ = (val & 0xff);
-  return out;
+    *out++ = (val >> 8) & 0xff;
+    *out++ = (val & 0xff);
+    return out;
 #endif
 }
 
 static ossl_inline ossl_unused unsigned char *
 OPENSSL_store_u32_le(unsigned char *out, uint32_t val) {
 #ifdef OSSL_HTOLE32
-  uint32_t t = OSSL_HTOLE32(val);
+    uint32_t t = OSSL_HTOLE32(val);
 
-  memcpy(out, (unsigned char *)&t, 4);
-  return out + 4;
+    memcpy(out, (unsigned char *)&t, 4);
+    return out + 4;
 #else
-  *out++ = (val & 0xff);
-  *out++ = (val >> 8) & 0xff;
-  *out++ = (val >> 16) & 0xff;
-  *out++ = (val >> 24) & 0xff;
-  return out;
+    *out++ = (val & 0xff);
+    *out++ = (val >> 8) & 0xff;
+    *out++ = (val >> 16) & 0xff;
+    *out++ = (val >> 24) & 0xff;
+    return out;
 #endif
 }
 
 static ossl_inline ossl_unused unsigned char *
 OPENSSL_store_u32_be(unsigned char *out, uint32_t val) {
 #ifdef OSSL_HTOBE32
-  uint32_t t = OSSL_HTOBE32(val);
+    uint32_t t = OSSL_HTOBE32(val);
 
-  memcpy(out, (unsigned char *)&t, 4);
-  return out + 4;
+    memcpy(out, (unsigned char *)&t, 4);
+    return out + 4;
 #else
-  *out++ = (val >> 24) & 0xff;
-  *out++ = (val >> 16) & 0xff;
-  *out++ = (val >> 8) & 0xff;
-  *out++ = (val & 0xff);
-  return out;
+    *out++ = (val >> 24) & 0xff;
+    *out++ = (val >> 16) & 0xff;
+    *out++ = (val >> 8) & 0xff;
+    *out++ = (val & 0xff);
+    return out;
 #endif
 }
 
 static ossl_inline ossl_unused unsigned char *
 OPENSSL_store_u64_le(unsigned char *out, uint64_t val) {
 #ifdef OSSL_HTOLE64
-  uint64_t t = OSSL_HTOLE64(val);
+    uint64_t t = OSSL_HTOLE64(val);
 
-  memcpy(out, (unsigned char *)&t, 8);
-  return out + 8;
+    memcpy(out, (unsigned char *)&t, 8);
+    return out + 8;
 #else
-  *out++ = (val & 0xff);
-  *out++ = (val >> 8) & 0xff;
-  *out++ = (val >> 16) & 0xff;
-  *out++ = (val >> 24) & 0xff;
-  *out++ = (val >> 32) & 0xff;
-  *out++ = (val >> 40) & 0xff;
-  *out++ = (val >> 48) & 0xff;
-  *out++ = (val >> 56) & 0xff;
-  return out;
+    *out++ = (val & 0xff);
+    *out++ = (val >> 8) & 0xff;
+    *out++ = (val >> 16) & 0xff;
+    *out++ = (val >> 24) & 0xff;
+    *out++ = (val >> 32) & 0xff;
+    *out++ = (val >> 40) & 0xff;
+    *out++ = (val >> 48) & 0xff;
+    *out++ = (val >> 56) & 0xff;
+    return out;
 #endif
 }
 
 static ossl_inline ossl_unused unsigned char *
 OPENSSL_store_u64_be(unsigned char *out, uint64_t val) {
 #ifdef OSSL_HTOLE64
-  uint64_t t = OSSL_HTOBE64(val);
+    uint64_t t = OSSL_HTOBE64(val);
 
-  memcpy(out, (unsigned char *)&t, 8);
-  return out + 8;
+    memcpy(out, (unsigned char *)&t, 8);
+    return out + 8;
 #else
-  *out++ = (val >> 56) & 0xff;
-  *out++ = (val >> 48) & 0xff;
-  *out++ = (val >> 40) & 0xff;
-  *out++ = (val >> 32) & 0xff;
-  *out++ = (val >> 24) & 0xff;
-  *out++ = (val >> 16) & 0xff;
-  *out++ = (val >> 8) & 0xff;
-  *out++ = (val & 0xff);
-  return out;
+    *out++ = (val >> 56) & 0xff;
+    *out++ = (val >> 48) & 0xff;
+    *out++ = (val >> 40) & 0xff;
+    *out++ = (val >> 32) & 0xff;
+    *out++ = (val >> 24) & 0xff;
+    *out++ = (val >> 16) & 0xff;
+    *out++ = (val >> 8) & 0xff;
+    *out++ = (val & 0xff);
+    return out;
 #endif
 }
 
 static ossl_inline ossl_unused const unsigned char *
 OPENSSL_load_u16_le(uint16_t *val, const unsigned char *in) {
 #ifdef OSSL_LE16TOH
-  uint16_t t;
+    uint16_t t;
 
-  memcpy((unsigned char *)&t, in, 2);
-  *val = OSSL_LE16TOH(t);
-  return in + 2;
+    memcpy((unsigned char *)&t, in, 2);
+    *val = OSSL_LE16TOH(t);
+    return in + 2;
 #else
-  uint16_t b0 = *in++;
-  uint16_t b1 = *in++;
+    uint16_t b0 = *in++;
+    uint16_t b1 = *in++;
 
-  *val = b0 | (b1 << 8);
-  return in;
+    *val = b0 | (b1 << 8);
+    return in;
 #endif
 }
 
 static ossl_inline ossl_unused const unsigned char *
 OPENSSL_load_u16_be(uint16_t *val, const unsigned char *in) {
 #ifdef OSSL_LE16TOH
-  uint16_t t;
+    uint16_t t;
 
-  memcpy((unsigned char *)&t, in, 2);
-  *val = OSSL_BE16TOH(t);
-  return in + 2;
+    memcpy((unsigned char *)&t, in, 2);
+    *val = OSSL_BE16TOH(t);
+    return in + 2;
 #else
-  uint16_t b1 = *in++;
-  uint16_t b0 = *in++;
+    uint16_t b1 = *in++;
+    uint16_t b0 = *in++;
 
-  *val = b0 | (b1 << 8);
-  return in;
+    *val = b0 | (b1 << 8);
+    return in;
 #endif
 }
 
 static ossl_inline ossl_unused const unsigned char *
 OPENSSL_load_u32_le(uint32_t *val, const unsigned char *in) {
 #ifdef OSSL_LE32TOH
-  uint32_t t;
+    uint32_t t;
 
-  memcpy((unsigned char *)&t, in, 4);
-  *val = OSSL_LE32TOH(t);
-  return in + 4;
+    memcpy((unsigned char *)&t, in, 4);
+    *val = OSSL_LE32TOH(t);
+    return in + 4;
 #else
-  uint32_t b0 = *in++;
-  uint32_t b1 = *in++;
-  uint32_t b2 = *in++;
-  uint32_t b3 = *in++;
+    uint32_t b0 = *in++;
+    uint32_t b1 = *in++;
+    uint32_t b2 = *in++;
+    uint32_t b3 = *in++;
 
-  *val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
-  return in;
+    *val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+    return in;
 #endif
 }
 
 static ossl_inline ossl_unused const unsigned char *
 OPENSSL_load_u32_be(uint32_t *val, const unsigned char *in) {
 #ifdef OSSL_LE32TOH
-  uint32_t t;
+    uint32_t t;
 
-  memcpy((unsigned char *)&t, in, 4);
-  *val = OSSL_BE32TOH(t);
-  return in + 4;
+    memcpy((unsigned char *)&t, in, 4);
+    *val = OSSL_BE32TOH(t);
+    return in + 4;
 #else
-  uint32_t b3 = *in++;
-  uint32_t b2 = *in++;
-  uint32_t b1 = *in++;
-  uint32_t b0 = *in++;
+    uint32_t b3 = *in++;
+    uint32_t b2 = *in++;
+    uint32_t b1 = *in++;
+    uint32_t b0 = *in++;
 
-  *val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
-  return in;
+    *val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+    return in;
 #endif
 }
 
 static ossl_inline ossl_unused const unsigned char *
 OPENSSL_load_u64_le(uint64_t *val, const unsigned char *in) {
 #ifdef OSSL_LE64TOH
-  uint64_t t;
+    uint64_t t;
 
-  memcpy((unsigned char *)&t, in, 8);
-  *val = OSSL_LE64TOH(t);
-  return in + 8;
+    memcpy((unsigned char *)&t, in, 8);
+    *val = OSSL_LE64TOH(t);
+    return in + 8;
 #else
-  uint64_t b0 = *in++;
-  uint64_t b1 = *in++;
-  uint64_t b2 = *in++;
-  uint64_t b3 = *in++;
-  uint64_t b4 = *in++;
-  uint64_t b5 = *in++;
-  uint64_t b6 = *in++;
-  uint64_t b7 = *in++;
+    uint64_t b0 = *in++;
+    uint64_t b1 = *in++;
+    uint64_t b2 = *in++;
+    uint64_t b3 = *in++;
+    uint64_t b4 = *in++;
+    uint64_t b5 = *in++;
+    uint64_t b6 = *in++;
+    uint64_t b7 = *in++;
 
-  *val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24) | (b4 << 32) | (b5 << 40) |
-         (b6 << 48) | (b7 << 56);
-  return in;
+    *val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24) | (b4 << 32) | (b5 << 40) |
+           (b6 << 48) | (b7 << 56);
+    return in;
 #endif
 }
 
 static ossl_inline ossl_unused const unsigned char *
 OPENSSL_load_u64_be(uint64_t *val, const unsigned char *in) {
 #ifdef OSSL_LE64TOH
-  uint64_t t;
+    uint64_t t;
 
-  memcpy((unsigned char *)&t, in, 8);
-  *val = OSSL_BE64TOH(t);
-  return in + 8;
+    memcpy((unsigned char *)&t, in, 8);
+    *val = OSSL_BE64TOH(t);
+    return in + 8;
 #else
-  uint64_t b7 = *in++;
-  uint64_t b6 = *in++;
-  uint64_t b5 = *in++;
-  uint64_t b4 = *in++;
-  uint64_t b3 = *in++;
-  uint64_t b2 = *in++;
-  uint64_t b1 = *in++;
-  uint64_t b0 = *in++;
+    uint64_t b7 = *in++;
+    uint64_t b6 = *in++;
+    uint64_t b5 = *in++;
+    uint64_t b4 = *in++;
+    uint64_t b3 = *in++;
+    uint64_t b2 = *in++;
+    uint64_t b1 = *in++;
+    uint64_t b0 = *in++;
 
-  *val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24) | (b4 << 32) | (b5 << 40) |
-         (b6 << 48) | (b7 << 56);
-  return in;
+    *val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24) | (b4 << 32) | (b5 << 40) |
+           (b6 << 48) | (b7 << 56);
+    return in;
 #endif
 }
 

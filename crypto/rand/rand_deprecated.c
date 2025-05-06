@@ -18,8 +18,8 @@
 #define DEPRECATED_RAND_FUNCTIONS_DEFINED
 
 int RAND_event(UINT iMsg, WPARAM wParam, LPARAM lParam) {
-  RAND_poll();
-  return RAND_status();
+    RAND_poll();
+    return RAND_status();
 }
 
 void RAND_screen(void) { RAND_poll(); }

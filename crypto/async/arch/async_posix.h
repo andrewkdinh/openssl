@@ -53,10 +53,10 @@ defined(__ARM_FEATURE_BTI_DEFAULT) && __ARM_FEATURE_BTI_DEFAULT == 1
 #endif
 
 typedef struct async_fibre_st {
-  ucontext_t fibre;
+    ucontext_t fibre;
 #ifndef USE_SWAPCONTEXT
-  jmp_buf env;
-  int env_init;
+    jmp_buf env;
+    int env_init;
 #endif
 } async_fibre;
 
@@ -66,19 +66,19 @@ void async_local_deinit(void);
 static ossl_inline int async_fibre_swapcontext(async_fibre *o, async_fibre *n,
                                                int r) {
 #ifdef USE_SWAPCONTEXT
-  swapcontext(&o->fibre, &n->fibre);
+    swapcontext(&o->fibre, &n->fibre);
 #else
-  o->env_init = 1;
+    o->env_init = 1;
 
-  if (!r || !_setjmp(o->env)) {
-    if (n->env_init)
-      _longjmp(n->env, 1);
-    else
-      setcontext(&n->fibre);
-  }
+    if (!r || !_setjmp(o->env)) {
+        if (n->env_init)
+            _longjmp(n->env, 1);
+        else
+            setcontext(&n->fibre);
+    }
 #endif
 
-  return 1;
+    return 1;
 }
 
 #define async_fibre_init_dispatcher(d)

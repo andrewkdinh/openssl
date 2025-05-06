@@ -11,9 +11,9 @@
  */
 
 typedef struct {
-  int sign_id;
-  int hash_id;
-  int pkey_id;
+    int sign_id;
+    int hash_id;
+    int pkey_id;
 } nid_triple;
 
 DEFINE_STACK_OF(nid_triple)

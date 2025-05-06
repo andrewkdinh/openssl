@@ -20,19 +20,19 @@
 #include "internal/cryptlib.h"
 
 typedef struct async_fibre_st {
-  LPVOID fibre;
-  int converted;
+    LPVOID fibre;
+    int converted;
 } async_fibre;
 
 #define async_fibre_swapcontext(o, n, r) (SwitchToFiber((n)->fibre), 1)
 
 #if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x600
 #define async_fibre_makecontext(c)                                             \
-  ((c)->fibre =                                                                \
-   CreateFiberEx(0, 0, FIBER_FLAG_FLOAT_SWITCH, async_start_func_win, 0))
+    ((c)->fibre =                                                              \
+     CreateFiberEx(0, 0, FIBER_FLAG_FLOAT_SWITCH, async_start_func_win, 0))
 #else
 #define async_fibre_makecontext(c)                                             \
-  ((c)->fibre = CreateFiber(0, async_start_func_win, 0))
+    ((c)->fibre = CreateFiber(0, async_start_func_win, 0))
 #endif
 
 #define async_fibre_free(f) (DeleteFiber((f)->fibre))

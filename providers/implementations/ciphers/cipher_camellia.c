@@ -23,25 +23,25 @@ static OSSL_FUNC_cipher_freectx_fn camellia_freectx;
 static OSSL_FUNC_cipher_dupctx_fn camellia_dupctx;
 
 static void camellia_freectx(void *vctx) {
-  PROV_CAMELLIA_CTX *ctx = (PROV_CAMELLIA_CTX *)vctx;
+    PROV_CAMELLIA_CTX *ctx = (PROV_CAMELLIA_CTX *)vctx;
 
-  ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
-  OPENSSL_clear_free(ctx, sizeof(*ctx));
+    ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
+    OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
 static void *camellia_dupctx(void *ctx) {
-  PROV_CAMELLIA_CTX *in = (PROV_CAMELLIA_CTX *)ctx;
-  PROV_CAMELLIA_CTX *ret;
+    PROV_CAMELLIA_CTX *in = (PROV_CAMELLIA_CTX *)ctx;
+    PROV_CAMELLIA_CTX *ret;
 
-  if (!ossl_prov_is_running())
-    return NULL;
+    if (!ossl_prov_is_running())
+        return NULL;
 
-  ret = OPENSSL_malloc(sizeof(*ret));
-  if (ret == NULL)
-    return NULL;
-  in->base.hw->copyctx(&ret->base, &in->base);
+    ret = OPENSSL_malloc(sizeof(*ret));
+    if (ret == NULL)
+        return NULL;
+    in->base.hw->copyctx(&ret->base, &in->base);
 
-  return ret;
+    return ret;
 }
 
 /* ossl_camellia256ecb_functions */

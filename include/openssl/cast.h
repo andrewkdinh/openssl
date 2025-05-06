@@ -34,8 +34,8 @@ extern "C" {
 #define CAST_LONG unsigned int
 
 typedef struct cast_key_st {
-  CAST_LONG data[32];
-  int short_key; /* Use reduced rounds for short key */
+    CAST_LONG data[32];
+    int short_key; /* Use reduced rounds for short key */
 } CAST_KEY;
 
 #endif /* OPENSSL_NO_DEPRECATED_3_0 */

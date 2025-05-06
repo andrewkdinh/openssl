@@ -28,22 +28,22 @@
  * says (for example, because the application knows better).
  */
 typedef struct ossl_method_construct_method_st {
-  /* Get a temporary store */
-  void *(*get_tmp_store)(void *data);
-  /* Reserve the appropriate method store */
-  int (*lock_store)(void *store, void *data);
-  /* Unreserve the appropriate method store */
-  int (*unlock_store)(void *store, void *data);
-  /* Get an already existing method from a store */
-  void *(*get)(void *store, const OSSL_PROVIDER **prov, void *data);
-  /* Store a method in a store */
-  int (*put)(void *store, void *method, const OSSL_PROVIDER *prov,
-             const char *name, const char *propdef, void *data);
-  /* Construct a new method */
-  void *(*construct)(const OSSL_ALGORITHM *algodef, OSSL_PROVIDER *prov,
-                     void *data);
-  /* Destruct a method */
-  void (*destruct)(void *method, void *data);
+    /* Get a temporary store */
+    void *(*get_tmp_store)(void *data);
+    /* Reserve the appropriate method store */
+    int (*lock_store)(void *store, void *data);
+    /* Unreserve the appropriate method store */
+    int (*unlock_store)(void *store, void *data);
+    /* Get an already existing method from a store */
+    void *(*get)(void *store, const OSSL_PROVIDER **prov, void *data);
+    /* Store a method in a store */
+    int (*put)(void *store, void *method, const OSSL_PROVIDER *prov,
+               const char *name, const char *propdef, void *data);
+    /* Construct a new method */
+    void *(*construct)(const OSSL_ALGORITHM *algodef, OSSL_PROVIDER *prov,
+                       void *data);
+    /* Destruct a method */
+    void (*destruct)(void *method, void *data);
 } OSSL_METHOD_CONSTRUCT_METHOD;
 
 void *ossl_method_construct(OSSL_LIB_CTX *ctx, int operation_id,

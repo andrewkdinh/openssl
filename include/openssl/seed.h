@@ -66,9 +66,9 @@ extern "C" {
 
 typedef struct seed_key_st {
 #ifdef SEED_LONG
-  unsigned long data[32];
+    unsigned long data[32];
 #else
-  unsigned int data[32];
+    unsigned int data[32];
 #endif
 } SEED_KEY_SCHEDULE;
 #endif /* OPENSSL_NO_DEPRECATED_3_0 */

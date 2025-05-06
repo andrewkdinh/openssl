@@ -27,9 +27,9 @@ typedef int(sha3_final_fn)(void *vctx, unsigned char *out, size_t outlen);
 typedef int(sha3_squeeze_fn)(void *vctx, unsigned char *out, size_t outlen);
 
 typedef struct prov_sha3_meth_st {
-  sha3_absorb_fn *absorb;
-  sha3_final_fn *final;
-  sha3_squeeze_fn *squeeze;
+    sha3_absorb_fn *absorb;
+    sha3_final_fn *final;
+    sha3_squeeze_fn *squeeze;
 } PROV_SHA3_METHOD;
 
 #define XOF_STATE_INIT 0
@@ -38,14 +38,14 @@ typedef struct prov_sha3_meth_st {
 #define XOF_STATE_SQUEEZE 3
 
 struct keccak_st {
-  uint64_t A[5][5];
-  unsigned char buf[KECCAK1600_WIDTH / 8 - 32];
-  size_t block_size; /* cached ctx->digest->block_size */
-  size_t md_size;    /* output length, variable in XOF */
-  size_t bufsz;      /* used bytes in below buffer */
-  unsigned char pad;
-  PROV_SHA3_METHOD meth;
-  int xof_state;
+    uint64_t A[5][5];
+    unsigned char buf[KECCAK1600_WIDTH / 8 - 32];
+    size_t block_size; /* cached ctx->digest->block_size */
+    size_t md_size;    /* output length, variable in XOF */
+    size_t bufsz;      /* used bytes in below buffer */
+    unsigned char pad;
+    PROV_SHA3_METHOD meth;
+    int xof_state;
 };
 
 void ossl_sha3_reset(KECCAK1600_CTX *ctx);

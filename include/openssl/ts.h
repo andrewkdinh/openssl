@@ -386,11 +386,11 @@ int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) * certs,
 
 /* You can use the following convenience constants. */
 #define TS_VFY_ALL_IMPRINT                                                     \
-  (TS_VFY_SIGNATURE | TS_VFY_VERSION | TS_VFY_POLICY | TS_VFY_IMPRINT |        \
-   TS_VFY_NONCE | TS_VFY_SIGNER | TS_VFY_TSA_NAME)
+    (TS_VFY_SIGNATURE | TS_VFY_VERSION | TS_VFY_POLICY | TS_VFY_IMPRINT |      \
+     TS_VFY_NONCE | TS_VFY_SIGNER | TS_VFY_TSA_NAME)
 #define TS_VFY_ALL_DATA                                                        \
-  (TS_VFY_SIGNATURE | TS_VFY_VERSION | TS_VFY_POLICY | TS_VFY_DATA |           \
-   TS_VFY_NONCE | TS_VFY_SIGNER | TS_VFY_TSA_NAME)
+    (TS_VFY_SIGNATURE | TS_VFY_VERSION | TS_VFY_POLICY | TS_VFY_DATA |         \
+     TS_VFY_NONCE | TS_VFY_SIGNER | TS_VFY_TSA_NAME)
 
 typedef struct TS_verify_ctx TS_VERIFY_CTX;
 

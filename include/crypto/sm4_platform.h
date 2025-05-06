@@ -16,16 +16,16 @@
 #include "arm_arch.h"
 extern unsigned int OPENSSL_arm_midr;
 static inline int vpsm4_capable(void) {
-  return (OPENSSL_armcap_P & ARMV8_CPUID) &&
-         (MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_ARM,
-                            ARM_CPU_PART_V1) ||
-          MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_ARM,
-                            ARM_CPU_PART_N1));
+    return (OPENSSL_armcap_P & ARMV8_CPUID) &&
+           (MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_ARM,
+                              ARM_CPU_PART_V1) ||
+            MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_ARM,
+                              ARM_CPU_PART_N1));
 }
 static inline int vpsm4_ex_capable(void) {
-  return (OPENSSL_armcap_P & ARMV8_CPUID) &&
-         (MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, HISI_CPU_IMP,
-                            HISI_CPU_PART_KP920));
+    return (OPENSSL_armcap_P & ARMV8_CPUID) &&
+           (MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, HISI_CPU_IMP,
+                              HISI_CPU_PART_KP920));
 }
 #if defined(VPSM4_ASM)
 #define VPSM4_CAPABLE vpsm4_capable()
@@ -56,7 +56,7 @@ void rv64i_zvksed_sm4_decrypt(const unsigned char *in, unsigned char *out,
 /* Intel x86_64 support */
 #include "internal/cryptlib.h"
 #define HWSM4_CAPABLE_X86_64                                                   \
-  ((OPENSSL_ia32cap_P[2] & (1 << 5)) && (OPENSSL_ia32cap_P[5] & (1 << 2)))
+    ((OPENSSL_ia32cap_P[2] & (1 << 5)) && (OPENSSL_ia32cap_P[5] & (1 << 2)))
 int hw_x86_64_sm4_set_key(const unsigned char *userKey, SM4_KEY *key);
 int hw_x86_64_sm4_set_decryption_key(const unsigned char *userKey,
                                      SM4_KEY *key);

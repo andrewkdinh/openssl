@@ -41,8 +41,8 @@ extern "C" {
 #define BF_ROUNDS 16
 
 typedef struct bf_key_st {
-  BF_LONG P[BF_ROUNDS + 2];
-  BF_LONG S[4 * 256];
+    BF_LONG P[BF_ROUNDS + 2];
+    BF_LONG S[4 * 256];
 } BF_KEY;
 
 #endif /* OPENSSL_NO_DEPRECATED_3_0 */

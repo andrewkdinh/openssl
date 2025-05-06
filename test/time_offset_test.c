@@ -19,9 +19,9 @@
 #include "internal/nelem.h"
 
 typedef struct {
-  const char *data;
-  int time_result;
-  int type;
+    const char *data;
+    int time_result;
+    int type;
 } TESTDATA;
 
 /**********************************************************************
@@ -60,48 +60,48 @@ static ASN1_TIME the_asn1_time = {15, V_ASN1_GENERALIZEDTIME,
                                   (unsigned char *)"20001201000000Z", 0};
 
 static int test_offset(int idx) {
-  ASN1_TIME at;
-  const TESTDATA *testdata = &tests[idx];
-  int ret = -2;
-  int day, sec;
+    ASN1_TIME at;
+    const TESTDATA *testdata = &tests[idx];
+    int ret = -2;
+    int day, sec;
 
-  at.data = (unsigned char *)testdata->data;
-  at.length = strlen(testdata->data);
-  at.type = testdata->type;
-  at.flags = 0;
+    at.data = (unsigned char *)testdata->data;
+    at.length = strlen(testdata->data);
+    at.type = testdata->type;
+    at.flags = 0;
 
-  if (!TEST_true(ASN1_TIME_diff(&day, &sec, &the_asn1_time, &at))) {
-    TEST_info("ASN1_TIME_diff() failed for %s\n", at.data);
-    return 0;
-  }
-  if (day > 0)
-    ret = 1;
-  else if (day < 0)
-    ret = -1;
-  else if (sec > 0)
-    ret = 1;
-  else if (sec < 0)
-    ret = -1;
-  else
-    ret = 0;
+    if (!TEST_true(ASN1_TIME_diff(&day, &sec, &the_asn1_time, &at))) {
+        TEST_info("ASN1_TIME_diff() failed for %s\n", at.data);
+        return 0;
+    }
+    if (day > 0)
+        ret = 1;
+    else if (day < 0)
+        ret = -1;
+    else if (sec > 0)
+        ret = 1;
+    else if (sec < 0)
+        ret = -1;
+    else
+        ret = 0;
 
-  if (!TEST_int_eq(testdata->time_result, ret)) {
-    TEST_info("ASN1_TIME_diff() test failed for %s day=%d sec=%d\n", at.data,
-              day, sec);
-    return 0;
-  }
+    if (!TEST_int_eq(testdata->time_result, ret)) {
+        TEST_info("ASN1_TIME_diff() test failed for %s day=%d sec=%d\n",
+                  at.data, day, sec);
+        return 0;
+    }
 
-  ret = ASN1_TIME_cmp_time_t(&at, the_time);
+    ret = ASN1_TIME_cmp_time_t(&at, the_time);
 
-  if (!TEST_int_eq(testdata->time_result, ret)) {
-    TEST_info("ASN1_UTCTIME_cmp_time_t() test failed for %s\n", at.data);
-    return 0;
-  }
+    if (!TEST_int_eq(testdata->time_result, ret)) {
+        TEST_info("ASN1_UTCTIME_cmp_time_t() test failed for %s\n", at.data);
+        return 0;
+    }
 
-  return 1;
+    return 1;
 }
 
 int setup_tests(void) {
-  ADD_ALL_TESTS(test_offset, OSSL_NELEM(tests));
-  return 1;
+    ADD_ALL_TESTS(test_offset, OSSL_NELEM(tests));
+    return 1;
 }

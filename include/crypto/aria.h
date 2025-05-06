@@ -28,15 +28,15 @@
 #define ARIA_MAX_KEYS 17   /* Number of keys needed in the worst case  */
 
 typedef union {
-  unsigned char c[ARIA_BLOCK_SIZE];
-  unsigned int u[ARIA_BLOCK_SIZE / sizeof(unsigned int)];
+    unsigned char c[ARIA_BLOCK_SIZE];
+    unsigned int u[ARIA_BLOCK_SIZE / sizeof(unsigned int)];
 } ARIA_u128;
 
 typedef unsigned char ARIA_c128[ARIA_BLOCK_SIZE];
 
 struct aria_key_st {
-  ARIA_u128 rd_key[ARIA_MAX_KEYS];
-  unsigned int rounds;
+    ARIA_u128 rd_key[ARIA_MAX_KEYS];
+    unsigned int rounds;
 };
 typedef struct aria_key_st ARIA_KEY;
 

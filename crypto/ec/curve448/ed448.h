@@ -23,7 +23,7 @@
 
 /* Number of bytes in an EdDSA signature. */
 #define EDDSA_448_SIGNATURE_BYTES                                              \
-  (EDDSA_448_PUBLIC_BYTES + EDDSA_448_PRIVATE_BYTES)
+    (EDDSA_448_PUBLIC_BYTES + EDDSA_448_PRIVATE_BYTES)
 
 /* EdDSA encoding ratio. */
 #define C448_EDDSA_ENCODE_RATIO 4

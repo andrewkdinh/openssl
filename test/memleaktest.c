@@ -34,28 +34,28 @@
 
 int main(int argc, char *argv[]) {
 #if __SANITIZE_ADDRESS__
-  int exitcode = EXIT_SUCCESS;
+    int exitcode = EXIT_SUCCESS;
 #else
-  /*
-   * When we don't sanitize, we set the exit code to what we would expect
-   * to get when we are sanitizing.  This makes it easy for wrapper scripts
-   * to detect that we get the result we expect.
-   */
-  int exitcode = EXIT_FAILURE;
+    /*
+     * When we don't sanitize, we set the exit code to what we would expect
+     * to get when we are sanitizing.  This makes it easy for wrapper scripts
+     * to detect that we get the result we expect.
+     */
+    int exitcode = EXIT_FAILURE;
 #endif
-  char *volatile lost;
+    char *volatile lost;
 
-  lost = OPENSSL_malloc(3);
-  if (!TEST_ptr(lost))
-    return EXIT_FAILURE;
+    lost = OPENSSL_malloc(3);
+    if (!TEST_ptr(lost))
+        return EXIT_FAILURE;
 
-  strcpy(lost, "ab");
+    strcpy(lost, "ab");
 
-  if (argv[1] && strcmp(argv[1], "freeit") == 0) {
-    OPENSSL_free(lost);
-    exitcode = EXIT_SUCCESS;
-  }
+    if (argv[1] && strcmp(argv[1], "freeit") == 0) {
+        OPENSSL_free(lost);
+        exitcode = EXIT_SUCCESS;
+    }
 
-  lost = NULL;
-  return exitcode;
+    lost = NULL;
+    return exitcode;
 }

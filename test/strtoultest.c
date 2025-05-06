@@ -12,11 +12,11 @@
 #include "testutil.h"
 
 struct strtoul_test_entry {
-  char *input;                 /* the input string */
-  int base;                    /* the base we are converting in */
-  unsigned long expect_val;    /* the expected value we should get */
-  int expect_err;              /* the expected error we expect to receive */
-  size_t expect_endptr_offset; /* the expected endptr offset, +1 for NULL */
+    char *input;                 /* the input string */
+    int base;                    /* the base we are converting in */
+    unsigned long expect_val;    /* the expected value we should get */
+    int expect_err;              /* the expected error we expect to receive */
+    size_t expect_endptr_offset; /* the expected endptr offset, +1 for NULL */
 };
 
 static struct strtoul_test_entry strtoul_tests[] = {
@@ -45,38 +45,38 @@ static struct strtoul_test_entry strtoul_tests[] = {
 {".1", 0, 0, 0, 0}};
 
 static int test_strtoul(int idx) {
-  unsigned long val;
-  char *endptr = NULL;
-  int err;
-  struct strtoul_test_entry *test = &strtoul_tests[idx];
+    unsigned long val;
+    char *endptr = NULL;
+    int err;
+    struct strtoul_test_entry *test = &strtoul_tests[idx];
 
-  /*
-   * For each test, convert the string to an unsigned long
-   */
-  err = OPENSSL_strtoul(test->input, &endptr, test->base, &val);
+    /*
+     * For each test, convert the string to an unsigned long
+     */
+    err = OPENSSL_strtoul(test->input, &endptr, test->base, &val);
 
-  /*
-   * Check to ensure the error returned is expected
-   */
-  if (!TEST_int_eq(err, test->expect_err))
-    return 0;
-  /*
-   * Confirm that the endptr points to where we expect
-   */
-  if (!TEST_ptr_eq(endptr, &test->input[test->expect_endptr_offset]))
-    return 0;
-  /*
-   * And check that we received the proper translated value
-   * Note, we only check the value if the conversion passed
-   */
-  if (test->expect_err == 1) {
-    if (!TEST_ulong_eq(val, test->expect_val))
-      return 0;
-  }
-  return 1;
+    /*
+     * Check to ensure the error returned is expected
+     */
+    if (!TEST_int_eq(err, test->expect_err))
+        return 0;
+    /*
+     * Confirm that the endptr points to where we expect
+     */
+    if (!TEST_ptr_eq(endptr, &test->input[test->expect_endptr_offset]))
+        return 0;
+    /*
+     * And check that we received the proper translated value
+     * Note, we only check the value if the conversion passed
+     */
+    if (test->expect_err == 1) {
+        if (!TEST_ulong_eq(val, test->expect_val))
+            return 0;
+    }
+    return 1;
 }
 
 int setup_tests(void) {
-  ADD_ALL_TESTS(test_strtoul, OSSL_NELEM(strtoul_tests));
-  return 1;
+    ADD_ALL_TESTS(test_strtoul, OSSL_NELEM(strtoul_tests));
+    return 1;
 }

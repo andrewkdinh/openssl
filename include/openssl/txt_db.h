@@ -37,14 +37,14 @@ typedef OPENSSL_STRING *OPENSSL_PSTRING;
 DEFINE_SPECIAL_STACK_OF(OPENSSL_PSTRING, OPENSSL_STRING)
 
 typedef struct txt_db_st {
-  int num_fields;
-  STACK_OF(OPENSSL_PSTRING) * data;
-  LHASH_OF(OPENSSL_STRING) * *index;
-  int (**qual)(OPENSSL_STRING *);
-  long error;
-  long arg1;
-  long arg2;
-  OPENSSL_STRING *arg_row;
+    int num_fields;
+    STACK_OF(OPENSSL_PSTRING) * data;
+    LHASH_OF(OPENSSL_STRING) * *index;
+    int (**qual)(OPENSSL_STRING *);
+    long error;
+    long arg1;
+    long arg2;
+    OPENSSL_STRING *arg_row;
 } TXT_DB;
 
 TXT_DB *TXT_DB_read(BIO *in, int num);

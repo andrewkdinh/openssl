@@ -60,7 +60,7 @@ const EVP_CIPHER *EVP_cast5_cfb(void) { return EVP_cast5_cfb64(); }
 #undef EVP_rc5_32_12_16_cfb
 const EVP_CIPHER *EVP_rc5_32_12_16_cfb(void);
 const EVP_CIPHER *EVP_rc5_32_12_16_cfb(void) {
-  return EVP_rc5_32_12_16_cfb64();
+    return EVP_rc5_32_12_16_cfb64();
 }
 #endif
 

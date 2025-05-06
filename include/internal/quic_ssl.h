@@ -30,11 +30,11 @@ __owur SSL *ossl_quic_new_domain(SSL_CTX *ctx, uint64_t flags);
  * Datatype returned from ossl_quic_get_peer_token
  */
 typedef struct quic_token_st {
-  CRYPTO_REF_COUNT references;
-  uint8_t *hashkey;
-  size_t hashkey_len;
-  uint8_t *token;
-  size_t token_len;
+    CRYPTO_REF_COUNT references;
+    uint8_t *hashkey;
+    size_t hashkey_len;
+    uint8_t *token;
+    size_t token_len;
 } QUIC_TOKEN;
 
 SSL_TOKEN_STORE *ossl_quic_new_token_store(void);

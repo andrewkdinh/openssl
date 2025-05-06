@@ -17,78 +17,78 @@
 #include "skeymgmt_lcl.h"
 
 void generic_free(void *keydata) {
-  PROV_SKEY *generic = keydata;
+    PROV_SKEY *generic = keydata;
 
-  if (generic == NULL)
-    return;
+    if (generic == NULL)
+        return;
 
-  OPENSSL_free(generic->data);
-  OPENSSL_free(generic);
+    OPENSSL_free(generic->data);
+    OPENSSL_free(generic);
 }
 
 void *generic_import(void *provctx, int selection, const OSSL_PARAM params[]) {
-  OSSL_LIB_CTX *libctx = PROV_LIBCTX_OF(provctx);
-  const OSSL_PARAM *raw_bytes;
-  PROV_SKEY *generic = NULL;
-  int ok = 0;
+    OSSL_LIB_CTX *libctx = PROV_LIBCTX_OF(provctx);
+    const OSSL_PARAM *raw_bytes;
+    PROV_SKEY *generic = NULL;
+    int ok = 0;
 
-  if (!ossl_prov_is_running())
-    return NULL;
+    if (!ossl_prov_is_running())
+        return NULL;
 
-  if ((selection & OSSL_SKEYMGMT_SELECT_SECRET_KEY) == 0)
-    return NULL;
+    if ((selection & OSSL_SKEYMGMT_SELECT_SECRET_KEY) == 0)
+        return NULL;
 
-  raw_bytes = OSSL_PARAM_locate_const(params, OSSL_SKEY_PARAM_RAW_BYTES);
-  if (raw_bytes == NULL)
-    return NULL;
+    raw_bytes = OSSL_PARAM_locate_const(params, OSSL_SKEY_PARAM_RAW_BYTES);
+    if (raw_bytes == NULL)
+        return NULL;
 
-  generic = OPENSSL_zalloc(sizeof(PROV_SKEY));
-  if (generic == NULL)
-    return NULL;
+    generic = OPENSSL_zalloc(sizeof(PROV_SKEY));
+    if (generic == NULL)
+        return NULL;
 
-  generic->libctx = libctx;
+    generic->libctx = libctx;
 
-  generic->type = SKEY_TYPE_GENERIC;
+    generic->type = SKEY_TYPE_GENERIC;
 
-  if ((generic->data = OPENSSL_memdup(raw_bytes->data, raw_bytes->data_size)) ==
-      NULL)
-    goto end;
-  generic->length = raw_bytes->data_size;
-  ok = 1;
+    if ((generic->data =
+         OPENSSL_memdup(raw_bytes->data, raw_bytes->data_size)) == NULL)
+        goto end;
+    generic->length = raw_bytes->data_size;
+    ok = 1;
 
 end:
-  if (ok == 0) {
-    generic_free(generic);
-    generic = NULL;
-  }
-  return generic;
+    if (ok == 0) {
+        generic_free(generic);
+        generic = NULL;
+    }
+    return generic;
 }
 
 static const OSSL_PARAM generic_import_params[] = {
 OSSL_PARAM_octet_string(OSSL_SKEY_PARAM_RAW_BYTES, NULL, 0), OSSL_PARAM_END};
 
 const OSSL_PARAM *generic_imp_settable_params(void *provctx) {
-  return generic_import_params;
+    return generic_import_params;
 }
 
 int generic_export(void *keydata, int selection, OSSL_CALLBACK *param_callback,
                    void *cbarg) {
-  PROV_SKEY *gen = keydata;
-  OSSL_PARAM params[2];
+    PROV_SKEY *gen = keydata;
+    OSSL_PARAM params[2];
 
-  if (!ossl_prov_is_running() || gen == NULL)
-    return 0;
+    if (!ossl_prov_is_running() || gen == NULL)
+        return 0;
 
-  /* If we use generic SKEYMGMT as a "base class", we shouldn't check the type
-   */
-  if ((selection & OSSL_SKEYMGMT_SELECT_SECRET_KEY) == 0)
-    return 0;
+    /* If we use generic SKEYMGMT as a "base class", we shouldn't check the type
+     */
+    if ((selection & OSSL_SKEYMGMT_SELECT_SECRET_KEY) == 0)
+        return 0;
 
-  params[0] = OSSL_PARAM_construct_octet_string(OSSL_SKEY_PARAM_RAW_BYTES,
-                                                gen->data, gen->length);
-  params[1] = OSSL_PARAM_construct_end();
+    params[0] = OSSL_PARAM_construct_octet_string(OSSL_SKEY_PARAM_RAW_BYTES,
+                                                  gen->data, gen->length);
+    params[1] = OSSL_PARAM_construct_end();
 
-  return param_callback(params, cbarg);
+    return param_callback(params, cbarg);
 }
 
 const OSSL_DISPATCH ossl_generic_skeymgmt_functions[] = {

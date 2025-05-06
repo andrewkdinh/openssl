@@ -53,76 +53,76 @@ void ossl_ackm_set_tx_max_ack_delay(OSSL_ACKM *ackm,
 
 typedef struct ossl_ackm_tx_pkt_st OSSL_ACKM_TX_PKT;
 struct ossl_ackm_tx_pkt_st {
-  /* The packet number of the transmitted packet. */
-  QUIC_PN pkt_num;
+    /* The packet number of the transmitted packet. */
+    QUIC_PN pkt_num;
 
-  /* The number of bytes in the packet which was sent. */
-  size_t num_bytes;
+    /* The number of bytes in the packet which was sent. */
+    size_t num_bytes;
 
-  /* The time at which the packet was sent. */
-  OSSL_TIME time;
+    /* The time at which the packet was sent. */
+    OSSL_TIME time;
 
-  /*
-   * If the packet being described by this structure contains an ACK frame,
-   * this must be set to the largest PN ACK'd by that frame.
-   *
-   * Otherwise, it should be set to QUIC_PN_INVALID.
-   *
-   * This is necessary to bound the number of PNs we have to keep track of on
-   * the RX side (RFC 9000 s. 13.2.4). It allows older PN tracking information
-   * on the RX side to be discarded.
-   */
-  QUIC_PN largest_acked;
+    /*
+     * If the packet being described by this structure contains an ACK frame,
+     * this must be set to the largest PN ACK'd by that frame.
+     *
+     * Otherwise, it should be set to QUIC_PN_INVALID.
+     *
+     * This is necessary to bound the number of PNs we have to keep track of on
+     * the RX side (RFC 9000 s. 13.2.4). It allows older PN tracking information
+     * on the RX side to be discarded.
+     */
+    QUIC_PN largest_acked;
 
-  /*
-   * One of the QUIC_PN_SPACE_* values. This qualifies the pkt_num field
-   * into a packet number space.
-   */
-  unsigned int pkt_space : 2;
+    /*
+     * One of the QUIC_PN_SPACE_* values. This qualifies the pkt_num field
+     * into a packet number space.
+     */
+    unsigned int pkt_space : 2;
 
-  /*
-   * 1 if the packet is in flight. A packet is considered 'in flight' if it is
-   * counted for purposes of congestion control and 'bytes in flight' counts.
-   * Most packets are considered in flight. The only circumstance where a
-   * numbered packet is not considered in flight is if it contains only ACK
-   * frames (not even PADDING frames), as these frames can bypass CC.
-   */
-  unsigned int is_inflight : 1;
+    /*
+     * 1 if the packet is in flight. A packet is considered 'in flight' if it is
+     * counted for purposes of congestion control and 'bytes in flight' counts.
+     * Most packets are considered in flight. The only circumstance where a
+     * numbered packet is not considered in flight is if it contains only ACK
+     * frames (not even PADDING frames), as these frames can bypass CC.
+     */
+    unsigned int is_inflight : 1;
 
-  /*
-   * 1 if the packet has one or more ACK-eliciting frames.
-   * Note that if this is set, is_inflight must be set.
-   */
-  unsigned int is_ack_eliciting : 1;
+    /*
+     * 1 if the packet has one or more ACK-eliciting frames.
+     * Note that if this is set, is_inflight must be set.
+     */
+    unsigned int is_ack_eliciting : 1;
 
-  /* 1 if the packet is a PTO probe. */
-  unsigned int is_pto_probe : 1;
+    /* 1 if the packet is a PTO probe. */
+    unsigned int is_pto_probe : 1;
 
-  /* 1 if the packet is an MTU probe. */
-  unsigned int is_mtu_probe : 1;
+    /* 1 if the packet is an MTU probe. */
+    unsigned int is_mtu_probe : 1;
 
-  /* Callback called if frames in this packet are lost. arg is cb_arg. */
-  void (*on_lost)(void *arg);
-  /* Callback called if frames in this packet are acked. arg is cb_arg. */
-  void (*on_acked)(void *arg);
-  /*
-   * Callback called if frames in this packet are neither acked nor lost. arg
-   * is cb_arg.
-   */
-  void (*on_discarded)(void *arg);
-  void *cb_arg;
+    /* Callback called if frames in this packet are lost. arg is cb_arg. */
+    void (*on_lost)(void *arg);
+    /* Callback called if frames in this packet are acked. arg is cb_arg. */
+    void (*on_acked)(void *arg);
+    /*
+     * Callback called if frames in this packet are neither acked nor lost. arg
+     * is cb_arg.
+     */
+    void (*on_discarded)(void *arg);
+    void *cb_arg;
 
-  /*
-   * (Internal use fields; must be zero-initialized.)
-   *
-   * Keep a TX history list, anext is used to manifest
-   * a singly-linked list of newly-acknowledged packets, and lnext is used to
-   * manifest a singly-linked list of newly lost packets.
-   */
-  OSSL_LIST_MEMBER(tx_history, OSSL_ACKM_TX_PKT);
+    /*
+     * (Internal use fields; must be zero-initialized.)
+     *
+     * Keep a TX history list, anext is used to manifest
+     * a singly-linked list of newly-acknowledged packets, and lnext is used to
+     * manifest a singly-linked list of newly lost packets.
+     */
+    OSSL_LIST_MEMBER(tx_history, OSSL_ACKM_TX_PKT);
 
-  struct ossl_ackm_tx_pkt_st *anext;
-  struct ossl_ackm_tx_pkt_st *lnext;
+    struct ossl_ackm_tx_pkt_st *anext;
+    struct ossl_ackm_tx_pkt_st *lnext;
 };
 
 int ossl_ackm_on_tx_packet(OSSL_ACKM *ackm, OSSL_ACKM_TX_PKT *pkt);
@@ -134,26 +134,26 @@ int ossl_ackm_on_rx_datagram(OSSL_ACKM *ackm, size_t num_bytes);
 #define OSSL_ACKM_ECN_ECNCE 3
 
 typedef struct ossl_ackm_rx_pkt_st {
-  /* The packet number of the received packet. */
-  QUIC_PN pkt_num;
+    /* The packet number of the received packet. */
+    QUIC_PN pkt_num;
 
-  /* The time at which the packet was received. */
-  OSSL_TIME time;
+    /* The time at which the packet was received. */
+    OSSL_TIME time;
 
-  /*
-   * One of the QUIC_PN_SPACE_* values. This qualifies the pkt_num field
-   * into a packet number space.
-   */
-  unsigned int pkt_space : 2;
+    /*
+     * One of the QUIC_PN_SPACE_* values. This qualifies the pkt_num field
+     * into a packet number space.
+     */
+    unsigned int pkt_space : 2;
 
-  /* 1 if the packet has one or more ACK-eliciting frames. */
-  unsigned int is_ack_eliciting : 1;
+    /* 1 if the packet has one or more ACK-eliciting frames. */
+    unsigned int is_ack_eliciting : 1;
 
-  /*
-   * One of the OSSL_ACKM_ECN_* values. This is the ECN labelling applied to
-   * the received packet. If unknown, use OSSL_ACKM_ECN_NONE.
-   */
-  unsigned int ecn : 2;
+    /*
+     * One of the OSSL_ACKM_ECN_* values. This is the ECN labelling applied to
+     * the received packet. If unknown, use OSSL_ACKM_ECN_NONE.
+     */
+    unsigned int ecn : 2;
 } OSSL_ACKM_RX_PKT;
 
 int ossl_ackm_on_rx_packet(OSSL_ACKM *ackm, const OSSL_ACKM_RX_PKT *pkt);
@@ -227,26 +227,26 @@ int ossl_ackm_is_ack_desired(OSSL_ACKM *ackm, int pkt_space);
 int ossl_ackm_is_rx_pn_processable(OSSL_ACKM *ackm, QUIC_PN pn, int pkt_space);
 
 typedef struct ossl_ackm_probe_info_st {
-  /*
-   * The following two probe request types are used only for anti-deadlock
-   * purposes in relation to the anti-amplification logic, by generating
-   * packets to buy ourselves more anti-amplification credit with the server
-   * until a client address is verified. Note that like all Initial packets,
-   * any Initial probes are padded.
-   *
-   * Note: The ACKM will only ever increase these by one at a time,
-   * as only one probe packet should be generated for these cases.
-   */
-  uint32_t anti_deadlock_initial, anti_deadlock_handshake;
+    /*
+     * The following two probe request types are used only for anti-deadlock
+     * purposes in relation to the anti-amplification logic, by generating
+     * packets to buy ourselves more anti-amplification credit with the server
+     * until a client address is verified. Note that like all Initial packets,
+     * any Initial probes are padded.
+     *
+     * Note: The ACKM will only ever increase these by one at a time,
+     * as only one probe packet should be generated for these cases.
+     */
+    uint32_t anti_deadlock_initial, anti_deadlock_handshake;
 
-  /*
-   * Send an ACK-eliciting packet for each count here.
-   *
-   * Note: The ACKM may increase this by either one or two for each probe
-   * request, depending on how many probe packets it thinks should be
-   * generated.
-   */
-  uint32_t pto[QUIC_PN_SPACE_NUM];
+    /*
+     * Send an ACK-eliciting packet for each count here.
+     *
+     * Note: The ACKM may increase this by either one or two for each probe
+     * request, depending on how many probe packets it thinks should be
+     * generated.
+     */
+    uint32_t pto[QUIC_PN_SPACE_NUM];
 } OSSL_ACKM_PROBE_INFO;
 
 /*

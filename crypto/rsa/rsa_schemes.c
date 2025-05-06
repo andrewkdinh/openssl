@@ -17,22 +17,22 @@
 static int meth2nid(const void *meth,
                     int (*meth_is_a)(const void *meth, const char *name),
                     const OSSL_ITEM *items, size_t items_n) {
-  size_t i;
+    size_t i;
 
-  if (meth != NULL)
-    for (i = 0; i < items_n; i++)
-      if (meth_is_a(meth, items[i].ptr))
-        return (int)items[i].id;
-  return NID_undef;
+    if (meth != NULL)
+        for (i = 0; i < items_n; i++)
+            if (meth_is_a(meth, items[i].ptr))
+                return (int)items[i].id;
+    return NID_undef;
 }
 
 static const char *nid2name(int meth, const OSSL_ITEM *items, size_t items_n) {
-  size_t i;
+    size_t i;
 
-  for (i = 0; i < items_n; i++)
-    if (meth == (int)items[i].id)
-      return items[i].ptr;
-  return NULL;
+    for (i = 0; i < items_n; i++)
+        if (meth == (int)items[i].id)
+            return items[i].ptr;
+    return NULL;
 }
 
 /*
@@ -61,20 +61,20 @@ static const OSSL_ITEM oaeppss_name_nid_map[] = {
 };
 
 static int md_is_a(const void *md, const char *name) {
-  return EVP_MD_is_a(md, name);
+    return EVP_MD_is_a(md, name);
 }
 
 int ossl_rsa_oaeppss_md2nid(const EVP_MD *md) {
-  return meth2nid(md, md_is_a, oaeppss_name_nid_map,
-                  OSSL_NELEM(oaeppss_name_nid_map));
+    return meth2nid(md, md_is_a, oaeppss_name_nid_map,
+                    OSSL_NELEM(oaeppss_name_nid_map));
 }
 
 const char *ossl_rsa_oaeppss_nid2name(int md) {
-  return nid2name(md, oaeppss_name_nid_map, OSSL_NELEM(oaeppss_name_nid_map));
+    return nid2name(md, oaeppss_name_nid_map, OSSL_NELEM(oaeppss_name_nid_map));
 }
 
 const char *ossl_rsa_mgf_nid2name(int mgf) {
-  if (mgf == NID_mgf1)
-    return SN_mgf1;
-  return NULL;
+    if (mgf == NID_mgf1)
+        return SN_mgf1;
+    return NULL;
 }

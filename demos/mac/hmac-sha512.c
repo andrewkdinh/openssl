@@ -67,92 +67,93 @@ static const unsigned char expected_output[] = {
 static const char *propq = NULL;
 
 int main(void) {
-  int ret = EXIT_FAILURE;
-  OSSL_LIB_CTX *library_context = NULL;
-  EVP_MAC *mac = NULL;
-  EVP_MAC_CTX *mctx = NULL;
-  EVP_MD_CTX *digest_context = NULL;
-  unsigned char *out = NULL;
-  size_t out_len = 0;
-  OSSL_PARAM params[4], *p = params;
-  char digest_name[] = "SHA3-512";
+    int ret = EXIT_FAILURE;
+    OSSL_LIB_CTX *library_context = NULL;
+    EVP_MAC *mac = NULL;
+    EVP_MAC_CTX *mctx = NULL;
+    EVP_MD_CTX *digest_context = NULL;
+    unsigned char *out = NULL;
+    size_t out_len = 0;
+    OSSL_PARAM params[4], *p = params;
+    char digest_name[] = "SHA3-512";
 
-  library_context = OSSL_LIB_CTX_new();
-  if (library_context == NULL) {
-    fprintf(stderr, "OSSL_LIB_CTX_new() returned NULL\n");
-    goto end;
-  }
+    library_context = OSSL_LIB_CTX_new();
+    if (library_context == NULL) {
+        fprintf(stderr, "OSSL_LIB_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* Fetch the HMAC implementation */
-  mac = EVP_MAC_fetch(library_context, "HMAC", propq);
-  if (mac == NULL) {
-    fprintf(stderr, "EVP_MAC_fetch() returned NULL\n");
-    goto end;
-  }
+    /* Fetch the HMAC implementation */
+    mac = EVP_MAC_fetch(library_context, "HMAC", propq);
+    if (mac == NULL) {
+        fprintf(stderr, "EVP_MAC_fetch() returned NULL\n");
+        goto end;
+    }
 
-  /* Create a context for the HMAC operation */
-  mctx = EVP_MAC_CTX_new(mac);
-  if (mctx == NULL) {
-    fprintf(stderr, "EVP_MAC_CTX_new() returned NULL\n");
-    goto end;
-  }
+    /* Create a context for the HMAC operation */
+    mctx = EVP_MAC_CTX_new(mac);
+    if (mctx == NULL) {
+        fprintf(stderr, "EVP_MAC_CTX_new() returned NULL\n");
+        goto end;
+    }
 
-  /* The underlying digest to be used */
-  *p++ = OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_DIGEST, digest_name,
-                                          sizeof(digest_name));
-  *p = OSSL_PARAM_construct_end();
+    /* The underlying digest to be used */
+    *p++ = OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_DIGEST, digest_name,
+                                            sizeof(digest_name));
+    *p = OSSL_PARAM_construct_end();
 
-  /* Initialise the HMAC operation */
-  if (!EVP_MAC_init(mctx, key, sizeof(key), params)) {
-    fprintf(stderr, "EVP_MAC_init() failed\n");
-    goto end;
-  }
+    /* Initialise the HMAC operation */
+    if (!EVP_MAC_init(mctx, key, sizeof(key), params)) {
+        fprintf(stderr, "EVP_MAC_init() failed\n");
+        goto end;
+    }
 
-  /* Make one or more calls to process the data to be authenticated */
-  if (!EVP_MAC_update(mctx, data, sizeof(data))) {
-    fprintf(stderr, "EVP_MAC_update() failed\n");
-    goto end;
-  }
+    /* Make one or more calls to process the data to be authenticated */
+    if (!EVP_MAC_update(mctx, data, sizeof(data))) {
+        fprintf(stderr, "EVP_MAC_update() failed\n");
+        goto end;
+    }
 
-  /* Make a call to the final with a NULL buffer to get the length of the MAC */
-  if (!EVP_MAC_final(mctx, NULL, &out_len, 0)) {
-    fprintf(stderr, "EVP_MAC_final() failed\n");
-    goto end;
-  }
-  out = OPENSSL_malloc(out_len);
-  if (out == NULL) {
-    fprintf(stderr, "malloc failed\n");
-    goto end;
-  }
-  /* Make one call to the final to get the MAC */
-  if (!EVP_MAC_final(mctx, out, &out_len, out_len)) {
-    fprintf(stderr, "EVP_MAC_final() failed\n");
-    goto end;
-  }
+    /* Make a call to the final with a NULL buffer to get the length of the MAC
+     */
+    if (!EVP_MAC_final(mctx, NULL, &out_len, 0)) {
+        fprintf(stderr, "EVP_MAC_final() failed\n");
+        goto end;
+    }
+    out = OPENSSL_malloc(out_len);
+    if (out == NULL) {
+        fprintf(stderr, "malloc failed\n");
+        goto end;
+    }
+    /* Make one call to the final to get the MAC */
+    if (!EVP_MAC_final(mctx, out, &out_len, out_len)) {
+        fprintf(stderr, "EVP_MAC_final() failed\n");
+        goto end;
+    }
 
-  printf("Generated MAC:\n");
-  BIO_dump_indent_fp(stdout, out, out_len, 2);
-  putchar('\n');
+    printf("Generated MAC:\n");
+    BIO_dump_indent_fp(stdout, out, out_len, 2);
+    putchar('\n');
 
-  if (out_len != sizeof(expected_output)) {
-    fprintf(stderr, "Generated MAC has an unexpected length\n");
-    goto end;
-  }
+    if (out_len != sizeof(expected_output)) {
+        fprintf(stderr, "Generated MAC has an unexpected length\n");
+        goto end;
+    }
 
-  if (CRYPTO_memcmp(expected_output, out, sizeof(expected_output)) != 0) {
-    fprintf(stderr, "Generated MAC does not match expected value\n");
-    goto end;
-  }
+    if (CRYPTO_memcmp(expected_output, out, sizeof(expected_output)) != 0) {
+        fprintf(stderr, "Generated MAC does not match expected value\n");
+        goto end;
+    }
 
-  ret = EXIT_SUCCESS;
+    ret = EXIT_SUCCESS;
 end:
-  if (ret != EXIT_SUCCESS)
-    ERR_print_errors_fp(stderr);
-  /* OpenSSL free functions will ignore NULL arguments */
-  OPENSSL_free(out);
-  EVP_MD_CTX_free(digest_context);
-  EVP_MAC_CTX_free(mctx);
-  EVP_MAC_free(mac);
-  OSSL_LIB_CTX_free(library_context);
-  return ret;
+    if (ret != EXIT_SUCCESS)
+        ERR_print_errors_fp(stderr);
+    /* OpenSSL free functions will ignore NULL arguments */
+    OPENSSL_free(out);
+    EVP_MD_CTX_free(digest_context);
+    EVP_MAC_CTX_free(mctx);
+    EVP_MAC_free(mac);
+    OSSL_LIB_CTX_free(library_context);
+    return ret;
 }

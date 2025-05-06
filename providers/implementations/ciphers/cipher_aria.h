@@ -11,11 +11,11 @@
 #include "prov/ciphercommon.h"
 
 typedef struct prov_aria_ctx_st {
-  PROV_CIPHER_CTX base; /* Must be first */
-  union {
-    OSSL_UNION_ALIGN;
-    ARIA_KEY ks;
-  } ks;
+    PROV_CIPHER_CTX base; /* Must be first */
+    union {
+        OSSL_UNION_ALIGN;
+        ARIA_KEY ks;
+    } ks;
 } PROV_ARIA_CTX;
 
 #define ossl_prov_cipher_hw_aria_ofb ossl_prov_cipher_hw_aria_ofb128

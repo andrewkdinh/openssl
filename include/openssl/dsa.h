@@ -103,12 +103,12 @@ int DSA_SIG_set0(DSA_SIG *sig, BIGNUM *r, BIGNUM *s);
 /* typedef struct dsa_method DSA_METHOD; */
 
 #define d2i_DSAparams_fp(fp, x)                                                \
-  (DSA *)ASN1_d2i_fp((char *(*)())DSA_new, (char *(*)())d2i_DSAparams, (fp),   \
-                     (unsigned char **)(x))
+    (DSA *)ASN1_d2i_fp((char *(*)())DSA_new, (char *(*)())d2i_DSAparams, (fp), \
+                       (unsigned char **)(x))
 #define i2d_DSAparams_fp(fp, x)                                                \
-  ASN1_i2d_fp(i2d_DSAparams, (fp), (unsigned char *)(x))
+    ASN1_i2d_fp(i2d_DSAparams, (fp), (unsigned char *)(x))
 #define d2i_DSAparams_bio(bp, x)                                               \
-  ASN1_d2i_bio_of(DSA, DSA_new, d2i_DSAparams, bp, x)
+    ASN1_d2i_bio_of(DSA, DSA_new, d2i_DSAparams, bp, x)
 #define i2d_DSAparams_bio(bp, x) ASN1_i2d_bio_of(DSA, i2d_DSAparams, bp, x)
 
 DECLARE_ASN1_DUP_FUNCTION_name_attr(OSSL_DEPRECATEDIN_3_0, DSA, DSAparams)
@@ -143,7 +143,7 @@ OSSL_DEPRECATEDIN_3_0 int DSA_verify(int type, const unsigned char *dgst,
                                      int siglen, DSA *dsa);
 
 #define DSA_get_ex_new_index(l, p, newf, dupf, freef)                          \
-  CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_DSA, l, p, newf, dupf, freef)
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_DSA, l, p, newf, dupf, freef)
 OSSL_DEPRECATEDIN_3_0 int DSA_set_ex_data(DSA *d, int idx, void *arg);
 OSSL_DEPRECATEDIN_3_0 void *DSA_get_ex_data(const DSA *d, int idx);
 
@@ -185,7 +185,7 @@ OSSL_DEPRECATEDIN_3_0 int DSA_print_fp(FILE *bp, const DSA *x, int off);
  * DSA key.
  */
 #define DSA_is_prime(n, callback, cb_arg)                                      \
-  BN_is_prime(n, DSS_prime_checks, callback, NULL, cb_arg)
+    BN_is_prime(n, DSS_prime_checks, callback, NULL, cb_arg)
 
 #ifndef OPENSSL_NO_DH
 /*

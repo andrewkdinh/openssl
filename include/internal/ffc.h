@@ -43,7 +43,7 @@
 #define FFC_PARAM_FLAG_VALIDATE_PQ 0x01
 #define FFC_PARAM_FLAG_VALIDATE_G 0x02
 #define FFC_PARAM_FLAG_VALIDATE_PQG                                            \
-  (FFC_PARAM_FLAG_VALIDATE_PQ | FFC_PARAM_FLAG_VALIDATE_G)
+    (FFC_PARAM_FLAG_VALIDATE_PQ | FFC_PARAM_FLAG_VALIDATE_G)
 #define FFC_PARAM_FLAG_VALIDATE_LEGACY 0x04
 
 /*
@@ -88,38 +88,38 @@
  * Refer to FIPS186_4 Appendix A & B.
  */
 typedef struct ffc_params_st {
-  /* Primes */
-  BIGNUM *p;
-  BIGNUM *q;
-  /* Generator */
-  BIGNUM *g;
-  /* DH X9.42 Optional Subgroup factor j >= 2 where p = j * q + 1 */
-  BIGNUM *j;
+    /* Primes */
+    BIGNUM *p;
+    BIGNUM *q;
+    /* Generator */
+    BIGNUM *g;
+    /* DH X9.42 Optional Subgroup factor j >= 2 where p = j * q + 1 */
+    BIGNUM *j;
 
-  /* Required for FIPS186_4 validation of p, q and optionally canonical g */
-  unsigned char *seed;
-  /* If this value is zero the hash size is used as the seed length */
-  size_t seedlen;
-  /* Required for FIPS186_4 validation of p and q */
-  int pcounter;
-  int nid; /* The identity of a named group */
+    /* Required for FIPS186_4 validation of p, q and optionally canonical g */
+    unsigned char *seed;
+    /* If this value is zero the hash size is used as the seed length */
+    size_t seedlen;
+    /* Required for FIPS186_4 validation of p and q */
+    int pcounter;
+    int nid; /* The identity of a named group */
 
-  /*
-   * Required for FIPS186_4 generation & validation of canonical g.
-   * It uses unverifiable g if this value is -1.
-   */
-  int gindex;
-  int h; /* loop counter for unverifiable g */
+    /*
+     * Required for FIPS186_4 generation & validation of canonical g.
+     * It uses unverifiable g if this value is -1.
+     */
+    int gindex;
+    int h; /* loop counter for unverifiable g */
 
-  unsigned int flags;
-  /*
-   * The digest to use for generation or validation. If this value is NULL,
-   * then the digest is chosen using the value of N.
-   */
-  const char *mdname;
-  const char *mdprops;
-  /* Default key length for known named groups according to RFC7919 */
-  int keylength;
+    unsigned int flags;
+    /*
+     * The digest to use for generation or validation. If this value is NULL,
+     * then the digest is chosen using the value of N.
+     */
+    const char *mdname;
+    const char *mdprops;
+    /* Default key length for known named groups according to RFC7919 */
+    int keylength;
 } FFC_PARAMS;
 
 void ossl_ffc_params_init(FFC_PARAMS *params);

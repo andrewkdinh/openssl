@@ -21,10 +21,10 @@ static char *type_strings[] = {
 };
 
 const char *OSSL_STORE_INFO_type_string(int type) {
-  int types = OSSL_NELEM(type_strings);
+    int types = OSSL_NELEM(type_strings);
 
-  if (type < 1 || type > types)
-    return NULL;
+    if (type < 1 || type > types)
+        return NULL;
 
-  return type_strings[type - 1];
+    return type_strings[type - 1];
 }

@@ -22,8 +22,9 @@
 
 #define ML_DSA_ENTROPY_LEN 32
 
-#define ML_DSA_MU_BYTES 64 /* Size of the Hash for the message representative  \
-                            */
+#define ML_DSA_MU_BYTES                                                        \
+    64 /* Size of the Hash for the message representative                      \
+        */
 
 /* See FIPS 204 Section 4 Table 1 & Table 2 */
 #define ML_DSA_44_PRIV_LEN 2560
@@ -49,7 +50,7 @@
 #define ML_DSA_KEY_RETAIN_SEED (1 << 1)
 /* Default provider flags */
 #define ML_DSA_KEY_PROV_FLAGS_DEFAULT                                          \
-  (ML_DSA_KEY_PREFER_SEED | ML_DSA_KEY_RETAIN_SEED)
+    (ML_DSA_KEY_PREFER_SEED | ML_DSA_KEY_RETAIN_SEED)
 
 /*
  * Refer to FIPS 204 Section 4 Parameter sets.
@@ -57,20 +58,20 @@
  * omitted.
  */
 typedef struct ml_dsa_params_st {
-  const char *alg;
-  int evp_type;
-  int tau;               /* Number of +/-1's in polynomial c */
-  int bit_strength;      /* The collision strength (lambda) */
-  int gamma1;            /* coefficient range of y */
-  int gamma2;            /* low-order rounding range */
-  size_t k, l;           /* matrix dimensions of 'A' */
-  int eta;               /* Private key range */
-  int beta;              /* tau * eta */
-  int omega;             /* Number of 1's in the hint 'h' */
-  int security_category; /* Category is related to Security strength */
-  size_t sk_len;         /* private key size */
-  size_t pk_len;         /* public key size */
-  size_t sig_len;        /* signature size */
+    const char *alg;
+    int evp_type;
+    int tau;               /* Number of +/-1's in polynomial c */
+    int bit_strength;      /* The collision strength (lambda) */
+    int gamma1;            /* coefficient range of y */
+    int gamma2;            /* low-order rounding range */
+    size_t k, l;           /* matrix dimensions of 'A' */
+    int eta;               /* Private key range */
+    int beta;              /* tau * eta */
+    int omega;             /* Number of 1's in the hint 'h' */
+    int security_category; /* Category is related to Security strength */
+    size_t sk_len;         /* private key size */
+    size_t pk_len;         /* public key size */
+    size_t sig_len;        /* signature size */
 } ML_DSA_PARAMS;
 
 /* NOTE - any changes to this struct may require updates to ossl_ml_dsa_dup() */

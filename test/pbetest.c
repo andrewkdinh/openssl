@@ -55,69 +55,69 @@ static const unsigned char pbe_ciphertext_des_sha1[] = {
 !defined OPENSSL_NO_DES && !defined OPENSSL_NO_SHA1
 static int test_pkcs5_pbe(const EVP_CIPHER *cipher, const EVP_MD *md,
                           const unsigned char *exp, const int exp_len) {
-  int ret = 0;
-  EVP_CIPHER_CTX *ctx;
-  X509_ALGOR *algor = NULL;
-  int i, outlen;
-  unsigned char out[32];
+    int ret = 0;
+    EVP_CIPHER_CTX *ctx;
+    X509_ALGOR *algor = NULL;
+    int i, outlen;
+    unsigned char out[32];
 
-  ctx = EVP_CIPHER_CTX_new();
-  if (!TEST_ptr(ctx))
-    goto err;
+    ctx = EVP_CIPHER_CTX_new();
+    if (!TEST_ptr(ctx))
+        goto err;
 
-  algor = X509_ALGOR_new();
-  if (!TEST_ptr(algor))
-    goto err;
+    algor = X509_ALGOR_new();
+    if (!TEST_ptr(algor))
+        goto err;
 
-  if (!TEST_true(PKCS5_pbe_set0_algor(algor, EVP_CIPHER_nid(cipher), pbe_iter,
-                                      pbe_salt, sizeof(pbe_salt))) ||
-      !TEST_true(PKCS5_PBE_keyivgen(ctx, pbe_password, strlen(pbe_password),
-                                    algor->parameter, cipher, md, 1)) ||
-      !TEST_true(
-      EVP_CipherUpdate(ctx, out, &i, pbe_plaintext, sizeof(pbe_plaintext))))
-    goto err;
-  outlen = i;
+    if (!TEST_true(PKCS5_pbe_set0_algor(algor, EVP_CIPHER_nid(cipher), pbe_iter,
+                                        pbe_salt, sizeof(pbe_salt))) ||
+        !TEST_true(PKCS5_PBE_keyivgen(ctx, pbe_password, strlen(pbe_password),
+                                      algor->parameter, cipher, md, 1)) ||
+        !TEST_true(
+        EVP_CipherUpdate(ctx, out, &i, pbe_plaintext, sizeof(pbe_plaintext))))
+        goto err;
+    outlen = i;
 
-  if (!TEST_true(EVP_CipherFinal_ex(ctx, out + i, &i)))
-    goto err;
-  outlen += i;
+    if (!TEST_true(EVP_CipherFinal_ex(ctx, out + i, &i)))
+        goto err;
+    outlen += i;
 
-  if (!TEST_mem_eq(out, outlen, exp, exp_len))
-    goto err;
+    if (!TEST_mem_eq(out, outlen, exp, exp_len))
+        goto err;
 
-  /* Decrypt */
+    /* Decrypt */
 
-  if (!TEST_true(PKCS5_PBE_keyivgen(ctx, pbe_password, strlen(pbe_password),
-                                    algor->parameter, cipher, md, 0)) ||
-      !TEST_true(EVP_CipherUpdate(ctx, out, &i, exp, exp_len)))
-    goto err;
+    if (!TEST_true(PKCS5_PBE_keyivgen(ctx, pbe_password, strlen(pbe_password),
+                                      algor->parameter, cipher, md, 0)) ||
+        !TEST_true(EVP_CipherUpdate(ctx, out, &i, exp, exp_len)))
+        goto err;
 
-  outlen = i;
-  if (!TEST_true(EVP_CipherFinal_ex(ctx, out + i, &i)))
-    goto err;
+    outlen = i;
+    if (!TEST_true(EVP_CipherFinal_ex(ctx, out + i, &i)))
+        goto err;
 
-  if (!TEST_mem_eq(out, outlen, pbe_plaintext, sizeof(pbe_plaintext)))
-    goto err;
+    if (!TEST_mem_eq(out, outlen, pbe_plaintext, sizeof(pbe_plaintext)))
+        goto err;
 
-  ret = 1;
+    ret = 1;
 err:
-  EVP_CIPHER_CTX_free(ctx);
-  X509_ALGOR_free(algor);
-  return ret;
+    EVP_CIPHER_CTX_free(ctx);
+    X509_ALGOR_free(algor);
+    return ret;
 }
 #endif
 
 #if !defined OPENSSL_NO_RC4 && !defined OPENSSL_NO_MD5
 static int test_pkcs5_pbe_rc4_md5(void) {
-  return test_pkcs5_pbe(EVP_rc4(), EVP_md5(), pbe_ciphertext_rc4_md5,
-                        sizeof(pbe_ciphertext_rc4_md5));
+    return test_pkcs5_pbe(EVP_rc4(), EVP_md5(), pbe_ciphertext_rc4_md5,
+                          sizeof(pbe_ciphertext_rc4_md5));
 }
 #endif
 
 #if !defined OPENSSL_NO_DES && !defined OPENSSL_NO_SHA1
 static int test_pkcs5_pbe_des_sha1(void) {
-  return test_pkcs5_pbe(EVP_des_cbc(), EVP_sha1(), pbe_ciphertext_des_sha1,
-                        sizeof(pbe_ciphertext_des_sha1));
+    return test_pkcs5_pbe(EVP_des_cbc(), EVP_sha1(), pbe_ciphertext_des_sha1,
+                          sizeof(pbe_ciphertext_des_sha1));
 }
 #endif
 
@@ -132,30 +132,30 @@ static OSSL_PROVIDER *legacy, *dflt;
 
 int setup_tests(void) {
 #ifdef OPENSSL_NO_AUTOLOAD_CONFIG
-  /* Load required providers if not done via configuration */
-  legacy = OSSL_PROVIDER_load(NULL, "legacy");
-  dflt = OSSL_PROVIDER_load(NULL, "default");
-  if (!TEST_ptr(legacy) || !TEST_ptr(dflt)) {
-    cleanup_tests();
-    return -1;
-  }
+    /* Load required providers if not done via configuration */
+    legacy = OSSL_PROVIDER_load(NULL, "legacy");
+    dflt = OSSL_PROVIDER_load(NULL, "default");
+    if (!TEST_ptr(legacy) || !TEST_ptr(dflt)) {
+        cleanup_tests();
+        return -1;
+    }
 #endif
 
 #if !defined OPENSSL_NO_RC4 && !defined OPENSSL_NO_MD5
-  ADD_TEST(test_pkcs5_pbe_rc4_md5);
+    ADD_TEST(test_pkcs5_pbe_rc4_md5);
 #endif
 #if !defined OPENSSL_NO_DES && !defined OPENSSL_NO_SHA1
-  ADD_TEST(test_pkcs5_pbe_des_sha1);
+    ADD_TEST(test_pkcs5_pbe_des_sha1);
 #endif
 
-  return 1;
+    return 1;
 }
 
 #ifdef OPENSSL_NO_AUTOLOAD_CONFIG
 void cleanup_tests(void) {
-  /* Dispose of providers */
-  OSSL_PROVIDER_unload(legacy);
-  OSSL_PROVIDER_unload(dflt);
-  legacy = dflt = NULL;
+    /* Dispose of providers */
+    OSSL_PROVIDER_unload(legacy);
+    OSSL_PROVIDER_unload(dflt);
+    legacy = dflt = NULL;
 }
 #endif

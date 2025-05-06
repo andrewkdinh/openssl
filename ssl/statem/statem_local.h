@@ -49,17 +49,17 @@ extern const unsigned char hrrrandom[];
 
 /* Message processing return codes */
 typedef enum {
-  /* Something bad happened */
-  MSG_PROCESS_ERROR,
-  /* We've finished reading - swap to writing */
-  MSG_PROCESS_FINISHED_READING,
-  /*
-   * We've completed the main processing of this message but there is some
-   * post processing to be done.
-   */
-  MSG_PROCESS_CONTINUE_PROCESSING,
-  /* We've finished this message - read the next message */
-  MSG_PROCESS_CONTINUE_READING
+    /* Something bad happened */
+    MSG_PROCESS_ERROR,
+    /* We've finished reading - swap to writing */
+    MSG_PROCESS_FINISHED_READING,
+    /*
+     * We've completed the main processing of this message but there is some
+     * post processing to be done.
+     */
+    MSG_PROCESS_CONTINUE_PROCESSING,
+    /* We've finished this message - read the next message */
+    MSG_PROCESS_CONTINUE_READING
 } MSG_PROCESS_RETURN;
 
 typedef CON_FUNC_RETURN (*confunc_f)(SSL_CONNECTION *s, WPACKET *pkt);
@@ -248,9 +248,9 @@ int ossl_gost_ukm(const SSL_CONNECTION *s, unsigned char *dgst_buf);
 /* Extension processing */
 
 typedef enum ext_return_en {
-  EXT_RETURN_FAIL,
-  EXT_RETURN_SENT,
-  EXT_RETURN_NOT_SENT
+    EXT_RETURN_FAIL,
+    EXT_RETURN_SENT,
+    EXT_RETURN_NOT_SENT
 } EXT_RETURN;
 
 __owur int tls_validate_all_contexts(SSL_CONNECTION *s, unsigned int thisctx,

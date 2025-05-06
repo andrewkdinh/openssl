@@ -61,94 +61,94 @@ static const unsigned char bin_buf[] = {0x01, 0xaf};
 static OSSL_TIME last_time;
 
 static OSSL_TIME now(void *arg) {
-  OSSL_TIME t = last_time;
+    OSSL_TIME t = last_time;
 
-  last_time = ossl_time_add(t, ossl_ms2time(1000));
-  return t;
+    last_time = ossl_time_add(t, ossl_ms2time(1000));
+    return t;
 }
 
 static int test_qlog(void) {
-  int testresult = 0;
-  QLOG_TRACE_INFO qti = {0};
-  QLOG *qlog;
-  BIO *bio;
-  char *buf = NULL;
-  size_t buf_len = 0;
+    int testresult = 0;
+    QLOG_TRACE_INFO qti = {0};
+    QLOG *qlog;
+    BIO *bio;
+    char *buf = NULL;
+    size_t buf_len = 0;
 
-  last_time = ossl_time_from_time_t(170653117);
+    last_time = ossl_time_from_time_t(170653117);
 
-  qti.odcid.id_len = 1;
-  qti.odcid.id[0] = 0x55;
-  qti.title = "test title";
-  qti.description = "test description";
-  qti.group_id = "test group ID";
-  qti.override_process_id = 123;
-  qti.now_cb = now;
-  qti.override_impl_name = "OpenSSL/x.y.z";
+    qti.odcid.id_len = 1;
+    qti.odcid.id[0] = 0x55;
+    qti.title = "test title";
+    qti.description = "test description";
+    qti.group_id = "test group ID";
+    qti.override_process_id = 123;
+    qti.now_cb = now;
+    qti.override_impl_name = "OpenSSL/x.y.z";
 
-  if (!TEST_ptr(qlog = ossl_qlog_new(&qti)))
-    goto err;
+    if (!TEST_ptr(qlog = ossl_qlog_new(&qti)))
+        goto err;
 
-  if (!TEST_true(ossl_qlog_set_event_type_enabled(
-      qlog, QLOG_EVENT_TYPE_transport_packet_sent, 1)))
-    goto err;
+    if (!TEST_true(ossl_qlog_set_event_type_enabled(
+        qlog, QLOG_EVENT_TYPE_transport_packet_sent, 1)))
+        goto err;
 
-  if (!TEST_ptr(bio = BIO_new(BIO_s_mem())))
-    goto err;
+    if (!TEST_ptr(bio = BIO_new(BIO_s_mem())))
+        goto err;
 
-  if (!TEST_true(ossl_qlog_set_sink_bio(qlog, bio)))
-    goto err;
+    if (!TEST_true(ossl_qlog_set_sink_bio(qlog, bio)))
+        goto err;
 
-  QLOG_EVENT_BEGIN(qlog, transport, packet_sent)
-  QLOG_STR("field1", "foo");
-  QLOG_STR_LEN("field2", "bar", 3);
-  QLOG_I64("field3", 42);
-  QLOG_I64("field4", 1ULL << 60);
-  QLOG_U64("field5", UINT64_MAX);
-  QLOG_BOOL("field6", 0);
-  QLOG_BOOL("field7", 1);
-  QLOG_BIN("field8", bin_buf, sizeof(bin_buf));
-  QLOG_CID("field9", &qti.odcid);
-  QLOG_BEGIN("subgroup")
-  QLOG_STR("field10", "baz");
-  QLOG_END()
-  QLOG_BEGIN_ARRAY("array")
-  QLOG_STR(NULL, "a");
-  QLOG_STR(NULL, "b");
-  QLOG_END_ARRAY()
-  QLOG_EVENT_END()
+    QLOG_EVENT_BEGIN(qlog, transport, packet_sent)
+    QLOG_STR("field1", "foo");
+    QLOG_STR_LEN("field2", "bar", 3);
+    QLOG_I64("field3", 42);
+    QLOG_I64("field4", 1ULL << 60);
+    QLOG_U64("field5", UINT64_MAX);
+    QLOG_BOOL("field6", 0);
+    QLOG_BOOL("field7", 1);
+    QLOG_BIN("field8", bin_buf, sizeof(bin_buf));
+    QLOG_CID("field9", &qti.odcid);
+    QLOG_BEGIN("subgroup")
+    QLOG_STR("field10", "baz");
+    QLOG_END()
+    QLOG_BEGIN_ARRAY("array")
+    QLOG_STR(NULL, "a");
+    QLOG_STR(NULL, "b");
+    QLOG_END_ARRAY()
+    QLOG_EVENT_END()
 
-  /* not enabled */
-  QLOG_EVENT_BEGIN(qlog, transport, packet_received)
-  QLOG_STR("field1", "foo");
-  QLOG_EVENT_END()
+    /* not enabled */
+    QLOG_EVENT_BEGIN(qlog, transport, packet_received)
+    QLOG_STR("field1", "foo");
+    QLOG_EVENT_END()
 
-  /* test delta time calculation */
-  QLOG_EVENT_BEGIN(qlog, transport, packet_sent)
-  QLOG_STR("field1", "bar");
-  QLOG_EVENT_END()
+    /* test delta time calculation */
+    QLOG_EVENT_BEGIN(qlog, transport, packet_sent)
+    QLOG_STR("field1", "bar");
+    QLOG_EVENT_END()
 
-  if (!TEST_true(ossl_qlog_flush(qlog)))
-    goto err;
+    if (!TEST_true(ossl_qlog_flush(qlog)))
+        goto err;
 
-  buf_len = BIO_get_mem_data(bio, &buf);
-  if (!TEST_size_t_gt(buf_len, 0))
-    goto err;
+    buf_len = BIO_get_mem_data(bio, &buf);
+    if (!TEST_size_t_gt(buf_len, 0))
+        goto err;
 
-  if (!TEST_mem_eq(buf, buf_len, expected, sizeof(expected)))
-    goto err;
+    if (!TEST_mem_eq(buf, buf_len, expected, sizeof(expected)))
+        goto err;
 
-  testresult = 1;
+    testresult = 1;
 err:
-  ossl_qlog_free(qlog);
-  return testresult;
+    ossl_qlog_free(qlog);
+    return testresult;
 }
 
 struct filter_spec {
-  const char *filter;
-  int expect_ok;
-  uint32_t expect_event_type;
-  int expect_event_enable;
+    const char *filter;
+    int expect_ok;
+    uint32_t expect_event_type;
+    int expect_event_enable;
 };
 
 static const struct filter_spec filters[] = {
@@ -190,33 +190,34 @@ static const struct filter_spec filters[] = {
 };
 
 static int test_qlog_filter(int idx) {
-  int testresult = 0;
-  QLOG_TRACE_INFO qti = {0};
-  QLOG *qlog;
+    int testresult = 0;
+    QLOG_TRACE_INFO qti = {0};
+    QLOG *qlog;
 
-  qti.odcid.id_len = 1;
-  qti.odcid.id[0] = 0x55;
+    qti.odcid.id_len = 1;
+    qti.odcid.id[0] = 0x55;
 
-  if (!TEST_ptr(qlog = ossl_qlog_new(&qti)))
-    goto err;
+    if (!TEST_ptr(qlog = ossl_qlog_new(&qti)))
+        goto err;
 
-  if (!TEST_int_eq(ossl_qlog_set_filter(qlog, filters[idx].filter),
-                   filters[idx].expect_ok))
-    goto err;
+    if (!TEST_int_eq(ossl_qlog_set_filter(qlog, filters[idx].filter),
+                     filters[idx].expect_ok))
+        goto err;
 
-  if (filters[idx].expect_event_type != QLOG_EVENT_TYPE_NONE)
-    if (!TEST_int_eq(ossl_qlog_enabled(qlog, filters[idx].expect_event_type),
-                     filters[idx].expect_event_enable))
-      goto err;
+    if (filters[idx].expect_event_type != QLOG_EVENT_TYPE_NONE)
+        if (!TEST_int_eq(
+            ossl_qlog_enabled(qlog, filters[idx].expect_event_type),
+            filters[idx].expect_event_enable))
+            goto err;
 
-  testresult = 1;
+    testresult = 1;
 err:
-  ossl_qlog_free(qlog);
-  return testresult;
+    ossl_qlog_free(qlog);
+    return testresult;
 }
 
 int setup_tests(void) {
-  ADD_TEST(test_qlog);
-  ADD_ALL_TESTS(test_qlog_filter, OSSL_NELEM(filters));
-  return 1;
+    ADD_TEST(test_qlog);
+    ADD_ALL_TESTS(test_qlog_filter, OSSL_NELEM(filters));
+    return 1;
 }

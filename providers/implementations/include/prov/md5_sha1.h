@@ -22,8 +22,8 @@
 #define MD5_SHA1_CBLOCK MD5_CBLOCK
 
 typedef struct md5_sha1_st {
-  MD5_CTX md5;
-  SHA_CTX sha1;
+    MD5_CTX md5;
+    SHA_CTX sha1;
 } MD5_SHA1_CTX;
 
 int ossl_md5_sha1_init(MD5_SHA1_CTX *mctx);

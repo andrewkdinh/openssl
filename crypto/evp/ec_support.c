@@ -13,8 +13,8 @@
 #include "internal/nelem.h"
 
 typedef struct ec_name2nid_st {
-  const char *name;
-  int nid;
+    const char *name;
+    int nid;
 } EC_NAME2NID;
 
 static const EC_NAME2NID curve_list[] = {
@@ -116,33 +116,33 @@ static const EC_NAME2NID curve_list[] = {
 };
 
 const char *OSSL_EC_curve_nid2name(int nid) {
-  size_t i;
+    size_t i;
 
-  if (nid <= 0)
+    if (nid <= 0)
+        return NULL;
+
+    for (i = 0; i < OSSL_NELEM(curve_list); i++) {
+        if (curve_list[i].nid == nid)
+            return curve_list[i].name;
+    }
     return NULL;
-
-  for (i = 0; i < OSSL_NELEM(curve_list); i++) {
-    if (curve_list[i].nid == nid)
-      return curve_list[i].name;
-  }
-  return NULL;
 }
 
 int ossl_ec_curve_name2nid(const char *name) {
-  size_t i;
-  int nid;
+    size_t i;
+    int nid;
 
-  if (name != NULL) {
-    if ((nid = ossl_ec_curve_nist2nid_int(name)) != NID_undef)
-      return nid;
+    if (name != NULL) {
+        if ((nid = ossl_ec_curve_nist2nid_int(name)) != NID_undef)
+            return nid;
 
-    for (i = 0; i < OSSL_NELEM(curve_list); i++) {
-      if (OPENSSL_strcasecmp(curve_list[i].name, name) == 0)
-        return curve_list[i].nid;
+        for (i = 0; i < OSSL_NELEM(curve_list); i++) {
+            if (OPENSSL_strcasecmp(curve_list[i].name, name) == 0)
+                return curve_list[i].nid;
+        }
     }
-  }
 
-  return NID_undef;
+    return NID_undef;
 }
 
 /* Functions to translate between common NIST curve names and NIDs */
@@ -158,19 +158,19 @@ static const EC_NAME2NID nist_curves[] = {
 {"P-521", NID_secp521r1}};
 
 const char *ossl_ec_curve_nid2nist_int(int nid) {
-  size_t i;
-  for (i = 0; i < OSSL_NELEM(nist_curves); i++) {
-    if (nist_curves[i].nid == nid)
-      return nist_curves[i].name;
-  }
-  return NULL;
+    size_t i;
+    for (i = 0; i < OSSL_NELEM(nist_curves); i++) {
+        if (nist_curves[i].nid == nid)
+            return nist_curves[i].name;
+    }
+    return NULL;
 }
 
 int ossl_ec_curve_nist2nid_int(const char *name) {
-  size_t i;
-  for (i = 0; i < OSSL_NELEM(nist_curves); i++) {
-    if (strcmp(nist_curves[i].name, name) == 0)
-      return nist_curves[i].nid;
-  }
-  return NID_undef;
+    size_t i;
+    for (i = 0; i < OSSL_NELEM(nist_curves); i++) {
+        if (strcmp(nist_curves[i].name, name) == 0)
+            return nist_curves[i].nid;
+    }
+    return NID_undef;
 }

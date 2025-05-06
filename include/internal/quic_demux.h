@@ -87,66 +87,66 @@
 #define QUIC_MAX_PKT_PER_URXE (sizeof(uint64_t) * 8)
 
 struct quic_urxe_st {
-  OSSL_LIST_MEMBER(urxe, QUIC_URXE);
+    OSSL_LIST_MEMBER(urxe, QUIC_URXE);
 
-  /*
-   * The URXE data starts after this structure so we don't need a pointer.
-   * data_len stores the current length (i.e., the length of the received
-   * datagram) and alloc_len stores the allocation length. The URXE will be
-   * reallocated if we need a larger allocation than is available, though this
-   * should not be common as we will have a good idea of worst-case MTUs up
-   * front.
-   */
-  size_t data_len, alloc_len;
+    /*
+     * The URXE data starts after this structure so we don't need a pointer.
+     * data_len stores the current length (i.e., the length of the received
+     * datagram) and alloc_len stores the allocation length. The URXE will be
+     * reallocated if we need a larger allocation than is available, though this
+     * should not be common as we will have a good idea of worst-case MTUs up
+     * front.
+     */
+    size_t data_len, alloc_len;
 
-  /*
-   * Bitfields per packet. processed indicates the packet has been processed
-   * and must not be processed again, hpr_removed indicates header protection
-   * has already been removed. Used by QRX only; not used by the demuxer.
-   */
-  uint64_t processed, hpr_removed;
+    /*
+     * Bitfields per packet. processed indicates the packet has been processed
+     * and must not be processed again, hpr_removed indicates header protection
+     * has already been removed. Used by QRX only; not used by the demuxer.
+     */
+    uint64_t processed, hpr_removed;
 
-  /*
-   * This monotonically increases with each datagram received. It is used for
-   * diagnostic purposes only.
-   */
-  uint64_t datagram_id;
+    /*
+     * This monotonically increases with each datagram received. It is used for
+     * diagnostic purposes only.
+     */
+    uint64_t datagram_id;
 
-  /*
-   * Address of peer we received the datagram from, and the local interface
-   * address we received it on. If local address support is not enabled, local
-   * is zeroed.
-   */
-  BIO_ADDR peer, local;
+    /*
+     * Address of peer we received the datagram from, and the local interface
+     * address we received it on. If local address support is not enabled, local
+     * is zeroed.
+     */
+    BIO_ADDR peer, local;
 
-  /*
-   * Time at which datagram was received (or ossl_time_zero()) if a now
-   * function was not provided).
-   */
-  OSSL_TIME time;
+    /*
+     * Time at which datagram was received (or ossl_time_zero()) if a now
+     * function was not provided).
+     */
+    OSSL_TIME time;
 
-  /*
-   * Used by the QRX to mark whether a datagram has been deferred. Used by the
-   * QRX only; not used by the demuxer.
-   */
-  char deferred;
+    /*
+     * Used by the QRX to mark whether a datagram has been deferred. Used by the
+     * QRX only; not used by the demuxer.
+     */
+    char deferred;
 
-  /*
-   * Used by the DEMUX to track if a URXE has been handed out. Used primarily
-   * for debugging purposes.
-   */
-  char demux_state;
+    /*
+     * Used by the DEMUX to track if a URXE has been handed out. Used primarily
+     * for debugging purposes.
+     */
+    char demux_state;
 };
 
 /* Accessors for URXE buffer. */
 static ossl_unused ossl_inline unsigned char *
 ossl_quic_urxe_data(const QUIC_URXE *e) {
-  return (unsigned char *)&e[1];
+    return (unsigned char *)&e[1];
 }
 
 static ossl_unused ossl_inline unsigned char *
 ossl_quic_urxe_data_end(const QUIC_URXE *e) {
-  return ossl_quic_urxe_data(e) + e->data_len;
+    return ossl_quic_urxe_data(e) + e->data_len;
 }
 
 /* List structure tracking a queue of URXEs. */

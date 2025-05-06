@@ -16,8 +16,8 @@
 #include "testutil.h"
 
 static const struct puny_test {
-  unsigned int raw[50];
-  const char *encoded;
+    unsigned int raw[50];
+    const char *encoded;
 } puny_cases[] = {
 {/* Test of 4 byte codepoint using smileyface emoji */
  {0x1F600},
@@ -109,26 +109,26 @@ static const struct puny_test {
  "-> $1.00 <--"}};
 
 static int test_punycode(int n) {
-  const struct puny_test *tc = puny_cases + n;
-  unsigned int buffer[50];
-  unsigned int bsize = OSSL_NELEM(buffer);
-  size_t i;
+    const struct puny_test *tc = puny_cases + n;
+    unsigned int buffer[50];
+    unsigned int bsize = OSSL_NELEM(buffer);
+    size_t i;
 
-  if (!TEST_true(
-      ossl_punycode_decode(tc->encoded, strlen(tc->encoded), buffer, &bsize)))
-    return 0;
-  for (i = 0; i < OSSL_NELEM(tc->raw); i++)
-    if (tc->raw[i] == 0)
-      break;
-  if (!TEST_mem_eq(buffer, bsize * sizeof(*buffer), tc->raw,
-                   i * sizeof(*tc->raw)))
-    return 0;
-  return 1;
+    if (!TEST_true(
+        ossl_punycode_decode(tc->encoded, strlen(tc->encoded), buffer, &bsize)))
+        return 0;
+    for (i = 0; i < OSSL_NELEM(tc->raw); i++)
+        if (tc->raw[i] == 0)
+            break;
+    if (!TEST_mem_eq(buffer, bsize * sizeof(*buffer), tc->raw,
+                     i * sizeof(*tc->raw)))
+        return 0;
+    return 1;
 }
 
 static const struct bad_decode_test {
-  size_t outlen;
-  const char input[20];
+    size_t outlen;
+    const char input[20];
 } bad_decode_tests[] = {
 {20, "xn--e-*"},                             /* bad digit '*' */
 {10, "xn--e-999"},                           /* loop > enc_len */
@@ -138,111 +138,111 @@ static const struct bad_decode_test {
 };
 
 static int test_a2ulabel_bad_decode(int tst) {
-  char out[20];
+    char out[20];
 
-  return TEST_int_eq(
-  ossl_a2ulabel(bad_decode_tests[tst].input, out, bad_decode_tests[tst].outlen),
-  -1);
+    return TEST_int_eq(ossl_a2ulabel(bad_decode_tests[tst].input, out,
+                                     bad_decode_tests[tst].outlen),
+                       -1);
 }
 
 static int test_a2ulabel(void) {
-  char out[50];
-  char in[530] = {0};
+    char out[50];
+    char in[530] = {0};
 
-  /*
-   * The punycode being passed in and parsed is malformed but we're not
-   * verifying that behaviour here.
-   */
-  if (!TEST_int_eq(ossl_a2ulabel("xn--a.b.c", out, 1), 0) ||
-      !TEST_int_eq(ossl_a2ulabel("xn--a.b.c", out, 7), 1))
-    return 0;
-  /* Test for an off by one on the buffer size works */
-  if (!TEST_int_eq(ossl_a2ulabel("xn--a.b.c", out, 6), 0) ||
-      !TEST_int_eq(ossl_a2ulabel("xn--a.b.c", out, 7), 1) ||
-      !TEST_str_eq(out, "\xc2\x80.b.c"))
-    return 0;
+    /*
+     * The punycode being passed in and parsed is malformed but we're not
+     * verifying that behaviour here.
+     */
+    if (!TEST_int_eq(ossl_a2ulabel("xn--a.b.c", out, 1), 0) ||
+        !TEST_int_eq(ossl_a2ulabel("xn--a.b.c", out, 7), 1))
+        return 0;
+    /* Test for an off by one on the buffer size works */
+    if (!TEST_int_eq(ossl_a2ulabel("xn--a.b.c", out, 6), 0) ||
+        !TEST_int_eq(ossl_a2ulabel("xn--a.b.c", out, 7), 1) ||
+        !TEST_str_eq(out, "\xc2\x80.b.c"))
+        return 0;
 
-  /* Test 4 byte smiley face */
-  if (!TEST_int_eq(ossl_a2ulabel("xn--e28h.com", out, 10), 1))
-    return 0;
+    /* Test 4 byte smiley face */
+    if (!TEST_int_eq(ossl_a2ulabel("xn--e28h.com", out, 10), 1))
+        return 0;
 
-  /* Test that we dont overflow the fixed internal buffer of 512 bytes when the
-   * starting bytes are copied */
-  strcpy(in, "xn--");
-  memset(in + 4, 'e', 513);
-  memcpy(in + 517, "-3ya", 4);
-  if (!TEST_int_eq(ossl_a2ulabel(in, out, 50), -1))
-    return 0;
+    /* Test that we dont overflow the fixed internal buffer of 512 bytes when
+     * the starting bytes are copied */
+    strcpy(in, "xn--");
+    memset(in + 4, 'e', 513);
+    memcpy(in + 517, "-3ya", 4);
+    if (!TEST_int_eq(ossl_a2ulabel(in, out, 50), -1))
+        return 0;
 
-  return 1;
+    return 1;
 }
 
 static int test_puny_overrun(void) {
-  static const unsigned int out[] = {0x0033, 0x5E74, 0x0042, 0x7D44,
-                                     0x91D1, 0x516B, 0x5148, 0x751F};
-  static const char *in = "3B-ww4c5e180e575a65lsy2b";
-  unsigned int buf[OSSL_NELEM(out)];
-  unsigned int bsize = OSSL_NELEM(buf) - 1;
+    static const unsigned int out[] = {0x0033, 0x5E74, 0x0042, 0x7D44,
+                                       0x91D1, 0x516B, 0x5148, 0x751F};
+    static const char *in = "3B-ww4c5e180e575a65lsy2b";
+    unsigned int buf[OSSL_NELEM(out)];
+    unsigned int bsize = OSSL_NELEM(buf) - 1;
 
-  if (!TEST_false(ossl_punycode_decode(in, strlen(in), buf, &bsize))) {
-    if (TEST_mem_eq(buf, bsize * sizeof(*buf), out, sizeof(out)))
-      TEST_error("CRITICAL: buffer overrun detected!");
-    return 0;
-  }
-  return 1;
+    if (!TEST_false(ossl_punycode_decode(in, strlen(in), buf, &bsize))) {
+        if (TEST_mem_eq(buf, bsize * sizeof(*buf), out, sizeof(out)))
+            TEST_error("CRITICAL: buffer overrun detected!");
+        return 0;
+    }
+    return 1;
 }
 
 static int test_dotted_overflow(void) {
-  static const char string[] = "a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a";
-  const size_t num_reps = OSSL_NELEM(string) / 2;
-  WPACKET p;
-  BUF_MEM *in;
-  char *out = NULL;
-  size_t i;
-  int res = 0;
+    static const char string[] = "a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a";
+    const size_t num_reps = OSSL_NELEM(string) / 2;
+    WPACKET p;
+    BUF_MEM *in;
+    char *out = NULL;
+    size_t i;
+    int res = 0;
 
-  /* Create out input punycode string */
-  if (!TEST_ptr(in = BUF_MEM_new()))
-    return 0;
-  if (!TEST_true(WPACKET_init_len(&p, in, 0))) {
-    BUF_MEM_free(in);
-    return 0;
-  }
-  for (i = 0; i < num_reps; i++) {
-    if (i > 1 && !TEST_true(WPACKET_put_bytes_u8(&p, '.')))
-      goto err;
-    if (!TEST_true(WPACKET_memcpy(&p, "xn--a", sizeof("xn--a") - 1)))
-      goto err;
-  }
-  if (!TEST_true(WPACKET_put_bytes_u8(&p, '\0')))
-    goto err;
-  if (!TEST_ptr(out = OPENSSL_malloc(in->length)))
-    goto err;
+    /* Create out input punycode string */
+    if (!TEST_ptr(in = BUF_MEM_new()))
+        return 0;
+    if (!TEST_true(WPACKET_init_len(&p, in, 0))) {
+        BUF_MEM_free(in);
+        return 0;
+    }
+    for (i = 0; i < num_reps; i++) {
+        if (i > 1 && !TEST_true(WPACKET_put_bytes_u8(&p, '.')))
+            goto err;
+        if (!TEST_true(WPACKET_memcpy(&p, "xn--a", sizeof("xn--a") - 1)))
+            goto err;
+    }
+    if (!TEST_true(WPACKET_put_bytes_u8(&p, '\0')))
+        goto err;
+    if (!TEST_ptr(out = OPENSSL_malloc(in->length)))
+        goto err;
 
-  /* Test the decode into an undersized buffer */
-  memset(out, 0x7f, in->length - 1);
-  if (!TEST_int_le(ossl_a2ulabel(in->data, out, num_reps), 0) ||
-      !TEST_int_eq(out[num_reps], 0x7f))
-    goto err;
+    /* Test the decode into an undersized buffer */
+    memset(out, 0x7f, in->length - 1);
+    if (!TEST_int_le(ossl_a2ulabel(in->data, out, num_reps), 0) ||
+        !TEST_int_eq(out[num_reps], 0x7f))
+        goto err;
 
-  /* Test the decode works into a full size buffer */
-  if (!TEST_int_gt(ossl_a2ulabel(in->data, out, in->length), 0) ||
-      !TEST_size_t_eq(strlen(out), num_reps * 3))
-    goto err;
+    /* Test the decode works into a full size buffer */
+    if (!TEST_int_gt(ossl_a2ulabel(in->data, out, in->length), 0) ||
+        !TEST_size_t_eq(strlen(out), num_reps * 3))
+        goto err;
 
-  res = 1;
+    res = 1;
 err:
-  WPACKET_cleanup(&p);
-  BUF_MEM_free(in);
-  OPENSSL_free(out);
-  return res;
+    WPACKET_cleanup(&p);
+    BUF_MEM_free(in);
+    OPENSSL_free(out);
+    return res;
 }
 
 int setup_tests(void) {
-  ADD_ALL_TESTS(test_punycode, OSSL_NELEM(puny_cases));
-  ADD_TEST(test_dotted_overflow);
-  ADD_TEST(test_a2ulabel);
-  ADD_TEST(test_puny_overrun);
-  ADD_ALL_TESTS(test_a2ulabel_bad_decode, OSSL_NELEM(bad_decode_tests));
-  return 1;
+    ADD_ALL_TESTS(test_punycode, OSSL_NELEM(puny_cases));
+    ADD_TEST(test_dotted_overflow);
+    ADD_TEST(test_a2ulabel);
+    ADD_TEST(test_puny_overrun);
+    ADD_ALL_TESTS(test_a2ulabel_bad_decode, OSSL_NELEM(bad_decode_tests));
+    return 1;
 }

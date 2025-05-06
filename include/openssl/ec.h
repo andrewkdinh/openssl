@@ -76,14 +76,14 @@ int EVP_PKEY_CTX_get0_ecdh_kdf_ukm(EVP_PKEY_CTX *ctx, unsigned char **ukm);
 /** Enum for the point conversion form as defined in X9.62 (ECDSA)
  *  for the encoding of a elliptic curve point (x,y) */
 typedef enum {
-  /** the point is encoded as z||x, where the octet z specifies
-   *  which solution of the quadratic equation y is  */
-  POINT_CONVERSION_COMPRESSED = 2,
-  /** the point is encoded as z||x||y, where z is the octet 0x04  */
-  POINT_CONVERSION_UNCOMPRESSED = 4,
-  /** the point is encoded as z||x||y, where the octet z specifies
-   *  which solution of the quadratic equation y is  */
-  POINT_CONVERSION_HYBRID = 6
+    /** the point is encoded as z||x, where the octet z specifies
+     *  which solution of the quadratic equation y is  */
+    POINT_CONVERSION_COMPRESSED = 2,
+    /** the point is encoded as z||x||y, where z is the octet 0x04  */
+    POINT_CONVERSION_UNCOMPRESSED = 4,
+    /** the point is encoded as z||x||y, where the octet z specifies
+     *  which solution of the quadratic equation y is  */
+    POINT_CONVERSION_HYBRID = 6
 } point_conversion_form_t;
 
 const char *OSSL_EC_curve_nid2name(int nid);
@@ -531,8 +531,8 @@ ECPKPARAMETERS *EC_GROUP_get_ecpkparameters(const EC_GROUP *group,
 /********************************************************************/
 
 typedef struct {
-  int nid;
-  const char *comment;
+    int nid;
+    const char *comment;
 } EC_builtin_curve;
 
 /*
@@ -932,14 +932,14 @@ EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len);
 int i2d_ECPKParameters(const EC_GROUP *, unsigned char **out);
 
 #define d2i_ECPKParameters_bio(bp, x)                                          \
-  ASN1_d2i_bio_of(EC_GROUP, NULL, d2i_ECPKParameters, bp, x)
+    ASN1_d2i_bio_of(EC_GROUP, NULL, d2i_ECPKParameters, bp, x)
 #define i2d_ECPKParameters_bio(bp, x)                                          \
-  ASN1_i2d_bio_of(EC_GROUP, i2d_ECPKParameters, bp, x)
+    ASN1_i2d_bio_of(EC_GROUP, i2d_ECPKParameters, bp, x)
 #define d2i_ECPKParameters_fp(fp, x)                                           \
-  (EC_GROUP *)ASN1_d2i_fp(NULL, (d2i_of_void *)d2i_ECPKParameters, (fp),       \
-                          (void **)(x))
+    (EC_GROUP *)ASN1_d2i_fp(NULL, (d2i_of_void *)d2i_ECPKParameters, (fp),     \
+                            (void **)(x))
 #define i2d_ECPKParameters_fp(fp, x)                                           \
-  ASN1_i2d_fp((i2d_of_void *)i2d_ECPKParameters, (fp), (void *)(x))
+    ASN1_i2d_fp((i2d_of_void *)i2d_ECPKParameters, (fp), (void *)(x))
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 OSSL_DEPRECATEDIN_3_0 int ECPKParameters_print(BIO *bp, const EC_GROUP *x,
@@ -964,7 +964,7 @@ OSSL_DEPRECATEDIN_3_0 int ECPKParameters_print_fp(FILE *fp, const EC_GROUP *x,
 #define EC_FLAG_CHECK_NAMED_GROUP 0x2000
 #define EC_FLAG_CHECK_NAMED_GROUP_NIST 0x4000
 #define EC_FLAG_CHECK_NAMED_GROUP_MASK                                         \
-  (EC_FLAG_CHECK_NAMED_GROUP | EC_FLAG_CHECK_NAMED_GROUP_NIST)
+    (EC_FLAG_CHECK_NAMED_GROUP | EC_FLAG_CHECK_NAMED_GROUP_NIST)
 
 /* Deprecated flags -  it was using 0x01..0x02 */
 #define EC_FLAG_NON_FIPS_ALLOW 0x0000
@@ -1101,7 +1101,7 @@ OSSL_DEPRECATEDIN_3_0 void EC_KEY_set_conv_form(EC_KEY *eckey,
 #endif /*OPENSSL_NO_DEPRECATED_3_0 */
 
 #define EC_KEY_get_ex_new_index(l, p, newf, dupf, freef)                       \
-  CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_EC_KEY, l, p, newf, dupf, freef)
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_EC_KEY, l, p, newf, dupf, freef)
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 OSSL_DEPRECATEDIN_3_0 int EC_KEY_set_ex_data(EC_KEY *key, int idx, void *arg);
@@ -1550,10 +1550,10 @@ int (**pverify_sig)(const unsigned char *dgst, int dgst_len,
 #endif /* OPENSSL_NO_DEPRECATED_3_0 */
 
 #define EVP_EC_gen(curve)                                                      \
-  EVP_PKEY_Q_keygen(NULL, NULL, "EC", (char *)(strstr(curve, "")))
+    EVP_PKEY_Q_keygen(NULL, NULL, "EC", (char *)(strstr(curve, "")))
 /* strstr is used to enable type checking for the variadic string arg */
 #define ECParameters_dup(x)                                                    \
-  ASN1_dup_of(EC_KEY, i2d_ECParameters, d2i_ECParameters, x)
+    ASN1_dup_of(EC_KEY, i2d_ECParameters, d2i_ECParameters, x)
 
 #ifndef __cplusplus
 #if defined(__SUNPRO_C)

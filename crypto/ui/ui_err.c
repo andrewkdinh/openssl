@@ -38,8 +38,8 @@ static const ERR_STRING_DATA UI_str_reasons[] = {
 
 int ossl_err_load_UI_strings(void) {
 #ifndef OPENSSL_NO_ERR
-  if (ERR_reason_error_string(UI_str_reasons[0].error) == NULL)
-    ERR_load_strings_const(UI_str_reasons);
+    if (ERR_reason_error_string(UI_str_reasons[0].error) == NULL)
+        ERR_load_strings_const(UI_str_reasons);
 #endif
-  return 1;
+    return 1;
 }

@@ -33,7 +33,7 @@ typedef unsigned int RC2_INT;
 #define RC2_DECRYPT 0
 
 typedef struct rc2_key_st {
-  RC2_INT data[64];
+    RC2_INT data[64];
 } RC2_KEY;
 #endif
 #ifndef OPENSSL_NO_DEPRECATED_3_0

@@ -26,12 +26,12 @@ extern CRYPTO_RWLOCK *global_engine_lock;
  * *after* the change.
  */
 #define ENGINE_REF_PRINT(e, isfunct, diff)                                     \
-  OSSL_TRACE6(                                                                 \
-  ENGINE_REF_COUNT, "engine: %p %s from %d to %d (%s:%d)\n", (void *)(e),      \
-  (isfunct ? "funct" : "struct"),                                              \
-  ((isfunct) ? ((e)->funct_ref - (diff)) : (eng_struct_ref(e) - (diff))),      \
-  ((isfunct) ? (e)->funct_ref : eng_struct_ref(e)), (OPENSSL_FILE),            \
-  (OPENSSL_LINE))
+    OSSL_TRACE6(                                                               \
+    ENGINE_REF_COUNT, "engine: %p %s from %d to %d (%s:%d)\n", (void *)(e),    \
+    (isfunct ? "funct" : "struct"),                                            \
+    ((isfunct) ? ((e)->funct_ref - (diff)) : (eng_struct_ref(e) - (diff))),    \
+    ((isfunct) ? (e)->funct_ref : eng_struct_ref(e)), (OPENSSL_FILE),          \
+    (OPENSSL_LINE))
 
 /*
  * Any code that will need cleanup operations should use these functions to
@@ -41,7 +41,7 @@ extern CRYPTO_RWLOCK *global_engine_lock;
  */
 typedef void(ENGINE_CLEANUP_CB)(void);
 typedef struct st_engine_cleanup_item {
-  ENGINE_CLEANUP_CB *cb;
+    ENGINE_CLEANUP_CB *cb;
 } ENGINE_CLEANUP_ITEM;
 DEFINE_STACK_OF(ENGINE_CLEANUP_ITEM)
 int engine_cleanup_add_first(ENGINE_CLEANUP_CB *cb);
@@ -107,49 +107,49 @@ void engine_remove_dynamic_id(ENGINE *e, int not_locked);
  * algorithms and functions.
  */
 struct engine_st {
-  const char *id;
-  const char *name;
-  const RSA_METHOD *rsa_meth;
-  const DSA_METHOD *dsa_meth;
-  const DH_METHOD *dh_meth;
-  const EC_KEY_METHOD *ec_meth;
-  const RAND_METHOD *rand_meth;
-  /* Cipher handling is via this callback */
-  ENGINE_CIPHERS_PTR ciphers;
-  /* Digest handling is via this callback */
-  ENGINE_DIGESTS_PTR digests;
-  /* Public key handling via this callback */
-  ENGINE_PKEY_METHS_PTR pkey_meths;
-  /* ASN1 public key handling via this callback */
-  ENGINE_PKEY_ASN1_METHS_PTR pkey_asn1_meths;
-  ENGINE_GEN_INT_FUNC_PTR destroy;
-  ENGINE_GEN_INT_FUNC_PTR init;
-  ENGINE_GEN_INT_FUNC_PTR finish;
-  ENGINE_CTRL_FUNC_PTR ctrl;
-  ENGINE_LOAD_KEY_PTR load_privkey;
-  ENGINE_LOAD_KEY_PTR load_pubkey;
-  ENGINE_SSL_CLIENT_CERT_PTR load_ssl_client_cert;
-  const ENGINE_CMD_DEFN *cmd_defns;
-  int flags;
-  /* reference count on the structure itself */
-  CRYPTO_REF_COUNT struct_ref;
-  /*
-   * reference count on usability of the engine type. NB: This controls the
-   * loading and initialisation of any functionality required by this
-   * engine, whereas the previous count is simply to cope with
-   * (de)allocation of this structure. Hence, running_ref <= struct_ref at
-   * all times.
-   */
-  int funct_ref;
-  /* A place to store per-ENGINE data */
-  CRYPTO_EX_DATA ex_data;
-  /* Used to maintain the linked-list of engines. */
-  struct engine_st *prev;
-  struct engine_st *next;
-  /* Used to maintain the linked-list of dynamic engines. */
-  struct engine_st *prev_dyn;
-  struct engine_st *next_dyn;
-  ENGINE_DYNAMIC_ID dynamic_id;
+    const char *id;
+    const char *name;
+    const RSA_METHOD *rsa_meth;
+    const DSA_METHOD *dsa_meth;
+    const DH_METHOD *dh_meth;
+    const EC_KEY_METHOD *ec_meth;
+    const RAND_METHOD *rand_meth;
+    /* Cipher handling is via this callback */
+    ENGINE_CIPHERS_PTR ciphers;
+    /* Digest handling is via this callback */
+    ENGINE_DIGESTS_PTR digests;
+    /* Public key handling via this callback */
+    ENGINE_PKEY_METHS_PTR pkey_meths;
+    /* ASN1 public key handling via this callback */
+    ENGINE_PKEY_ASN1_METHS_PTR pkey_asn1_meths;
+    ENGINE_GEN_INT_FUNC_PTR destroy;
+    ENGINE_GEN_INT_FUNC_PTR init;
+    ENGINE_GEN_INT_FUNC_PTR finish;
+    ENGINE_CTRL_FUNC_PTR ctrl;
+    ENGINE_LOAD_KEY_PTR load_privkey;
+    ENGINE_LOAD_KEY_PTR load_pubkey;
+    ENGINE_SSL_CLIENT_CERT_PTR load_ssl_client_cert;
+    const ENGINE_CMD_DEFN *cmd_defns;
+    int flags;
+    /* reference count on the structure itself */
+    CRYPTO_REF_COUNT struct_ref;
+    /*
+     * reference count on usability of the engine type. NB: This controls the
+     * loading and initialisation of any functionality required by this
+     * engine, whereas the previous count is simply to cope with
+     * (de)allocation of this structure. Hence, running_ref <= struct_ref at
+     * all times.
+     */
+    int funct_ref;
+    /* A place to store per-ENGINE data */
+    CRYPTO_EX_DATA ex_data;
+    /* Used to maintain the linked-list of engines. */
+    struct engine_st *prev;
+    struct engine_st *next;
+    /* Used to maintain the linked-list of dynamic engines. */
+    struct engine_st *prev_dyn;
+    struct engine_st *next_dyn;
+    ENGINE_DYNAMIC_ID dynamic_id;
 };
 
 typedef struct st_engine_pile ENGINE_PILE;
@@ -157,10 +157,10 @@ typedef struct st_engine_pile ENGINE_PILE;
 DEFINE_LHASH_OF_EX(ENGINE_PILE);
 
 static ossl_unused ossl_inline int eng_struct_ref(ENGINE *e) {
-  int res;
+    int res;
 
-  CRYPTO_GET_REF(&e->struct_ref, &res);
-  return res;
+    CRYPTO_GET_REF(&e->struct_ref, &res);
+    return res;
 }
 
 #endif /* OSSL_CRYPTO_ENGINE_ENG_LOCAL_H */

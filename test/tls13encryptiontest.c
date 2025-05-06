@@ -22,15 +22,15 @@
  */
 
 typedef struct {
-  /*
-   * We split these into 3 chunks in order to work around the 509 character
-   * limit that the standard specifies for string literals
-   */
-  const char *plaintext[3];
-  const char *ciphertext[3];
-  const char *key;
-  const char *iv;
-  const char *seq;
+    /*
+     * We split these into 3 chunks in order to work around the 509 character
+     * limit that the standard specifies for string literals
+     */
+    const char *plaintext[3];
+    const char *ciphertext[3];
+    const char *key;
+    const char *iv;
+    const char *seq;
 } RECORD_DATA;
 
 /*
@@ -168,194 +168,196 @@ static RECORD_DATA refdata[] = {
  * 3 chunks
  */
 static unsigned char *multihexstr2buf(const char *str[3], size_t *len) {
-  size_t outer, inner, curr = 0;
-  unsigned char *outbuf;
-  size_t totlen = 0;
+    size_t outer, inner, curr = 0;
+    unsigned char *outbuf;
+    size_t totlen = 0;
 
-  /* Check lengths of all input strings are even */
-  for (outer = 0; outer < 3; outer++) {
-    totlen += strlen(str[outer]);
-    if ((totlen & 1) != 0)
-      return NULL;
-  }
-
-  totlen /= 2;
-  outbuf = OPENSSL_malloc(totlen);
-  if (outbuf == NULL)
-    return NULL;
-
-  for (outer = 0; outer < 3; outer++) {
-    for (inner = 0; str[outer][inner] != 0; inner += 2) {
-      int hi, lo;
-
-      hi = OPENSSL_hexchar2int(str[outer][inner]);
-      lo = OPENSSL_hexchar2int(str[outer][inner + 1]);
-
-      if (hi < 0 || lo < 0) {
-        OPENSSL_free(outbuf);
-        return NULL;
-      }
-      outbuf[curr++] = (hi << 4) | lo;
+    /* Check lengths of all input strings are even */
+    for (outer = 0; outer < 3; outer++) {
+        totlen += strlen(str[outer]);
+        if ((totlen & 1) != 0)
+            return NULL;
     }
-  }
 
-  *len = totlen;
-  return outbuf;
+    totlen /= 2;
+    outbuf = OPENSSL_malloc(totlen);
+    if (outbuf == NULL)
+        return NULL;
+
+    for (outer = 0; outer < 3; outer++) {
+        for (inner = 0; str[outer][inner] != 0; inner += 2) {
+            int hi, lo;
+
+            hi = OPENSSL_hexchar2int(str[outer][inner]);
+            lo = OPENSSL_hexchar2int(str[outer][inner + 1]);
+
+            if (hi < 0 || lo < 0) {
+                OPENSSL_free(outbuf);
+                return NULL;
+            }
+            outbuf[curr++] = (hi << 4) | lo;
+        }
+    }
+
+    *len = totlen;
+    return outbuf;
 }
 
 static int load_record(TLS_RL_RECORD *rec, RECORD_DATA *recd,
                        unsigned char **key, unsigned char *iv, size_t ivlen,
                        unsigned char *seq) {
-  unsigned char *pt = NULL, *sq = NULL, *ivtmp = NULL;
-  size_t ptlen;
+    unsigned char *pt = NULL, *sq = NULL, *ivtmp = NULL;
+    size_t ptlen;
 
-  *key = OPENSSL_hexstr2buf(recd->key, NULL);
-  ivtmp = OPENSSL_hexstr2buf(recd->iv, NULL);
-  sq = OPENSSL_hexstr2buf(recd->seq, NULL);
-  pt = multihexstr2buf(recd->plaintext, &ptlen);
+    *key = OPENSSL_hexstr2buf(recd->key, NULL);
+    ivtmp = OPENSSL_hexstr2buf(recd->iv, NULL);
+    sq = OPENSSL_hexstr2buf(recd->seq, NULL);
+    pt = multihexstr2buf(recd->plaintext, &ptlen);
 
-  if (*key == NULL || ivtmp == NULL || sq == NULL || pt == NULL)
-    goto err;
+    if (*key == NULL || ivtmp == NULL || sq == NULL || pt == NULL)
+        goto err;
 
-  rec->data = rec->input = OPENSSL_malloc(ptlen + EVP_GCM_TLS_TAG_LEN);
+    rec->data = rec->input = OPENSSL_malloc(ptlen + EVP_GCM_TLS_TAG_LEN);
 
-  if (rec->data == NULL)
-    goto err;
+    if (rec->data == NULL)
+        goto err;
 
-  rec->length = ptlen;
-  memcpy(rec->data, pt, ptlen);
-  OPENSSL_free(pt);
-  memcpy(seq, sq, SEQ_NUM_SIZE);
-  OPENSSL_free(sq);
-  memcpy(iv, ivtmp, ivlen);
-  OPENSSL_free(ivtmp);
+    rec->length = ptlen;
+    memcpy(rec->data, pt, ptlen);
+    OPENSSL_free(pt);
+    memcpy(seq, sq, SEQ_NUM_SIZE);
+    OPENSSL_free(sq);
+    memcpy(iv, ivtmp, ivlen);
+    OPENSSL_free(ivtmp);
 
-  return 1;
+    return 1;
 err:
-  OPENSSL_free(*key);
-  *key = NULL;
-  OPENSSL_free(ivtmp);
-  OPENSSL_free(sq);
-  OPENSSL_free(pt);
-  return 0;
+    OPENSSL_free(*key);
+    *key = NULL;
+    OPENSSL_free(ivtmp);
+    OPENSSL_free(sq);
+    OPENSSL_free(pt);
+    return 0;
 }
 
 static int test_record(TLS_RL_RECORD *rec, RECORD_DATA *recd, int enc) {
-  int ret = 0;
-  unsigned char *refd;
-  size_t refdatalen = 0;
+    int ret = 0;
+    unsigned char *refd;
+    size_t refdatalen = 0;
 
-  if (enc)
-    refd = multihexstr2buf(recd->ciphertext, &refdatalen);
-  else
-    refd = multihexstr2buf(recd->plaintext, &refdatalen);
+    if (enc)
+        refd = multihexstr2buf(recd->ciphertext, &refdatalen);
+    else
+        refd = multihexstr2buf(recd->plaintext, &refdatalen);
 
-  if (!TEST_ptr(refd)) {
-    TEST_info("Failed to get reference data");
-    goto err;
-  }
+    if (!TEST_ptr(refd)) {
+        TEST_info("Failed to get reference data");
+        goto err;
+    }
 
-  if (!TEST_mem_eq(rec->data, rec->length, refd, refdatalen))
-    goto err;
+    if (!TEST_mem_eq(rec->data, rec->length, refd, refdatalen))
+        goto err;
 
-  ret = 1;
+    ret = 1;
 
 err:
-  OPENSSL_free(refd);
-  return ret;
+    OPENSSL_free(refd);
+    return ret;
 }
 
 #define TLS13_AES_128_GCM_SHA256_BYTES ((const unsigned char *)"\x13\x01")
 
 static int test_tls13_encryption(void) {
-  TLS_RL_RECORD rec;
-  unsigned char *key = NULL;
-  const EVP_CIPHER *ciph = EVP_aes_128_gcm();
-  int ret = 0;
-  size_t ivlen, ctr;
-  unsigned char seqbuf[SEQ_NUM_SIZE];
-  unsigned char iv[EVP_MAX_IV_LENGTH];
-  OSSL_RECORD_LAYER *rrl = NULL, *wrl = NULL;
+    TLS_RL_RECORD rec;
+    unsigned char *key = NULL;
+    const EVP_CIPHER *ciph = EVP_aes_128_gcm();
+    int ret = 0;
+    size_t ivlen, ctr;
+    unsigned char seqbuf[SEQ_NUM_SIZE];
+    unsigned char iv[EVP_MAX_IV_LENGTH];
+    OSSL_RECORD_LAYER *rrl = NULL, *wrl = NULL;
 
-  /*
-   * Encrypted TLSv1.3 records always have an outer content type of
-   * application data, and a record version of TLSv1.2.
-   */
-  rec.data = NULL;
-  rec.type = SSL3_RT_APPLICATION_DATA;
-  rec.rec_version = TLS1_2_VERSION;
-
-  for (ctr = 0; ctr < OSSL_NELEM(refdata); ctr++) {
-    /* Load the record */
-    ivlen = EVP_CIPHER_get_iv_length(ciph);
-    if (!load_record(&rec, &refdata[ctr], &key, iv, ivlen, seqbuf)) {
-      TEST_error("Failed loading key into EVP_CIPHER_CTX");
-      goto err;
-    }
-
-    /* Set up the write record layer */
-    if (!TEST_true(ossl_tls_record_method.new_record_layer(
-        NULL, NULL, TLS1_3_VERSION, OSSL_RECORD_ROLE_SERVER,
-        OSSL_RECORD_DIRECTION_WRITE, OSSL_RECORD_PROTECTION_LEVEL_APPLICATION,
-        0, NULL, 0, key, 16, iv, ivlen, NULL, 0, EVP_aes_128_gcm(),
-        EVP_GCM_TLS_TAG_LEN, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL, NULL, &wrl)))
-      goto err;
-    memcpy(wrl->sequence, seqbuf, sizeof(seqbuf));
-
-    /* Encrypt it */
-    if (!TEST_size_t_eq(wrl->funcs->cipher(wrl, &rec, 1, 1, NULL, 0), 1)) {
-      TEST_info("Failed to encrypt record %zu", ctr);
-      goto err;
-    }
-
-    if (!TEST_true(test_record(&rec, &refdata[ctr], 1))) {
-      TEST_info("Record %zu encryption test failed", ctr);
-      goto err;
-    }
-
-    /* Set up the read record layer */
-    if (!TEST_true(ossl_tls_record_method.new_record_layer(
-        NULL, NULL, TLS1_3_VERSION, OSSL_RECORD_ROLE_SERVER,
-        OSSL_RECORD_DIRECTION_READ, OSSL_RECORD_PROTECTION_LEVEL_APPLICATION, 0,
-        NULL, 0, key, 16, iv, ivlen, NULL, 0, EVP_aes_128_gcm(),
-        EVP_GCM_TLS_TAG_LEN, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL, NULL, &rrl)))
-      goto err;
-    memcpy(rrl->sequence, seqbuf, sizeof(seqbuf));
-
-    /* Decrypt it */
-    if (!TEST_int_eq(rrl->funcs->cipher(rrl, &rec, 1, 0, NULL, 0), 1)) {
-      TEST_info("Failed to decrypt record %zu", ctr);
-      goto err;
-    }
-
-    if (!TEST_true(test_record(&rec, &refdata[ctr], 0))) {
-      TEST_info("Record %zu decryption test failed", ctr);
-      goto err;
-    }
-
-    ossl_tls_record_method.free(rrl);
-    ossl_tls_record_method.free(wrl);
-    rrl = wrl = NULL;
-    OPENSSL_free(rec.data);
-    OPENSSL_free(key);
+    /*
+     * Encrypted TLSv1.3 records always have an outer content type of
+     * application data, and a record version of TLSv1.2.
+     */
     rec.data = NULL;
-    key = NULL;
-  }
+    rec.type = SSL3_RT_APPLICATION_DATA;
+    rec.rec_version = TLS1_2_VERSION;
 
-  TEST_note("PASS: %zu records tested", ctr);
-  ret = 1;
+    for (ctr = 0; ctr < OSSL_NELEM(refdata); ctr++) {
+        /* Load the record */
+        ivlen = EVP_CIPHER_get_iv_length(ciph);
+        if (!load_record(&rec, &refdata[ctr], &key, iv, ivlen, seqbuf)) {
+            TEST_error("Failed loading key into EVP_CIPHER_CTX");
+            goto err;
+        }
+
+        /* Set up the write record layer */
+        if (!TEST_true(ossl_tls_record_method.new_record_layer(
+            NULL, NULL, TLS1_3_VERSION, OSSL_RECORD_ROLE_SERVER,
+            OSSL_RECORD_DIRECTION_WRITE,
+            OSSL_RECORD_PROTECTION_LEVEL_APPLICATION, 0, NULL, 0, key, 16, iv,
+            ivlen, NULL, 0, EVP_aes_128_gcm(), EVP_GCM_TLS_TAG_LEN, 0, NULL,
+            NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+            NULL, &wrl)))
+            goto err;
+        memcpy(wrl->sequence, seqbuf, sizeof(seqbuf));
+
+        /* Encrypt it */
+        if (!TEST_size_t_eq(wrl->funcs->cipher(wrl, &rec, 1, 1, NULL, 0), 1)) {
+            TEST_info("Failed to encrypt record %zu", ctr);
+            goto err;
+        }
+
+        if (!TEST_true(test_record(&rec, &refdata[ctr], 1))) {
+            TEST_info("Record %zu encryption test failed", ctr);
+            goto err;
+        }
+
+        /* Set up the read record layer */
+        if (!TEST_true(ossl_tls_record_method.new_record_layer(
+            NULL, NULL, TLS1_3_VERSION, OSSL_RECORD_ROLE_SERVER,
+            OSSL_RECORD_DIRECTION_READ,
+            OSSL_RECORD_PROTECTION_LEVEL_APPLICATION, 0, NULL, 0, key, 16, iv,
+            ivlen, NULL, 0, EVP_aes_128_gcm(), EVP_GCM_TLS_TAG_LEN, 0, NULL,
+            NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+            NULL, &rrl)))
+            goto err;
+        memcpy(rrl->sequence, seqbuf, sizeof(seqbuf));
+
+        /* Decrypt it */
+        if (!TEST_int_eq(rrl->funcs->cipher(rrl, &rec, 1, 0, NULL, 0), 1)) {
+            TEST_info("Failed to decrypt record %zu", ctr);
+            goto err;
+        }
+
+        if (!TEST_true(test_record(&rec, &refdata[ctr], 0))) {
+            TEST_info("Record %zu decryption test failed", ctr);
+            goto err;
+        }
+
+        ossl_tls_record_method.free(rrl);
+        ossl_tls_record_method.free(wrl);
+        rrl = wrl = NULL;
+        OPENSSL_free(rec.data);
+        OPENSSL_free(key);
+        rec.data = NULL;
+        key = NULL;
+    }
+
+    TEST_note("PASS: %zu records tested", ctr);
+    ret = 1;
 
 err:
-  ossl_tls_record_method.free(rrl);
-  ossl_tls_record_method.free(wrl);
-  OPENSSL_free(rec.data);
-  OPENSSL_free(key);
-  return ret;
+    ossl_tls_record_method.free(rrl);
+    ossl_tls_record_method.free(wrl);
+    OPENSSL_free(rec.data);
+    OPENSSL_free(key);
+    return ret;
 }
 
 int setup_tests(void) {
-  ADD_TEST(test_tls13_encryption);
-  return 1;
+    ADD_TEST(test_tls13_encryption);
+    return 1;
 }

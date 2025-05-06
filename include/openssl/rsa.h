@@ -255,7 +255,7 @@ OSSL_DEPRECATEDIN_3_0 ENGINE *RSA_get0_engine(const RSA *r);
 #endif /* !OPENSSL_NO_DEPRECATED_3_0 */
 
 #define EVP_RSA_gen(bits)                                                      \
-  EVP_PKEY_Q_keygen(NULL, NULL, "RSA", (size_t)(0 + (bits)))
+    EVP_PKEY_Q_keygen(NULL, NULL, "RSA", (size_t)(0 + (bits)))
 
 /* Deprecated version */
 #ifndef OPENSSL_NO_DEPRECATED_0_9_8
@@ -319,23 +319,23 @@ DECLARE_ASN1_ENCODE_FUNCTIONS_name_attr(OSSL_DEPRECATEDIN_3_0, RSA,
 int RSA_pkey_ctx_ctrl(EVP_PKEY_CTX *ctx, int optype, int cmd, int p1, void *p2);
 
 struct rsa_pss_params_st {
-  X509_ALGOR *hashAlgorithm;
-  X509_ALGOR *maskGenAlgorithm;
-  ASN1_INTEGER *saltLength;
-  ASN1_INTEGER *trailerField;
-  /* Decoded hash algorithm from maskGenAlgorithm */
-  X509_ALGOR *maskHash;
+    X509_ALGOR *hashAlgorithm;
+    X509_ALGOR *maskGenAlgorithm;
+    ASN1_INTEGER *saltLength;
+    ASN1_INTEGER *trailerField;
+    /* Decoded hash algorithm from maskGenAlgorithm */
+    X509_ALGOR *maskHash;
 };
 
 DECLARE_ASN1_FUNCTIONS(RSA_PSS_PARAMS)
 DECLARE_ASN1_DUP_FUNCTION(RSA_PSS_PARAMS)
 
 typedef struct rsa_oaep_params_st {
-  X509_ALGOR *hashFunc;
-  X509_ALGOR *maskGenFunc;
-  X509_ALGOR *pSourceFunc;
-  /* Decoded hash algorithm from maskGenFunc */
-  X509_ALGOR *maskHash;
+    X509_ALGOR *hashFunc;
+    X509_ALGOR *maskGenFunc;
+    X509_ALGOR *pSourceFunc;
+    /* Decoded hash algorithm from maskGenFunc */
+    X509_ALGOR *maskHash;
 } RSA_OAEP_PARAMS;
 
 DECLARE_ASN1_FUNCTIONS(RSA_OAEP_PARAMS)
@@ -442,7 +442,7 @@ int RSA_padding_add_PKCS1_PSS_mgf1(RSA *rsa, unsigned char *EM,
                                    int sLen);
 
 #define RSA_get_ex_new_index(l, p, newf, dupf, freef)                          \
-  CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_RSA, l, p, newf, dupf, freef)
+    CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_RSA, l, p, newf, dupf, freef)
 OSSL_DEPRECATEDIN_3_0 int RSA_set_ex_data(RSA *r, int idx, void *arg);
 OSSL_DEPRECATEDIN_3_0 void *RSA_get_ex_data(const RSA *r, int idx);
 

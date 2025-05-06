@@ -92,9 +92,9 @@ int set_crl_nextupdate(X509_CRL *crl, const char *nextupdate, long days,
                        long hours, long secs);
 
 typedef struct args_st {
-  int size;
-  int argc;
-  char **argv;
+    int size;
+    int argc;
+    char **argv;
 } ARGS;
 
 /* We need both wrap and the "real" function because libcrypto uses both. */
@@ -213,14 +213,14 @@ int unpack_revinfo(ASN1_TIME **prevtm, int *preason, ASN1_OBJECT **phold,
 #define DB_TYPE_SUSP 'S' /* Suspended  */
 
 typedef struct db_attr_st {
-  int unique_subject;
+    int unique_subject;
 } DB_ATTR;
 typedef struct ca_db_st {
-  DB_ATTR attributes;
-  TXT_DB *db;
-  char *dbfname;
+    DB_ATTR attributes;
+    TXT_DB *db;
+    char *dbfname;
 #ifndef OPENSSL_NO_POSIX_IO
-  struct stat dbst;
+    struct stat dbst;
 #endif
 } CA_DB;
 
@@ -245,8 +245,8 @@ int rotate_index(const char *dbfile, const char *new_suffix,
                  const char *old_suffix);
 void free_index(CA_DB *db);
 #define index_name_cmp_noconst(a, b)                                           \
-  index_name_cmp((const OPENSSL_CSTRING *)CHECKED_PTR_OF(OPENSSL_STRING, a),   \
-                 (const OPENSSL_CSTRING *)CHECKED_PTR_OF(OPENSSL_STRING, b))
+    index_name_cmp((const OPENSSL_CSTRING *)CHECKED_PTR_OF(OPENSSL_STRING, a), \
+                   (const OPENSSL_CSTRING *)CHECKED_PTR_OF(OPENSSL_STRING, b))
 int index_name_cmp(const OPENSSL_CSTRING *a, const OPENSSL_CSTRING *b);
 int parse_yesno(const char *str, int def);
 
@@ -281,11 +281,11 @@ int check_cert_attributes(BIO *bio, X509 *x, const char *checkhost,
 void store_setup_crl_download(X509_STORE *st);
 
 typedef struct app_http_tls_info_st {
-  const char *server;
-  const char *port;
-  int use_proxy;
-  long timeout;
-  SSL_CTX *ssl_ctx;
+    const char *server;
+    const char *port;
+    int use_proxy;
+    long timeout;
+    SSL_CTX *ssl_ctx;
 } APP_HTTP_TLS_INFO;
 BIO *app_http_tls_cb(BIO *hbio, /* APP_HTTP_TLS_INFO */ void *arg, int connect,
                      int detail);
@@ -332,10 +332,10 @@ double app_tminterval(int stop, int usertime);
 void make_uppercase(char *string);
 
 typedef struct verify_options_st {
-  int depth;
-  int quiet;
-  int error;
-  int return_error;
+    int depth;
+    int quiet;
+    int error;
+    int return_error;
 } VERIFY_CB_ARGS;
 
 extern VERIFY_CB_ARGS verify_args;

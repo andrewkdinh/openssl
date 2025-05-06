@@ -15,20 +15,20 @@
 #include <openssl/bio.h>
 
 struct bio_method_st {
-  int type;
-  char *name;
-  int (*bwrite)(BIO *, const char *, size_t, size_t *);
-  int (*bwrite_old)(BIO *, const char *, int);
-  int (*bread)(BIO *, char *, size_t, size_t *);
-  int (*bread_old)(BIO *, char *, int);
-  int (*bputs)(BIO *, const char *);
-  int (*bgets)(BIO *, char *, int);
-  long (*ctrl)(BIO *, int, long, void *);
-  int (*create)(BIO *);
-  int (*destroy)(BIO *);
-  long (*callback_ctrl)(BIO *, int, BIO_info_cb *);
-  int (*bsendmmsg)(BIO *, BIO_MSG *, size_t, size_t, uint64_t, size_t *);
-  int (*brecvmmsg)(BIO *, BIO_MSG *, size_t, size_t, uint64_t, size_t *);
+    int type;
+    char *name;
+    int (*bwrite)(BIO *, const char *, size_t, size_t *);
+    int (*bwrite_old)(BIO *, const char *, int);
+    int (*bread)(BIO *, char *, size_t, size_t *);
+    int (*bread_old)(BIO *, char *, int);
+    int (*bputs)(BIO *, const char *);
+    int (*bgets)(BIO *, char *, int);
+    long (*ctrl)(BIO *, int, long, void *);
+    int (*create)(BIO *);
+    int (*destroy)(BIO *);
+    long (*callback_ctrl)(BIO *, int, BIO_info_cb *);
+    int (*bsendmmsg)(BIO *, BIO_MSG *, size_t, size_t, uint64_t, size_t *);
+    int (*brecvmmsg)(BIO *, BIO_MSG *, size_t, size_t, uint64_t, size_t *);
 };
 
 void bio_free_ex_data(BIO *bio);
@@ -59,26 +59,26 @@ int bread_conv(BIO *bio, char *data, size_t datal, size_t *read);
 
 /* KTLS related controls and flags */
 #define BIO_set_ktls_flag(b, is_tx)                                            \
-  BIO_set_flags(b, (is_tx) ? BIO_FLAGS_KTLS_TX : BIO_FLAGS_KTLS_RX)
+    BIO_set_flags(b, (is_tx) ? BIO_FLAGS_KTLS_TX : BIO_FLAGS_KTLS_RX)
 #define BIO_should_ktls_flag(b, is_tx)                                         \
-  BIO_test_flags(b, (is_tx) ? BIO_FLAGS_KTLS_TX : BIO_FLAGS_KTLS_RX)
+    BIO_test_flags(b, (is_tx) ? BIO_FLAGS_KTLS_TX : BIO_FLAGS_KTLS_RX)
 #define BIO_set_ktls_ctrl_msg_flag(b)                                          \
-  BIO_set_flags(b, BIO_FLAGS_KTLS_TX_CTRL_MSG)
+    BIO_set_flags(b, BIO_FLAGS_KTLS_TX_CTRL_MSG)
 #define BIO_should_ktls_ctrl_msg_flag(b)                                       \
-  BIO_test_flags(b, BIO_FLAGS_KTLS_TX_CTRL_MSG)
+    BIO_test_flags(b, BIO_FLAGS_KTLS_TX_CTRL_MSG)
 #define BIO_clear_ktls_ctrl_msg_flag(b)                                        \
-  BIO_clear_flags(b, BIO_FLAGS_KTLS_TX_CTRL_MSG)
+    BIO_clear_flags(b, BIO_FLAGS_KTLS_TX_CTRL_MSG)
 #define BIO_set_ktls_zerocopy_sendfile_flag(b)                                 \
-  BIO_set_flags(b, BIO_FLAGS_KTLS_TX_ZEROCOPY_SENDFILE)
+    BIO_set_flags(b, BIO_FLAGS_KTLS_TX_ZEROCOPY_SENDFILE)
 
 #define BIO_set_ktls(b, keyblob, is_tx)                                        \
-  BIO_ctrl(b, BIO_CTRL_SET_KTLS, is_tx, keyblob)
+    BIO_ctrl(b, BIO_CTRL_SET_KTLS, is_tx, keyblob)
 #define BIO_set_ktls_ctrl_msg(b, record_type)                                  \
-  BIO_ctrl(b, BIO_CTRL_SET_KTLS_TX_SEND_CTRL_MSG, record_type, NULL)
+    BIO_ctrl(b, BIO_CTRL_SET_KTLS_TX_SEND_CTRL_MSG, record_type, NULL)
 #define BIO_clear_ktls_ctrl_msg(b)                                             \
-  BIO_ctrl(b, BIO_CTRL_CLEAR_KTLS_TX_CTRL_MSG, 0, NULL)
+    BIO_ctrl(b, BIO_CTRL_CLEAR_KTLS_TX_CTRL_MSG, 0, NULL)
 #define BIO_set_ktls_tx_zerocopy_sendfile(b)                                   \
-  BIO_ctrl(b, BIO_CTRL_SET_KTLS_TX_ZEROCOPY_SENDFILE, 0, NULL)
+    BIO_ctrl(b, BIO_CTRL_SET_KTLS_TX_ZEROCOPY_SENDFILE, 0, NULL)
 
 /* Functions to allow the core to offer the CORE_BIO type to providers */
 OSSL_CORE_BIO *ossl_core_bio_new_from_bio(BIO *bio);

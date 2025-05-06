@@ -53,11 +53,11 @@ typedef void (*OSSL_FUNC)(void);
  * not use this or assume its existence.
  */
 #define OSSL_CORE_MAKE_FUNC(type, name, args)                                  \
-  typedef type(OSSL_FUNC_##name##_fn) args;                                    \
-  static ossl_unused ossl_inline OSSL_FUNC_##name##_fn *OSSL_FUNC_##name(      \
-  const OSSL_DISPATCH *opf) {                                                  \
-    return (OSSL_FUNC_##name##_fn *)opf->function;                             \
-  }
+    typedef type(OSSL_FUNC_##name##_fn) args;                                  \
+    static ossl_unused ossl_inline OSSL_FUNC_##name##_fn *OSSL_FUNC_##name(    \
+    const OSSL_DISPATCH *opf) {                                                \
+        return (OSSL_FUNC_##name##_fn *)opf->function;                         \
+    }
 
 /*
  * Core function identities, for the two OSSL_DISPATCH tables being passed
@@ -626,11 +626,12 @@ OSSL_CORE_MAKE_FUNC(void, rand_clear_seed,
 
 /* Key data subset selection - combinations */
 #define OSSL_KEYMGMT_SELECT_ALL_PARAMETERS                                     \
-  (OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS | OSSL_KEYMGMT_SELECT_OTHER_PARAMETERS)
+    (OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS |                                   \
+     OSSL_KEYMGMT_SELECT_OTHER_PARAMETERS)
 #define OSSL_KEYMGMT_SELECT_KEYPAIR                                            \
-  (OSSL_KEYMGMT_SELECT_PRIVATE_KEY | OSSL_KEYMGMT_SELECT_PUBLIC_KEY)
+    (OSSL_KEYMGMT_SELECT_PRIVATE_KEY | OSSL_KEYMGMT_SELECT_PUBLIC_KEY)
 #define OSSL_KEYMGMT_SELECT_ALL                                                \
-  (OSSL_KEYMGMT_SELECT_KEYPAIR | OSSL_KEYMGMT_SELECT_ALL_PARAMETERS)
+    (OSSL_KEYMGMT_SELECT_KEYPAIR | OSSL_KEYMGMT_SELECT_ALL_PARAMETERS)
 
 #define OSSL_KEYMGMT_VALIDATE_FULL_CHECK 0
 #define OSSL_KEYMGMT_VALIDATE_QUICK_CHECK 1
@@ -895,7 +896,7 @@ OSSL_CORE_MAKE_FUNC(const char **, signature_query_key_types, (void))
 
 /* Key data subset selection - combinations */
 #define OSSL_SKEYMGMT_SELECT_ALL                                               \
-  (OSSL_SKEYMGMT_SELECT_PARAMETERS | OSSL_SKEYMGMT_SELECT_SECRET_KEY)
+    (OSSL_SKEYMGMT_SELECT_PARAMETERS | OSSL_SKEYMGMT_SELECT_SECRET_KEY)
 
 #define OSSL_FUNC_SKEYMGMT_FREE 1
 #define OSSL_FUNC_SKEYMGMT_IMPORT 2

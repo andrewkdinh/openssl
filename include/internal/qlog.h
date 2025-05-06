@@ -19,23 +19,23 @@ typedef struct qlog_st QLOG;
 #ifndef OPENSSL_NO_QLOG
 
 enum {
-  QLOG_EVENT_TYPE_NONE,
+    QLOG_EVENT_TYPE_NONE,
 
 #define QLOG_EVENT(cat, name) QLOG_EVENT_TYPE_##cat##_##name,
 #include "internal/qlog_events.h"
 #undef QLOG_EVENT
 
-  QLOG_EVENT_TYPE_NUM
+    QLOG_EVENT_TYPE_NUM
 };
 
 typedef struct qlog_trace_info_st {
-  QUIC_CONN_ID odcid;
-  const char *title, *description, *group_id;
-  int is_server;
-  OSSL_TIME (*now_cb)(void *arg);
-  void *now_cb_arg;
-  uint64_t override_process_id;
-  const char *override_impl_name;
+    QUIC_CONN_ID odcid;
+    const char *title, *description, *group_id;
+    int is_server;
+    OSSL_TIME (*now_cb)(void *arg);
+    void *now_cb_arg;
+    uint64_t override_process_id;
+    const char *override_impl_name;
 } QLOG_TRACE_INFO;
 
 QLOG *ossl_qlog_new(const QLOG_TRACE_INFO *info);
@@ -76,33 +76,33 @@ void ossl_qlog_override_time(QLOG *qlog, OSSL_TIME event_time);
 
 /* Grouping Macros */
 #define QLOG_EVENT_BEGIN(qlog, cat, name)                                      \
-  {                                                                            \
-    QLOG *qlog_instance = (qlog);                                              \
-    uint32_t qlog_event_type = QLOG_EVENT_TYPE_##cat##_##name;                 \
+    {                                                                          \
+        QLOG *qlog_instance = (qlog);                                          \
+        uint32_t qlog_event_type = QLOG_EVENT_TYPE_##cat##_##name;             \
                                                                                \
-    if (ossl_qlog_event_try_begin(qlog_instance, qlog_event_type, #cat, #name, \
-                                  #cat ":" #name)) {
+        if (ossl_qlog_event_try_begin(qlog_instance, qlog_event_type, #cat,    \
+                                      #name, #cat ":" #name)) {
 
 #define QLOG_EVENT_END()                                                       \
-  ossl_qlog_event_end(qlog_instance);                                          \
-  }                                                                            \
-  }
+    ossl_qlog_event_end(qlog_instance);                                        \
+    }                                                                          \
+    }
 
 #define QLOG_BEGIN(name)                                                       \
-  {                                                                            \
-    ossl_qlog_group_begin(qlog_instance, (name));
+    {                                                                          \
+        ossl_qlog_group_begin(qlog_instance, (name));
 
 #define QLOG_END()                                                             \
-  ossl_qlog_group_end(qlog_instance);                                          \
-  }
+    ossl_qlog_group_end(qlog_instance);                                        \
+    }
 
 #define QLOG_BEGIN_ARRAY(name)                                                 \
-  {                                                                            \
-    ossl_qlog_array_begin(qlog_instance, (name));
+    {                                                                          \
+        ossl_qlog_array_begin(qlog_instance, (name));
 
 #define QLOG_END_ARRAY()                                                       \
-  ossl_qlog_array_end(qlog_instance);                                          \
-  }
+    ossl_qlog_array_end(qlog_instance);                                        \
+    }
 
 /* Field Functions */
 void ossl_qlog_str(QLOG *qlog, const char *name, const char *value);
@@ -117,13 +117,13 @@ void ossl_qlog_bin(QLOG *qlog, const char *name, const void *value,
 /* Field Macros */
 #define QLOG_STR(name, value) ossl_qlog_str(qlog_instance, (name), (value))
 #define QLOG_STR_LEN(name, value, value_len)                                   \
-  ossl_qlog_str_len(qlog_instance, (name), (value), (value_len))
+    ossl_qlog_str_len(qlog_instance, (name), (value), (value_len))
 #define QLOG_I64(name, value) ossl_qlog_i64(qlog_instance, (name), (value))
 #define QLOG_U64(name, value) ossl_qlog_u64(qlog_instance, (name), (value))
 #define QLOG_F64(name, value) ossl_qlog_f64(qlog_instance, (name), (value))
 #define QLOG_BOOL(name, value) ossl_qlog_bool(qlog_instance, (name), (value))
 #define QLOG_BIN(name, value, value_len)                                       \
-  ossl_qlog_bin(qlog_instance, (name), (value), (value_len))
+    ossl_qlog_bin(qlog_instance, (name), (value), (value_len))
 #define QLOG_CID(name, value) QLOG_BIN((name), (value)->id, (value)->id_len)
 
 #endif

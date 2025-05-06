@@ -55,23 +55,23 @@
 #endif
 
 #define SPARC_PIC_THUNK(reg)                                                   \
-  .align 32;                                                                   \
-  .Lpic_thunk : jmp % o7 + 8;                                                  \
-  add % o7, reg, reg;
+    .align 32;                                                                 \
+    .Lpic_thunk : jmp % o7 + 8;                                                \
+    add % o7, reg, reg;
 
 #define SPARC_PIC_THUNK_CALL(reg)                                              \
-  sethi % hi(_GLOBAL_OFFSET_TABLE_ - 4), reg;                                  \
-  call.Lpic_thunk;                                                             \
-  or reg, % lo(_GLOBAL_OFFSET_TABLE_ + 4), reg;
+    sethi % hi(_GLOBAL_OFFSET_TABLE_ - 4), reg;                                \
+    call.Lpic_thunk;                                                           \
+    or reg, % lo(_GLOBAL_OFFSET_TABLE_ + 4), reg;
 
 #if 1
 #define SPARC_SETUP_GOT_REG(reg) SPARC_PIC_THUNK_CALL(reg)
 #else
 #define SPARC_SETUP_GOT_REG(reg)                                               \
-  sethi % hi(_GLOBAL_OFFSET_TABLE_ - 4), reg;                                  \
-  call.+ 8;                                                                    \
-  or reg, % lo(_GLOBAL_OFFSET_TABLE_ + 4), reg;                                \
-  add % o7, reg, reg
+    sethi % hi(_GLOBAL_OFFSET_TABLE_ - 4), reg;                                \
+    call.+ 8;                                                                  \
+    or reg, % lo(_GLOBAL_OFFSET_TABLE_ + 4), reg;                              \
+    add % o7, reg, reg
 #endif
 
 #if defined(__arch64__)
@@ -99,17 +99,17 @@
 #undef SPARC_LOAD_ADDRESS
 #undef SPARC_LOAD_ADDRESS_LEAF
 #define SPARC_LOAD_ADDRESS(SYM, reg)                                           \
-  SPARC_SETUP_GOT_REG(reg);                                                    \
-  sethi % hi(SYM), % o7;                                                       \
-  or % o7, % lo(SYM), % o7;                                                    \
-  LDPTR[reg + % o7], reg;
+    SPARC_SETUP_GOT_REG(reg);                                                  \
+    sethi % hi(SYM), % o7;                                                     \
+    or % o7, % lo(SYM), % o7;                                                  \
+    LDPTR[reg + % o7], reg;
 #endif
 
 #ifndef SPARC_LOAD_ADDRESS_LEAF
 #define SPARC_LOAD_ADDRESS_LEAF(SYM, reg, tmp)                                 \
-  mov % o7, tmp;                                                               \
-  SPARC_LOAD_ADDRESS(SYM, reg)                                                 \
-  mov tmp, % o7;
+    mov % o7, tmp;                                                             \
+    SPARC_LOAD_ADDRESS(SYM, reg)                                               \
+    mov tmp, % o7;
 #endif
 
 #ifndef __ASSEMBLER__

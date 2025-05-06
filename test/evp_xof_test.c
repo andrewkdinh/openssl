@@ -106,79 +106,81 @@ static const unsigned char shake256_largemsg_output[] = {
 };
 
 static EVP_MD_CTX *shake_setup(const char *name) {
-  EVP_MD_CTX *ctx = NULL;
-  EVP_MD *md = NULL;
+    EVP_MD_CTX *ctx = NULL;
+    EVP_MD *md = NULL;
 
-  if (!TEST_ptr(md = EVP_MD_fetch(NULL, name, NULL)))
-    return NULL;
+    if (!TEST_ptr(md = EVP_MD_fetch(NULL, name, NULL)))
+        return NULL;
 
-  if (!TEST_ptr(ctx = EVP_MD_CTX_new()))
-    goto err;
-  if (!TEST_true(EVP_DigestInit_ex2(ctx, md, NULL)))
-    goto err;
-  EVP_MD_free(md);
-  return ctx;
+    if (!TEST_ptr(ctx = EVP_MD_CTX_new()))
+        goto err;
+    if (!TEST_true(EVP_DigestInit_ex2(ctx, md, NULL)))
+        goto err;
+    EVP_MD_free(md);
+    return ctx;
 err:
-  EVP_MD_free(md);
-  EVP_MD_CTX_free(ctx);
-  return NULL;
+    EVP_MD_free(md);
+    EVP_MD_CTX_free(ctx);
+    return NULL;
 }
 
 static int shake_kat_test(void) {
-  int ret = 0;
-  EVP_MD_CTX *ctx = NULL;
-  unsigned char out[sizeof(shake256_output)];
+    int ret = 0;
+    EVP_MD_CTX *ctx = NULL;
+    unsigned char out[sizeof(shake256_output)];
 
-  if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
-    return 0;
-  if (!TEST_true(
-      EVP_DigestUpdate(ctx, shake256_input, sizeof(shake256_input))) ||
-      !TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))) ||
-      !TEST_mem_eq(out, sizeof(out), shake256_output, sizeof(shake256_output))
-      /* Test that a second call to EVP_DigestFinalXOF fails */
-      || !TEST_false(EVP_DigestFinalXOF(ctx, out, sizeof(out)))
-      /* Test that a call to EVP_DigestSqueeze fails */
-      || !TEST_false(EVP_DigestSqueeze(ctx, out, sizeof(out))))
-    goto err;
-  ret = 1;
+    if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
+        return 0;
+    if (!TEST_true(
+        EVP_DigestUpdate(ctx, shake256_input, sizeof(shake256_input))) ||
+        !TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))) ||
+        !TEST_mem_eq(out, sizeof(out), shake256_output, sizeof(shake256_output))
+        /* Test that a second call to EVP_DigestFinalXOF fails */
+        || !TEST_false(EVP_DigestFinalXOF(ctx, out, sizeof(out)))
+        /* Test that a call to EVP_DigestSqueeze fails */
+        || !TEST_false(EVP_DigestSqueeze(ctx, out, sizeof(out))))
+        goto err;
+    ret = 1;
 err:
-  EVP_MD_CTX_free(ctx);
-  return ret;
+    EVP_MD_CTX_free(ctx);
+    return ret;
 }
 
 static int shake_kat_digestfinal_test(void) {
-  int ret = 0;
-  unsigned int digest_length = 0;
-  EVP_MD_CTX *ctx = NULL;
-  unsigned char out[sizeof(shake256_output)];
+    int ret = 0;
+    unsigned int digest_length = 0;
+    EVP_MD_CTX *ctx = NULL;
+    unsigned char out[sizeof(shake256_output)];
 
-  /* Test that EVP_DigestFinal without setting XOFLEN fails */
-  if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
-    return 0;
-  if (!TEST_true(EVP_DigestUpdate(ctx, shake256_input, sizeof(shake256_input))))
-    return 0;
-  ERR_set_mark();
-  if (!TEST_false(EVP_DigestFinal(ctx, out, &digest_length))) {
-    ERR_clear_last_mark();
-    return 0;
-  }
-  ERR_pop_to_mark();
-  EVP_MD_CTX_free(ctx);
+    /* Test that EVP_DigestFinal without setting XOFLEN fails */
+    if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
+        return 0;
+    if (!TEST_true(
+        EVP_DigestUpdate(ctx, shake256_input, sizeof(shake256_input))))
+        return 0;
+    ERR_set_mark();
+    if (!TEST_false(EVP_DigestFinal(ctx, out, &digest_length))) {
+        ERR_clear_last_mark();
+        return 0;
+    }
+    ERR_pop_to_mark();
+    EVP_MD_CTX_free(ctx);
 
-  /* However EVP_DigestFinalXOF must work */
-  if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
-    return 0;
-  if (!TEST_true(EVP_DigestUpdate(ctx, shake256_input, sizeof(shake256_input))))
-    return 0;
-  if (!TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))) ||
-      !TEST_mem_eq(out, sizeof(out), shake256_output,
-                   sizeof(shake256_output)) ||
-      !TEST_false(EVP_DigestFinalXOF(ctx, out, sizeof(out))))
-    goto err;
-  ret = 1;
+    /* However EVP_DigestFinalXOF must work */
+    if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
+        return 0;
+    if (!TEST_true(
+        EVP_DigestUpdate(ctx, shake256_input, sizeof(shake256_input))))
+        return 0;
+    if (!TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))) ||
+        !TEST_mem_eq(out, sizeof(out), shake256_output,
+                     sizeof(shake256_output)) ||
+        !TEST_false(EVP_DigestFinalXOF(ctx, out, sizeof(out))))
+        goto err;
+    ret = 1;
 err:
-  EVP_MD_CTX_free(ctx);
-  return ret;
+    EVP_MD_CTX_free(ctx);
+    return ret;
 }
 
 /*
@@ -186,37 +188,37 @@ err:
  * set by the OSSL_DIGEST_PARAM_XOFLEN param.
  */
 static int shake_kat_digestfinal_xoflen_test(void) {
-  int ret = 0;
-  unsigned int digest_length = 0;
-  EVP_MD_CTX *ctx = NULL;
-  const EVP_MD *md;
-  unsigned char out[sizeof(shake256_output)];
-  OSSL_PARAM params[2];
-  size_t sz = 12;
+    int ret = 0;
+    unsigned int digest_length = 0;
+    EVP_MD_CTX *ctx = NULL;
+    const EVP_MD *md;
+    unsigned char out[sizeof(shake256_output)];
+    OSSL_PARAM params[2];
+    size_t sz = 12;
 
-  if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
-    return 0;
-  md = EVP_MD_CTX_get0_md(ctx);
+    if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
+        return 0;
+    md = EVP_MD_CTX_get0_md(ctx);
 
-  memset(out, 0, sizeof(out));
-  params[0] = OSSL_PARAM_construct_size_t(OSSL_DIGEST_PARAM_XOFLEN, &sz);
-  params[1] = OSSL_PARAM_construct_end();
+    memset(out, 0, sizeof(out));
+    params[0] = OSSL_PARAM_construct_size_t(OSSL_DIGEST_PARAM_XOFLEN, &sz);
+    params[1] = OSSL_PARAM_construct_end();
 
-  if (!TEST_int_eq(EVP_MD_CTX_size(ctx), -1) ||
-      !TEST_int_eq(EVP_MD_CTX_set_params(ctx, params), 1) ||
-      !TEST_int_eq(EVP_MD_CTX_size(ctx), sz) ||
-      !TEST_int_eq(EVP_MD_get_size(md), 0) || !TEST_true(EVP_MD_xof(md)) ||
-      !TEST_true(
-      EVP_DigestUpdate(ctx, shake256_input, sizeof(shake256_input))) ||
-      !TEST_true(EVP_DigestFinal(ctx, out, &digest_length)) ||
-      !TEST_uint_eq(digest_length, (unsigned int)sz) ||
-      !TEST_mem_eq(out, digest_length, shake256_output, digest_length) ||
-      !TEST_uchar_eq(out[digest_length], 0))
-    goto err;
-  ret = 1;
+    if (!TEST_int_eq(EVP_MD_CTX_size(ctx), -1) ||
+        !TEST_int_eq(EVP_MD_CTX_set_params(ctx, params), 1) ||
+        !TEST_int_eq(EVP_MD_CTX_size(ctx), sz) ||
+        !TEST_int_eq(EVP_MD_get_size(md), 0) || !TEST_true(EVP_MD_xof(md)) ||
+        !TEST_true(
+        EVP_DigestUpdate(ctx, shake256_input, sizeof(shake256_input))) ||
+        !TEST_true(EVP_DigestFinal(ctx, out, &digest_length)) ||
+        !TEST_uint_eq(digest_length, (unsigned int)sz) ||
+        !TEST_mem_eq(out, digest_length, shake256_output, digest_length) ||
+        !TEST_uchar_eq(out[digest_length], 0))
+        goto err;
+    ret = 1;
 err:
-  EVP_MD_CTX_free(ctx);
-  return ret;
+    EVP_MD_CTX_free(ctx);
+    return ret;
 }
 
 /*
@@ -224,35 +226,36 @@ err:
  * This is a nested test that uses multiple strides for the input.
  */
 static int shake_absorb_test(void) {
-  int ret = 0;
-  EVP_MD_CTX *ctx = NULL;
-  unsigned char out[sizeof(shake256_largemsg_output)];
-  size_t total = sizeof(shake256_largemsg_input);
-  size_t i, stride, sz;
+    int ret = 0;
+    EVP_MD_CTX *ctx = NULL;
+    unsigned char out[sizeof(shake256_largemsg_output)];
+    size_t total = sizeof(shake256_largemsg_input);
+    size_t i, stride, sz;
 
-  if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
-    return 0;
+    if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
+        return 0;
 
-  for (stride = 1; stride < total; ++stride) {
-    sz = 0;
-    for (i = 0; i < total; i += sz) {
-      sz += stride;
-      if ((i + sz) > total)
-        sz = total - i;
-      if (!TEST_true(EVP_DigestUpdate(ctx, shake256_largemsg_input + i, sz)))
-        goto err;
+    for (stride = 1; stride < total; ++stride) {
+        sz = 0;
+        for (i = 0; i < total; i += sz) {
+            sz += stride;
+            if ((i + sz) > total)
+                sz = total - i;
+            if (!TEST_true(
+                EVP_DigestUpdate(ctx, shake256_largemsg_input + i, sz)))
+                goto err;
+        }
+        if (!TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))) ||
+            !TEST_mem_eq(out, sizeof(out), shake256_largemsg_output,
+                         sizeof(shake256_largemsg_output)))
+            goto err;
+        if (!TEST_true(EVP_DigestInit_ex2(ctx, NULL, NULL)))
+            goto err;
     }
-    if (!TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))) ||
-        !TEST_mem_eq(out, sizeof(out), shake256_largemsg_output,
-                     sizeof(shake256_largemsg_output)))
-      goto err;
-    if (!TEST_true(EVP_DigestInit_ex2(ctx, NULL, NULL)))
-      goto err;
-  }
-  ret = 1;
+    ret = 1;
 err:
-  EVP_MD_CTX_free(ctx);
-  return ret;
+    EVP_MD_CTX_free(ctx);
+    return ret;
 }
 
 /*
@@ -260,7 +263,7 @@ err:
  * initially call, followed by a size for each subsequent call.
  */
 static const struct {
-  size_t startsz, incsz;
+    size_t startsz, incsz;
 } stride_tests[] = {
 {1, 1},
 {1, 136},
@@ -307,38 +310,38 @@ static const struct {
 static int do_shake_squeeze_test(int tst, const unsigned char *in, size_t inlen,
                                  const unsigned char *expected_out,
                                  size_t expected_outlen) {
-  int ret = 0;
-  EVP_MD_CTX *ctx = NULL;
-  unsigned char *out = NULL;
-  size_t i = 0, sz = stride_tests[tst].startsz;
+    int ret = 0;
+    EVP_MD_CTX *ctx = NULL;
+    unsigned char *out = NULL;
+    size_t i = 0, sz = stride_tests[tst].startsz;
 
-  if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
-    return 0;
-  if (!TEST_ptr(out = OPENSSL_malloc(expected_outlen)))
-    goto err;
-  if (!TEST_true(EVP_DigestUpdate(ctx, in, inlen)))
-    goto err;
+    if (!TEST_ptr(ctx = shake_setup("SHAKE256")))
+        return 0;
+    if (!TEST_ptr(out = OPENSSL_malloc(expected_outlen)))
+        goto err;
+    if (!TEST_true(EVP_DigestUpdate(ctx, in, inlen)))
+        goto err;
 
-  while (i < expected_outlen) {
-    if ((i + sz) > expected_outlen)
-      sz = expected_outlen - i;
-    if (!TEST_true(EVP_DigestSqueeze(ctx, out + i, sz)))
-      goto err;
-    i += sz;
-    sz = stride_tests[tst].incsz;
-  }
-  if (!TEST_mem_eq(out, expected_outlen, expected_out, expected_outlen))
-    goto err;
-  ret = 1;
+    while (i < expected_outlen) {
+        if ((i + sz) > expected_outlen)
+            sz = expected_outlen - i;
+        if (!TEST_true(EVP_DigestSqueeze(ctx, out + i, sz)))
+            goto err;
+        i += sz;
+        sz = stride_tests[tst].incsz;
+    }
+    if (!TEST_mem_eq(out, expected_outlen, expected_out, expected_outlen))
+        goto err;
+    ret = 1;
 err:
-  OPENSSL_free(out);
-  EVP_MD_CTX_free(ctx);
-  return ret;
+    OPENSSL_free(out);
+    EVP_MD_CTX_free(ctx);
+    return ret;
 }
 
 static int shake_squeeze_kat_test(int tst) {
-  return do_shake_squeeze_test(tst, shake256_input, sizeof(shake256_input),
-                               shake256_output, sizeof(shake256_output));
+    return do_shake_squeeze_test(tst, shake256_input, sizeof(shake256_input),
+                                 shake256_output, sizeof(shake256_output));
 }
 
 /*
@@ -348,21 +351,21 @@ static int shake_squeeze_kat_test(int tst) {
  * on the same input gives the same output.
  */
 static int shake_squeeze_large_test(int tst) {
-  int ret = 0;
-  EVP_MD_CTX *ctx = NULL;
-  unsigned char msg[16];
-  unsigned char out[2000];
+    int ret = 0;
+    EVP_MD_CTX *ctx = NULL;
+    unsigned char msg[16];
+    unsigned char out[2000];
 
-  if (!TEST_int_gt(RAND_bytes(msg, sizeof(msg)), 0) ||
-      !TEST_ptr(ctx = shake_setup("SHAKE256")) ||
-      !TEST_true(EVP_DigestUpdate(ctx, msg, sizeof(msg))) ||
-      !TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))))
-    goto err;
+    if (!TEST_int_gt(RAND_bytes(msg, sizeof(msg)), 0) ||
+        !TEST_ptr(ctx = shake_setup("SHAKE256")) ||
+        !TEST_true(EVP_DigestUpdate(ctx, msg, sizeof(msg))) ||
+        !TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))))
+        goto err;
 
-  ret = do_shake_squeeze_test(tst, msg, sizeof(msg), out, sizeof(out));
+    ret = do_shake_squeeze_test(tst, msg, sizeof(msg), out, sizeof(out));
 err:
-  EVP_MD_CTX_free(ctx);
-  return ret;
+    EVP_MD_CTX_free(ctx);
+    return ret;
 }
 
 static const size_t dupoffset_tests[] = {1,           135,     136,        137,
@@ -373,109 +376,110 @@ static int do_shake_squeeze_dup_test(int tst, const char *alg,
                                      const unsigned char *in, size_t inlen,
                                      const unsigned char *expected_out,
                                      size_t expected_outlen) {
-  int ret = 0;
-  EVP_MD_CTX *cur, *ctx = NULL, *dupctx = NULL;
-  unsigned char *out = NULL;
-  size_t i = 0, sz = 10;
-  size_t dupoffset = dupoffset_tests[tst];
+    int ret = 0;
+    EVP_MD_CTX *cur, *ctx = NULL, *dupctx = NULL;
+    unsigned char *out = NULL;
+    size_t i = 0, sz = 10;
+    size_t dupoffset = dupoffset_tests[tst];
 
-  if (!TEST_ptr(ctx = shake_setup(alg)))
-    return 0;
-  cur = ctx;
-  if (!TEST_ptr(out = OPENSSL_malloc(expected_outlen)))
-    goto err;
-  if (!TEST_true(EVP_DigestUpdate(ctx, in, inlen)))
-    goto err;
-
-  while (i < expected_outlen) {
-    if ((i + sz) > expected_outlen)
-      sz = expected_outlen - i;
-    if (!TEST_true(EVP_DigestSqueeze(cur, out + i, sz)))
-      goto err;
-    i += sz;
-    /* At a certain offset we swap to a new ctx that copies the state */
-    if (dupctx == NULL && i >= dupoffset) {
-      if (!TEST_ptr(dupctx = EVP_MD_CTX_dup(ctx)))
+    if (!TEST_ptr(ctx = shake_setup(alg)))
+        return 0;
+    cur = ctx;
+    if (!TEST_ptr(out = OPENSSL_malloc(expected_outlen)))
         goto err;
-      cur = dupctx;
+    if (!TEST_true(EVP_DigestUpdate(ctx, in, inlen)))
+        goto err;
+
+    while (i < expected_outlen) {
+        if ((i + sz) > expected_outlen)
+            sz = expected_outlen - i;
+        if (!TEST_true(EVP_DigestSqueeze(cur, out + i, sz)))
+            goto err;
+        i += sz;
+        /* At a certain offset we swap to a new ctx that copies the state */
+        if (dupctx == NULL && i >= dupoffset) {
+            if (!TEST_ptr(dupctx = EVP_MD_CTX_dup(ctx)))
+                goto err;
+            cur = dupctx;
+        }
     }
-  }
-  if (!TEST_mem_eq(out, expected_outlen, expected_out, expected_outlen))
-    goto err;
-  ret = 1;
+    if (!TEST_mem_eq(out, expected_outlen, expected_out, expected_outlen))
+        goto err;
+    ret = 1;
 err:
-  OPENSSL_free(out);
-  EVP_MD_CTX_free(ctx);
-  EVP_MD_CTX_free(dupctx);
-  return ret;
+    OPENSSL_free(out);
+    EVP_MD_CTX_free(ctx);
+    EVP_MD_CTX_free(dupctx);
+    return ret;
 }
 
 /* Test that the internal state can be copied */
 static int shake_squeeze_dup_test(int tst) {
-  int ret = 0;
-  EVP_MD_CTX *ctx = NULL;
-  unsigned char msg[16];
-  unsigned char out[1000];
-  const char *alg = "SHAKE128";
+    int ret = 0;
+    EVP_MD_CTX *ctx = NULL;
+    unsigned char msg[16];
+    unsigned char out[1000];
+    const char *alg = "SHAKE128";
 
-  if (!TEST_int_gt(RAND_bytes(msg, sizeof(msg)), 0) ||
-      !TEST_ptr(ctx = shake_setup(alg)) ||
-      !TEST_true(EVP_DigestUpdate(ctx, msg, sizeof(msg))) ||
-      !TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))))
-    goto err;
+    if (!TEST_int_gt(RAND_bytes(msg, sizeof(msg)), 0) ||
+        !TEST_ptr(ctx = shake_setup(alg)) ||
+        !TEST_true(EVP_DigestUpdate(ctx, msg, sizeof(msg))) ||
+        !TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))))
+        goto err;
 
-  ret = do_shake_squeeze_dup_test(tst, alg, msg, sizeof(msg), out, sizeof(out));
+    ret =
+    do_shake_squeeze_dup_test(tst, alg, msg, sizeof(msg), out, sizeof(out));
 err:
-  EVP_MD_CTX_free(ctx);
-  return ret;
+    EVP_MD_CTX_free(ctx);
+    return ret;
 }
 
 /* Test that a squeeze without a preceding absorb works */
 static int shake_squeeze_no_absorb_test(void) {
-  int ret = 0;
-  EVP_MD_CTX *ctx = NULL;
-  unsigned char out[1000];
-  unsigned char out2[1000];
-  const char *alg = "SHAKE128";
+    int ret = 0;
+    EVP_MD_CTX *ctx = NULL;
+    unsigned char out[1000];
+    unsigned char out2[1000];
+    const char *alg = "SHAKE128";
 
-  if (!TEST_ptr(ctx = shake_setup(alg)) ||
-      !TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))))
-    goto err;
+    if (!TEST_ptr(ctx = shake_setup(alg)) ||
+        !TEST_true(EVP_DigestFinalXOF(ctx, out, sizeof(out))))
+        goto err;
 
-  if (!TEST_true(EVP_DigestInit_ex2(ctx, NULL, NULL)) ||
-      !TEST_true(EVP_DigestSqueeze(ctx, out2, sizeof(out2) / 2)) ||
-      !TEST_true(
-      EVP_DigestSqueeze(ctx, out2 + sizeof(out2) / 2, sizeof(out2) / 2)))
-    goto err;
+    if (!TEST_true(EVP_DigestInit_ex2(ctx, NULL, NULL)) ||
+        !TEST_true(EVP_DigestSqueeze(ctx, out2, sizeof(out2) / 2)) ||
+        !TEST_true(
+        EVP_DigestSqueeze(ctx, out2 + sizeof(out2) / 2, sizeof(out2) / 2)))
+        goto err;
 
-  if (!TEST_mem_eq(out2, sizeof(out2), out, sizeof(out)))
-    goto err;
-  ret = 1;
+    if (!TEST_mem_eq(out2, sizeof(out2), out, sizeof(out)))
+        goto err;
+    ret = 1;
 
 err:
-  EVP_MD_CTX_free(ctx);
-  return ret;
+    EVP_MD_CTX_free(ctx);
+    return ret;
 }
 
 static int xof_fail_test(void) {
-  int ret;
-  EVP_MD *md = NULL;
+    int ret;
+    EVP_MD *md = NULL;
 
-  ret = TEST_ptr(md = EVP_MD_fetch(NULL, "SHA256", NULL)) &&
-        TEST_false(EVP_MD_xof(md));
-  EVP_MD_free(md);
-  return ret;
+    ret = TEST_ptr(md = EVP_MD_fetch(NULL, "SHA256", NULL)) &&
+          TEST_false(EVP_MD_xof(md));
+    EVP_MD_free(md);
+    return ret;
 }
 
 int setup_tests(void) {
-  ADD_TEST(shake_kat_test);
-  ADD_TEST(shake_kat_digestfinal_test);
-  ADD_TEST(shake_kat_digestfinal_xoflen_test);
-  ADD_TEST(shake_absorb_test);
-  ADD_ALL_TESTS(shake_squeeze_kat_test, OSSL_NELEM(stride_tests));
-  ADD_ALL_TESTS(shake_squeeze_large_test, OSSL_NELEM(stride_tests));
-  ADD_ALL_TESTS(shake_squeeze_dup_test, OSSL_NELEM(dupoffset_tests));
-  ADD_TEST(xof_fail_test);
-  ADD_TEST(shake_squeeze_no_absorb_test);
-  return 1;
+    ADD_TEST(shake_kat_test);
+    ADD_TEST(shake_kat_digestfinal_test);
+    ADD_TEST(shake_kat_digestfinal_xoflen_test);
+    ADD_TEST(shake_absorb_test);
+    ADD_ALL_TESTS(shake_squeeze_kat_test, OSSL_NELEM(stride_tests));
+    ADD_ALL_TESTS(shake_squeeze_large_test, OSSL_NELEM(stride_tests));
+    ADD_ALL_TESTS(shake_squeeze_dup_test, OSSL_NELEM(dupoffset_tests));
+    ADD_TEST(xof_fail_test);
+    ADD_TEST(shake_squeeze_no_absorb_test);
+    return 1;
 }

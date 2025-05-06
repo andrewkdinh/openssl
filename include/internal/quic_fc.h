@@ -24,9 +24,9 @@
 typedef struct quic_txfc_st QUIC_TXFC;
 
 struct quic_txfc_st {
-  QUIC_TXFC *parent; /* stream-level iff non-NULL */
-  uint64_t swm, cwm;
-  char has_become_blocked;
+    QUIC_TXFC *parent; /* stream-level iff non-NULL */
+    uint64_t swm, cwm;
+    char has_become_blocked;
 };
 
 /*
@@ -126,20 +126,20 @@ uint64_t ossl_quic_txfc_get_swm(QUIC_TXFC *txfc);
 typedef struct quic_rxfc_st QUIC_RXFC;
 
 struct quic_rxfc_st {
-  /*
-   * swm is the sent/received watermark, which tracks how much we have
-   * received from the peer. rwm is the retired watermark, which tracks how
-   * much has been passed to the application. esrwm is the rwm value at which
-   * the current auto-tuning epoch started. hwm is the highest stream length
-   * (STREAM frame offset + payload length) we have seen from a STREAM frame
-   * yet.
-   */
-  uint64_t cwm, swm, rwm, esrwm, hwm, cur_window_size, max_window_size;
-  OSSL_TIME epoch_start;
-  OSSL_TIME (*now)(void *arg);
-  void *now_arg;
-  QUIC_RXFC *parent;
-  unsigned char error_code, has_cwm_changed, is_fin, standalone;
+    /*
+     * swm is the sent/received watermark, which tracks how much we have
+     * received from the peer. rwm is the retired watermark, which tracks how
+     * much has been passed to the application. esrwm is the rwm value at which
+     * the current auto-tuning epoch started. hwm is the highest stream length
+     * (STREAM frame offset + payload length) we have seen from a STREAM frame
+     * yet.
+     */
+    uint64_t cwm, swm, rwm, esrwm, hwm, cur_window_size, max_window_size;
+    OSSL_TIME epoch_start;
+    OSSL_TIME (*now)(void *arg);
+    void *now_arg;
+    QUIC_RXFC *parent;
+    unsigned char error_code, has_cwm_changed, is_fin, standalone;
 };
 
 /*

@@ -34,7 +34,7 @@
 #endif
 
 typedef struct rio_notifier_st {
-  int rfd, wfd;
+    int rfd, wfd;
 } RIO_NOTIFIER;
 
 /*
@@ -62,7 +62,7 @@ int ossl_rio_notifier_unsignal(RIO_NOTIFIER *nfy);
  * readability to determine when the notifier has been signalled.
  */
 static ossl_inline ossl_unused int ossl_rio_notifier_as_fd(RIO_NOTIFIER *nfy) {
-  return nfy->rfd;
+    return nfy->rfd;
 }
 
 #endif

@@ -27,7 +27,7 @@ static int cast_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
                          const unsigned char *iv, int enc);
 
 typedef struct {
-  CAST_KEY ks;
+    CAST_KEY ks;
 } EVP_CAST_KEY;
 
 #define data(ctx) EVP_C_DATA(EVP_CAST_KEY, ctx)
@@ -39,12 +39,12 @@ IMPLEMENT_BLOCK_CIPHER(cast5, ks, CAST, EVP_CAST_KEY, NID_cast5, 8,
 
 static int cast_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
                          const unsigned char *iv, int enc) {
-  int keylen = EVP_CIPHER_CTX_get_key_length(ctx);
+    int keylen = EVP_CIPHER_CTX_get_key_length(ctx);
 
-  if (keylen <= 0)
-    return 0;
-  CAST_set_key(&data(ctx)->ks, keylen, key);
-  return 1;
+    if (keylen <= 0)
+        return 0;
+    CAST_set_key(&data(ctx)->ks, keylen, key);
+    return 1;
 }
 
 #endif

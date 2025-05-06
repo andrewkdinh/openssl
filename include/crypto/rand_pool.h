@@ -68,17 +68,17 @@
  * lifetime is intended to be restricted to a single stack frame.
  */
 typedef struct rand_pool_st {
-  unsigned char *buffer; /* points to the beginning of the random pool */
-  size_t len; /* current number of random bytes contained in the pool */
+    unsigned char *buffer; /* points to the beginning of the random pool */
+    size_t len; /* current number of random bytes contained in the pool */
 
-  int attached; /* true pool was attached to existing buffer */
-  int secure;   /* 1: allocated on the secure heap, 0: otherwise */
+    int attached; /* true pool was attached to existing buffer */
+    int secure;   /* 1: allocated on the secure heap, 0: otherwise */
 
-  size_t min_len;   /* minimum number of random bytes requested */
-  size_t max_len;   /* maximum number of random bytes (allocated buffer size) */
-  size_t alloc_len; /* current number of bytes allocated */
-  size_t entropy;   /* current entropy count in bits */
-  size_t entropy_requested; /* requested entropy count in bits */
+    size_t min_len; /* minimum number of random bytes requested */
+    size_t max_len; /* maximum number of random bytes (allocated buffer size) */
+    size_t alloc_len;         /* current number of bytes allocated */
+    size_t entropy;           /* current entropy count in bits */
+    size_t entropy_requested; /* requested entropy count in bits */
 } RAND_POOL;
 
 RAND_POOL *ossl_rand_pool_new(int entropy_requested, int secure, size_t min_len,

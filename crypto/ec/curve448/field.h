@@ -33,7 +33,7 @@
 #endif
 
 typedef struct gf_s {
-  word_t limb[NLIMBS];
+    word_t limb[NLIMBS];
 } ALIGNED gf_s, gf[1];
 
 /* RFC 7748 support */
@@ -78,85 +78,87 @@ static const gf ZERO = {{{0}}}, ONE = {{{1}}};
 
 /* Square x, n times. */
 static ossl_inline void gf_sqrn(gf_s *RESTRICT y, const gf x, int n) {
-  gf tmp;
+    gf tmp;
 
-  assert(n > 0);
-  if (n & 1) {
-    ossl_gf_sqr(y, x);
-    n--;
-  } else {
-    ossl_gf_sqr(tmp, x);
-    ossl_gf_sqr(y, tmp);
-    n -= 2;
-  }
-  for (; n; n -= 2) {
-    ossl_gf_sqr(tmp, y);
-    ossl_gf_sqr(y, tmp);
-  }
+    assert(n > 0);
+    if (n & 1) {
+        ossl_gf_sqr(y, x);
+        n--;
+    } else {
+        ossl_gf_sqr(tmp, x);
+        ossl_gf_sqr(y, tmp);
+        n -= 2;
+    }
+    for (; n; n -= 2) {
+        ossl_gf_sqr(tmp, y);
+        ossl_gf_sqr(y, tmp);
+    }
 }
 
 #define gf_add_nr gf_add_RAW
 
 /* Subtract mod p.  Bias by 2 and don't reduce  */
 static ossl_inline void gf_sub_nr(gf c, const gf a, const gf b) {
-  gf_sub_RAW(c, a, b);
-  gf_bias(c, 2);
-  if (GF_HEADROOM < 3)
-    gf_weak_reduce(c);
+    gf_sub_RAW(c, a, b);
+    gf_bias(c, 2);
+    if (GF_HEADROOM < 3)
+        gf_weak_reduce(c);
 }
 
 /* Subtract mod p. Bias by amt but don't reduce.  */
 static ossl_inline void gf_subx_nr(gf c, const gf a, const gf b, int amt) {
-  gf_sub_RAW(c, a, b);
-  gf_bias(c, amt);
-  if (GF_HEADROOM < amt + 1)
-    gf_weak_reduce(c);
+    gf_sub_RAW(c, a, b);
+    gf_bias(c, amt);
+    if (GF_HEADROOM < amt + 1)
+        gf_weak_reduce(c);
 }
 
 /* Mul by signed int.  Not constant-time WRT the sign of that int. */
 static ossl_inline void gf_mulw(gf c, const gf a, int32_t w) {
-  if (w > 0) {
-    ossl_gf_mulw_unsigned(c, a, w);
-  } else {
-    ossl_gf_mulw_unsigned(c, a, -w);
-    gf_sub(c, ZERO, c);
-  }
+    if (w > 0) {
+        ossl_gf_mulw_unsigned(c, a, w);
+    } else {
+        ossl_gf_mulw_unsigned(c, a, -w);
+        gf_sub(c, ZERO, c);
+    }
 }
 
 /* Constant time, x = is_z ? z : y */
 static ossl_inline void gf_cond_sel(gf x, const gf y, const gf z, mask_t is_z) {
-  size_t i;
+    size_t i;
 
-  for (i = 0; i < NLIMBS; i++) {
+    for (i = 0; i < NLIMBS; i++) {
 #if ARCH_WORD_BITS == 32
-    x[0].limb[i] = constant_time_select_32(is_z, z[0].limb[i], y[0].limb[i]);
+        x[0].limb[i] =
+        constant_time_select_32(is_z, z[0].limb[i], y[0].limb[i]);
 #else
-    /* Must be 64 bit */
-    x[0].limb[i] = constant_time_select_64(is_z, z[0].limb[i], y[0].limb[i]);
+        /* Must be 64 bit */
+        x[0].limb[i] =
+        constant_time_select_64(is_z, z[0].limb[i], y[0].limb[i]);
 #endif
-  }
+    }
 }
 
 /* Constant time, if (neg) x=-x; */
 static ossl_inline void gf_cond_neg(gf x, mask_t neg) {
-  gf y;
+    gf y;
 
-  gf_sub(y, ZERO, x);
-  gf_cond_sel(x, x, y, neg);
+    gf_sub(y, ZERO, x);
+    gf_cond_sel(x, x, y, neg);
 }
 
 /* Constant time, if (swap) (x,y) = (y,x); */
 static ossl_inline void gf_cond_swap(gf x, gf_s *RESTRICT y, mask_t swap) {
-  size_t i;
+    size_t i;
 
-  for (i = 0; i < NLIMBS; i++) {
+    for (i = 0; i < NLIMBS; i++) {
 #if ARCH_WORD_BITS == 32
-    constant_time_cond_swap_32(swap, &(x[0].limb[i]), &(y->limb[i]));
+        constant_time_cond_swap_32(swap, &(x[0].limb[i]), &(y->limb[i]));
 #else
-    /* Must be 64 bit */
-    constant_time_cond_swap_64(swap, &(x[0].limb[i]), &(y->limb[i]));
+        /* Must be 64 bit */
+        constant_time_cond_swap_64(swap, &(x[0].limb[i]), &(y->limb[i]));
 #endif
-  }
+    }
 }
 
 #endif /* OSSL_CRYPTO_EC_CURVE448_FIELD_H */

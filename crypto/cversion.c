@@ -25,11 +25,11 @@ unsigned int OPENSSL_version_minor(void) { return OPENSSL_VERSION_MINOR; }
 unsigned int OPENSSL_version_patch(void) { return OPENSSL_VERSION_PATCH; }
 
 const char *OPENSSL_version_pre_release(void) {
-  return OPENSSL_VERSION_PRE_RELEASE;
+    return OPENSSL_VERSION_PRE_RELEASE;
 }
 
 const char *OPENSSL_version_build_metadata(void) {
-  return OPENSSL_VERSION_BUILD_METADATA;
+    return OPENSSL_VERSION_BUILD_METADATA;
 }
 
 extern char ossl_cpu_info_str[];
@@ -47,13 +47,13 @@ static char modulesdir[MAX_PATH + 15];
 static CRYPTO_ONCE version_strings_once = CRYPTO_ONCE_STATIC_INIT;
 
 DEFINE_RUN_ONCE_STATIC(version_strings_setup) {
-  BIO_snprintf(openssldir, sizeof(openssldir), "OPENSSLDIR: \"%s\"",
-               ossl_get_openssldir());
-  BIO_snprintf(enginesdir, sizeof(enginesdir), "ENGINESDIR: \"%s\"",
-               ossl_get_enginesdir());
-  BIO_snprintf(modulesdir, sizeof(modulesdir), "MODULESDIR: \"%s\"",
-               ossl_get_modulesdir());
-  return 1;
+    BIO_snprintf(openssldir, sizeof(openssldir), "OPENSSLDIR: \"%s\"",
+                 ossl_get_openssldir());
+    BIO_snprintf(enginesdir, sizeof(enginesdir), "ENGINESDIR: \"%s\"",
+                 ossl_get_enginesdir());
+    BIO_snprintf(modulesdir, sizeof(modulesdir), "MODULESDIR: \"%s\"",
+                 ossl_get_modulesdir());
+    return 1;
 }
 
 #define TOSTR(x) #x
@@ -63,61 +63,61 @@ DEFINE_RUN_ONCE_STATIC(version_strings_setup) {
 
 const char *OpenSSL_version(int t) {
 #if defined(_WIN32) && defined(OSSL_WINCTX)
-  /* Cannot really fail but we would return empty strings anyway */
-  (void)RUN_ONCE(&version_strings_once, version_strings_setup);
+    /* Cannot really fail but we would return empty strings anyway */
+    (void)RUN_ONCE(&version_strings_once, version_strings_setup);
 #endif
 
-  switch (t) {
-  case OPENSSL_VERSION:
-    return OPENSSL_VERSION_TEXT;
-  case OPENSSL_VERSION_STRING:
-    return OPENSSL_VERSION_STR;
-  case OPENSSL_FULL_VERSION_STRING:
-    return OPENSSL_FULL_VERSION_STR;
-  case OPENSSL_BUILT_ON:
-    return DATE;
-  case OPENSSL_CFLAGS:
-    return compiler_flags;
-  case OPENSSL_PLATFORM:
-    return PLATFORM;
+    switch (t) {
+    case OPENSSL_VERSION:
+        return OPENSSL_VERSION_TEXT;
+    case OPENSSL_VERSION_STRING:
+        return OPENSSL_VERSION_STR;
+    case OPENSSL_FULL_VERSION_STRING:
+        return OPENSSL_FULL_VERSION_STR;
+    case OPENSSL_BUILT_ON:
+        return DATE;
+    case OPENSSL_CFLAGS:
+        return compiler_flags;
+    case OPENSSL_PLATFORM:
+        return PLATFORM;
 #if defined(_WIN32) && defined(OSSL_WINCTX)
-  case OPENSSL_DIR:
-    return openssldir;
-  case OPENSSL_ENGINES_DIR:
-    return enginesdir;
-  case OPENSSL_MODULES_DIR:
-    return modulesdir;
+    case OPENSSL_DIR:
+        return openssldir;
+    case OPENSSL_ENGINES_DIR:
+        return enginesdir;
+    case OPENSSL_MODULES_DIR:
+        return modulesdir;
 #else
-  case OPENSSL_DIR:
+    case OPENSSL_DIR:
 #ifdef OPENSSLDIR
-    return "OPENSSLDIR: \"" OPENSSLDIR "\"";
+        return "OPENSSLDIR: \"" OPENSSLDIR "\"";
 #else
-    return "OPENSSLDIR: N/A";
+        return "OPENSSLDIR: N/A";
 #endif
-  case OPENSSL_ENGINES_DIR:
+    case OPENSSL_ENGINES_DIR:
 #ifdef ENGINESDIR
-    return "ENGINESDIR: \"" ENGINESDIR "\"";
+        return "ENGINESDIR: \"" ENGINESDIR "\"";
 #else
-    return "ENGINESDIR: N/A";
+        return "ENGINESDIR: N/A";
 #endif
-  case OPENSSL_MODULES_DIR:
+    case OPENSSL_MODULES_DIR:
 #ifdef MODULESDIR
-    return "MODULESDIR: \"" MODULESDIR "\"";
+        return "MODULESDIR: \"" MODULESDIR "\"";
 #else
-    return "MODULESDIR: N/A";
+        return "MODULESDIR: N/A";
 #endif
 #endif
-  case OPENSSL_CPU_INFO:
-    if (OPENSSL_info(OPENSSL_INFO_CPU_SETTINGS) != NULL)
-      return ossl_cpu_info_str;
-    else
-      return "CPUINFO: N/A";
-  case OPENSSL_WINCTX:
+    case OPENSSL_CPU_INFO:
+        if (OPENSSL_info(OPENSSL_INFO_CPU_SETTINGS) != NULL)
+            return ossl_cpu_info_str;
+        else
+            return "CPUINFO: N/A";
+    case OPENSSL_WINCTX:
 #if defined(_WIN32) && defined(OSSL_WINCTX)
-    return OSSL_WINCTX_STRING;
+        return OSSL_WINCTX_STRING;
 #else
-    return "OSSL_WINCTX: Undefined";
+        return "OSSL_WINCTX: Undefined";
 #endif
-  }
-  return "not available";
+    }
+    return "not available";
 }

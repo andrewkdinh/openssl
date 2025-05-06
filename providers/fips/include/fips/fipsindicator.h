@@ -53,9 +53,9 @@
  * settable.
  */
 typedef struct ossl_fips_ind_st {
-  unsigned char approved;
-  signed char
-  settable[OSSL_FIPS_IND_SETTABLE_MAX]; /* See OSSL_FIPS_IND_STATE */
+    unsigned char approved;
+    signed char
+    settable[OSSL_FIPS_IND_SETTABLE_MAX]; /* See OSSL_FIPS_IND_STATE */
 } OSSL_FIPS_IND;
 
 typedef int(OSSL_FIPS_IND_CHECK_CB)(OSSL_LIB_CTX *libctx);
@@ -85,7 +85,7 @@ void ossl_FIPS_IND_copy(OSSL_FIPS_IND *dst, const OSSL_FIPS_IND *src);
  * the dst.
  */
 #define OSSL_FIPS_IND_COPY(dst, src)                                           \
-  ossl_FIPS_IND_copy(&dst->indicator, &src->indicator);
+    ossl_FIPS_IND_copy(&dst->indicator, &src->indicator);
 
 /*
  * Required for reset - since once something becomes unapproved it will remain
@@ -93,7 +93,7 @@ void ossl_FIPS_IND_copy(OSSL_FIPS_IND *dst, const OSSL_FIPS_IND *src);
  * params are set into the ctx & before any FIPS checks are done.
  */
 #define OSSL_FIPS_IND_SET_APPROVED(ctx)                                        \
-  ossl_FIPS_IND_set_approved(&ctx->indicator);
+    ossl_FIPS_IND_set_approved(&ctx->indicator);
 /*
  * This should be called if a FIPS check fails, to indicate the operation is not
  * approved If there is more than 1 strict check flag per algorithm ctx, the id
@@ -101,8 +101,8 @@ void ossl_FIPS_IND_copy(OSSL_FIPS_IND *dst, const OSSL_FIPS_IND *src);
  */
 #define OSSL_FIPS_IND_ON_UNAPPROVED(ctx, id, libctx, algname, opname,          \
                                     config_check_fn)                           \
-  ossl_FIPS_IND_on_unapproved(&ctx->indicator, id, libctx, algname, opname,    \
-                              config_check_fn)
+    ossl_FIPS_IND_on_unapproved(&ctx->indicator, id, libctx, algname, opname,  \
+                                config_check_fn)
 
 #define OSSL_FIPS_IND_SETTABLE_CTX_PARAM(name) OSSL_PARAM_int(name, NULL),
 
@@ -111,20 +111,20 @@ void ossl_FIPS_IND_copy(OSSL_FIPS_IND *dst, const OSSL_FIPS_IND *src);
  * The name must match the param used by OSSL_FIPS_IND_SETTABLE_CTX_PARAM
  */
 #define OSSL_FIPS_IND_SET_CTX_PARAM(ctx, id, params, name)                     \
-  ossl_FIPS_IND_set_ctx_param(&((ctx)->indicator), id, params, name)
+    ossl_FIPS_IND_set_ctx_param(&((ctx)->indicator), id, params, name)
 
 #define OSSL_FIPS_IND_GETTABLE_CTX_PARAM()                                     \
-  OSSL_PARAM_int(OSSL_ALG_PARAM_FIPS_APPROVED_INDICATOR, NULL),
+    OSSL_PARAM_int(OSSL_ALG_PARAM_FIPS_APPROVED_INDICATOR, NULL),
 
 #define OSSL_FIPS_IND_GET_CTX_PARAM(ctx, prms)                                 \
-  ossl_FIPS_IND_get_ctx_param(&((ctx)->indicator), prms)
+    ossl_FIPS_IND_get_ctx_param(&((ctx)->indicator), prms)
 
 #define OSSL_FIPS_IND_GET(ctx) (&((ctx)->indicator))
 
 #define OSSL_FIPS_IND_GET_PARAM(ctx, p, settable, id, name)                    \
-  *settable = ossl_FIPS_IND_get_settable(&((ctx)->indicator), id);             \
-  if (*settable != OSSL_FIPS_IND_STATE_UNKNOWN)                                \
-    *p = OSSL_PARAM_construct_int(name, settable);
+    *settable = ossl_FIPS_IND_get_settable(&((ctx)->indicator), id);           \
+    if (*settable != OSSL_FIPS_IND_STATE_UNKNOWN)                              \
+        *p = OSSL_PARAM_construct_int(name, settable);
 
 int ossl_fips_ind_rsa_key_check(OSSL_FIPS_IND *ind, int id,
                                 OSSL_LIB_CTX *libctx, const RSA *rsa,

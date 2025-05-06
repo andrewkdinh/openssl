@@ -59,25 +59,25 @@ OSSL_PARAM_DEFN(OSSL_PROV_PARAM_STATUS, OSSL_PARAM_INTEGER, NULL, 0),
 OSSL_PARAM_END};
 
 static const OSSL_PARAM *legacy_gettable_params(void *provctx) {
-  return legacy_param_types;
+    return legacy_param_types;
 }
 
 static int legacy_get_params(void *provctx, OSSL_PARAM params[]) {
-  OSSL_PARAM *p;
+    OSSL_PARAM *p;
 
-  p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_NAME);
-  if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, "OpenSSL Legacy Provider"))
-    return 0;
-  p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_VERSION);
-  if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, OPENSSL_VERSION_STR))
-    return 0;
-  p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_BUILDINFO);
-  if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, OPENSSL_FULL_VERSION_STR))
-    return 0;
-  p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_STATUS);
-  if (p != NULL && !OSSL_PARAM_set_int(p, ossl_prov_is_running()))
-    return 0;
-  return 1;
+    p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_NAME);
+    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, "OpenSSL Legacy Provider"))
+        return 0;
+    p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_VERSION);
+    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, OPENSSL_VERSION_STR))
+        return 0;
+    p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_BUILDINFO);
+    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, OPENSSL_FULL_VERSION_STR))
+        return 0;
+    p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_STATUS);
+    if (p != NULL && !OSSL_PARAM_set_int(p, ossl_prov_is_running()))
+        return 0;
+    return 1;
 }
 
 static const OSSL_ALGORITHM legacy_digests[] = {
@@ -162,21 +162,21 @@ ALG(PROV_NAMES_PVKKDF, ossl_kdf_pvk_functions),
 
 static const OSSL_ALGORITHM *legacy_query(void *provctx, int operation_id,
                                           int *no_cache) {
-  *no_cache = 0;
-  switch (operation_id) {
-  case OSSL_OP_DIGEST:
-    return legacy_digests;
-  case OSSL_OP_CIPHER:
-    return legacy_ciphers;
-  case OSSL_OP_KDF:
-    return legacy_kdfs;
-  }
-  return NULL;
+    *no_cache = 0;
+    switch (operation_id) {
+    case OSSL_OP_DIGEST:
+        return legacy_digests;
+    case OSSL_OP_CIPHER:
+        return legacy_ciphers;
+    case OSSL_OP_KDF:
+        return legacy_kdfs;
+    }
+    return NULL;
 }
 
 static void legacy_teardown(void *provctx) {
-  OSSL_LIB_CTX_free(PROV_LIBCTX_OF(provctx));
-  ossl_prov_ctx_free(provctx);
+    OSSL_LIB_CTX_free(PROV_LIBCTX_OF(provctx));
+    ossl_prov_ctx_free(provctx);
 }
 
 /* Functions we provide to the core */
@@ -189,60 +189,61 @@ OSSL_DISPATCH_END};
 
 int OSSL_provider_init(const OSSL_CORE_HANDLE *handle, const OSSL_DISPATCH *in,
                        const OSSL_DISPATCH **out, void **provctx) {
-  OSSL_LIB_CTX *libctx = NULL;
+    OSSL_LIB_CTX *libctx = NULL;
 #ifndef STATIC_LEGACY
-  const OSSL_DISPATCH *tmp;
+    const OSSL_DISPATCH *tmp;
 #endif
 
 #ifndef STATIC_LEGACY
-  for (tmp = in; tmp->function_id != 0; tmp++) {
-    /*
-     * We do not support the scenario of an application linked against
-     * multiple versions of libcrypto (e.g. one static and one dynamic),
-     * but sharing a single legacy.so. We do a simple sanity check here.
-     */
+    for (tmp = in; tmp->function_id != 0; tmp++) {
+        /*
+         * We do not support the scenario of an application linked against
+         * multiple versions of libcrypto (e.g. one static and one dynamic),
+         * but sharing a single legacy.so. We do a simple sanity check here.
+         */
 #define set_func(c, f)                                                         \
-  if (c == NULL)                                                               \
-    c = f;                                                                     \
-  else if (c != f)                                                             \
-    return 0;
-    switch (tmp->function_id) {
-    case OSSL_FUNC_CORE_NEW_ERROR:
-      set_func(c_new_error, OSSL_FUNC_core_new_error(tmp));
-      break;
-    case OSSL_FUNC_CORE_SET_ERROR_DEBUG:
-      set_func(c_set_error_debug, OSSL_FUNC_core_set_error_debug(tmp));
-      break;
-    case OSSL_FUNC_CORE_VSET_ERROR:
-      set_func(c_vset_error, OSSL_FUNC_core_vset_error(tmp));
-      break;
-    case OSSL_FUNC_CORE_SET_ERROR_MARK:
-      set_func(c_set_error_mark, OSSL_FUNC_core_set_error_mark(tmp));
-      break;
-    case OSSL_FUNC_CORE_CLEAR_LAST_ERROR_MARK:
-      set_func(c_clear_last_error_mark,
-               OSSL_FUNC_core_clear_last_error_mark(tmp));
-      break;
-    case OSSL_FUNC_CORE_POP_ERROR_TO_MARK:
-      set_func(c_pop_error_to_mark, OSSL_FUNC_core_pop_error_to_mark(tmp));
-      break;
+    if (c == NULL)                                                             \
+        c = f;                                                                 \
+    else if (c != f)                                                           \
+        return 0;
+        switch (tmp->function_id) {
+        case OSSL_FUNC_CORE_NEW_ERROR:
+            set_func(c_new_error, OSSL_FUNC_core_new_error(tmp));
+            break;
+        case OSSL_FUNC_CORE_SET_ERROR_DEBUG:
+            set_func(c_set_error_debug, OSSL_FUNC_core_set_error_debug(tmp));
+            break;
+        case OSSL_FUNC_CORE_VSET_ERROR:
+            set_func(c_vset_error, OSSL_FUNC_core_vset_error(tmp));
+            break;
+        case OSSL_FUNC_CORE_SET_ERROR_MARK:
+            set_func(c_set_error_mark, OSSL_FUNC_core_set_error_mark(tmp));
+            break;
+        case OSSL_FUNC_CORE_CLEAR_LAST_ERROR_MARK:
+            set_func(c_clear_last_error_mark,
+                     OSSL_FUNC_core_clear_last_error_mark(tmp));
+            break;
+        case OSSL_FUNC_CORE_POP_ERROR_TO_MARK:
+            set_func(c_pop_error_to_mark,
+                     OSSL_FUNC_core_pop_error_to_mark(tmp));
+            break;
+        }
     }
-  }
 #endif
 
-  if ((*provctx = ossl_prov_ctx_new()) == NULL ||
-      (libctx = OSSL_LIB_CTX_new_child(handle, in)) == NULL) {
-    OSSL_LIB_CTX_free(libctx);
-    legacy_teardown(*provctx);
-    *provctx = NULL;
-    return 0;
-  }
-  ossl_prov_ctx_set0_libctx(*provctx, libctx);
-  ossl_prov_ctx_set0_handle(*provctx, handle);
+    if ((*provctx = ossl_prov_ctx_new()) == NULL ||
+        (libctx = OSSL_LIB_CTX_new_child(handle, in)) == NULL) {
+        OSSL_LIB_CTX_free(libctx);
+        legacy_teardown(*provctx);
+        *provctx = NULL;
+        return 0;
+    }
+    ossl_prov_ctx_set0_libctx(*provctx, libctx);
+    ossl_prov_ctx_set0_handle(*provctx, handle);
 
-  *out = legacy_dispatch_table;
+    *out = legacy_dispatch_table;
 
-  return 1;
+    return 1;
 }
 
 #ifndef STATIC_LEGACY
@@ -258,19 +259,19 @@ int OSSL_provider_init(const OSSL_CORE_HANDLE *handle, const OSSL_DISPATCH *in,
 void ERR_new(void) { c_new_error(NULL); }
 
 void ERR_set_debug(const char *file, int line, const char *func) {
-  c_set_error_debug(NULL, file, line, func);
+    c_set_error_debug(NULL, file, line, func);
 }
 
 void ERR_set_error(int lib, int reason, const char *fmt, ...) {
-  va_list args;
+    va_list args;
 
-  va_start(args, fmt);
-  c_vset_error(NULL, ERR_PACK(lib, 0, reason), fmt, args);
-  va_end(args);
+    va_start(args, fmt);
+    c_vset_error(NULL, ERR_PACK(lib, 0, reason), fmt, args);
+    va_end(args);
 }
 
 void ERR_vset_error(int lib, int reason, const char *fmt, va_list args) {
-  c_vset_error(NULL, ERR_PACK(lib, 0, reason), fmt, args);
+    c_vset_error(NULL, ERR_PACK(lib, 0, reason), fmt, args);
 }
 
 int ERR_set_mark(void) { return c_set_error_mark(NULL); }

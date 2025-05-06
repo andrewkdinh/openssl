@@ -26,14 +26,14 @@
 typedef struct quic_cfq_item_st QUIC_CFQ_ITEM;
 
 struct quic_cfq_item_st {
-  /*
-   * These fields are not used by the CFQ, but are a convenience to assist the
-   * TXPIM in keeping a list of GCR control frames which were sent in a
-   * packet. They may be used for any purpose.
-   */
-  QUIC_CFQ_ITEM *pkt_prev, *pkt_next;
+    /*
+     * These fields are not used by the CFQ, but are a convenience to assist the
+     * TXPIM in keeping a list of GCR control frames which were sent in a
+     * packet. They may be used for any purpose.
+     */
+    QUIC_CFQ_ITEM *pkt_prev, *pkt_next;
 
-  /* All other fields are private; use ossl_quic_cfq_item_* accessors. */
+    /* All other fields are private; use ossl_quic_cfq_item_* accessors. */
 };
 
 #define QUIC_CFQ_STATE_NEW 0

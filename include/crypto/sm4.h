@@ -26,7 +26,7 @@
 #define SM4_KEY_SCHEDULE 32
 
 typedef struct SM4_KEY_st {
-  uint32_t rk[SM4_KEY_SCHEDULE];
+    uint32_t rk[SM4_KEY_SCHEDULE];
 } SM4_KEY;
 
 int ossl_sm4_set_key(const uint8_t *key, SM4_KEY *ks);
