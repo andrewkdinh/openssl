@@ -23,28 +23,26 @@
 static OSSL_FUNC_cipher_freectx_fn aes_freectx;
 static OSSL_FUNC_cipher_dupctx_fn aes_dupctx;
 
-static void aes_freectx(void *vctx)
-{
-    PROV_AES_CTX *ctx = (PROV_AES_CTX *)vctx;
+static void aes_freectx(void *vctx) {
+  PROV_AES_CTX *ctx = (PROV_AES_CTX *)vctx;
 
-    ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
-    OPENSSL_clear_free(ctx,  sizeof(*ctx));
+  ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
+  OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
-static void *aes_dupctx(void *ctx)
-{
-    PROV_AES_CTX *in = (PROV_AES_CTX *)ctx;
-    PROV_AES_CTX *ret;
+static void *aes_dupctx(void *ctx) {
+  PROV_AES_CTX *in = (PROV_AES_CTX *)ctx;
+  PROV_AES_CTX *ret;
 
-    if (!ossl_prov_is_running())
-        return NULL;
+  if (!ossl_prov_is_running())
+    return NULL;
 
-    ret = OPENSSL_malloc(sizeof(*ret));
-    if (ret == NULL)
-        return NULL;
-    in->base.hw->copyctx(&ret->base, &in->base);
+  ret = OPENSSL_malloc(sizeof(*ret));
+  if (ret == NULL)
+    return NULL;
+  in->base.hw->copyctx(&ret->base, &in->base);
 
-    return ret;
+  return ret;
 }
 
 /* ossl_aes256ecb_functions */
@@ -66,11 +64,11 @@ IMPLEMENT_generic_cipher(aes, AES, ofb, OFB, 0, 192, 8, 128, stream)
 /* ossl_aes128ofb_functions */
 IMPLEMENT_generic_cipher(aes, AES, ofb, OFB, 0, 128, 8, 128, stream)
 /* ossl_aes256cfb_functions */
-IMPLEMENT_generic_cipher(aes, AES, cfb,  CFB, 0, 256, 8, 128, stream)
+IMPLEMENT_generic_cipher(aes, AES, cfb, CFB, 0, 256, 8, 128, stream)
 /* ossl_aes192cfb_functions */
-IMPLEMENT_generic_cipher(aes, AES, cfb,  CFB, 0, 192, 8, 128, stream)
+IMPLEMENT_generic_cipher(aes, AES, cfb, CFB, 0, 192, 8, 128, stream)
 /* ossl_aes128cfb_functions */
-IMPLEMENT_generic_cipher(aes, AES, cfb,  CFB, 0, 128, 8, 128, stream)
+IMPLEMENT_generic_cipher(aes, AES, cfb, CFB, 0, 128, 8, 128, stream)
 /* ossl_aes256cfb1_functions */
 IMPLEMENT_generic_cipher(aes, AES, cfb1, CFB, 0, 256, 8, 128, stream)
 /* ossl_aes192cfb1_functions */
