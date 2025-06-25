@@ -41,7 +41,7 @@ static int get_cert_and_key(X509 **cert_out, EVP_PKEY **key_out)
     *cert_out = cert;
     *key_out = key;
     return 1;
- end:
+end:
     X509_free(cert);
     EVP_PKEY_free(key);
     return 0;
@@ -60,7 +60,7 @@ static int get_cert(X509 **cert_out)
         goto end;
     *cert_out = cert;
     return 1;
- end:
+end:
     X509_free(cert);
     return 0;
 }
@@ -78,27 +78,21 @@ static OCSP_BASICRESP *make_dummy_resp(void)
     ASN1_BIT_STRING *key = ASN1_BIT_STRING_new();
     ASN1_INTEGER *serial = ASN1_INTEGER_new();
 
-    if (!TEST_ptr(name)
-        || !TEST_ptr(key)
-        || !TEST_ptr(serial)
-        || !TEST_true(X509_NAME_add_entry_by_NID(name, NID_commonName,
-                                                 MBSTRING_ASC,
-                                                 namestr, -1, -1, 1))
+    if (!TEST_ptr(name) || !TEST_ptr(key) || !TEST_ptr(serial)
+        || !TEST_true(X509_NAME_add_entry_by_NID(
+            name, NID_commonName, MBSTRING_ASC, namestr, -1, -1, 1))
         || !TEST_true(ASN1_BIT_STRING_set(key, keybytes, sizeof(keybytes)))
         || !TEST_true(ASN1_INTEGER_set_uint64(serial, (uint64_t)1)))
         goto err;
     cid = OCSP_cert_id_new(EVP_sha256(), name, key, serial);
-    if (!TEST_ptr(bs)
-        || !TEST_ptr(thisupd)
-        || !TEST_ptr(nextupd)
+    if (!TEST_ptr(bs) || !TEST_ptr(thisupd) || !TEST_ptr(nextupd)
         || !TEST_ptr(cid)
-        || !TEST_true(OCSP_basic_add1_status(bs, cid,
-                                             V_OCSP_CERTSTATUS_UNKNOWN,
+        || !TEST_true(OCSP_basic_add1_status(bs, cid, V_OCSP_CERTSTATUS_UNKNOWN,
                                              0, NULL, thisupd, nextupd)))
         goto err;
     bs_out = bs;
     bs = NULL;
- err:
+err:
     ASN1_TIME_free(thisupd);
     ASN1_TIME_free(nextupd);
     ASN1_BIT_STRING_free(key);
@@ -123,12 +117,11 @@ static int test_resp_signer(void)
      */
     bs = make_dummy_resp();
     extra_certs = sk_X509_new_null();
-    if (!TEST_ptr(bs)
-        || !TEST_ptr(extra_certs)
+    if (!TEST_ptr(bs) || !TEST_ptr(extra_certs)
         || !TEST_true(get_cert_and_key(&signer, &key))
         || !TEST_true(sk_X509_push(extra_certs, signer))
-        || !TEST_true(OCSP_basic_sign(bs, signer, key, EVP_sha1(),
-                                      NULL, OCSP_NOCERTS)))
+        || !TEST_true(
+            OCSP_basic_sign(bs, signer, key, EVP_sha1(), NULL, OCSP_NOCERTS)))
         goto err;
     if (!TEST_true(OCSP_resp_get0_signer(bs, &tmp, extra_certs))
         || !TEST_int_eq(X509_cmp(tmp, signer), 0))
@@ -139,14 +132,13 @@ static int test_resp_signer(void)
     bs = make_dummy_resp();
     tmp = NULL;
     if (!TEST_ptr(bs)
-        || !TEST_true(OCSP_basic_sign(bs, signer, key, EVP_sha1(),
-                                      NULL, 0)))
+        || !TEST_true(OCSP_basic_sign(bs, signer, key, EVP_sha1(), NULL, 0)))
         goto err;
     if (!TEST_true(OCSP_resp_get0_signer(bs, &tmp, NULL))
         || !TEST_int_eq(X509_cmp(tmp, signer), 0))
         goto err;
     ret = 1;
- err:
+err:
     OCSP_BASICRESP_free(bs);
     sk_X509_free(extra_certs);
     X509_free(signer);
@@ -186,11 +178,7 @@ err:
 
 static int test_ocsp_url_svcloc_new(void)
 {
-    static const char *urls[] = {
-        "www.openssl.org",
-        "www.openssl.net",
-        NULL
-    };
+    static const char *urls[] = {"www.openssl.org", "www.openssl.net", NULL};
 
     X509 *issuer = NULL;
     X509_EXTENSION *ext = NULL;

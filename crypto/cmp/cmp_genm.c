@@ -26,8 +26,8 @@ static void cert_msg(const char *func, const char *file, int lineno,
 
     ossl_cmp_print_log(level, ctx, func, file, lineno,
                        level == OSSL_CMP_LOG_WARNING ? "WARN" : "ERR",
-                       "certificate from '%s' with subject '%s' %s",
-                       source, subj, msg);
+                       "certificate from '%s' with subject '%s' %s", source,
+                       subj, msg);
     OPENSSL_free(subj);
 }
 
@@ -43,8 +43,8 @@ static int ossl_X509_check(OSSL_CMP_CTX *ctx, const char *source, X509 *cert,
         vpm == NULL ? OSSL_CMP_LOG_WARNING : OSSL_CMP_LOG_ERR;
 
     if (!ret)
-        cert_msg(OPENSSL_FUNC, OPENSSL_FILE, OPENSSL_LINE, level, ctx,
-                 source, cert, res > 0 ? "has expired" : "not yet valid");
+        cert_msg(OPENSSL_FUNC, OPENSSL_FILE, OPENSSL_LINE, level, ctx, source,
+                 cert, res > 0 ? "has expired" : "not yet valid");
     if (type_CA >= 0 && (ex_flags & EXFLAG_V1) == 0) {
         int is_CA = (ex_flags & EXFLAG_CA) != 0;
 
@@ -59,15 +59,15 @@ static int ossl_X509_check(OSSL_CMP_CTX *ctx, const char *source, X509 *cert,
 }
 
 static int ossl_X509_check_all(OSSL_CMP_CTX *ctx, const char *source,
-                               STACK_OF(X509) *certs,
-                               int type_CA, const X509_VERIFY_PARAM *vpm)
+                               STACK_OF(X509) *certs, int type_CA,
+                               const X509_VERIFY_PARAM *vpm)
 {
     int i;
     int ret = 1;
 
     for (i = 0; i < sk_X509_num(certs /* may be NULL */); i++)
-        ret = ossl_X509_check(ctx, source,
-                              sk_X509_value(certs, i), type_CA, vpm)
+        ret =
+            ossl_X509_check(ctx, source, sk_X509_value(certs, i), type_CA, vpm)
             && ret; /* Having 'ret' after the '&&', all certs are checked. */
     return ret;
 }
@@ -84,8 +84,9 @@ static OSSL_CMP_ITAV *get_genm_itav(OSSL_CMP_CTX *ctx,
         goto err;
     }
     if (OSSL_CMP_CTX_get_status(ctx) != OSSL_CMP_PKISTATUS_unspecified) {
-        ERR_raise_data(ERR_LIB_CMP, CMP_R_UNCLEAN_CTX,
-                       "client context in unsuitable state; should call CMPclient_reinit() before");
+        ERR_raise_data(
+            ERR_LIB_CMP, CMP_R_UNCLEAN_CTX,
+            "client context in unsuitable state; should call CMPclient_reinit() before");
         goto err;
     }
 
@@ -95,22 +96,25 @@ static OSSL_CMP_ITAV *get_genm_itav(OSSL_CMP_CTX *ctx,
     itavs = OSSL_CMP_exec_GENM_ses(ctx);
     if (itavs == NULL) {
         if (OSSL_CMP_CTX_get_status(ctx) != OSSL_CMP_PKISTATUS_request)
-            ERR_raise_data(ERR_LIB_CMP, CMP_R_GETTING_GENP,
-                           "with infoType %s", desc);
+            ERR_raise_data(ERR_LIB_CMP, CMP_R_GETTING_GENP, "with infoType %s",
+                           desc);
         return NULL;
     }
 
     if ((n = sk_OSSL_CMP_ITAV_num(itavs)) <= 0) {
-        ERR_raise_data(ERR_LIB_CMP, CMP_R_INVALID_GENP,
-                       "response on genm requesting infoType %s does not include suitable value", desc);
+        ERR_raise_data(
+            ERR_LIB_CMP, CMP_R_INVALID_GENP,
+            "response on genm requesting infoType %s does not include suitable value",
+            desc);
         sk_OSSL_CMP_ITAV_free(itavs);
         return NULL;
     }
 
     if (n > 1)
-        ossl_cmp_log2(WARN, ctx,
-                      "response on genm contains %d ITAVs; will use the first ITAV with infoType id-it-%s",
-                      n, desc);
+        ossl_cmp_log2(
+            WARN, ctx,
+            "response on genm contains %d ITAVs; will use the first ITAV with infoType id-it-%s",
+            n, desc);
     for (i = 0; i < n; i++) {
         OSSL_CMP_ITAV *itav = sk_OSSL_CMP_ITAV_shift(itavs);
         ASN1_OBJECT *obj = OSSL_CMP_ITAV_get0_type(itav);
@@ -132,7 +136,7 @@ static OSSL_CMP_ITAV *get_genm_itav(OSSL_CMP_CTX *ctx,
     ERR_raise_data(ERR_LIB_CMP, CMP_R_INVALID_GENP,
                    "could not find any ITAV for %s", desc);
 
- err:
+err:
     sk_OSSL_CMP_ITAV_free(itavs);
     OSSL_CMP_ITAV_free(req);
     return NULL;
@@ -173,16 +177,15 @@ int OSSL_CMP_get1_caCerts(OSSL_CMP_CTX *ctx, STACK_OF(X509) **out)
         ret = 0;
     }
 
- end:
+end:
     OSSL_CMP_ITAV_free(itav);
     return ret;
 }
 
 static int selfsigned_verify_cb(int ok, X509_STORE_CTX *store_ctx)
 {
-    if (ok == 0
-            && X509_STORE_CTX_get_error_depth(store_ctx) == 0
-            && X509_STORE_CTX_get_error(store_ctx)
+    if (ok == 0 && X509_STORE_CTX_get_error_depth(store_ctx) == 0
+        && X509_STORE_CTX_get_error(store_ctx)
             == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) {
         /* in this case, custom chain building */
         int i;
@@ -235,12 +238,12 @@ static int verify_ss_cert(OSSL_LIB_CTX *libctx, const char *propq,
     }
 
     if ((csc = X509_STORE_CTX_new_ex(libctx, propq)) == NULL
-            || !X509_STORE_CTX_init(csc, ts, target, untrusted))
+        || !X509_STORE_CTX_init(csc, ts, target, untrusted))
         goto err;
     X509_STORE_CTX_set_verify_cb(csc, selfsigned_verify_cb);
     ok = X509_verify_cert(csc) > 0;
 
- err:
+err:
     X509_STORE_CTX_free(csc);
     return ok;
 }
@@ -265,28 +268,28 @@ verify_ss_cert_trans(OSSL_CMP_CTX *ctx, X509 *trusted /* may be NULL */,
     }
 
     if (trans != NULL
-            && !ossl_x509_add_cert_new(&untrusted, trans, X509_ADD_FLAG_UP_REF))
+        && !ossl_x509_add_cert_new(&untrusted, trans, X509_ADD_FLAG_UP_REF))
         goto err;
 
     res = verify_ss_cert(OSSL_CMP_CTX_get0_libctx(ctx),
-                         OSSL_CMP_CTX_get0_propq(ctx),
-                         ts, untrusted, target);
+                         OSSL_CMP_CTX_get0_propq(ctx), ts, untrusted, target);
     if (!res)
-        ERR_raise_data(ERR_LIB_CMP, CMP_R_INVALID_ROOTCAKEYUPDATE,
-                       "failed to validate %s certificate received in genp %s",
-                       desc, trusted == NULL ? "using trust store"
-                       : "with given certificate as trust anchor");
+        ERR_raise_data(
+            ERR_LIB_CMP, CMP_R_INVALID_ROOTCAKEYUPDATE,
+            "failed to validate %s certificate received in genp %s", desc,
+            trusted == NULL ? "using trust store"
+                            : "with given certificate as trust anchor");
 
- err:
+err:
     sk_X509_pop_free(untrusted, X509_free);
     if (trusted != NULL)
         X509_STORE_free(ts);
     return res;
 }
 
-int OSSL_CMP_get1_rootCaKeyUpdate(OSSL_CMP_CTX *ctx,
-                                  const X509 *oldWithOld, X509 **newWithNew,
-                                  X509 **newWithOld, X509 **oldWithNew)
+int OSSL_CMP_get1_rootCaKeyUpdate(OSSL_CMP_CTX *ctx, const X509 *oldWithOld,
+                                  X509 **newWithNew, X509 **newWithOld,
+                                  X509 **oldWithNew)
 {
     X509 *oldWithOld_copy = NULL, *my_newWithOld, *my_oldWithNew;
     OSSL_CMP_ITAV *req, *itav;
@@ -300,12 +303,13 @@ int OSSL_CMP_get1_rootCaKeyUpdate(OSSL_CMP_CTX *ctx,
 
     if ((req = OSSL_CMP_ITAV_new_rootCaCert(oldWithOld)) == NULL)
         return 0;
-    itav = get_genm_itav(ctx, req, NID_id_it_rootCaKeyUpdate, "rootCaKeyUpdate");
+    itav =
+        get_genm_itav(ctx, req, NID_id_it_rootCaKeyUpdate, "rootCaKeyUpdate");
     if (itav == NULL)
         return 0;
 
-    if (!OSSL_CMP_ITAV_get0_rootCaKeyUpdate(itav, newWithNew,
-                                            &my_newWithOld, &my_oldWithNew))
+    if (!OSSL_CMP_ITAV_get0_rootCaKeyUpdate(itav, newWithNew, &my_newWithOld,
+                                            &my_oldWithNew))
         goto end;
     /* no root CA cert update available */
     if (*newWithNew == NULL) {
@@ -314,8 +318,8 @@ int OSSL_CMP_get1_rootCaKeyUpdate(OSSL_CMP_CTX *ctx,
     }
     if ((oldWithOld_copy = X509_dup(oldWithOld)) == NULL && oldWithOld != NULL)
         goto end;
-    if (!verify_ss_cert_trans(ctx, oldWithOld_copy, my_newWithOld,
-                              *newWithNew, "newWithNew")) {
+    if (!verify_ss_cert_trans(ctx, oldWithOld_copy, my_newWithOld, *newWithNew,
+                              "newWithNew")) {
         ERR_raise(ERR_LIB_CMP, CMP_R_INVALID_ROOTCAKEYUPDATE);
         goto end;
     }
@@ -328,28 +332,27 @@ int OSSL_CMP_get1_rootCaKeyUpdate(OSSL_CMP_CTX *ctx,
 
     if (!X509_up_ref(*newWithNew))
         goto end;
-    if (newWithOld != NULL &&
-        (*newWithOld = my_newWithOld) != NULL && !X509_up_ref(*newWithOld))
+    if (newWithOld != NULL && (*newWithOld = my_newWithOld) != NULL
+        && !X509_up_ref(*newWithOld))
         goto free;
-    if (oldWithNew == NULL ||
-        (*oldWithNew = my_oldWithNew) == NULL || X509_up_ref(*oldWithNew)) {
+    if (oldWithNew == NULL || (*oldWithNew = my_oldWithNew) == NULL
+        || X509_up_ref(*oldWithNew)) {
         res = 1;
         goto end;
     }
     if (newWithOld != NULL)
         X509_free(*newWithOld);
- free:
+free:
     X509_free(*newWithNew);
 
- end:
+end:
     OSSL_CMP_ITAV_free(itav);
     X509_free(oldWithOld_copy);
     return res;
 }
 
 int OSSL_CMP_get1_crlUpdate(OSSL_CMP_CTX *ctx, const X509 *crlcert,
-                            const X509_CRL *last_crl,
-                            X509_CRL **crl)
+                            const X509_CRL *last_crl, X509_CRL **crl)
 {
     OSSL_CMP_CRLSTATUS *status = NULL;
     STACK_OF(OSSL_CMP_CRLSTATUS) *list = NULL;
@@ -400,7 +403,7 @@ int OSSL_CMP_get1_crlUpdate(OSSL_CMP_CTX *ctx, const X509 *crlcert,
         goto end;
     }
     res = 1;
- end:
+end:
     OSSL_CMP_CRLSTATUS_free(status);
     sk_OSSL_CMP_CRLSTATUS_free(list);
     OSSL_CMP_ITAV_free(itav);
@@ -428,14 +431,15 @@ int OSSL_CMP_get1_certReqTemplate(OSSL_CMP_CTX *ctx,
     }
 
     if ((itav = get_genm_itav(ctx, req, NID_id_it_certReqTemplate,
-                              "certReqTemplate")) == NULL)
+                              "certReqTemplate"))
+        == NULL)
         return 0;
 
     if (!OSSL_CMP_ITAV_get1_certReqTemplate(itav, certTemplate, keySpec))
         goto end;
 
     res = 1;
- end:
+end:
     OSSL_CMP_ITAV_free(itav);
     return res;
 }

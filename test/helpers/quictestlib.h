@@ -117,14 +117,12 @@ int qtest_check_server_frame_encoding_err(QUIC_TSERVER *qtserv);
  */
 typedef int (*qtest_fault_on_packet_plain_cb)(QTEST_FAULT *fault,
                                               QUIC_PKT_HDR *hdr,
-                                              unsigned char *buf,
-                                              size_t len,
+                                              unsigned char *buf, size_t len,
                                               void *cbarg);
 
-int qtest_fault_set_packet_plain_listener(QTEST_FAULT *fault,
-                                          qtest_fault_on_packet_plain_cb pplaincb,
-                                          void *pplaincbarg);
-
+int qtest_fault_set_packet_plain_listener(
+    QTEST_FAULT *fault, qtest_fault_on_packet_plain_cb pplaincb,
+    void *pplaincbarg);
 
 /*
  * Helper function to be called from a packet_plain_listener callback if it
@@ -148,8 +146,7 @@ int qtest_fault_prepend_frame(QTEST_FAULT *fault, const unsigned char *frame,
  * data block, including the handshake header itself
  */
 typedef int (*qtest_fault_on_handshake_cb)(QTEST_FAULT *fault,
-                                           unsigned char *msg,
-                                           size_t msglen,
+                                           unsigned char *msg, size_t msglen,
                                            void *handshakecbarg);
 
 int qtest_fault_set_handshake_listener(QTEST_FAULT *fault,
@@ -180,15 +177,13 @@ int qtest_fault_resize_handshake(QTEST_FAULT *fault, size_t newlen);
  */
 typedef int (*qtest_fault_on_enc_ext_cb)(QTEST_FAULT *fault,
                                          QTEST_ENCRYPTED_EXTENSIONS *ee,
-                                         size_t eelen,
-                                         void *encextcbarg);
+                                         size_t eelen, void *encextcbarg);
 
 int qtest_fault_set_hand_enc_ext_listener(QTEST_FAULT *fault,
                                           qtest_fault_on_enc_ext_cb encextcb,
                                           void *encextcbarg);
 
 /* Add listeners for other types of handshake message here */
-
 
 /*
  * Helper function to be called from message specific listener callbacks. newlen
@@ -207,9 +202,8 @@ int qtest_fault_resize_message(QTEST_FAULT *fault, size_t newlen);
  * with the new length on exit. If old_ext is non-NULL, the deleted extension
  * is appended to the given BUF_MEM.
  */
-int qtest_fault_delete_extension(QTEST_FAULT *fault,
-                                 unsigned int exttype, unsigned char *ext,
-                                 size_t *extlen,
+int qtest_fault_delete_extension(QTEST_FAULT *fault, unsigned int exttype,
+                                 unsigned char *ext, size_t *extlen,
                                  BUF_MEM *old_ext);
 
 /*
@@ -227,20 +221,17 @@ typedef int (*qtest_fault_on_packet_cipher_cb)(QTEST_FAULT *fault,
                                                /* The packet payload data */
                                                unsigned char *buf,
                                                /* Length of the payload */
-                                               size_t len,
-                                               void *cbarg);
+                                               size_t len, void *cbarg);
 
-int qtest_fault_set_packet_cipher_listener(QTEST_FAULT *fault,
-                                           qtest_fault_on_packet_cipher_cb pciphercb,
-                                           void *picphercbarg);
+int qtest_fault_set_packet_cipher_listener(
+    QTEST_FAULT *fault, qtest_fault_on_packet_cipher_cb pciphercb,
+    void *picphercbarg);
 
 /*
  * Enable tests to listen for datagrams being sent
  */
-typedef int (*qtest_fault_on_datagram_cb)(QTEST_FAULT *fault,
-                                          BIO_MSG *m,
-                                          size_t stride,
-                                          void *cbarg);
+typedef int (*qtest_fault_on_datagram_cb)(QTEST_FAULT *fault, BIO_MSG *m,
+                                          size_t stride, void *cbarg);
 
 int qtest_fault_set_datagram_listener(QTEST_FAULT *fault,
                                       qtest_fault_on_datagram_cb datagramcb,
@@ -259,8 +250,7 @@ int qtest_fault_resize_datagram(QTEST_FAULT *fault, size_t newlen);
  * Arguments with values of 0 mean no limit/no noise.
  */
 
-int qtest_fault_set_bw_limit(QTEST_FAULT *fault,
-                             size_t ctos_bw, size_t stoc_bw,
+int qtest_fault_set_bw_limit(QTEST_FAULT *fault, size_t ctos_bw, size_t stoc_bw,
                              int noise_rate);
 
 /* Copy a BIO_MSG */

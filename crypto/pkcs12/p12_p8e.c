@@ -14,9 +14,8 @@
 #include "crypto/x509.h"
 
 X509_SIG *PKCS8_encrypt_ex(int pbe_nid, const EVP_CIPHER *cipher,
-                           const char *pass, int passlen,
-                           unsigned char *salt, int saltlen, int iter,
-                           PKCS8_PRIV_KEY_INFO *p8inf,
+                           const char *pass, int passlen, unsigned char *salt,
+                           int saltlen, int iter, PKCS8_PRIV_KEY_INFO *p8inf,
                            OSSL_LIB_CTX *libctx, const char *propq)
 {
     X509_SIG *p8 = NULL;
@@ -27,8 +26,8 @@ X509_SIG *PKCS8_encrypt_ex(int pbe_nid, const EVP_CIPHER *cipher,
             ERR_raise(ERR_LIB_PKCS12, ERR_R_PASSED_NULL_PARAMETER);
             return NULL;
         }
-        pbe = PKCS5_pbe2_set_iv_ex(cipher, iter, salt, saltlen, NULL, -1,
-                                   libctx);
+        pbe =
+            PKCS5_pbe2_set_iv_ex(cipher, iter, salt, saltlen, NULL, -1, libctx);
     } else {
         ERR_set_mark();
         if (EVP_PBE_find(EVP_PBE_TYPE_PRF, pbe_nid, NULL, NULL, 0)) {
@@ -57,9 +56,8 @@ X509_SIG *PKCS8_encrypt_ex(int pbe_nid, const EVP_CIPHER *cipher,
     return p8;
 }
 
-X509_SIG *PKCS8_encrypt(int pbe_nid, const EVP_CIPHER *cipher,
-                        const char *pass, int passlen,
-                        unsigned char *salt, int saltlen, int iter,
+X509_SIG *PKCS8_encrypt(int pbe_nid, const EVP_CIPHER *cipher, const char *pass,
+                        int passlen, unsigned char *salt, int saltlen, int iter,
                         PKCS8_PRIV_KEY_INFO *p8inf)
 {
     return PKCS8_encrypt_ex(pbe_nid, cipher, pass, passlen, salt, saltlen, iter,

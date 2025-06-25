@@ -25,26 +25,22 @@
  * the soliloquy from Hamlet scene 1 act 3
  */
 
-static const char *hamlet_1 =
-    "To be, or not to be, that is the question,\n"
-    "Whether tis nobler in the minde to suffer\n"
-    "The slings and arrowes of outragious fortune,\n"
-    "Or to take Armes again in a sea of troubles,\n"
-;
+static const char *hamlet_1 = "To be, or not to be, that is the question,\n"
+                              "Whether tis nobler in the minde to suffer\n"
+                              "The slings and arrowes of outragious fortune,\n"
+                              "Or to take Armes again in a sea of troubles,\n";
 static const char *hamlet_2 =
     "And by opposing, end them, to die to sleep;\n"
     "No more, and by a sleep, to say we end\n"
     "The heart-ache, and the thousand natural shocks\n"
-    "That flesh is heir to? tis a consumation\n"
-;
+    "That flesh is heir to? tis a consumation\n";
 
 static const char ALG[] = "DSA";
 static const char DIGEST[] = "SHA256";
 static const int NUMBITS = 2048;
-static const char * const PROPQUERY = NULL;
+static const char *const PROPQUERY = NULL;
 
-static int generate_dsa_params(OSSL_LIB_CTX *libctx,
-                               EVP_PKEY **p_params)
+static int generate_dsa_params(OSSL_LIB_CTX *libctx, EVP_PKEY **p_params)
 {
     int ret = 0;
 
@@ -67,7 +63,7 @@ static int generate_dsa_params(OSSL_LIB_CTX *libctx,
 
     ret = 1;
 end:
-    if(ret != 1) {
+    if (ret != 1) {
         EVP_PKEY_free(params);
         params = NULL;
     }
@@ -80,8 +76,7 @@ end:
     return ret;
 }
 
-static int generate_dsa_key(OSSL_LIB_CTX *libctx,
-                            EVP_PKEY *params,
+static int generate_dsa_key(OSSL_LIB_CTX *libctx, EVP_PKEY *params,
                             EVP_PKEY **p_pkey)
 {
     int ret = 0;
@@ -89,8 +84,7 @@ static int generate_dsa_key(OSSL_LIB_CTX *libctx,
     EVP_PKEY_CTX *ctx = NULL;
     EVP_PKEY *pkey = NULL;
 
-    ctx = EVP_PKEY_CTX_new_from_pkey(libctx, params,
-                                     NULL);
+    ctx = EVP_PKEY_CTX_new_from_pkey(libctx, params, NULL);
     if (ctx == NULL)
         goto end;
     if (EVP_PKEY_keygen_init(ctx) <= 0)
@@ -103,7 +97,7 @@ static int generate_dsa_key(OSSL_LIB_CTX *libctx,
 
     ret = 1;
 end:
-    if(ret != 1) {
+    if (ret != 1) {
         EVP_PKEY_free(pkey);
         pkey = NULL;
     }
@@ -120,8 +114,7 @@ end:
     return ret;
 }
 
-static int extract_public_key(const EVP_PKEY *pkey,
-                              OSSL_PARAM **p_public_key)
+static int extract_public_key(const EVP_PKEY *pkey, OSSL_PARAM **p_public_key)
 {
     int ret = 0;
     OSSL_PARAM *public_key = NULL;
@@ -140,8 +133,7 @@ end:
     return ret;
 }
 
-static int extract_keypair(const EVP_PKEY *pkey,
-                           OSSL_PARAM **p_keypair)
+static int extract_keypair(const EVP_PKEY *pkey, OSSL_PARAM **p_keypair)
 {
     int ret = 0;
     OSSL_PARAM *keypair = NULL;
@@ -160,9 +152,8 @@ end:
     return ret;
 }
 
-static int demo_sign(OSSL_LIB_CTX *libctx,
-                     size_t *p_sig_len, unsigned char **p_sig_value,
-                     OSSL_PARAM keypair[])
+static int demo_sign(OSSL_LIB_CTX *libctx, size_t *p_sig_len,
+                     unsigned char **p_sig_value, OSSL_PARAM keypair[])
 {
     int ret = 0;
     size_t sig_len = 0;
@@ -225,9 +216,8 @@ end:
     return ret;
 }
 
-static int demo_verify(OSSL_LIB_CTX *libctx,
-                       size_t sig_len, unsigned char *sig_value,
-                       OSSL_PARAM public_key[])
+static int demo_verify(OSSL_LIB_CTX *libctx, size_t sig_len,
+                       unsigned char *sig_value, OSSL_PARAM public_key[])
 {
     int ret = 0;
     EVP_MD_CTX *ctx = NULL;
@@ -239,14 +229,16 @@ static int demo_verify(OSSL_LIB_CTX *libctx,
         goto end;
     if (EVP_PKEY_fromdata_init(pkey_ctx) != 1)
         goto end;
-    if (EVP_PKEY_fromdata(pkey_ctx, &pkey, EVP_PKEY_PUBLIC_KEY, public_key) != 1)
+    if (EVP_PKEY_fromdata(pkey_ctx, &pkey, EVP_PKEY_PUBLIC_KEY, public_key)
+        != 1)
         goto end;
 
     ctx = EVP_MD_CTX_create();
-    if(ctx == NULL)
+    if (ctx == NULL)
         goto end;
 
-    if (EVP_DigestVerifyInit_ex(ctx, NULL, DIGEST, libctx, NULL, pkey, NULL) != 1)
+    if (EVP_DigestVerifyInit_ex(ctx, NULL, DIGEST, libctx, NULL, pkey, NULL)
+        != 1)
         goto end;
 
     if (EVP_DigestVerifyUpdate(ctx, hamlet_1, sizeof(hamlet_1)) != 1)

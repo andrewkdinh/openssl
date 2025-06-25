@@ -24,7 +24,6 @@ static int ts_status_map_print(BIO *bio, const struct status_map_st *a,
                                const ASN1_BIT_STRING *v);
 static int ts_ACCURACY_print_bio(BIO *bio, const TS_ACCURACY *accuracy);
 
-
 int TS_RESP_print_bio(BIO *bio, TS_RESP *a)
 {
     BIO_printf(bio, "Status info:\n");
@@ -42,22 +41,13 @@ int TS_RESP_print_bio(BIO *bio, TS_RESP *a)
 int TS_STATUS_INFO_print_bio(BIO *bio, TS_STATUS_INFO *a)
 {
     static const char *status_map[] = {
-        "Granted.",
-        "Granted with modifications.",
-        "Rejected.",
-        "Waiting.",
-        "Revocation warning.",
-        "Revoked."
-    };
+        "Granted.", "Granted with modifications.", "Rejected.",
+        "Waiting.", "Revocation warning.",         "Revoked."};
     static const struct status_map_st failure_map[] = {
-        {TS_INFO_BAD_ALG,
-         "unrecognized or unsupported algorithm identifier"},
-        {TS_INFO_BAD_REQUEST,
-         "transaction not permitted or supported"},
-        {TS_INFO_BAD_DATA_FORMAT,
-         "the data submitted has the wrong format"},
-        {TS_INFO_TIME_NOT_AVAILABLE,
-         "the TSA's time source is not available"},
+        {TS_INFO_BAD_ALG, "unrecognized or unsupported algorithm identifier"},
+        {TS_INFO_BAD_REQUEST, "transaction not permitted or supported"},
+        {TS_INFO_BAD_DATA_FORMAT, "the data submitted has the wrong format"},
+        {TS_INFO_TIME_NOT_AVAILABLE, "the TSA's time source is not available"},
         {TS_INFO_UNACCEPTED_POLICY,
          "the requested TSA policy is not supported by the TSA"},
         {TS_INFO_UNACCEPTED_EXTENSION,
@@ -67,8 +57,7 @@ int TS_STATUS_INFO_print_bio(BIO *bio, TS_STATUS_INFO *a)
          "or is not available"},
         {TS_INFO_SYSTEM_FAILURE,
          "the request cannot be handled due to system failure"},
-        {-1, NULL}
-    };
+        {-1, NULL}};
     long status;
     int i, lines = 0;
 

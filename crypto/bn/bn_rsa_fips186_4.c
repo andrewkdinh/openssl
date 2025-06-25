@@ -37,16 +37,11 @@
 /* 1 / sqrt(2) * 2^256, rounded up */
 static const BN_ULONG inv_sqrt_2_val[] = {
     BN_DEF(0x83339916UL, 0xED17AC85UL), BN_DEF(0x893BA84CUL, 0x1D6F60BAUL),
-    BN_DEF(0x754ABE9FUL, 0x597D89B3UL), BN_DEF(0xF9DE6484UL, 0xB504F333UL)
-};
+    BN_DEF(0x754ABE9FUL, 0x597D89B3UL), BN_DEF(0xF9DE6484UL, 0xB504F333UL)};
 
 const BIGNUM ossl_bn_inv_sqrt_2 = {
-    (BN_ULONG *)inv_sqrt_2_val,
-    OSSL_NELEM(inv_sqrt_2_val),
-    OSSL_NELEM(inv_sqrt_2_val),
-    0,
-    BN_FLG_STATIC_DATA
-};
+    (BN_ULONG *)inv_sqrt_2_val, OSSL_NELEM(inv_sqrt_2_val),
+    OSSL_NELEM(inv_sqrt_2_val), 0, BN_FLG_STATIC_DATA};
 
 /*
  * Refer to FIPS 186-5 Table B.1 for minimum rounds of Miller Rabin
@@ -129,9 +124,8 @@ static int bn_rsa_fips186_5_aux_prime_max_sum_size_for_prob_primes(int nbits)
  *     cb An optional BIGNUM callback.
  * Returns: 1 on success otherwise it returns 0.
  */
-static int bn_rsa_fips186_4_find_aux_prob_prime(const BIGNUM *Xp1,
-                                                BIGNUM *p1, BN_CTX *ctx,
-                                                int rounds,
+static int bn_rsa_fips186_4_find_aux_prob_prime(const BIGNUM *Xp1, BIGNUM *p1,
+                                                BN_CTX *ctx, int rounds,
                                                 BN_GENCB *cb)
 {
     int ret = 0;
@@ -181,12 +175,11 @@ err:
  *     cb An optional BIGNUM callback.
  * Returns: 1 on success otherwise it returns 0.
  */
-int ossl_bn_rsa_fips186_4_gen_prob_primes(BIGNUM *p, BIGNUM *Xpout,
-                                          BIGNUM *p1, BIGNUM *p2,
-                                          const BIGNUM *Xp, const BIGNUM *Xp1,
-                                          const BIGNUM *Xp2, int nlen,
-                                          const BIGNUM *e, BN_CTX *ctx,
-                                          BN_GENCB *cb)
+int ossl_bn_rsa_fips186_4_gen_prob_primes(BIGNUM *p, BIGNUM *Xpout, BIGNUM *p1,
+                                          BIGNUM *p2, const BIGNUM *Xp,
+                                          const BIGNUM *Xp1, const BIGNUM *Xp2,
+                                          int nlen, const BIGNUM *e,
+                                          BN_CTX *ctx, BN_GENCB *cb)
 {
     int ret = 0;
     BIGNUM *p1i = NULL, *p2i = NULL, *Xp1i = NULL, *Xp2i = NULL;
@@ -226,11 +219,11 @@ int ossl_bn_rsa_fips186_4_gen_prob_primes(BIGNUM *p, BIGNUM *Xpout,
 
     /* (Steps 4.2/5.2) - find first auxiliary probable primes */
     if (!bn_rsa_fips186_4_find_aux_prob_prime(Xp1i, p1i, ctx, rounds, cb)
-            || !bn_rsa_fips186_4_find_aux_prob_prime(Xp2i, p2i, ctx, rounds, cb))
+        || !bn_rsa_fips186_4_find_aux_prob_prime(Xp2i, p2i, ctx, rounds, cb))
         goto err;
     /* (Table B.1) auxiliary prime Max length check */
-    if ((BN_num_bits(p1i) + BN_num_bits(p2i)) >=
-            bn_rsa_fips186_5_aux_prime_max_sum_size_for_prob_primes(nlen))
+    if ((BN_num_bits(p1i) + BN_num_bits(p2i))
+        >= bn_rsa_fips186_5_aux_prime_max_sum_size_for_prob_primes(nlen))
         goto err;
     /* (Steps 4.3/5.3) - generate prime */
     if (!ossl_bn_rsa_fips186_4_derive_prime(p, Xpout, Xp, p1i, p2i, nlen, e,
@@ -274,8 +267,8 @@ err:
  */
 int ossl_bn_rsa_fips186_4_derive_prime(BIGNUM *Y, BIGNUM *X, const BIGNUM *Xin,
                                        const BIGNUM *r1, const BIGNUM *r2,
-                                       int nlen, const BIGNUM *e,
-                                       BN_CTX *ctx, BN_GENCB *cb)
+                                       int nlen, const BIGNUM *e, BN_CTX *ctx,
+                                       BN_GENCB *cb)
 {
     int ret = 0;
     int i, imax, rounds;
@@ -327,14 +320,14 @@ int ossl_bn_rsa_fips186_4_derive_prime(BIGNUM *Y, BIGNUM *X, const BIGNUM *Xin,
      *    is used further down.
      */
     if (!(BN_lshift1(r1x2, r1)
-            && (BN_mod_inverse(tmp, r1x2, r2, ctx) != NULL)
-            /* (Step 2) R = ((r2^-1 mod 2r1) * r2) - ((2r1^-1 mod r2)*2r1) */
-            && (BN_mod_inverse(R, r2, r1x2, ctx) != NULL)
-            && BN_mul(R, R, r2, ctx) /* R = (r2^-1 mod 2r1) * r2 */
-            && BN_mul(tmp, tmp, r1x2, ctx) /* tmp = (2r1^-1 mod r2)*2r1 */
-            && BN_sub(R, R, tmp)
-            /* Calculate 2r1r2 */
-            && BN_mul(r1r2x2, r1x2, r2, ctx)))
+          && (BN_mod_inverse(tmp, r1x2, r2, ctx) != NULL)
+          /* (Step 2) R = ((r2^-1 mod 2r1) * r2) - ((2r1^-1 mod r2)*2r1) */
+          && (BN_mod_inverse(R, r2, r1x2, ctx) != NULL)
+          && BN_mul(R, R, r2, ctx) /* R = (r2^-1 mod 2r1) * r2 */
+          && BN_mul(tmp, tmp, r1x2, ctx) /* tmp = (2r1^-1 mod r2)*2r1 */
+          && BN_sub(R, R, tmp)
+          /* Calculate 2r1r2 */
+          && BN_mul(r1r2x2, r1x2, r2, ctx)))
         goto err;
     /* Make positive by adding the modulus */
     if (BN_is_negative(R) && !BN_add(R, R, r1r2x2))
@@ -375,8 +368,7 @@ int ossl_bn_rsa_fips186_4_derive_prime(BIGNUM *Y, BIGNUM *X, const BIGNUM *Xin,
             BN_GENCB_call(cb, 0, 2);
 
             /* (Step 7) If GCD(Y-1) == 1 & Y is probably prime then return Y */
-            if (BN_copy(y1, Y) == NULL
-                    || !BN_sub_word(y1, 1))
+            if (BN_copy(y1, Y) == NULL || !BN_sub_word(y1, 1))
                 goto err;
 
             if (BN_are_coprime(y1, e, ctx)) {

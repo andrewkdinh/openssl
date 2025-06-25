@@ -42,7 +42,7 @@ static const unsigned char key_table[256] = {
 };
 
 #if defined(_MSC_VER) && defined(_ARM_)
-# pragma optimize("g",off)
+# pragma optimize("g", off)
 #endif
 
 /*
@@ -69,8 +69,7 @@ void RC2_set_key(RC2_KEY *key, int len, const unsigned char *data, int bits)
     if (bits > 1024)
         bits = 1024;
 
-    for (i = 0; i < len; i++)
-        k[i] = data[i];
+    for (i = 0; i < len; i++) k[i] = data[i];
 
     /* expand table */
     d = k[len - 1];
@@ -95,10 +94,9 @@ void RC2_set_key(RC2_KEY *key, int len, const unsigned char *data, int bits)
 
     /* copy from bytes into RC2_INT's */
     ki = &(key->data[63]);
-    for (i = 127; i >= 0; i -= 2)
-        *(ki--) = ((k[i] << 8) | k[i - 1]) & 0xffff;
+    for (i = 127; i >= 0; i -= 2) *(ki--) = ((k[i] << 8) | k[i - 1]) & 0xffff;
 }
 
 #if defined(_MSC_VER)
-# pragma optimize("",on)
+# pragma optimize("", on)
 #endif

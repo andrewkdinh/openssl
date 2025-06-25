@@ -23,7 +23,8 @@
  * only VC++ 2008 or earlier x86 compilers.
  */
 
-#if ((defined(_MSC_VER) && defined(_M_IX86) && _MSC_VER <= 1600) || (defined(__MINGW32__) && !defined(__MINGW64__)))
+#if ((defined(_MSC_VER) && defined(_M_IX86) && _MSC_VER <= 1600) \
+     || (defined(__MINGW32__) && !defined(__MINGW64__)))
 # define NO_INTERLOCKEDOR64
 #endif
 
@@ -35,7 +36,8 @@
 #include "internal/rcu.h"
 #include "rcu_internal.h"
 
-#if defined(OPENSSL_THREADS) && !defined(CRYPTO_TDEBUG) && defined(OPENSSL_SYS_WINDOWS)
+#if defined(OPENSSL_THREADS) && !defined(CRYPTO_TDEBUG) \
+    && defined(OPENSSL_SYS_WINDOWS)
 
 # ifdef USE_RWLOCK
 typedef struct {
@@ -127,8 +129,7 @@ struct rcu_lock_st {
 static struct rcu_qp *allocate_new_qp_group(struct rcu_lock_st *lock,
                                             uint32_t count)
 {
-    struct rcu_qp *new =
-        OPENSSL_zalloc(sizeof(*new) * count);
+    struct rcu_qp *new = OPENSSL_zalloc(sizeof(*new) * count);
 
     lock->group_count = count;
     return new;
@@ -161,12 +162,9 @@ CRYPTO_RCU_LOCK *ossl_rcu_lock_new(int num_writers, OSSL_LIB_CTX *ctx)
     new->alloc_lock = ossl_crypto_mutex_new();
     new->prior_lock = ossl_crypto_mutex_new();
     new->qp_group = allocate_new_qp_group(new, num_writers);
-    if (new->qp_group == NULL
-        || new->alloc_signal == NULL
-        || new->prior_signal == NULL
-        || new->write_lock == NULL
-        || new->alloc_lock == NULL
-        || new->prior_lock == NULL
+    if (new->qp_group == NULL || new->alloc_signal == NULL
+        || new->prior_signal == NULL || new->write_lock == NULL
+        || new->alloc_lock == NULL || new->prior_lock == NULL
         || new->rw_lock == NULL) {
         CRYPTO_THREAD_lock_free(new->rw_lock);
         OPENSSL_free(new->qp_group);
@@ -180,7 +178,6 @@ CRYPTO_RCU_LOCK *ossl_rcu_lock_new(int num_writers, OSSL_LIB_CTX *ctx)
     }
 
     return new;
-
 }
 
 void ossl_rcu_lock_free(CRYPTO_RCU_LOCK *lock)
@@ -222,7 +219,8 @@ static ossl_inline struct rcu_qp *get_hold_current_qp(CRYPTO_RCU_LOCK *lock)
 static void ossl_rcu_free_local_data(void *arg)
 {
     OSSL_LIB_CTX *ctx = arg;
-    struct rcu_thr_data *data = CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, ctx);
+    struct rcu_thr_data *data =
+        CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, ctx);
 
     CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, ctx, NULL);
     OPENSSL_free(data);
@@ -243,7 +241,8 @@ void ossl_rcu_read_lock(CRYPTO_RCU_LOCK *lock)
     if (data == NULL) {
         data = OPENSSL_zalloc(sizeof(*data));
         OPENSSL_assert(data != NULL);
-        CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, lock->ctx, data);
+        CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, lock->ctx,
+                                   data);
         ossl_init_thread_start(NULL, lock->ctx, ossl_rcu_free_local_data);
     }
 
@@ -277,7 +276,8 @@ void ossl_rcu_write_unlock(CRYPTO_RCU_LOCK *lock)
 
 void ossl_rcu_read_unlock(CRYPTO_RCU_LOCK *lock)
 {
-    struct rcu_thr_data *data = CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, lock->ctx);
+    struct rcu_thr_data *data =
+        CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, lock->ctx);
     int i;
     LONG64 ret;
 
@@ -324,8 +324,7 @@ static struct rcu_qp *update_qp(CRYPTO_RCU_LOCK *lock, uint32_t *curr_id)
     lock->writers_alloced++;
 
     /* increment the allocation index */
-    lock->current_alloc_idx =
-        (lock->current_alloc_idx + 1) % lock->group_count;
+    lock->current_alloc_idx = (lock->current_alloc_idx + 1) % lock->group_count;
 
     /* get and insert a new id */
     *curr_id = lock->id_ctr;
@@ -347,15 +346,13 @@ static struct rcu_qp *update_qp(CRYPTO_RCU_LOCK *lock, uint32_t *curr_id)
     return &lock->qp_group[current_idx];
 }
 
-static void retire_qp(CRYPTO_RCU_LOCK *lock,
-                      struct rcu_qp *qp)
+static void retire_qp(CRYPTO_RCU_LOCK *lock, struct rcu_qp *qp)
 {
     ossl_crypto_mutex_lock(lock->alloc_lock);
     lock->writers_alloced--;
     ossl_crypto_condvar_broadcast(lock->alloc_signal);
     ossl_crypto_mutex_unlock(lock->alloc_lock);
 }
-
 
 void ossl_synchronize_rcu(CRYPTO_RCU_LOCK *lock)
 {
@@ -398,7 +395,6 @@ void ossl_synchronize_rcu(CRYPTO_RCU_LOCK *lock)
 
     /* and we're done */
     return;
-
 }
 
 /*
@@ -427,9 +423,8 @@ void *ossl_rcu_uptr_deref(void **p)
 
 void ossl_rcu_assign_uptr(void **p, void **v)
 {
-    InterlockedExchangePointer((void * volatile *)p, (void *)*v);
+    InterlockedExchangePointer((void *volatile *)p, (void *)*v);
 }
-
 
 CRYPTO_RWLOCK *CRYPTO_THREAD_lock_new(void)
 {

@@ -41,8 +41,7 @@ static int test_quic_client_ex(int fd_arg)
     int c_connected = 0, c_write_done = 0, c_shutdown = 0;
     size_t l = 0, c_total_read = 0;
     OSSL_TIME start_time;
-    unsigned char alpn[] = { 8, 'h', 't', 't', 'p', '/', '0', '.', '9' };
-
+    unsigned char alpn[] = {8, 'h', 't', 't', 'p', '/', '0', '.', '9'};
 
     if (fd_arg == INVALID_SOCKET) {
         /* Setup test client. */
@@ -100,7 +99,8 @@ static int test_quic_client_ex(int fd_arg)
 
     for (;;) {
         if (ossl_time_compare(ossl_time_subtract(ossl_time_now(), start_time),
-                              ossl_ms2time(10000)) >= 0) {
+                              ossl_ms2time(10000))
+            >= 0) {
             TEST_error("timeout while attempting QUIC client test");
             goto err;
         }
@@ -192,7 +192,8 @@ static int test_quic_client_connect_first(void)
     if (!TEST_int_ne(c_fd, INVALID_SOCKET))
         goto err;
 
-    if (!TEST_int_eq(connect(c_fd, (const struct sockaddr *)&sin, sizeof(sin)), 0))
+    if (!TEST_int_eq(connect(c_fd, (const struct sockaddr *)&sin, sizeof(sin)),
+                     0))
         goto err;
 
     if (!TEST_true(BIO_socket_nbio(c_fd, 1)))

@@ -55,7 +55,7 @@ static int aes_xts_check_keys_differ(const unsigned char *key, size_t bytes,
                                      int enc)
 {
     if ((!ossl_aes_xts_allow_insecure_decrypt || enc)
-            && CRYPTO_memcmp(key, key + bytes, bytes) == 0) {
+        && CRYPTO_memcmp(key, key + bytes, bytes) == 0) {
         ERR_raise(ERR_LIB_PROV, PROV_R_XTS_DUPLICATED_KEYS);
         return 0;
     }
@@ -142,7 +142,7 @@ static void aes_xts_freectx(void *vctx)
     PROV_AES_XTS_CTX *ctx = (PROV_AES_XTS_CTX *)vctx;
 
     ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
-    OPENSSL_clear_free(ctx,  sizeof(*ctx));
+    OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
 static void *aes_xts_dupctx(void *vctx)
@@ -183,13 +183,9 @@ static int aes_xts_cipher(void *vctx, unsigned char *out, size_t *outl,
         return s390x_aes_xts_cipher(vctx, out, outl, outsize, in, inl);
 #endif
 
-    if (!ossl_prov_is_running()
-            || ctx->xts.key1 == NULL
-            || ctx->xts.key2 == NULL
-            || !ctx->base.iv_set
-            || out == NULL
-            || in == NULL
-            || inl < AES_BLOCK_SIZE)
+    if (!ossl_prov_is_running() || ctx->xts.key1 == NULL
+        || ctx->xts.key2 == NULL || !ctx->base.iv_set || out == NULL
+        || in == NULL || inl < AES_BLOCK_SIZE)
         return 0;
 
     /*
@@ -204,7 +200,8 @@ static int aes_xts_cipher(void *vctx, unsigned char *out, size_t *outl,
     }
 
     if (ctx->stream != NULL)
-        (*ctx->stream)(in, out, inl, ctx->xts.key1, ctx->xts.key2, ctx->base.iv);
+        (*ctx->stream)(in, out, inl, ctx->xts.key1, ctx->xts.key2,
+                       ctx->base.iv);
     else if (CRYPTO_xts128_encrypt(&ctx->xts, ctx->base.iv, in, out, inl,
                                    ctx->base.enc))
         return 0;
@@ -242,9 +239,7 @@ static int aes_xts_stream_final(void *vctx, unsigned char *out, size_t *outl,
 }
 
 static const OSSL_PARAM aes_xts_known_settable_ctx_params[] = {
-    OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL), OSSL_PARAM_END};
 
 static const OSSL_PARAM *aes_xts_settable_ctx_params(ossl_unused void *cctx,
                                                      ossl_unused void *provctx)

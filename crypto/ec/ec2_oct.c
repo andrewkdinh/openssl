@@ -43,7 +43,7 @@ int ossl_ec_GF2m_simple_set_compressed_coordinates(const EC_GROUP *group,
 {
     BIGNUM *tmp, *x, *y, *z;
     int ret = 0, z0;
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX *new_ctx = NULL;
 
     if (ctx == NULL) {
@@ -51,7 +51,7 @@ int ossl_ec_GF2m_simple_set_compressed_coordinates(const EC_GROUP *group,
         if (ctx == NULL)
             return 0;
     }
-#endif
+# endif
 
     y_bit = (y_bit != 0) ? 1 : 0;
 
@@ -79,7 +79,7 @@ int ossl_ec_GF2m_simple_set_compressed_coordinates(const EC_GROUP *group,
             goto err;
         ERR_set_mark();
         if (!BN_GF2m_mod_solve_quad_arr(z, tmp, group->poly, ctx)) {
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
             unsigned long err = ERR_peek_last_error();
 
             if (ERR_GET_LIB(err) == ERR_LIB_BN
@@ -87,7 +87,7 @@ int ossl_ec_GF2m_simple_set_compressed_coordinates(const EC_GROUP *group,
                 ERR_pop_to_mark();
                 ERR_raise(ERR_LIB_EC, EC_R_INVALID_COMPRESSED_POINT);
             } else
-#endif
+# endif
             {
                 ERR_clear_last_mark();
                 ERR_raise(ERR_LIB_EC, ERR_R_BN_LIB);
@@ -109,11 +109,11 @@ int ossl_ec_GF2m_simple_set_compressed_coordinates(const EC_GROUP *group,
 
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return ret;
 }
 
@@ -125,15 +125,16 @@ int ossl_ec_GF2m_simple_set_compressed_coordinates(const EC_GROUP *group,
 size_t ossl_ec_GF2m_simple_point2oct(const EC_GROUP *group,
                                      const EC_POINT *point,
                                      point_conversion_form_t form,
-                                     unsigned char *buf, size_t len, BN_CTX *ctx)
+                                     unsigned char *buf, size_t len,
+                                     BN_CTX *ctx)
 {
     size_t ret;
     int used_ctx = 0;
     BIGNUM *x, *y, *yxi;
     size_t field_len, i, skip;
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX *new_ctx = NULL;
-#endif
+# endif
 
     if ((form != POINT_CONVERSION_COMPRESSED)
         && (form != POINT_CONVERSION_UNCOMPRESSED)
@@ -156,9 +157,8 @@ size_t ossl_ec_GF2m_simple_point2oct(const EC_GROUP *group,
 
     /* ret := required output buffer length */
     field_len = (EC_GROUP_get_degree(group) + 7) / 8;
-    ret =
-        (form ==
-         POINT_CONVERSION_COMPRESSED) ? 1 + field_len : 1 + 2 * field_len;
+    ret = (form == POINT_CONVERSION_COMPRESSED) ? 1 + field_len
+                                                : 1 + 2 * field_len;
 
     /* if 'buf' is NULL, just return required length */
     if (buf != NULL) {
@@ -167,13 +167,13 @@ size_t ossl_ec_GF2m_simple_point2oct(const EC_GROUP *group,
             goto err;
         }
 
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
         if (ctx == NULL) {
             ctx = new_ctx = BN_CTX_new();
             if (ctx == NULL)
                 return 0;
         }
-#endif
+# endif
 
         BN_CTX_start(ctx);
         used_ctx = 1;
@@ -235,17 +235,17 @@ size_t ossl_ec_GF2m_simple_point2oct(const EC_GROUP *group,
 
     if (used_ctx)
         BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return ret;
 
- err:
+err:
     if (used_ctx)
         BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return 0;
 }
 
@@ -262,9 +262,9 @@ int ossl_ec_GF2m_simple_oct2point(const EC_GROUP *group, EC_POINT *point,
     BIGNUM *x, *y, *yxi;
     size_t field_len, enc_len;
     int ret = 0;
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX *new_ctx = NULL;
-#endif
+# endif
 
     if (len == 0) {
         ERR_raise(ERR_LIB_EC, EC_R_BUFFER_TOO_SMALL);
@@ -308,22 +308,21 @@ int ossl_ec_GF2m_simple_oct2point(const EC_GROUP *group, EC_POINT *point,
 
     m = EC_GROUP_get_degree(group);
     field_len = (m + 7) / 8;
-    enc_len =
-        (form ==
-         POINT_CONVERSION_COMPRESSED) ? 1 + field_len : 1 + 2 * field_len;
+    enc_len = (form == POINT_CONVERSION_COMPRESSED) ? 1 + field_len
+                                                    : 1 + 2 * field_len;
 
     if (len != enc_len) {
         ERR_raise(ERR_LIB_EC, EC_R_INVALID_ENCODING);
         return 0;
     }
 
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     if (ctx == NULL) {
         ctx = new_ctx = BN_CTX_new();
         if (ctx == NULL)
             return 0;
     }
-#endif
+# endif
 
     BN_CTX_start(ctx);
     x = BN_CTX_get(ctx);
@@ -380,11 +379,11 @@ int ossl_ec_GF2m_simple_oct2point(const EC_GROUP *group, EC_POINT *point,
 
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return ret;
 }
 #endif

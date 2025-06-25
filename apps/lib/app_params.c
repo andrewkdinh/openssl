@@ -142,8 +142,7 @@ static void print_param_octet(const unsigned char **bytes_ptr, size_t len)
         tail = "...\n";
     }
     BIO_puts(bio_out, " ");
-    for (i = 0; i < len; i++)
-        BIO_printf(bio_out, "%02x", bytes[i]);
+    for (i = 0; i < len; i++) BIO_printf(bio_out, "%02x", bytes[i]);
     BIO_puts(bio_out, tail);
 }
 
@@ -179,9 +178,8 @@ void print_param_value(const OSSL_PARAM *p, int indent)
         print_param_octet((const unsigned char **)&p->data, p->return_size);
         break;
     default:
-        BIO_printf(bio_out, "unknown type (%u) of %zu bytes\n",
-                   p->data_type, p->return_size);
+        BIO_printf(bio_out, "unknown type (%u) of %zu bytes\n", p->data_type,
+                   p->return_size);
         break;
     }
 }
-

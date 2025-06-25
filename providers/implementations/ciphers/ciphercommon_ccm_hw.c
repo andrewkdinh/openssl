@@ -35,8 +35,8 @@ int ossl_ccm_generic_auth_encrypt(PROV_CCM_CTX *ctx, const unsigned char *in,
     int rv;
 
     if (ctx->str != NULL)
-        rv = CRYPTO_ccm128_encrypt_ccm64(&ctx->ccm_ctx, in,
-                                         out, len, ctx->str) == 0;
+        rv = CRYPTO_ccm128_encrypt_ccm64(&ctx->ccm_ctx, in, out, len, ctx->str)
+            == 0;
     else
         rv = CRYPTO_ccm128_encrypt(&ctx->ccm_ctx, in, out, len) == 0;
 
@@ -52,8 +52,8 @@ int ossl_ccm_generic_auth_decrypt(PROV_CCM_CTX *ctx, const unsigned char *in,
     int rv = 0;
 
     if (ctx->str != NULL)
-        rv = CRYPTO_ccm128_decrypt_ccm64(&ctx->ccm_ctx, in, out, len,
-                                         ctx->str) == 0;
+        rv = CRYPTO_ccm128_decrypt_ccm64(&ctx->ccm_ctx, in, out, len, ctx->str)
+            == 0;
     else
         rv = CRYPTO_ccm128_decrypt(&ctx->ccm_ctx, in, out, len) == 0;
     if (rv) {

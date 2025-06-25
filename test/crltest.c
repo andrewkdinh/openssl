@@ -41,8 +41,7 @@ static const char *kCRLTestRoot[] = {
     "24Wxj4Z7KzzWIHsNqE/RIs6RV3fcW61j/mRgW2XyoWnMVeBzvcJr9NXp4VQYmFPw\n",
     "amd8GKMZQvP0ufGnUn7D7uartA==\n",
     "-----END CERTIFICATE-----\n",
-    NULL
-};
+    NULL};
 
 static const char *kCRLTestLeaf[] = {
     "-----BEGIN CERTIFICATE-----\n",
@@ -67,8 +66,7 @@ static const char *kCRLTestLeaf[] = {
     "5CNXsXi4b1nAntu89crwSLA3rEwzCWeYj+BX7e1T9rr3oJdwOU/2KQtW1js1yQUG\n",
     "tjJMFw==\n",
     "-----END CERTIFICATE-----\n",
-    NULL
-};
+    NULL};
 
 static const char *kBasicCRL[] = {
     "-----BEGIN X509 CRL-----\n",
@@ -82,8 +80,7 @@ static const char *kBasicCRL[] = {
     "diyu0fZ/bPAM3VAGawatf/SyWfBMyKpoPXEG39oAzmjjOj8en82psn7m474IGaho\n",
     "/vBbhl1ms5qQiLYPjm4YELtnXQoFyC72tBjbdFd/ZE9k4CNKDbxFUXFbkw==\n",
     "-----END X509 CRL-----\n",
-    NULL
-};
+    NULL};
 
 static const char *kRevokedCRL[] = {
     "-----BEGIN X509 CRL-----\n",
@@ -98,15 +95,12 @@ static const char *kRevokedCRL[] = {
     "Pz4aF+L7OtczxL0GYtD2fR9B7TDMqsNmHXgQrixvvOY7MUdLGbd4RfJL3yA53hyO\n",
     "xzfKY2TzxLiOmctG0hXFkH5J\n",
     "-----END X509 CRL-----\n",
-    NULL
-};
+    NULL};
 
 static const char *kInvalidCRL[] = {
     "-----BEGIN X509 CRL-----\n",
     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n",
-    "-----END X509 CRL-----\n",
-    NULL
-};
+    "-----END X509 CRL-----\n", NULL};
 
 static const char *kBadIssuerCRL[] = {
     "-----BEGIN X509 CRL-----\n",
@@ -121,8 +115,7 @@ static const char *kBadIssuerCRL[] = {
     "L8V8aT8+Ghfi+zrXM8S9BmLQ9n0fQe0wzKrDZh14EK4sb7zmOzFHSxm3eEXyS98g\n",
     "Od4cjsc3ymNk88S4jpnLRtIVxZB+SQ==\n",
     "-----END X509 CRL-----\n",
-    NULL
-};
+    NULL};
 
 /*
  * This is kBasicCRL but with a critical issuing distribution point
@@ -141,8 +134,7 @@ static const char *kKnownCriticalCRL[] = {
     "7VVeiNzdIjkZjyTmAzoXGha4+wbxXyBRbfH+XWcO/H+8nwyG8Gktdu2QB9S9nnIp\n",
     "o/1TpfOMSGhMyMoyPrk=\n",
     "-----END X509 CRL-----\n",
-    NULL
-};
+    NULL};
 
 /*
  * kUnknownCriticalCRL is kBasicCRL but with an unknown critical extension.
@@ -160,8 +152,7 @@ static const char *kUnknownCriticalCRL[] = {
     "nhtfERx99SDmC/jtUAJrGhtCO8acr7exCeYcduN7KKCm91OeCJKK6OzWst0Og1DB\n",
     "kwzzU2rL3G65CrZ7H0SZsQ==\n",
     "-----END X509 CRL-----\n",
-    NULL
-};
+    NULL};
 
 /*
  * kUnknownCriticalCRL2 is kBasicCRL but with a critical issuing distribution
@@ -180,12 +171,10 @@ static const char *kUnknownCriticalCRL2[] = {
     "2xXdkrSqXLFo7ToyP8YKTgiXpya4x6m53biEYwa2ULlas0igL6DK7wjYZX95Uy7H\n",
     "GKljn9weIYiMPV/BzGymwfv2EW0preLwtyJNJPaxbdin6Jc=\n",
     "-----END X509 CRL-----\n",
-    NULL
-};
+    NULL};
 
-static const char **unknown_critical_crls[] = {
-    kUnknownCriticalCRL, kUnknownCriticalCRL2
-};
+static const char **unknown_critical_crls[] = {kUnknownCriticalCRL,
+                                               kUnknownCriticalCRL2};
 
 static X509 *test_root = NULL;
 static X509 *test_leaf = NULL;
@@ -259,9 +248,7 @@ static int verify(X509 *leaf, X509 *root, STACK_OF(X509_CRL) *crls,
     STACK_OF(X509) *roots = sk_X509_new_null();
     int status = X509_V_ERR_UNSPECIFIED;
 
-    if (!TEST_ptr(ctx)
-        || !TEST_ptr(store)
-        || !TEST_ptr(param)
+    if (!TEST_ptr(ctx) || !TEST_ptr(store) || !TEST_ptr(param)
         || !TEST_ptr(roots))
         goto err;
 
@@ -286,8 +273,8 @@ static int verify(X509 *leaf, X509 *root, STACK_OF(X509_CRL) *crls,
     param = NULL;
 
     ERR_clear_error();
-    status = X509_verify_cert(ctx) == 1 ? X509_V_OK
-                                        : X509_STORE_CTX_get_error(ctx);
+    status =
+        X509_verify_cert(ctx) == 1 ? X509_V_OK : X509_STORE_CTX_get_error(ctx);
 err:
     OSSL_STACK_OF_X509_free(roots);
     sk_X509_CRL_pop_free(crls, X509_CRL_free);
@@ -337,14 +324,15 @@ static int test_basic_crl(void)
     X509_CRL *revoked_crl = CRL_from_strings(kRevokedCRL);
     int r;
 
-    r = TEST_ptr(basic_crl)
-        && TEST_ptr(revoked_crl)
+    r = TEST_ptr(basic_crl) && TEST_ptr(revoked_crl)
         && TEST_int_eq(verify(test_leaf, test_root,
                               make_CRL_stack(basic_crl, NULL),
-                              X509_V_FLAG_CRL_CHECK), X509_V_OK)
+                              X509_V_FLAG_CRL_CHECK),
+                       X509_V_OK)
         && TEST_int_eq(verify(test_leaf, test_root,
                               make_CRL_stack(basic_crl, revoked_crl),
-                              X509_V_FLAG_CRL_CHECK), X509_V_ERR_CERT_REVOKED);
+                              X509_V_FLAG_CRL_CHECK),
+                       X509_V_ERR_CERT_REVOKED);
     X509_CRL_free(basic_crl);
     X509_CRL_free(revoked_crl);
     return r;
@@ -352,9 +340,9 @@ static int test_basic_crl(void)
 
 static int test_no_crl(void)
 {
-    return TEST_int_eq(verify(test_leaf, test_root, NULL,
-                              X509_V_FLAG_CRL_CHECK),
-                       X509_V_ERR_UNABLE_TO_GET_CRL);
+    return TEST_int_eq(
+        verify(test_leaf, test_root, NULL, X509_V_FLAG_CRL_CHECK),
+        X509_V_ERR_UNABLE_TO_GET_CRL);
 }
 
 static int test_bad_issuer_crl(void)
@@ -379,7 +367,8 @@ static int test_known_critical_crl(void)
     r = TEST_ptr(known_critical_crl)
         && TEST_int_eq(verify(test_leaf, test_root,
                               make_CRL_stack(known_critical_crl, NULL),
-                              X509_V_FLAG_CRL_CHECK), X509_V_OK);
+                              X509_V_FLAG_CRL_CHECK),
+                       X509_V_OK);
     X509_CRL_free(known_critical_crl);
     return r;
 }
@@ -412,7 +401,7 @@ static int test_reuse_crl(int idx)
     if (idx & 1) {
         if (!TEST_true(X509_CRL_up_ref(reused_crl)))
             goto err;
-	addref_crl = reused_crl;
+        addref_crl = reused_crl;
     }
 
     idx >>= 1;
@@ -425,26 +414,23 @@ static int test_reuse_crl(int idx)
 
     switch (idx) {
     case 0: /* valid PEM + invalid DER */
-        if (!TEST_ptr_null(result)
-                || !TEST_ptr_null(reused_crl))
+        if (!TEST_ptr_null(result) || !TEST_ptr_null(reused_crl))
             goto err;
         break;
     case 1: /* invalid PEM */
-        if (!TEST_ptr_null(result)
-                || !TEST_ptr(reused_crl))
+        if (!TEST_ptr_null(result) || !TEST_ptr(reused_crl))
             goto err;
         break;
     case 2:
-        if (!TEST_ptr(result)
-                || !TEST_ptr(reused_crl)
-                || !TEST_ptr_eq(result, reused_crl))
+        if (!TEST_ptr(result) || !TEST_ptr(reused_crl)
+            || !TEST_ptr_eq(result, reused_crl))
             goto err;
         break;
     }
 
     r = 1;
 
- err:
+err:
     OPENSSL_free(p);
     BIO_free(b);
     X509_CRL_free(reused_crl);

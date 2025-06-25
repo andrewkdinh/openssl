@@ -23,17 +23,19 @@
  * Public key bytes:   800 (0x0320)
  * Private key bytes: 1632 (0x0660)
  */
-static const ML_COMMON_SPKI_FMT ml_kem_512_spkifmt = {
-    { 0x30, 0x82, 0x03, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
-      0x01, 0x65, 0x03, 0x04, 0x04, 0x01, 0x03, 0x82, 0x03, 0x21, 0x00, }
-};
+static const ML_COMMON_SPKI_FMT ml_kem_512_spkifmt = {{
+    0x30, 0x82, 0x03, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
+    0x01, 0x65, 0x03, 0x04, 0x04, 0x01, 0x03, 0x82, 0x03, 0x21, 0x00,
+}};
 static const ML_COMMON_PKCS8_FMT ml_kem_512_p8fmt[NUM_PKCS8_FORMATS] = {
-    { "seed-priv",  0x06aa, 0, 0x308206a6, 0x0440, 6, 0x40, 0x04820660, 0x4a, 0x0660, 0,      0      },
-    { "priv-only",  0x0664, 0, 0x04820660, 0,      0, 0,    0,          0x04, 0x0660, 0,      0      },
-    { "oqskeypair", 0x0984, 0, 0x04820980, 0,      0, 0,    0,          0x04, 0x0660, 0x0664, 0x0320 },
-    { "seed-only",  0x0042, 2, 0x8040,     0,      2, 0x40, 0,          0,    0,      0,      0      },
-    { "bare-priv",  0x0660, 4, 0,          0,      0, 0,    0,          0,    0x0660, 0,      0      },
-    { "bare-seed",  0x0040, 4, 0,          0,      0, 0x40, 0,          0,    0,      0,      0      },
+    {"seed-priv", 0x06aa, 0, 0x308206a6, 0x0440, 6, 0x40, 0x04820660, 0x4a,
+     0x0660, 0, 0},
+    {"priv-only", 0x0664, 0, 0x04820660, 0, 0, 0, 0, 0x04, 0x0660, 0, 0},
+    {"oqskeypair", 0x0984, 0, 0x04820980, 0, 0, 0, 0, 0x04, 0x0660, 0x0664,
+     0x0320},
+    {"seed-only", 0x0042, 2, 0x8040, 0, 2, 0x40, 0, 0, 0, 0, 0},
+    {"bare-priv", 0x0660, 4, 0, 0, 0, 0, 0, 0, 0x0660, 0, 0},
+    {"bare-seed", 0x0040, 4, 0, 0, 0, 0x40, 0, 0, 0, 0, 0},
 };
 
 /*-
@@ -41,17 +43,83 @@ static const ML_COMMON_PKCS8_FMT ml_kem_512_p8fmt[NUM_PKCS8_FORMATS] = {
  * Public key bytes:  1184 (0x04a0)
  * Private key bytes: 2400 (0x0960)
  */
-static const ML_COMMON_SPKI_FMT ml_kem_768_spkifmt = {
-    { 0x30, 0x82, 0x04, 0xb2, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
-      0x01, 0x65, 0x03, 0x04, 0x04, 0x02, 0x03, 0x82, 0x04, 0xa1, 0x00, }
-};
+static const ML_COMMON_SPKI_FMT ml_kem_768_spkifmt = {{
+    0x30, 0x82, 0x04, 0xb2, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
+    0x01, 0x65, 0x03, 0x04, 0x04, 0x02, 0x03, 0x82, 0x04, 0xa1, 0x00,
+}};
 static const ML_COMMON_PKCS8_FMT ml_kem_768_p8fmt[NUM_PKCS8_FORMATS] = {
-    { "seed-priv",  0x09aa, 0, 0x308209a6, 0x0440, 6, 0x40, 0x04820960, 0x4a, 0x0960, 0,      0,     },
-    { "priv-only",  0x0964, 0, 0x04820960, 0,      0, 0,    0,          0x04, 0x0960, 0,      0,     },
-    { "oqskeypair", 0x0e04, 0, 0x04820e00, 0,      0, 0,    0,          0x04, 0x0960, 0x0964, 0x04a0 },
-    { "seed-only",  0x0042, 2, 0x8040,     0,      2, 0x40, 0,          0,    0,      0,      0,     },
-    { "bare-priv",  0x0960, 4, 0,          0,      0, 0,    0,          0,    0x0960, 0,      0,     },
-    { "bare-seed",  0x0040, 4, 0,          0,      0, 0x40, 0,          0,    0,      0,      0,     },
+    {
+        "seed-priv",
+        0x09aa,
+        0,
+        0x308209a6,
+        0x0440,
+        6,
+        0x40,
+        0x04820960,
+        0x4a,
+        0x0960,
+        0,
+        0,
+    },
+    {
+        "priv-only",
+        0x0964,
+        0,
+        0x04820960,
+        0,
+        0,
+        0,
+        0,
+        0x04,
+        0x0960,
+        0,
+        0,
+    },
+    {"oqskeypair", 0x0e04, 0, 0x04820e00, 0, 0, 0, 0, 0x04, 0x0960, 0x0964,
+     0x04a0},
+    {
+        "seed-only",
+        0x0042,
+        2,
+        0x8040,
+        0,
+        2,
+        0x40,
+        0,
+        0,
+        0,
+        0,
+        0,
+    },
+    {
+        "bare-priv",
+        0x0960,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x0960,
+        0,
+        0,
+    },
+    {
+        "bare-seed",
+        0x0040,
+        4,
+        0,
+        0,
+        0,
+        0x40,
+        0,
+        0,
+        0,
+        0,
+        0,
+    },
 };
 
 /*-
@@ -59,17 +127,19 @@ static const ML_COMMON_PKCS8_FMT ml_kem_768_p8fmt[NUM_PKCS8_FORMATS] = {
  * Private key bytes: 3168 (0x0c60)
  * Public key bytes:  1568 (0x0620)
  */
-static const ML_COMMON_SPKI_FMT ml_kem_1024_spkifmt = {
-    { 0x30, 0x82, 0x06, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
-      0x01, 0x65, 0x03, 0x04, 0x04, 0x03, 0x03, 0x82, 0x06, 0x21, 0x00, }
-};
+static const ML_COMMON_SPKI_FMT ml_kem_1024_spkifmt = {{
+    0x30, 0x82, 0x06, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
+    0x01, 0x65, 0x03, 0x04, 0x04, 0x03, 0x03, 0x82, 0x06, 0x21, 0x00,
+}};
 static const ML_COMMON_PKCS8_FMT ml_kem_1024_p8fmt[NUM_PKCS8_FORMATS] = {
-    { "seed-priv",  0x0caa, 0, 0x30820ca6, 0x0440, 6, 0x40, 0x04820c60, 0x4a, 0x0c60, 0,      0      },
-    { "priv-only",  0x0c64, 0, 0x04820c60, 0,      0, 0,    0,          0x04, 0x0c60, 0,      0      },
-    { "oqskeypair", 0x1284, 0, 0x04821280, 0,      0, 0,    0,          0x04, 0x0c60, 0x0c64, 0x0620 },
-    { "seed-only",  0x0042, 2, 0x8040,     0,      2, 0x40, 0,          0,    0,      0,      0      },
-    { "bare-priv",  0x0c60, 4, 0,          0,      0, 0,    0,          0,    0x0c60, 0,      0      },
-    { "bare-seed",  0x0040, 4, 0,          0,      0, 0x40, 0,          0,    0,      0,      0      },
+    {"seed-priv", 0x0caa, 0, 0x30820ca6, 0x0440, 6, 0x40, 0x04820c60, 0x4a,
+     0x0c60, 0, 0},
+    {"priv-only", 0x0c64, 0, 0x04820c60, 0, 0, 0, 0, 0x04, 0x0c60, 0, 0},
+    {"oqskeypair", 0x1284, 0, 0x04821280, 0, 0, 0, 0, 0x04, 0x0c60, 0x0c64,
+     0x0620},
+    {"seed-only", 0x0042, 2, 0x8040, 0, 2, 0x40, 0, 0, 0, 0, 0},
+    {"bare-priv", 0x0c60, 4, 0, 0, 0, 0, 0, 0, 0x0c60, 0, 0},
+    {"bare-seed", 0x0040, 4, 0, 0, 0, 0x40, 0, 0, 0, 0, 0},
 };
 
 /* Indices of slots in the `codecs` table below */
@@ -81,10 +151,9 @@ static const ML_COMMON_PKCS8_FMT ml_kem_1024_p8fmt[NUM_PKCS8_FORMATS] = {
  * Per-variant fixed parameters
  */
 static const ML_COMMON_CODEC codecs[3] = {
-    { &ml_kem_512_spkifmt,  ml_kem_512_p8fmt },
-    { &ml_kem_768_spkifmt,  ml_kem_768_p8fmt },
-    { &ml_kem_1024_spkifmt, ml_kem_1024_p8fmt }
-};
+    {&ml_kem_512_spkifmt, ml_kem_512_p8fmt},
+    {&ml_kem_768_spkifmt, ml_kem_768_p8fmt},
+    {&ml_kem_1024_spkifmt, ml_kem_1024_p8fmt}};
 
 /* Retrieve the parameters of one of the ML-KEM variants */
 static const ML_COMMON_CODEC *ml_kem_get_codec(int evp_type)
@@ -100,9 +169,9 @@ static const ML_COMMON_CODEC *ml_kem_get_codec(int evp_type)
     return NULL;
 }
 
-ML_KEM_KEY *
-ossl_ml_kem_d2i_PUBKEY(const uint8_t *pubenc, int publen, int evp_type,
-                       PROV_CTX *provctx, const char *propq)
+ML_KEM_KEY *ossl_ml_kem_d2i_PUBKEY(const uint8_t *pubenc, int publen,
+                                   int evp_type, PROV_CTX *provctx,
+                                   const char *propq)
 {
     OSSL_LIB_CTX *libctx = PROV_LIBCTX_OF(provctx);
     const ML_KEM_VINFO *v;
@@ -114,7 +183,7 @@ ossl_ml_kem_d2i_PUBKEY(const uint8_t *pubenc, int publen, int evp_type,
         || (codec = ml_kem_get_codec(evp_type)) == NULL)
         return NULL;
     vspki = codec->spkifmt;
-    if (publen != ML_COMMON_SPKI_OVERHEAD + (ossl_ssize_t) v->pubkey_bytes
+    if (publen != ML_COMMON_SPKI_OVERHEAD + (ossl_ssize_t)v->pubkey_bytes
         || memcmp(pubenc, vspki->asn1_prefix, ML_COMMON_SPKI_OVERHEAD) != 0)
         return NULL;
     publen -= ML_COMMON_SPKI_OVERHEAD;
@@ -123,7 +192,7 @@ ossl_ml_kem_d2i_PUBKEY(const uint8_t *pubenc, int publen, int evp_type,
     if ((ret = ossl_ml_kem_key_new(libctx, propq, evp_type)) == NULL)
         return NULL;
 
-    if (!ossl_ml_kem_parse_public_key(pubenc, (size_t) publen, ret)) {
+    if (!ossl_ml_kem_parse_public_key(pubenc, (size_t)publen, ret)) {
         ERR_raise_data(ERR_LIB_PROV, PROV_R_BAD_ENCODING,
                        "errror parsing %s public key from input SPKI",
                        v->algorithm_name);
@@ -134,10 +203,9 @@ ossl_ml_kem_d2i_PUBKEY(const uint8_t *pubenc, int publen, int evp_type,
     return ret;
 }
 
-ML_KEM_KEY *
-ossl_ml_kem_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
-                      int evp_type, PROV_CTX *provctx,
-                      const char *propq)
+ML_KEM_KEY *ossl_ml_kem_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
+                                  int evp_type, PROV_CTX *provctx,
+                                  const char *propq)
 {
     const ML_KEM_VINFO *v;
     const ML_COMMON_CODEC *codec;
@@ -245,8 +313,8 @@ ossl_ml_kem_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
         goto end;
 
     if (p8fmt->seed_length > 0) {
-        if (!ossl_ml_kem_set_seed(buf + p8fmt->seed_offset,
-                                  ML_KEM_SEED_BYTES, key)) {
+        if (!ossl_ml_kem_set_seed(buf + p8fmt->seed_offset, ML_KEM_SEED_BYTES,
+                                  key)) {
             ERR_raise_data(ERR_LIB_OSSL_DECODER, ERR_R_INTERNAL_ERROR,
                            "error storing %s private key seed",
                            v->algorithm_name);
@@ -256,8 +324,7 @@ ossl_ml_kem_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
     if (p8fmt->priv_length > 0) {
         if ((key->encoded_dk = OPENSSL_malloc(p8fmt->priv_length)) == NULL) {
             ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_KEY,
-                           "error parsing %s private key",
-                           v->algorithm_name);
+                           "error parsing %s private key", v->algorithm_name);
             goto end;
         }
         memcpy(key->encoded_dk, buf + p8fmt->priv_offset, p8fmt->priv_length);
@@ -265,7 +332,7 @@ ossl_ml_kem_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
     /* Any OQS public key content is ignored */
     ret = key;
 
- end:
+end:
     OPENSSL_free(fmt_slots);
     PKCS8_PRIV_KEY_INFO_free(p8inf);
     if (ret == NULL)
@@ -286,8 +353,7 @@ int ossl_ml_kem_i2d_pubkey(const ML_KEM_KEY *key, unsigned char **out)
     }
     publen = key->vinfo->pubkey_bytes;
 
-    if (out != NULL
-        && (*out = OPENSSL_malloc(publen)) == NULL)
+    if (out != NULL && (*out = OPENSSL_malloc(publen)) == NULL)
         return 0;
     if (!ossl_ml_kem_encode_public_key(*out, publen, key)) {
         ERR_raise_data(ERR_LIB_OSSL_ENCODER, ERR_R_INTERNAL_ERROR,
@@ -352,7 +418,7 @@ int ossl_ml_kem_i2d_prvkey(const ML_KEM_KEY *key, uint8_t **out,
         goto end;
     }
 
-    if ((pos = buf = OPENSSL_malloc((size_t) len)) == NULL)
+    if ((pos = buf = OPENSSL_malloc((size_t)len)) == NULL)
         goto end;
 
     switch (p8fmt->p8_shift) {
@@ -366,8 +432,7 @@ int ossl_ml_kem_i2d_prvkey(const ML_KEM_KEY *key, uint8_t **out,
         break;
     default:
         ERR_raise_data(ERR_LIB_PROV, ERR_R_INTERNAL_ERROR,
-                       "error encoding %s private key",
-                       v->algorithm_name);
+                       "error encoding %s private key", v->algorithm_name);
         goto end;
     }
 
@@ -381,8 +446,7 @@ int ossl_ml_kem_i2d_prvkey(const ML_KEM_KEY *key, uint8_t **out,
         if (pos != buf + p8fmt->seed_offset
             || !ossl_ml_kem_encode_seed(pos, ML_KEM_SEED_BYTES, key)) {
             ERR_raise_data(ERR_LIB_PROV, ERR_R_INTERNAL_ERROR,
-                           "error encoding %s private key",
-                           v->algorithm_name);
+                           "error encoding %s private key", v->algorithm_name);
             goto end;
         }
         pos += ML_KEM_SEED_BYTES;
@@ -393,8 +457,7 @@ int ossl_ml_kem_i2d_prvkey(const ML_KEM_KEY *key, uint8_t **out,
         if (pos != buf + p8fmt->priv_offset
             || !ossl_ml_kem_encode_private_key(pos, v->prvkey_bytes, key)) {
             ERR_raise_data(ERR_LIB_PROV, ERR_R_INTERNAL_ERROR,
-                           "error encoding %s private key",
-                           v->algorithm_name);
+                           "error encoding %s private key", v->algorithm_name);
             goto end;
         }
         pos += v->prvkey_bytes;
@@ -405,8 +468,7 @@ int ossl_ml_kem_i2d_prvkey(const ML_KEM_KEY *key, uint8_t **out,
         if (pos != buf + p8fmt->pub_offset
             || !ossl_ml_kem_encode_public_key(pos, v->pubkey_bytes, key)) {
             ERR_raise_data(ERR_LIB_PROV, ERR_R_INTERNAL_ERROR,
-                           "error encoding %s private key",
-                           v->algorithm_name);
+                           "error encoding %s private key", v->algorithm_name);
             goto end;
         }
         pos += v->pubkey_bytes;
@@ -417,7 +479,7 @@ int ossl_ml_kem_i2d_prvkey(const ML_KEM_KEY *key, uint8_t **out,
         ret = len;
     }
 
- end:
+end:
     OPENSSL_free(fmt_slots);
     if (ret == 0)
         OPENSSL_free(buf);
@@ -440,8 +502,7 @@ int ossl_ml_kem_key_to_text(BIO *out, const ML_KEM_KEY *key, int selection)
     prvlen = key->vinfo->prvkey_bytes;
 
     if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0
-        && (ossl_ml_kem_have_prvkey(key)
-            || ossl_ml_kem_have_seed(key))) {
+        && (ossl_ml_kem_have_prvkey(key) || ossl_ml_kem_have_seed(key))) {
         if (BIO_printf(out, "%s Private-Key:\n", type_label) <= 0)
             return 0;
 
@@ -478,10 +539,9 @@ int ossl_ml_kem_key_to_text(BIO *out, const ML_KEM_KEY *key, int selection)
     /* If we got here, and ret == 0, there was no key material */
     if (ret == 0)
         ERR_raise_data(ERR_LIB_PROV, PROV_R_MISSING_KEY,
-                       "no %s key material available",
-                       type_label);
+                       "no %s key material available", type_label);
 
- end:
+end:
     OPENSSL_free(pubenc);
     OPENSSL_free(prvenc);
     return ret;

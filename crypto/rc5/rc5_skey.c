@@ -25,8 +25,8 @@ int RC5_32_set_key(RC5_32_KEY *key, int len, const unsigned char *data,
     if (len > 255)
         return 0;
 
-    if ((rounds != RC5_16_ROUNDS) &&
-        (rounds != RC5_12_ROUNDS) && (rounds != RC5_8_ROUNDS))
+    if ((rounds != RC5_16_ROUNDS) && (rounds != RC5_12_ROUNDS)
+        && (rounds != RC5_8_ROUNDS))
         rounds = RC5_16_ROUNDS;
 
     key->rounds = rounds;
@@ -49,8 +49,7 @@ int RC5_32_set_key(RC5_32_KEY *key, int len, const unsigned char *data,
     c = (len + 3) / 4;
     t = (rounds + 1) * 2;
     S[0] = RC5_32_P;
-    for (i = 1; i < t; i++)
-        S[i] = (S[i - 1] + RC5_32_Q) & RC5_32_MASK;
+    for (i = 1; i < t; i++) S[i] = (S[i - 1] + RC5_32_Q) & RC5_32_MASK;
 
     j = (t > c) ? t : c;
     j *= 3;

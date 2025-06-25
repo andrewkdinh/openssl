@@ -22,9 +22,11 @@ typedef struct {
     unsigned int nonce[12 / 4];
     unsigned char tag[POLY1305_BLOCK_SIZE];
     unsigned char tls_aad[POLY1305_BLOCK_SIZE];
-    struct { uint64_t aad, text; } len;
-    unsigned int aad : 1;
-    unsigned int mac_inited : 1;
+    struct {
+        uint64_t aad, text;
+    } len;
+    unsigned int aad:1;
+    unsigned int mac_inited:1;
     size_t tag_len;
     size_t tls_payload_length;
     size_t tls_aad_pad_sz;

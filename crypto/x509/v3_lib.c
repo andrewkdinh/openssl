@@ -42,8 +42,8 @@ static int ext_cmp(const X509V3_EXT_METHOD *const *a,
     return ((*a)->ext_nid - (*b)->ext_nid);
 }
 
-DECLARE_OBJ_BSEARCH_CMP_FN(const X509V3_EXT_METHOD *,
-                           const X509V3_EXT_METHOD *, ext);
+DECLARE_OBJ_BSEARCH_CMP_FN(const X509V3_EXT_METHOD *, const X509V3_EXT_METHOD *,
+                           ext);
 IMPLEMENT_OBJ_BSEARCH_CMP_FN(const X509V3_EXT_METHOD *,
                              const X509V3_EXT_METHOD *, ext);
 
@@ -52,7 +52,7 @@ IMPLEMENT_OBJ_BSEARCH_CMP_FN(const X509V3_EXT_METHOD *,
 const X509V3_EXT_METHOD *X509V3_EXT_get_nid(int nid)
 {
     X509V3_EXT_METHOD tmp;
-    const X509V3_EXT_METHOD *t = &tmp, *const *ret;
+    const X509V3_EXT_METHOD *t = &tmp, *const * ret;
     int idx;
 
     if (nid < 0)
@@ -257,8 +257,8 @@ int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value,
         /*
          * If replace existing or delete, error since extension must exist
          */
-        if ((ext_op == X509V3_ADD_REPLACE_EXISTING) ||
-            (ext_op == X509V3_ADD_DELETE)) {
+        if ((ext_op == X509V3_ADD_REPLACE_EXISTING)
+            || (ext_op == X509V3_ADD_DELETE)) {
             errcode = X509V3_R_EXTENSION_NOT_FOUND;
             goto err;
         }
@@ -286,8 +286,7 @@ int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value,
     }
 
     ret = *x;
-    if (*x == NULL
-        && (ret = sk_X509_EXTENSION_new_null()) == NULL)
+    if (*x == NULL && (ret = sk_X509_EXTENSION_new_null()) == NULL)
         goto m_fail;
     if (!sk_X509_EXTENSION_push(ret, ext))
         goto m_fail;
@@ -295,14 +294,14 @@ int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value,
     *x = ret;
     return 1;
 
- m_fail:
+m_fail:
     /* ERR_raise(ERR_LIB_X509V3, ERR_R_CRYPTO_LIB); */
     if (ret != *x)
         sk_X509_EXTENSION_free(ret);
     X509_EXTENSION_free(ext);
     return -1;
 
- err:
+err:
     if (!(flags & X509V3_ADD_SILENT))
         ERR_raise(ERR_LIB_X509V3, errcode);
     return 0;

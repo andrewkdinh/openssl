@@ -28,18 +28,10 @@ static long linebuffer_callback_ctrl(BIO *h, int cmd, BIO_info_cb *fp);
 /* #define DEBUG */
 
 static const BIO_METHOD methods_linebuffer = {
-    BIO_TYPE_LINEBUFFER,
-    "linebuffer",
-    bwrite_conv,
-    linebuffer_write,
-    bread_conv,
-    linebuffer_read,
-    linebuffer_puts,
-    linebuffer_gets,
-    linebuffer_ctrl,
-    linebuffer_new,
-    linebuffer_free,
-    linebuffer_callback_ctrl,
+    BIO_TYPE_LINEBUFFER, "linebuffer",    bwrite_conv,
+    linebuffer_write,    bread_conv,      linebuffer_read,
+    linebuffer_puts,     linebuffer_gets, linebuffer_ctrl,
+    linebuffer_new,      linebuffer_free, linebuffer_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_linebuffer(void)
@@ -119,7 +111,7 @@ static int linebuffer_write(BIO *b, const char *in, int inl)
         const char *p;
         char c;
 
-        for (p = in, c = '\0'; p < in + inl && (c = *p) != '\n'; p++) ;
+        for (p = in, c = '\0'; p < in + inl && (c = *p) != '\n'; p++);
         if (c == '\n') {
             p++;
             foundnl = 1;
@@ -182,8 +174,7 @@ static int linebuffer_write(BIO *b, const char *in, int inl)
             in += i;
             inl -= i;
         }
-    }
-    while (foundnl && inl > 0);
+    } while (foundnl && inl > 0);
     /*
      * We've written as much as we can.  The rest of the input buffer, if
      * any, is text that doesn't and with a NL and therefore needs to be

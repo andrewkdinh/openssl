@@ -28,7 +28,10 @@ typedef enum OPTION_choice {
     OPT_PSK,
     OPT_SRP,
     OPT_CIPHERSUITES,
-    OPT_V, OPT_UPPER_V, OPT_S, OPT_PROV_ENUM
+    OPT_V,
+    OPT_UPPER_V,
+    OPT_S,
+    OPT_PROV_ENUM
 } OPTION_CHOICE;
 
 const OPTIONS ciphers_options[] = {
@@ -72,13 +75,11 @@ const OPTIONS ciphers_options[] = {
 
     OPT_PARAMETERS(),
     {"cipher", 0, 0, "Cipher string to decode (optional)"},
-    {NULL}
-};
+    {NULL}};
 
 #ifndef OPENSSL_NO_PSK
 static unsigned int dummy_psk(SSL *ssl, const char *hint, char *identity,
-                              unsigned int max_identity_len,
-                              unsigned char *psk,
+                              unsigned int max_identity_len, unsigned char *psk,
                               unsigned int max_psk_len)
 {
     return 0;
@@ -110,7 +111,7 @@ int ciphers_main(int argc, char **argv)
         switch (o) {
         case OPT_EOF:
         case OPT_ERR:
- opthelp:
+opthelp:
             BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);
             goto end;
         case OPT_HELP:
@@ -256,10 +257,12 @@ int ciphers_main(int argc, char **argv)
                 int id3 = (int)(id & 0xffL);
 
                 if ((id & 0xff000000L) == 0x03000000L)
-                    BIO_printf(bio_out, "          0x%02X,0x%02X - ", id2, id3); /* SSL3
+                    BIO_printf(bio_out, "          0x%02X,0x%02X - ", id2,
+                               id3); /* SSL3
                                                                                   * cipher */
                 else
-                    BIO_printf(bio_out, "0x%02X,0x%02X,0x%02X,0x%02X - ", id0, id1, id2, id3); /* whatever */
+                    BIO_printf(bio_out, "0x%02X,0x%02X,0x%02X,0x%02X - ", id0,
+                               id1, id2, id3); /* whatever */
             }
             if (stdname) {
                 const char *nm = SSL_CIPHER_standard_name(c);
@@ -273,9 +276,9 @@ int ciphers_main(int argc, char **argv)
 
     ret = 0;
     goto end;
- err:
+err:
     ERR_print_errors(bio_err);
- end:
+end:
     if (use_supported)
         sk_SSL_CIPHER_free(sk);
     SSL_CTX_free(ctx);

@@ -54,7 +54,7 @@
 #define LeftRotate(x, s)  ( ((x) << (s)) + ((x) >> (32 - s)) )
 
 #define GETU32(p)   (((u32)(p)[0] << 24) ^ ((u32)(p)[1] << 16) ^ ((u32)(p)[2] <<  8) ^ ((u32)(p)[3]))
-#define PUTU32(p,v) ((p)[0] = (u8)((v) >> 24), (p)[1] = (u8)((v) >> 16), (p)[2] = (u8)((v) >>  8), (p)[3] = (u8)(v))
+#define PUTU32(p, v) ((p)[0] = (u8)((v) >> 24), (p)[1] = (u8)((v) >> 16), (p)[2] = (u8)((v) >>  8), (p)[3] = (u8)(v))
 
 /* S-box data */
 #define SBOX1_1110 Camellia_SBOX[0]
@@ -233,14 +233,12 @@ static const u32 Camellia_SBOX[][256] = {
      0x15001515, 0x34003434, 0x1e001e1e, 0x1c001c1c, 0xf800f8f8, 0x52005252,
      0x20002020, 0x14001414, 0xe900e9e9, 0xbd00bdbd, 0xdd00dddd, 0xe400e4e4,
      0xa100a1a1, 0xe000e0e0, 0x8a008a8a, 0xf100f1f1, 0xd600d6d6, 0x7a007a7a,
-     0xbb00bbbb, 0xe300e3e3, 0x40004040, 0x4f004f4f}
-};
+     0xbb00bbbb, 0xe300e3e3, 0x40004040, 0x4f004f4f}};
 
 /* Key generation constants */
-static const u32 SIGMA[] = {
-    0xa09e667f, 0x3bcc908b, 0xb67ae858, 0x4caa73b2, 0xc6ef372f, 0xe94f82be,
-    0x54ff53a5, 0xf1d36f1c, 0x10e527fa, 0xde682d1d, 0xb05688c2, 0xb3e6c1fd
-};
+static const u32 SIGMA[] = {0xa09e667f, 0x3bcc908b, 0xb67ae858, 0x4caa73b2,
+                            0xc6ef372f, 0xe94f82be, 0x54ff53a5, 0xf1d36f1c,
+                            0x10e527fa, 0xde682d1d, 0xb05688c2, 0xb3e6c1fd};
 
 /* The phi algorithm given in C.2.7 of the Camellia spec document. */
 /*
@@ -250,7 +248,7 @@ static const u32 SIGMA[] = {
  * ~16 registers. For platforms with less registers [well, x86 to be
  * specific] assembler version should be/is provided anyway...
  */
-#define Camellia_Feistel(_s0,_s1,_s2,_s3,_key) do {\
+#define Camellia_Feistel(_s0, _s1, _s2, _s3, _key) do {\
         register u32 _t0,_t1,_t2,_t3;\
 \
         _t0  = _s0 ^ (_key)[0];\
@@ -275,7 +273,7 @@ static const u32 SIGMA[] = {
  * of bits are achieved by "rotating" order of s-elements and
  * adjusting n accordingly, e.g. RotLeft128(s1,s2,s3,s0,n-32).
  */
-#define RotLeft128(_s0,_s1,_s2,_s3,_n) do {\
+#define RotLeft128(_s0, _s1, _s2, _s3, _n) do {\
         u32 _t0=_s0>>(32-_n);\
         _s0 = (_s0<<_n) | (_s1>>(32-_n));\
         _s1 = (_s1<<_n) | (_s2>>(32-_n));\
@@ -449,13 +447,12 @@ void Camellia_EncryptBlock_Rounds(int grandRounds, const u8 plaintext[],
 void Camellia_EncryptBlock(int keyBitLength, const u8 plaintext[],
                            const KEY_TABLE_TYPE keyTable, u8 ciphertext[])
 {
-    Camellia_EncryptBlock_Rounds(keyBitLength == 128 ? 3 : 4,
-                                 plaintext, keyTable, ciphertext);
+    Camellia_EncryptBlock_Rounds(keyBitLength == 128 ? 3 : 4, plaintext,
+                                 keyTable, ciphertext);
 }
 
 void Camellia_DecryptBlock_Rounds(int grandRounds, const u8 ciphertext[],
-                                  const KEY_TABLE_TYPE keyTable,
-                                  u8 plaintext[])
+                                  const KEY_TABLE_TYPE keyTable, u8 plaintext[])
 {
     u32 s0, s1, s2, s3;
     const u32 *k = keyTable + grandRounds * 16, *kend = keyTable + 4;
@@ -502,6 +499,6 @@ void Camellia_DecryptBlock_Rounds(int grandRounds, const u8 ciphertext[],
 void Camellia_DecryptBlock(int keyBitLength, const u8 ciphertext[],
                            const KEY_TABLE_TYPE keyTable, u8 plaintext[])
 {
-    Camellia_DecryptBlock_Rounds(keyBitLength == 128 ? 3 : 4,
-                                 ciphertext, keyTable, plaintext);
+    Camellia_DecryptBlock_Rounds(keyBitLength == 128 ? 3 : 4, ciphertext,
+                                 keyTable, plaintext);
 }

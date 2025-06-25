@@ -60,7 +60,8 @@ static char *modulesdirptr = NULL;
  *
  * @return A pointer to a char array containing the registry directories.
  */
-static char *get_windows_regdirs(char *dst, DWORD dstsizebytes, LPCWSTR valuename)
+static char *get_windows_regdirs(char *dst, DWORD dstsizebytes,
+                                 LPCWSTR valuename)
 {
     char *retval = NULL;
 # ifdef REGISTRY_KEY
@@ -71,15 +72,13 @@ static char *get_windows_regdirs(char *dst, DWORD dstsizebytes, LPCWSTR valuenam
     DWORD index = 0;
     LPCWSTR tempstr = NULL;
 
-    ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                       TEXT(REGISTRY_KEY), KEY_WOW64_32KEY,
+    ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT(REGISTRY_KEY), KEY_WOW64_32KEY,
                        KEY_QUERY_VALUE, &hkey);
     if (ret != ERROR_SUCCESS)
         goto out;
 
     /* Always use wide call so we can avoid extra encoding conversions on the output */
-    ret = RegQueryValueExW(hkey, valuename, NULL, &ktype, NULL,
-                           &keysizebytes);
+    ret = RegQueryValueExW(hkey, valuename, NULL, &ktype, NULL, &keysizebytes);
     if (ret != ERROR_SUCCESS)
         goto out;
     if (ktype != REG_EXPAND_SZ && ktype != REG_SZ)
@@ -96,12 +95,13 @@ static char *get_windows_regdirs(char *dst, DWORD dstsizebytes, LPCWSTR valuenam
     if (tempstr == NULL)
         goto out;
 
-    if (RegQueryValueExW(hkey, valuename,
-                         NULL, &ktype, (LPBYTE)tempstr, &keysizebytes) != ERROR_SUCCESS)
+    if (RegQueryValueExW(hkey, valuename, NULL, &ktype, (LPBYTE)tempstr,
+                         &keysizebytes)
+        != ERROR_SUCCESS)
         goto out;
 
-    if (!WideCharToMultiByte(CP_UTF8, 0, tempstr, -1, dst, dstsizebytes,
-                             NULL, NULL))
+    if (!WideCharToMultiByte(CP_UTF8, 0, tempstr, -1, dst, dstsizebytes, NULL,
+                             NULL))
         goto out;
 
     retval = dst;
@@ -148,11 +148,11 @@ DEFINE_RUN_ONCE_STATIC(do_defaults_setup)
  */
 const char *ossl_get_openssldir(void)
 {
-#if defined(_WIN32) && defined (OSSL_WINCTX)
+#if defined(_WIN32) && defined(OSSL_WINCTX)
     if (!RUN_ONCE(&defaults_setup_init, do_defaults_setup))
         return NULL;
     return (const char *)openssldirptr;
-# else
+#else
     return OPENSSLDIR;
 #endif
 }
@@ -164,7 +164,7 @@ const char *ossl_get_openssldir(void)
  */
 const char *ossl_get_enginesdir(void)
 {
-#if defined(_WIN32) && defined (OSSL_WINCTX)
+#if defined(_WIN32) && defined(OSSL_WINCTX)
     if (!RUN_ONCE(&defaults_setup_init, do_defaults_setup))
         return NULL;
     return (const char *)enginesdirptr;
@@ -196,7 +196,7 @@ const char *ossl_get_modulesdir(void)
  */
 const char *ossl_get_wininstallcontext(void)
 {
-#if defined(_WIN32) && defined (OSSL_WINCTX)
+#if defined(_WIN32) && defined(OSSL_WINCTX)
     return MAKESTR(OSSL_WINCTX);
 #else
     return "Undefined";

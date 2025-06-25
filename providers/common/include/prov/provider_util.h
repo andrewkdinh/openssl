@@ -94,14 +94,10 @@ void ossl_prov_digest_set_md(PROV_DIGEST *pd, EVP_MD *md);
  * If any of the supplied ciphername/mdname etc are NULL then the values
  * from the supplied params (if non NULL) are used instead.
  */
-int ossl_prov_set_macctx(EVP_MAC_CTX *macctx,
-                         const OSSL_PARAM params[],
-                         const char *ciphername,
-                         const char *mdname,
-                         const char *engine,
-                         const char *properties,
-                         const unsigned char *key,
-                         size_t keylen);
+int ossl_prov_set_macctx(EVP_MAC_CTX *macctx, const OSSL_PARAM params[],
+                         const char *ciphername, const char *mdname,
+                         const char *engine, const char *properties,
+                         const unsigned char *key, size_t keylen);
 
 /* MAC functions */
 /*
@@ -124,8 +120,7 @@ int ossl_prov_macctx_load_from_params(EVP_MAC_CTX **macctx,
                                       const OSSL_PARAM params[],
                                       const char *macname,
                                       const char *ciphername,
-                                      const char *mdname,
-                                      OSSL_LIB_CTX *ctx);
+                                      const char *mdname, OSSL_LIB_CTX *ctx);
 
 typedef struct ag_capable_st {
     OSSL_ALGORITHM alg;
@@ -140,5 +135,5 @@ void ossl_prov_cache_exported_algorithms(const OSSL_ALGORITHM_CAPABLE *in,
                                          OSSL_ALGORITHM *out);
 
 /* Duplicate a lump of memory safely */
-int ossl_prov_memdup(const void *src, size_t src_len,
-                     unsigned char **dest, size_t *dest_len);
+int ossl_prov_memdup(const void *src, size_t src_len, unsigned char **dest,
+                     size_t *dest_len);

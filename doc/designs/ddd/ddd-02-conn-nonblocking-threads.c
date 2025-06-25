@@ -216,8 +216,7 @@ int get_conn_pending_tx(APP_CONN *conn)
 {
 #ifdef USE_QUIC
     return (SSL_net_read_desired(conn->ssl) ? POLLIN : 0)
-           | (SSL_net_write_desired(conn->ssl) ? POLLOUT : 0)
-           | POLLERR;
+        | (SSL_net_write_desired(conn->ssl) ? POLLOUT : 0) | POLLERR;
 #else
     return (conn->tx_need_rx ? POLLIN : 0) | POLLOUT | POLLERR;
 #endif

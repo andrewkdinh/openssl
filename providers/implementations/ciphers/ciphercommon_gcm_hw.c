@@ -10,7 +10,6 @@
 #include "prov/ciphercommon.h"
 #include "prov/ciphercommon_gcm.h"
 
-
 int ossl_gcm_setiv(PROV_GCM_CTX *ctx, const unsigned char *iv, size_t ivlen)
 {
     CRYPTO_gcm128_setiv(&ctx->gcm, iv, ivlen);

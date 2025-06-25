@@ -127,8 +127,7 @@ void X509_ACERT_set0_holder_entityName(X509_ACERT *x, GENERAL_NAMES *names)
     x->acinfo->holder.entityName = names;
 }
 
-void X509_ACERT_set0_holder_baseCertId(X509_ACERT *x,
-                                       OSSL_ISSUER_SERIAL *isss)
+void X509_ACERT_set0_holder_baseCertId(X509_ACERT *x, OSSL_ISSUER_SERIAL *isss)
 {
     OSSL_ISSUER_SERIAL_free(x->acinfo->holder.baseCertificateID);
     x->acinfo->holder.baseCertificateID = isss;

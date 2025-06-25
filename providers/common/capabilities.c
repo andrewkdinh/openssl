@@ -24,8 +24,8 @@
  * If none of EC, DH OR ML-KEM are available then we have no TLS-GROUP
  * capabilities.
  */
-#if !defined(OPENSSL_NO_EC) || !defined(OPENSSL_NO_DH) || \
-    !defined(OPENSSL_NO_ML_KEM)
+#if !defined(OPENSSL_NO_EC) || !defined(OPENSSL_NO_DH) \
+    || !defined(OPENSSL_NO_ML_KEM)
 typedef struct tls_group_constants_st {
     unsigned int group_id;   /* Group ID */
     unsigned int secbits;    /* Bits of security */
@@ -48,53 +48,125 @@ typedef struct tls_group_constants_st {
  * bits.
  */
 static const TLS_GROUP_CONSTANTS group_list[] = {
-    /*  0 */ { OSSL_TLS_GROUP_ID_sect163k1, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  1 */ { OSSL_TLS_GROUP_ID_sect163r1, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  2 */ { OSSL_TLS_GROUP_ID_sect163r2, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  3 */ { OSSL_TLS_GROUP_ID_sect193r1, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  4 */ { OSSL_TLS_GROUP_ID_sect193r2, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  5 */ { OSSL_TLS_GROUP_ID_sect233k1, 112, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  6 */ { OSSL_TLS_GROUP_ID_sect233r1, 112, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  7 */ { OSSL_TLS_GROUP_ID_sect239k1, 112, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  8 */ { OSSL_TLS_GROUP_ID_sect283k1, 128, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /*  9 */ { OSSL_TLS_GROUP_ID_sect283r1, 128, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 10 */ { OSSL_TLS_GROUP_ID_sect409k1, 192, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 11 */ { OSSL_TLS_GROUP_ID_sect409r1, 192, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 12 */ { OSSL_TLS_GROUP_ID_sect571k1, 256, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 13 */ { OSSL_TLS_GROUP_ID_sect571r1, 256, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 14 */ { OSSL_TLS_GROUP_ID_secp160k1, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 15 */ { OSSL_TLS_GROUP_ID_secp160r1, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 16 */ { OSSL_TLS_GROUP_ID_secp160r2, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 17 */ { OSSL_TLS_GROUP_ID_secp192k1, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 18 */ { OSSL_TLS_GROUP_ID_secp192r1, 80, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 19 */ { OSSL_TLS_GROUP_ID_secp224k1, 112, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 20 */ { OSSL_TLS_GROUP_ID_secp224r1, 112, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 21 */ { OSSL_TLS_GROUP_ID_secp256k1, 128, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 22 */ { OSSL_TLS_GROUP_ID_secp256r1, 128, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0 },
-    /* 23 */ { OSSL_TLS_GROUP_ID_secp384r1, 192, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0 },
-    /* 24 */ { OSSL_TLS_GROUP_ID_secp521r1, 256, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0 },
-    /* 25 */ { OSSL_TLS_GROUP_ID_brainpoolP256r1, 128, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 26 */ { OSSL_TLS_GROUP_ID_brainpoolP384r1, 192, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 27 */ { OSSL_TLS_GROUP_ID_brainpoolP512r1, 256, TLS1_VERSION, TLS1_2_VERSION, DTLS1_VERSION, DTLS1_2_VERSION, 0 },
-    /* 28 */ { OSSL_TLS_GROUP_ID_x25519, 128, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0 },
-    /* 29 */ { OSSL_TLS_GROUP_ID_x448, 224, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0 },
-    /* 30 */ { OSSL_TLS_GROUP_ID_brainpoolP256r1_tls13, 128, TLS1_3_VERSION, 0, -1, -1, 0 },
-    /* 31 */ { OSSL_TLS_GROUP_ID_brainpoolP384r1_tls13, 192, TLS1_3_VERSION, 0, -1, -1, 0 },
-    /* 32 */ { OSSL_TLS_GROUP_ID_brainpoolP512r1_tls13, 256, TLS1_3_VERSION, 0, -1, -1, 0 },
-    /* 33 */ { OSSL_TLS_GROUP_ID_ffdhe2048, 112, TLS1_3_VERSION, 0, -1, -1, 0 },
-    /* 34 */ { OSSL_TLS_GROUP_ID_ffdhe3072, 128, TLS1_3_VERSION, 0, -1, -1, 0 },
-    /* 35 */ { OSSL_TLS_GROUP_ID_ffdhe4096, 128, TLS1_3_VERSION, 0, -1, -1, 0 },
-    /* 36 */ { OSSL_TLS_GROUP_ID_ffdhe6144, 128, TLS1_3_VERSION, 0, -1, -1, 0 },
-    /* 37 */ { OSSL_TLS_GROUP_ID_ffdhe8192, 192, TLS1_3_VERSION, 0, -1, -1, 0 },
-    /* 38 */ { OSSL_TLS_GROUP_ID_mlkem512, ML_KEM_512_SECBITS, TLS1_3_VERSION, 0, -1, -1, 1 },
-    /* 39 */ { OSSL_TLS_GROUP_ID_mlkem768, ML_KEM_768_SECBITS, TLS1_3_VERSION, 0, -1, -1, 1 },
-    /* 40 */ { OSSL_TLS_GROUP_ID_mlkem1024, ML_KEM_1024_SECBITS, TLS1_3_VERSION, 0, -1, -1, 1 },
-    /* 41 */ { OSSL_TLS_GROUP_ID_X25519MLKEM768, ML_KEM_768_SECBITS, TLS1_3_VERSION, 0, -1, -1, 1 },
-    /* 42 */ { OSSL_TLS_GROUP_ID_SecP256r1MLKEM768, ML_KEM_768_SECBITS, TLS1_3_VERSION, 0, -1, -1, 1 },
-    /* 43 */ { OSSL_TLS_GROUP_ID_SecP384r1MLKEM1024, ML_KEM_1024_SECBITS, TLS1_3_VERSION, 0, -1, -1, 1 },
+    /*  0 */ {OSSL_TLS_GROUP_ID_sect163k1, 80, TLS1_VERSION, TLS1_2_VERSION,
+              DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  1 */
+    {OSSL_TLS_GROUP_ID_sect163r1, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  2 */
+    {OSSL_TLS_GROUP_ID_sect163r2, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  3 */
+    {OSSL_TLS_GROUP_ID_sect193r1, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  4 */
+    {OSSL_TLS_GROUP_ID_sect193r2, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  5 */
+    {OSSL_TLS_GROUP_ID_sect233k1, 112, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  6 */
+    {OSSL_TLS_GROUP_ID_sect233r1, 112, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  7 */
+    {OSSL_TLS_GROUP_ID_sect239k1, 112, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  8 */
+    {OSSL_TLS_GROUP_ID_sect283k1, 128, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /*  9 */
+    {OSSL_TLS_GROUP_ID_sect283r1, 128, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 10 */
+    {OSSL_TLS_GROUP_ID_sect409k1, 192, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 11 */
+    {OSSL_TLS_GROUP_ID_sect409r1, 192, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 12 */
+    {OSSL_TLS_GROUP_ID_sect571k1, 256, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 13 */
+    {OSSL_TLS_GROUP_ID_sect571r1, 256, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 14 */
+    {OSSL_TLS_GROUP_ID_secp160k1, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 15 */
+    {OSSL_TLS_GROUP_ID_secp160r1, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 16 */
+    {OSSL_TLS_GROUP_ID_secp160r2, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 17 */
+    {OSSL_TLS_GROUP_ID_secp192k1, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 18 */
+    {OSSL_TLS_GROUP_ID_secp192r1, 80, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 19 */
+    {OSSL_TLS_GROUP_ID_secp224k1, 112, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 20 */
+    {OSSL_TLS_GROUP_ID_secp224r1, 112, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 21 */
+    {OSSL_TLS_GROUP_ID_secp256k1, 128, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 22 */
+    {OSSL_TLS_GROUP_ID_secp256r1, 128, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0},
+    /* 23 */
+    {OSSL_TLS_GROUP_ID_secp384r1, 192, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0},
+    /* 24 */
+    {OSSL_TLS_GROUP_ID_secp521r1, 256, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0},
+    /* 25 */
+    {OSSL_TLS_GROUP_ID_brainpoolP256r1, 128, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 26 */
+    {OSSL_TLS_GROUP_ID_brainpoolP384r1, 192, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 27 */
+    {OSSL_TLS_GROUP_ID_brainpoolP512r1, 256, TLS1_VERSION, TLS1_2_VERSION,
+     DTLS1_VERSION, DTLS1_2_VERSION, 0},
+    /* 28 */
+    {OSSL_TLS_GROUP_ID_x25519, 128, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0},
+    /* 29 */
+    {OSSL_TLS_GROUP_ID_x448, 224, TLS1_VERSION, 0, DTLS1_VERSION, 0, 0},
+    /* 30 */
+    {OSSL_TLS_GROUP_ID_brainpoolP256r1_tls13, 128, TLS1_3_VERSION, 0, -1, -1,
+     0},
+    /* 31 */
+    {OSSL_TLS_GROUP_ID_brainpoolP384r1_tls13, 192, TLS1_3_VERSION, 0, -1, -1,
+     0},
+    /* 32 */
+    {OSSL_TLS_GROUP_ID_brainpoolP512r1_tls13, 256, TLS1_3_VERSION, 0, -1, -1,
+     0},
+    /* 33 */ {OSSL_TLS_GROUP_ID_ffdhe2048, 112, TLS1_3_VERSION, 0, -1, -1, 0},
+    /* 34 */ {OSSL_TLS_GROUP_ID_ffdhe3072, 128, TLS1_3_VERSION, 0, -1, -1, 0},
+    /* 35 */ {OSSL_TLS_GROUP_ID_ffdhe4096, 128, TLS1_3_VERSION, 0, -1, -1, 0},
+    /* 36 */ {OSSL_TLS_GROUP_ID_ffdhe6144, 128, TLS1_3_VERSION, 0, -1, -1, 0},
+    /* 37 */ {OSSL_TLS_GROUP_ID_ffdhe8192, 192, TLS1_3_VERSION, 0, -1, -1, 0},
+    /* 38 */
+    {OSSL_TLS_GROUP_ID_mlkem512, ML_KEM_512_SECBITS, TLS1_3_VERSION, 0, -1, -1,
+     1},
+    /* 39 */
+    {OSSL_TLS_GROUP_ID_mlkem768, ML_KEM_768_SECBITS, TLS1_3_VERSION, 0, -1, -1,
+     1},
+    /* 40 */
+    {OSSL_TLS_GROUP_ID_mlkem1024, ML_KEM_1024_SECBITS, TLS1_3_VERSION, 0, -1,
+     -1, 1},
+    /* 41 */
+    {OSSL_TLS_GROUP_ID_X25519MLKEM768, ML_KEM_768_SECBITS, TLS1_3_VERSION, 0,
+     -1, -1, 1},
+    /* 42 */
+    {OSSL_TLS_GROUP_ID_SecP256r1MLKEM768, ML_KEM_768_SECBITS, TLS1_3_VERSION, 0,
+     -1, -1, 1},
+    /* 43 */
+    {OSSL_TLS_GROUP_ID_SecP384r1MLKEM1024, ML_KEM_1024_SECBITS, TLS1_3_VERSION,
+     0, -1, -1, 1},
 };
 
-#define TLS_GROUP_ENTRY(tlsname, realname, algorithm, idx) \
+# define TLS_GROUP_ENTRY(tlsname, realname, algorithm, idx) \
     { \
         OSSL_PARAM_utf8_string(OSSL_CAPABILITY_TLS_GROUP_NAME, \
                                tlsname, \
@@ -260,7 +332,8 @@ static const OSSL_PARAM param_group_list[][11] = {
 
 static int tls_group_capability(OSSL_CALLBACK *cb, void *arg)
 {
-#if !defined(OPENSSL_NO_EC) || !defined(OPENSSL_NO_DH) || !defined(OPENSSL_NO_ML_KEM)
+#if !defined(OPENSSL_NO_EC) || !defined(OPENSSL_NO_DH) \
+    || !defined(OPENSSL_NO_ML_KEM)
     size_t i;
 
     for (i = 0; i < OSSL_NELEM(param_group_list); i++)
@@ -277,17 +350,17 @@ static int tls_group_capability(OSSL_CALLBACK *cb, void *arg)
 
 typedef struct tls_sigalg_constants_st {
     unsigned int code_point;
-    unsigned int sec_bits;    /* Bits of security */
-    int min_tls;              /* Minimum TLS version, -1 unsupported */
-    int max_tls;              /* Maximum TLS version (or 0 for undefined) */
-    int min_dtls;             /* Minimum DTLS version, -1 unsupported */
-    int max_dtls;             /* Maximum DTLS version (or 0 for undefined) */
+    unsigned int sec_bits; /* Bits of security */
+    int min_tls; /* Minimum TLS version, -1 unsupported */
+    int max_tls; /* Maximum TLS version (or 0 for undefined) */
+    int min_dtls; /* Minimum DTLS version, -1 unsupported */
+    int max_dtls; /* Maximum DTLS version (or 0 for undefined) */
 } TLS_SIGALG_CONSTANTS;
 
 static const TLS_SIGALG_CONSTANTS sigalg_constants_list[3] = {
-    { 0x0904, 128, TLS1_3_VERSION, 0, -1, -1 },
-    { 0x0905, 192, TLS1_3_VERSION, 0, -1, -1 },
-    { 0x0906, 256, TLS1_3_VERSION, 0, -1, -1 },
+    {0x0904, 128, TLS1_3_VERSION, 0, -1, -1},
+    {0x0905, 192, TLS1_3_VERSION, 0, -1, -1},
+    {0x0906, 256, TLS1_3_VERSION, 0, -1, -1},
 };
 
 # define TLS_SIGALG_ENTRY(tlsname, algorithm, oid, idx)                         \

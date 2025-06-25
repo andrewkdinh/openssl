@@ -60,8 +60,7 @@ void ossl_sframe_list_destroy(SFRAME_LIST *fl)
     }
 }
 
-static int append_frame(SFRAME_LIST *fl, UINT_RANGE *range,
-                        OSSL_QRX_PKT *pkt,
+static int append_frame(SFRAME_LIST *fl, UINT_RANGE *range, OSSL_QRX_PKT *pkt,
                         const unsigned char *data)
 {
     STREAM_FRAME *new_frame;
@@ -77,13 +76,12 @@ static int append_frame(SFRAME_LIST *fl, UINT_RANGE *range,
 }
 
 int ossl_sframe_list_insert(SFRAME_LIST *fl, UINT_RANGE *range,
-                            OSSL_QRX_PKT *pkt,
-                            const unsigned char *data, int fin)
+                            OSSL_QRX_PKT *pkt, const unsigned char *data,
+                            int fin)
 {
     STREAM_FRAME *sf, *new_frame, *prev_frame, *next_frame;
 #ifndef NDEBUG
-    uint64_t curr_end = fl->tail != NULL ? fl->tail->range.end
-                                         : fl->offset;
+    uint64_t curr_end = fl->tail != NULL ? fl->tail->range.end : fl->offset;
 
     /* This check for FINAL_SIZE_ERROR is handled by QUIC FC already */
     assert((!fin || curr_end <= range->end)
@@ -172,15 +170,14 @@ int ossl_sframe_list_insert(SFRAME_LIST *fl, UINT_RANGE *range,
 
     ++fl->num_frames;
 
- end:
+end:
     fl->fin = fin || fl->fin;
 
     return 1;
 }
 
-int ossl_sframe_list_peek(const SFRAME_LIST *fl, void **iter,
-                          UINT_RANGE *range, const unsigned char **data,
-                          int *fin)
+int ossl_sframe_list_peek(const SFRAME_LIST *fl, void **iter, UINT_RANGE *range,
+                          const unsigned char **data, int *fin)
 {
     STREAM_FRAME *sf = *iter;
     uint64_t start;
@@ -221,10 +218,8 @@ int ossl_sframe_list_drop_frames(SFRAME_LIST *fl, uint64_t limit)
 
     /* offset cannot move back or past the data received */
     if (!ossl_assert(limit >= fl->offset)
-        || !ossl_assert(fl->tail == NULL
-                        || limit <= fl->tail->range.end)
-        || !ossl_assert(fl->tail != NULL
-                        || limit == fl->offset))
+        || !ossl_assert(fl->tail == NULL || limit <= fl->tail->range.end)
+        || !ossl_assert(fl->tail != NULL || limit == fl->offset))
         return 0;
 
     fl->offset = limit;
@@ -249,8 +244,7 @@ int ossl_sframe_list_drop_frames(SFRAME_LIST *fl, uint64_t limit)
 }
 
 int ossl_sframe_list_lock_head(SFRAME_LIST *fl, UINT_RANGE *range,
-                               const unsigned char **data,
-                               int *fin)
+                               const unsigned char **data, int *fin)
 {
     int ret;
     void *iter = NULL;
@@ -311,8 +305,7 @@ int ossl_sframe_list_move_data(SFRAME_LIST *fl,
         limit = sf->range.end;
 
         /* merge contiguous frames */
-        if (prev_frame != NULL
-            && prev_frame->range.end >= sf->range.start) {
+        if (prev_frame != NULL && prev_frame->range.end >= sf->range.start) {
             prev_frame->range.end = sf->range.end;
             prev_frame->next = sf->next;
 

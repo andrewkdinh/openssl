@@ -35,8 +35,8 @@ static OSSL_FUNC_kdf_gettable_ctx_params_fn kdf_scrypt_gettable_ctx_params;
 static OSSL_FUNC_kdf_get_ctx_params_fn kdf_scrypt_get_ctx_params;
 
 static int scrypt_alg(const char *pass, size_t passlen,
-                      const unsigned char *salt, size_t saltlen,
-                      uint64_t N, uint64_t r, uint64_t p, uint64_t maxmem,
+                      const unsigned char *salt, size_t saltlen, uint64_t N,
+                      uint64_t r, uint64_t p, uint64_t maxmem,
                       unsigned char *key, size_t keylen, EVP_MD *sha256,
                       OSSL_LIB_CTX *libctx, const char *propq);
 
@@ -112,10 +112,10 @@ static void *kdf_scrypt_dup(void *vctx)
             if (dest->propq == NULL)
                 goto err;
         }
-        if (!ossl_prov_memdup(src->salt, src->salt_len,
-                              &dest->salt, &dest->salt_len)
-                || !ossl_prov_memdup(src->pass, src->pass_len,
-                                     &dest->pass , &dest->pass_len))
+        if (!ossl_prov_memdup(src->salt, src->salt_len, &dest->salt,
+                              &dest->salt_len)
+            || !ossl_prov_memdup(src->pass, src->pass_len, &dest->pass,
+                                 &dest->pass_len))
             goto err;
         dest->N = src->N;
         dest->r = src->r;
@@ -125,7 +125,7 @@ static void *kdf_scrypt_dup(void *vctx)
     }
     return dest;
 
- err:
+err:
     kdf_scrypt_free(dest);
     return NULL;
 }
@@ -204,9 +204,8 @@ static int kdf_scrypt_derive(void *vctx, unsigned char *key, size_t keylen,
         return 0;
 
     return scrypt_alg((char *)ctx->pass, ctx->pass_len, ctx->salt,
-                      ctx->salt_len, ctx->N, ctx->r, ctx->p,
-                      ctx->maxmem_bytes, key, keylen, ctx->sha256,
-                      ctx->libctx, ctx->propq);
+                      ctx->salt_len, ctx->N, ctx->r, ctx->p, ctx->maxmem_bytes,
+                      key, keylen, ctx->sha256, ctx->libctx, ctx->propq);
 }
 
 static int is_power_of_two(uint64_t value)
@@ -233,8 +232,7 @@ static int kdf_scrypt_set_ctx_params(void *vctx, const OSSL_PARAM params[])
 
     if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_SCRYPT_N))
         != NULL) {
-        if (!OSSL_PARAM_get_uint64(p, &u64_value)
-            || u64_value <= 1
+        if (!OSSL_PARAM_get_uint64(p, &u64_value) || u64_value <= 1
             || !is_power_of_two(u64_value))
             return 0;
         ctx->N = u64_value;
@@ -264,8 +262,7 @@ static int kdf_scrypt_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_PROPERTIES);
     if (p != NULL) {
         if (p->data_type != OSSL_PARAM_UTF8_STRING
-            || !set_property_query(ctx, p->data)
-            || !set_digest(ctx))
+            || !set_property_query(ctx, p->data) || !set_digest(ctx))
             return 0;
     }
     return 1;
@@ -282,8 +279,7 @@ static const OSSL_PARAM *kdf_scrypt_settable_ctx_params(ossl_unused void *ctx,
         OSSL_PARAM_uint32(OSSL_KDF_PARAM_SCRYPT_P, NULL),
         OSSL_PARAM_uint64(OSSL_KDF_PARAM_SCRYPT_MAXMEM, NULL),
         OSSL_PARAM_utf8_string(OSSL_KDF_PARAM_PROPERTIES, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
     return known_settable_ctx_params;
 }
 
@@ -300,28 +296,25 @@ static const OSSL_PARAM *kdf_scrypt_gettable_ctx_params(ossl_unused void *ctx,
                                                         ossl_unused void *p_ctx)
 {
     static const OSSL_PARAM known_gettable_ctx_params[] = {
-        OSSL_PARAM_size_t(OSSL_KDF_PARAM_SIZE, NULL),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_size_t(OSSL_KDF_PARAM_SIZE, NULL), OSSL_PARAM_END};
     return known_gettable_ctx_params;
 }
 
 const OSSL_DISPATCH ossl_kdf_scrypt_functions[] = {
-    { OSSL_FUNC_KDF_NEWCTX, (void(*)(void))kdf_scrypt_new },
-    { OSSL_FUNC_KDF_DUPCTX, (void(*)(void))kdf_scrypt_dup },
-    { OSSL_FUNC_KDF_FREECTX, (void(*)(void))kdf_scrypt_free },
-    { OSSL_FUNC_KDF_RESET, (void(*)(void))kdf_scrypt_reset },
-    { OSSL_FUNC_KDF_DERIVE, (void(*)(void))kdf_scrypt_derive },
-    { OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
-      (void(*)(void))kdf_scrypt_settable_ctx_params },
-    { OSSL_FUNC_KDF_SET_CTX_PARAMS, (void(*)(void))kdf_scrypt_set_ctx_params },
-    { OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
-      (void(*)(void))kdf_scrypt_gettable_ctx_params },
-    { OSSL_FUNC_KDF_GET_CTX_PARAMS, (void(*)(void))kdf_scrypt_get_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_KDF_NEWCTX, (void (*)(void))kdf_scrypt_new},
+    {OSSL_FUNC_KDF_DUPCTX, (void (*)(void))kdf_scrypt_dup},
+    {OSSL_FUNC_KDF_FREECTX, (void (*)(void))kdf_scrypt_free},
+    {OSSL_FUNC_KDF_RESET, (void (*)(void))kdf_scrypt_reset},
+    {OSSL_FUNC_KDF_DERIVE, (void (*)(void))kdf_scrypt_derive},
+    {OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
+     (void (*)(void))kdf_scrypt_settable_ctx_params},
+    {OSSL_FUNC_KDF_SET_CTX_PARAMS, (void (*)(void))kdf_scrypt_set_ctx_params},
+    {OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
+     (void (*)(void))kdf_scrypt_gettable_ctx_params},
+    {OSSL_FUNC_KDF_GET_CTX_PARAMS, (void (*)(void))kdf_scrypt_get_ctx_params},
+    OSSL_DISPATCH_END};
 
-#define R(a,b) (((a) << (b)) | ((a) >> (32 - (b))))
+# define R(a, b) (((a) << (b)) | ((a) >> (32 - (b))))
 static void salsa208_word_specification(uint32_t inout[16])
 {
     int i;
@@ -362,8 +355,7 @@ static void salsa208_word_specification(uint32_t inout[16])
         x[14] ^= R(x[13] + x[12], 13);
         x[15] ^= R(x[14] + x[13], 18);
     }
-    for (i = 0; i < 16; ++i)
-        inout[i] += x[i];
+    for (i = 0; i < 16; ++i) inout[i] += x[i];
     OPENSSL_cleanse(x, sizeof(x));
 }
 
@@ -375,16 +367,15 @@ static void scryptBlockMix(uint32_t *B_, uint32_t *B, uint64_t r)
     memcpy(X, B + (r * 2 - 1) * 16, sizeof(X));
     pB = B;
     for (i = 0; i < r * 2; i++) {
-        for (j = 0; j < 16; j++)
-            X[j] ^= *pB++;
+        for (j = 0; j < 16; j++) X[j] ^= *pB++;
         salsa208_word_specification(X);
         memcpy(B_ + (i / 2 + (i & 1) * r) * 16, X, sizeof(X));
     }
     OPENSSL_cleanse(X, sizeof(X));
 }
 
-static void scryptROMix(unsigned char *B, uint64_t r, uint64_t N,
-                        uint32_t *X, uint32_t *T, uint32_t *V)
+static void scryptROMix(unsigned char *B, uint64_t r, uint64_t N, uint32_t *X,
+                        uint32_t *T, uint32_t *V)
 {
     unsigned char *pB;
     uint32_t *pV;
@@ -398,8 +389,7 @@ static void scryptROMix(unsigned char *B, uint64_t r, uint64_t N,
         *pV |= (uint32_t)*pB++ << 24;
     }
 
-    for (i = 1; i < N; i++, pV += 32 * r)
-        scryptBlockMix(pV, pV - 32 * r, r);
+    for (i = 1; i < N; i++, pV += 32 * r) scryptBlockMix(pV, pV - 32 * r, r);
 
     scryptBlockMix(X, V + (N - 1) * 32 * r, r);
 
@@ -407,8 +397,7 @@ static void scryptROMix(unsigned char *B, uint64_t r, uint64_t N,
         uint32_t j;
         j = X[16 * (2 * r - 1)] % N;
         pV = V + 32 * r * j;
-        for (k = 0; k < 32 * r; k++)
-            T[k] = X[k] ^ *pV++;
+        for (k = 0; k < 32 * r; k++) T[k] = X[k] ^ *pV++;
         scryptBlockMix(X, T, r);
     }
     /* Convert output to little endian */
@@ -421,16 +410,16 @@ static void scryptROMix(unsigned char *B, uint64_t r, uint64_t N,
     }
 }
 
-#ifndef SIZE_MAX
-# define SIZE_MAX    ((size_t)-1)
-#endif
+# ifndef SIZE_MAX
+#  define SIZE_MAX    ((size_t)-1)
+# endif
 
 /*
  * Maximum power of two that will fit in uint64_t: this should work on
  * most (all?) platforms.
  */
 
-#define LOG2_UINT64_MAX         (sizeof(uint64_t) * 8 - 1)
+# define LOG2_UINT64_MAX         (sizeof(uint64_t) * 8 - 1)
 
 /*
  * Maximum value of p * r:
@@ -439,11 +428,11 @@ static void scryptROMix(unsigned char *B, uint64_t r, uint64_t N,
  * p * r <= (2^30-1)
  */
 
-#define SCRYPT_PR_MAX   ((1 << 30) - 1)
+# define SCRYPT_PR_MAX   ((1 << 30) - 1)
 
 static int scrypt_alg(const char *pass, size_t passlen,
-                      const unsigned char *salt, size_t saltlen,
-                      uint64_t N, uint64_t r, uint64_t p, uint64_t maxmem,
+                      const unsigned char *salt, size_t saltlen, uint64_t N,
+                      uint64_t r, uint64_t p, uint64_t maxmem,
                       unsigned char *key, size_t keylen, EVP_MD *sha256,
                       OSSL_LIB_CTX *libctx, const char *propq)
 {
@@ -528,17 +517,18 @@ static int scrypt_alg(const char *pass, size_t passlen,
     T = X + 32 * r;
     V = T + 32 * r;
     if (ossl_pkcs5_pbkdf2_hmac_ex(pass, passlen, salt, saltlen, 1, sha256,
-                                  (int)Blen, B, libctx, propq) == 0)
+                                  (int)Blen, B, libctx, propq)
+        == 0)
         goto err;
 
-    for (i = 0; i < p; i++)
-        scryptROMix(B + 128 * r * i, r, N, X, T, V);
+    for (i = 0; i < p; i++) scryptROMix(B + 128 * r * i, r, N, X, T, V);
 
     if (ossl_pkcs5_pbkdf2_hmac_ex(pass, passlen, B, (int)Blen, 1, sha256,
-                                  keylen, key, libctx, propq) == 0)
+                                  keylen, key, libctx, propq)
+        == 0)
         goto err;
     rv = 1;
- err:
+err:
     if (rv == 0)
         ERR_raise(ERR_LIB_EVP, EVP_R_PBKDF2_ERROR);
 

@@ -39,10 +39,10 @@ int DH_set_method(DH *dh, const DH_METHOD *meth)
     mtmp = dh->meth;
     if (mtmp->finish)
         mtmp->finish(dh);
-#ifndef OPENSSL_NO_ENGINE
+# ifndef OPENSSL_NO_ENGINE
     ENGINE_finish(dh->engine);
     dh->engine = NULL;
-#endif
+# endif
     dh->meth = meth;
     if (meth->init)
         meth->init(dh);
@@ -128,7 +128,7 @@ static DH *dh_new_intern(ENGINE *engine, OSSL_LIB_CTX *libctx)
 
     return ret;
 
- err:
+err:
     DH_free(ret);
     return NULL;
 }
@@ -222,8 +222,8 @@ int DH_security_bits(const DH *dh)
     return -1;
 }
 
-void DH_get0_pqg(const DH *dh,
-                 const BIGNUM **p, const BIGNUM **q, const BIGNUM **g)
+void DH_get0_pqg(const DH *dh, const BIGNUM **p, const BIGNUM **q,
+                 const BIGNUM **g)
 {
     ossl_ffc_params_get0_pqg(&dh->params, p, q, g);
 }

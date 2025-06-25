@@ -19,11 +19,8 @@
 
 #define NO_PAYLOAD_LENGTH ((size_t)-1)
 
-#if defined(RC4_ASM)                                                           \
-    && defined(MD5_ASM)                                                        \
-    && (defined(__x86_64)                                                      \
-        || defined(__x86_64__)                                                 \
-        || defined(_M_AMD64)                                                   \
+#if defined(RC4_ASM) && defined(MD5_ASM) \
+    && (defined(__x86_64) || defined(__x86_64__) || defined(_M_AMD64) \
         || defined(_M_X64))
 # define STITCHED_CALL
 # define MOD 32 /* 32 is $MOD from rc4_md5-x86_64.pl */
@@ -71,14 +68,13 @@ static int cipher_hw_rc4_hmac_md5_cipher(PROV_CIPHER_CTX *bctx,
         if (rc4_off > md5_off)
             md5_off += MD5_CBLOCK;
 
-        if (plen > md5_off
-                && (blocks = (plen - md5_off) / MD5_CBLOCK)
-                && (OPENSSL_ia32cap_P[0] & (1 << 20)) == 0) {
+        if (plen > md5_off && (blocks = (plen - md5_off) / MD5_CBLOCK)
+            && (OPENSSL_ia32cap_P[0] & (1 << 20)) == 0) {
             MD5_Update(&ctx->md, in, md5_off);
             RC4(ks, rc4_off, in, out);
 
-            rc4_md5_enc(ks, in + rc4_off, out + rc4_off,
-                        &ctx->md, in + md5_off, blocks);
+            rc4_md5_enc(ks, in + rc4_off, out + rc4_off, &ctx->md, in + md5_off,
+                        blocks);
             blocks *= MD5_CBLOCK;
             rc4_off += blocks;
             md5_off += blocks;
@@ -117,14 +113,13 @@ static int cipher_hw_rc4_hmac_md5_cipher(PROV_CIPHER_CTX *bctx,
         else
             rc4_off += MD5_CBLOCK;
 
-        if (len > rc4_off
-                && (blocks = (len - rc4_off) / MD5_CBLOCK)
-                && (OPENSSL_ia32cap_P[0] & (1 << 20)) == 0) {
+        if (len > rc4_off && (blocks = (len - rc4_off) / MD5_CBLOCK)
+            && (OPENSSL_ia32cap_P[0] & (1 << 20)) == 0) {
             RC4(ks, rc4_off, in, out);
             MD5_Update(&ctx->md, out, md5_off);
 
-            rc4_md5_enc(ks, in + rc4_off, out + rc4_off,
-                        &ctx->md, out + md5_off, blocks);
+            rc4_md5_enc(ks, in + rc4_off, out + rc4_off, &ctx->md,
+                        out + md5_off, blocks);
             blocks *= MD5_CBLOCK;
             rc4_off += blocks;
             md5_off += blocks;
@@ -205,8 +200,7 @@ static void cipher_hw_rc4_hmac_md5_init_mackey(PROV_CIPHER_CTX *bctx,
         memcpy(hmac_key, key, len);
     }
 
-    for (i = 0; i < sizeof(hmac_key); i++)
-        hmac_key[i] ^= 0x36; /* ipad */
+    for (i = 0; i < sizeof(hmac_key); i++) hmac_key[i] ^= 0x36; /* ipad */
     MD5_Init(&ctx->head);
     MD5_Update(&ctx->head, hmac_key, sizeof(hmac_key));
 
@@ -219,13 +213,9 @@ static void cipher_hw_rc4_hmac_md5_init_mackey(PROV_CIPHER_CTX *bctx,
 }
 
 static const PROV_CIPHER_HW_RC4_HMAC_MD5 rc4_hmac_md5_hw = {
-    {
-      cipher_hw_rc4_hmac_md5_initkey,
-      cipher_hw_rc4_hmac_md5_cipher
-    },
+    {cipher_hw_rc4_hmac_md5_initkey, cipher_hw_rc4_hmac_md5_cipher},
     cipher_hw_rc4_hmac_md5_tls_init,
-    cipher_hw_rc4_hmac_md5_init_mackey
-};
+    cipher_hw_rc4_hmac_md5_init_mackey};
 
 const PROV_CIPHER_HW *ossl_prov_cipher_hw_rc4_hmac_md5(size_t keybits)
 {

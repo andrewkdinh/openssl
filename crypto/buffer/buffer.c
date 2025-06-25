@@ -146,8 +146,7 @@ void BUF_reverse(unsigned char *out, const unsigned char *in, size_t size)
     size_t i;
     if (in) {
         out += size - 1;
-        for (i = 0; i < size; i++)
-            *out-- = *in++;
+        for (i = 0; i < size; i++) *out-- = *in++;
     } else {
         unsigned char *q;
         char c;

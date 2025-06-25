@@ -20,9 +20,12 @@ typedef struct prov_cipher_hw_aes_hmac_sha_ctx_etm_st {
     void (*init_mac_key)(void *ctx, const unsigned char *inkey, size_t inlen);
 } PROV_CIPHER_HW_AES_HMAC_SHA_ETM;
 
-const PROV_CIPHER_HW_AES_HMAC_SHA_ETM *ossl_prov_cipher_hw_aes_cbc_hmac_sha1_etm(void);
-const PROV_CIPHER_HW_AES_HMAC_SHA_ETM *ossl_prov_cipher_hw_aes_cbc_hmac_sha256_etm(void);
-const PROV_CIPHER_HW_AES_HMAC_SHA_ETM *ossl_prov_cipher_hw_aes_cbc_hmac_sha512_etm(void);
+const PROV_CIPHER_HW_AES_HMAC_SHA_ETM *
+ossl_prov_cipher_hw_aes_cbc_hmac_sha1_etm(void);
+const PROV_CIPHER_HW_AES_HMAC_SHA_ETM *
+ossl_prov_cipher_hw_aes_cbc_hmac_sha256_etm(void);
+const PROV_CIPHER_HW_AES_HMAC_SHA_ETM *
+ossl_prov_cipher_hw_aes_cbc_hmac_sha512_etm(void);
 
 #ifdef AES_CBC_HMAC_SHA_ETM_CAPABLE
 # include <openssl/aes.h>

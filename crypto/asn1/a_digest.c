@@ -89,4 +89,3 @@ int ASN1_item_digest(const ASN1_ITEM *it, const EVP_MD *md, void *asn,
 {
     return ossl_asn1_item_digest_ex(it, md, asn, data, len, NULL, NULL);
 }
-

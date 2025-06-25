@@ -101,7 +101,7 @@ int ASN1_get_object(const unsigned char **pp, long *plength, int *ptag,
     }
     *pp = p;
     return ret | inf;
- err:
+err:
     ERR_raise(ERR_LIB_ASN1, ASN1_R_HEADER_TOO_LONG);
     return 0x80;
 }
@@ -169,8 +169,7 @@ void ASN1_put_object(unsigned char **pp, int constructed, int length, int tag,
         *(p++) = i | (tag & V_ASN1_PRIMITIVE_TAG);
     } else {
         *(p++) = i | V_ASN1_PRIMITIVE_TAG;
-        for (i = 0, ttag = tag; ttag > 0; i++)
-            ttag >>= 7;
+        for (i = 0, ttag = tag; ttag > 0; i++) ttag >>= 7;
         ttag = i;
         while (i-- > 0) {
             p[i] = tag & 0x7f;
@@ -206,8 +205,7 @@ static void asn1_put_length(unsigned char **pp, int length)
         *(p++) = (unsigned char)length;
     } else {
         len = length;
-        for (i = 0; len > 0; i++)
-            len >>= 8;
+        for (i = 0; len > 0; i++) len >>= 8;
         *(p++) = i | 0x80;
         len = i;
         while (i-- > 0) {

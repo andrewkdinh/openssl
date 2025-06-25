@@ -38,7 +38,7 @@ static int verify_signature(const OSSL_CMP_CTX *cmp_ctx,
         return 0;
     /* verify that keyUsage, if present, contains digitalSignature */
     if (!cmp_ctx->ignore_keyusage
-            && (X509_get_key_usage(cert) & X509v3_KU_DIGITAL_SIGNATURE) == 0) {
+        && (X509_get_key_usage(cert) & X509v3_KU_DIGITAL_SIGNATURE) == 0) {
         ERR_raise(ERR_LIB_CMP, CMP_R_MISSING_KEY_USAGE_DIGITALSIGNATURE);
         goto sig_err;
     }
@@ -55,19 +55,20 @@ static int verify_signature(const OSSL_CMP_CTX *cmp_ctx,
     if (ASN1_item_verify_ex(ASN1_ITEM_rptr(OSSL_CMP_PROTECTEDPART),
                             msg->header->protectionAlg, msg->protection,
                             &prot_part, NULL, pubkey, cmp_ctx->libctx,
-                            cmp_ctx->propq) > 0) {
+                            cmp_ctx->propq)
+        > 0) {
         res = 1;
         goto end;
     }
 
- sig_err:
+sig_err:
     res = ossl_x509_print_ex_brief(bio, cert, X509_FLAG_NO_EXTENSIONS);
     ERR_raise(ERR_LIB_CMP, CMP_R_ERROR_VALIDATING_SIGNATURE);
     if (res)
         ERR_add_error_mem_bio("\n", bio);
     res = 0;
 
- end:
+end:
     EVP_PKEY_free(pubkey);
     BIO_free(bio);
 
@@ -85,10 +86,11 @@ static int verify_PBMAC(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg)
         return 0; /* failed to generate protection string! */
 
     valid = msg->protection != NULL && msg->protection->length >= 0
-            && msg->protection->type == protection->type
-            && msg->protection->length == protection->length
-            && CRYPTO_memcmp(msg->protection->data, protection->data,
-                             protection->length) == 0;
+        && msg->protection->type == protection->type
+        && msg->protection->length == protection->length
+        && CRYPTO_memcmp(msg->protection->data, protection->data,
+                         protection->length)
+            == 0;
     ASN1_BIT_STRING_free(protection);
     if (!valid)
         ERR_raise(ERR_LIB_CMP, CMP_R_WRONG_PBM_VALUE);
@@ -121,8 +123,7 @@ int OSSL_CMP_validate_cert_path(const OSSL_CMP_CTX *ctx,
     }
 
     if ((csc = X509_STORE_CTX_new_ex(ctx->libctx, ctx->propq)) == NULL
-            || !X509_STORE_CTX_init(csc, trusted_store,
-                                    cert, ctx->untrusted))
+        || !X509_STORE_CTX_init(csc, trusted_store, cert, ctx->untrusted))
         goto err;
 
     valid = X509_verify_cert(csc) > 0;
@@ -132,7 +133,7 @@ int OSSL_CMP_validate_cert_path(const OSSL_CMP_CTX *ctx,
     if (!valid && ERR_GET_REASON(err) != CMP_R_POTENTIALLY_INVALID_CERTIFICATE)
         ERR_raise(ERR_LIB_CMP, CMP_R_POTENTIALLY_INVALID_CERTIFICATE);
 
- err:
+err:
     /* directly output any fresh errors, needed for check_msg_find_cert() */
     OSSL_CMP_CTX_print_errors(ctx);
     X509_STORE_CTX_free(csc);
@@ -148,7 +149,7 @@ static int verify_cb_cert(X509_STORE *ts, X509 *cert, int err)
     if (ts == NULL || (verify_cb = X509_STORE_get_verify_cb(ts)) == NULL)
         return ok;
     if ((csc = X509_STORE_CTX_new()) != NULL
-            && X509_STORE_CTX_init(csc, ts, cert, NULL)) {
+        && X509_STORE_CTX_init(csc, ts, cert, NULL)) {
         X509_STORE_CTX_set_error(csc, err);
         X509_STORE_CTX_set_current_cert(csc, cert);
         ok = (*verify_cb)(0, csc);
@@ -175,8 +176,8 @@ static int check_name(const OSSL_CMP_CTX *ctx, int log_success,
     str = X509_NAME_oneline(actual_name, NULL, 0);
     if (X509_NAME_cmp(actual_name, expect_name) == 0) {
         if (log_success && str != NULL)
-            ossl_cmp_log3(INFO, ctx, " %s matches %s: %s",
-                          actual_desc, expect_desc, str);
+            ossl_cmp_log3(INFO, ctx, " %s matches %s: %s", actual_desc,
+                          expect_desc, str);
         OPENSSL_free(str);
         return 1;
     }
@@ -191,8 +192,7 @@ static int check_name(const OSSL_CMP_CTX *ctx, int log_success,
 }
 
 /* Return 0 if skid != NULL and there is no matching subject key ID in cert */
-static int check_kid(const OSSL_CMP_CTX *ctx,
-                     const ASN1_OCTET_STRING *ckid,
+static int check_kid(const OSSL_CMP_CTX *ctx, const ASN1_OCTET_STRING *ckid,
                      const ASN1_OCTET_STRING *skid)
 {
     char *str;
@@ -241,8 +241,8 @@ static int already_checked(const X509 *cert,
  *
  * Returns 0 on error or not acceptable, else 1.
  */
-static int cert_acceptable(const OSSL_CMP_CTX *ctx,
-                           const char *desc1, const char *desc2, X509 *cert,
+static int cert_acceptable(const OSSL_CMP_CTX *ctx, const char *desc1,
+                           const char *desc2, X509 *cert,
                            const STACK_OF(X509) *already_checked1,
                            const STACK_OF(X509) *already_checked2,
                            const OSSL_CMP_MSG *msg)
@@ -254,7 +254,7 @@ static int cert_acceptable(const OSSL_CMP_CTX *ctx,
     int time_cmp;
 
     ossl_cmp_log3(INFO, ctx, " considering %s%s %s with..",
-                  self_issued ? "self-issued ": "", desc1, desc2);
+                  self_issued ? "self-issued " : "", desc1, desc2);
     if ((str = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0)) != NULL)
         ossl_cmp_log1(INFO, ctx, "  subject = %s", str);
     OPENSSL_free(str);
@@ -266,7 +266,7 @@ static int cert_acceptable(const OSSL_CMP_CTX *ctx,
     }
 
     if (already_checked(cert, already_checked1)
-            || already_checked(cert, already_checked2)) {
+        || already_checked(cert, already_checked2)) {
         ossl_cmp_info(ctx, " cert has already been checked");
         return 0;
     }
@@ -277,15 +277,14 @@ static int cert_acceptable(const OSSL_CMP_CTX *ctx,
         int err = time_cmp > 0 ? X509_V_ERR_CERT_HAS_EXPIRED
                                : X509_V_ERR_CERT_NOT_YET_VALID;
 
-        ossl_cmp_warn(ctx, time_cmp > 0 ? "cert has expired"
-                                        : "cert is not yet valid");
+        ossl_cmp_warn(
+            ctx, time_cmp > 0 ? "cert has expired" : "cert is not yet valid");
         if (ctx->log_cb != NULL /* logging not temporarily disabled */
-                && verify_cb_cert(ts, cert, err) <= 0)
+            && verify_cb_cert(ts, cert, err) <= 0)
             return 0;
     }
 
-    if (!check_name(ctx, 1,
-                    "cert subject", X509_get_subject_name(cert),
+    if (!check_name(ctx, 1, "cert subject", X509_get_subject_name(cert),
                     "sender field", msg->header->sender->d.directoryName))
         return 0;
 
@@ -333,8 +332,8 @@ static int check_cert_path_3gpp(const OSSL_CMP_CTX *ctx,
         return 0;
 
     if ((store = X509_STORE_new()) == NULL
-            || !ossl_cmp_X509_STORE_add1_certs(store, msg->extraCerts,
-                                               1 /* self-issued only */))
+        || !ossl_cmp_X509_STORE_add1_certs(store, msg->extraCerts,
+                                           1 /* self-issued only */))
         goto err;
 
     /* store does not include CRLs */
@@ -347,9 +346,8 @@ static int check_cert_path_3gpp(const OSSL_CMP_CTX *ctx,
          * verify that the newly enrolled certificate (which assumed rid ==
          * OSSL_CMP_CERTREQID) can also be validated with the same trusted store
          */
-        OSSL_CMP_CERTRESPONSE *crep =
-            ossl_cmp_certrepmessage_get0_certresponse(msg->body->value.ip,
-                                                      OSSL_CMP_CERTREQID);
+        OSSL_CMP_CERTRESPONSE *crep = ossl_cmp_certrepmessage_get0_certresponse(
+            msg->body->value.ip, OSSL_CMP_CERTREQID);
         X509 *newcrt = ossl_cmp_certresponse_get1_cert(ctx, crep);
 
         /*
@@ -360,7 +358,7 @@ static int check_cert_path_3gpp(const OSSL_CMP_CTX *ctx,
         X509_free(newcrt);
     }
 
- err:
+err:
     X509_STORE_free(store);
     return valid;
 }
@@ -368,8 +366,8 @@ static int check_cert_path_3gpp(const OSSL_CMP_CTX *ctx,
 static int check_msg_given_cert(const OSSL_CMP_CTX *ctx, X509 *cert,
                                 const OSSL_CMP_MSG *msg)
 {
-    return cert_acceptable(ctx, "previously validated", "sender cert",
-                           cert, NULL, NULL, msg)
+    return cert_acceptable(ctx, "previously validated", "sender cert", cert,
+                           NULL, NULL, msg)
         && (check_cert_path(ctx, ctx->trusted, cert)
             || check_cert_path_3gpp(ctx, msg, cert));
 }
@@ -399,8 +397,8 @@ static int check_msg_with_certs(OSSL_CMP_CTX *ctx, const STACK_OF(X509) *certs,
 
         if (!ossl_assert(cert != NULL))
             return 0;
-        if (!cert_acceptable(ctx, "cert from", desc, cert,
-                             already_checked1, already_checked2, msg))
+        if (!cert_acceptable(ctx, "cert from", desc, cert, already_checked1,
+                             already_checked2, msg))
             continue;
         n_acceptable_certs++;
         if (mode_3gpp ? check_cert_path_3gpp(ctx, msg, cert)
@@ -425,31 +423,32 @@ static int check_msg_all_certs(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg,
     int ret = 0;
 
     if (ctx->permitTAInExtraCertsForIR
-            && OSSL_CMP_MSG_get_bodytype(msg) == OSSL_CMP_PKIBODY_IP)
-        ossl_cmp_info(ctx, mode_3gpp ?
-                      "normal mode failed; trying now 3GPP mode trusting extraCerts"
-                      : "trying first normal mode using trust store");
+        && OSSL_CMP_MSG_get_bodytype(msg) == OSSL_CMP_PKIBODY_IP)
+        ossl_cmp_info(
+            ctx,
+            mode_3gpp
+                ? "normal mode failed; trying now 3GPP mode trusting extraCerts"
+                : "trying first normal mode using trust store");
     else if (mode_3gpp)
         return 0;
 
-    if (check_msg_with_certs(ctx, msg->extraCerts, "extraCerts",
-                             NULL, NULL, msg, mode_3gpp))
+    if (check_msg_with_certs(ctx, msg->extraCerts, "extraCerts", NULL, NULL,
+                             msg, mode_3gpp))
         return 1;
     if (check_msg_with_certs(ctx, ctx->untrusted, "untrusted certs",
                              msg->extraCerts, NULL, msg, mode_3gpp))
         return 1;
 
     if (ctx->trusted == NULL) {
-        ossl_cmp_warn(ctx, mode_3gpp ? "no self-issued extraCerts"
-                                     : "no trusted store");
+        ossl_cmp_warn(
+            ctx, mode_3gpp ? "no self-issued extraCerts" : "no trusted store");
     } else {
         STACK_OF(X509) *trusted = X509_STORE_get1_all_certs(ctx->trusted);
 
-        ret = check_msg_with_certs(ctx, trusted,
-                                   mode_3gpp ? "self-issued extraCerts"
-                                             : "certs in trusted store",
-                                   msg->extraCerts, ctx->untrusted,
-                                   msg, mode_3gpp);
+        ret = check_msg_with_certs(
+            ctx, trusted,
+            mode_3gpp ? "self-issued extraCerts" : "certs in trusted store",
+            msg->extraCerts, ctx->untrusted, msg, mode_3gpp);
         OSSL_STACK_OF_X509_free(trusted);
     }
     return ret;
@@ -497,13 +496,14 @@ static int check_msg_find_cert(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg)
         /* cached sender cert has shown to be no more successfully usable */
         (void)ossl_cmp_ctx_set1_validatedSrvCert(ctx, NULL);
         /* re-do the above check (just) for adding diagnostic information */
-        ossl_cmp_info(ctx,
-                      "trying to verify msg signature with previously validated cert");
+        ossl_cmp_info(
+            ctx,
+            "trying to verify msg signature with previously validated cert");
         (void)check_msg_given_cert(ctx, scrt, msg);
     }
 
     res = check_msg_all_certs(ctx, msg, 0 /* using ctx->trusted */)
-            || check_msg_all_certs(ctx, msg, 1 /* 3gpp */);
+        || check_msg_all_certs(ctx, msg, 1 /* 3gpp */);
     ctx->log_cb = backup_log_cb;
     if (res) {
         /* discard any diagnostic information on trying to use certs */
@@ -516,7 +516,8 @@ static int check_msg_find_cert(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg)
     sname = X509_NAME_oneline(sender->d.directoryName, NULL, 0);
     skid_str = skid == NULL ? NULL : i2s_ASN1_OCTET_STRING(NULL, skid);
     if (ctx->log_cb != NULL) {
-        ossl_cmp_info(ctx, "trying to verify msg signature with a valid cert that..");
+        ossl_cmp_info(
+            ctx, "trying to verify msg signature with a valid cert that..");
         if (sname != NULL)
             ossl_cmp_log1(INFO, ctx, "matches msg sender    = %s", sname);
         if (skid_str != NULL)
@@ -538,7 +539,7 @@ static int check_msg_find_cert(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg)
         ERR_add_error_txt(NULL, skid_str);
     }
 
- end:
+end:
     OPENSSL_free(sname);
     OPENSSL_free(skid_str);
     return res;
@@ -565,14 +566,14 @@ int OSSL_CMP_validate_msg(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg)
     X509 *scrt;
 
     ossl_cmp_debug(ctx, "validating CMP message");
-    if (ctx == NULL || msg == NULL
-            || msg->header == NULL || msg->body == NULL) {
+    if (ctx == NULL || msg == NULL || msg->header == NULL
+        || msg->body == NULL) {
         ERR_raise(ERR_LIB_CMP, CMP_R_NULL_ARGUMENT);
         return 0;
     }
 
     if (msg->header->protectionAlg == NULL /* unprotected message */
-            || msg->protection == NULL || msg->protection->data == NULL) {
+        || msg->protection == NULL || msg->protection->data == NULL) {
         ERR_raise(ERR_LIB_CMP, CMP_R_MISSING_PROTECTION);
         return 0;
     }
@@ -581,7 +582,9 @@ int OSSL_CMP_validate_msg(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg)
         /* 5.1.3.1.  Shared Secret Information */
     case NID_id_PasswordBasedMAC:
         if (ctx->secretValue == NULL) {
-            ossl_cmp_info(ctx, "no secret available for verifying PBM-based CMP message protection");
+            ossl_cmp_info(
+                ctx,
+                "no secret available for verifying PBM-based CMP message protection");
             ERR_raise(ERR_LIB_CMP, CMP_R_MISSING_SECRET);
             return 0;
         }
@@ -611,8 +614,8 @@ int OSSL_CMP_validate_msg(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg)
             default:
                 break;
             }
-            ossl_cmp_debug(ctx,
-                           "successfully validated PBM-based CMP message protection");
+            ossl_cmp_debug(
+                ctx, "successfully validated PBM-based CMP message protection");
             return 1;
         }
         ossl_cmp_warn(ctx, "verifying PBM-based CMP message protection failed");
@@ -633,20 +636,24 @@ int OSSL_CMP_validate_msg(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg)
         scrt = ctx->srvCert;
         if (scrt == NULL) {
             if (ctx->trusted == NULL && ctx->secretValue != NULL) {
-                ossl_cmp_info(ctx, "no trust store nor pinned server cert available for verifying signature-based CMP message protection");
+                ossl_cmp_info(
+                    ctx,
+                    "no trust store nor pinned server cert available for verifying signature-based CMP message protection");
                 ERR_raise(ERR_LIB_CMP, CMP_R_MISSING_TRUST_ANCHOR);
                 return 0;
             }
             if (check_msg_find_cert(ctx, msg)) {
-                ossl_cmp_debug(ctx,
-                               "successfully validated signature-based CMP message protection using trust store");
+                ossl_cmp_debug(
+                    ctx,
+                    "successfully validated signature-based CMP message protection using trust store");
                 return 1;
             }
         } else { /* use pinned sender cert */
             /* use ctx->srvCert for signature check even if not acceptable */
             if (verify_signature(ctx, msg, scrt)) {
-                ossl_cmp_debug(ctx,
-                               "successfully validated signature-based CMP message protection using pinned server cert");
+                ossl_cmp_debug(
+                    ctx,
+                    "successfully validated signature-based CMP message protection using pinned server cert");
                 return ossl_cmp_ctx_set1_validatedSrvCert(ctx, scrt);
             }
             ossl_cmp_warn(ctx, "CMP message signature verification failed");
@@ -666,12 +673,13 @@ static int check_transactionID_or_nonce(ASN1_OCTET_STRING *expected,
         char *expected_str, *actual_str;
 
         expected_str = i2s_ASN1_OCTET_STRING(NULL, expected);
-        actual_str = actual == NULL ? NULL: i2s_ASN1_OCTET_STRING(NULL, actual);
-        ERR_raise_data(ERR_LIB_CMP, reason,
-                       "expected = %s, actual = %s",
+        actual_str =
+            actual == NULL ? NULL : i2s_ASN1_OCTET_STRING(NULL, actual);
+        ERR_raise_data(ERR_LIB_CMP, reason, "expected = %s, actual = %s",
                        expected_str == NULL ? "?" : expected_str,
-                       actual == NULL ? "(none)" :
-                       actual_str == NULL ? "?" : actual_str);
+                       actual == NULL           ? "(none)"
+                           : actual_str == NULL ? "?"
+                                                : actual_str);
         OPENSSL_free(expected_str);
         OPENSSL_free(actual_str);
         return 0;
@@ -757,12 +765,11 @@ int ossl_cmp_msg_check_update(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg,
     res = ossl_x509_add_certs_new(&ctx->untrusted, msg->extraCerts,
                                   /* this allows self-signed certs */
                                   X509_ADD_FLAG_UP_REF | X509_ADD_FLAG_NO_DUP
-                                  | X509_ADD_FLAG_PREPEND);
+                                      | X509_ADD_FLAG_PREPEND);
     num_added = (ctx->untrusted == NULL ? 0 : sk_X509_num(ctx->untrusted))
         - num_untrusted;
     if (!res) {
-        while (num_added-- > 0)
-            X509_free(sk_X509_shift(ctx->untrusted));
+        while (num_added-- > 0) X509_free(sk_X509_shift(ctx->untrusted));
         return 0;
     }
 
@@ -779,8 +786,7 @@ int ossl_cmp_msg_check_update(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg,
 
     /* remove extraCerts again if not caching */
     if (ctx->noCacheExtraCerts)
-        while (num_added-- > 0)
-            X509_free(sk_X509_shift(ctx->untrusted));
+        while (num_added-- > 0) X509_free(sk_X509_shift(ctx->untrusted));
 
     if (!res) {
         if (hdr->protectionAlg != NULL)
@@ -792,7 +798,7 @@ int ossl_cmp_msg_check_update(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg,
 
     /* check CMP version number in header */
     if (ossl_cmp_hdr_get_pvno(hdr) != OSSL_CMP_PVNO_2
-            && ossl_cmp_hdr_get_pvno(hdr) != OSSL_CMP_PVNO_3) {
+        && ossl_cmp_hdr_get_pvno(hdr) != OSSL_CMP_PVNO_3) {
 #ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
         ERR_raise(ERR_LIB_CMP, CMP_R_UNEXPECTED_PVNO);
         return 0;
@@ -873,31 +879,30 @@ int ossl_cmp_msg_check_update(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg,
     return 1;
 }
 
-int ossl_cmp_verify_popo(const OSSL_CMP_CTX *ctx,
-                         const OSSL_CMP_MSG *msg, int acceptRAVerified)
+int ossl_cmp_verify_popo(const OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *msg,
+                         int acceptRAVerified)
 {
     if (!ossl_assert(msg != NULL && msg->body != NULL))
         return 0;
     switch (msg->body->type) {
-    case OSSL_CMP_PKIBODY_P10CR:
-        {
-            X509_REQ *req = msg->body->value.p10cr;
+    case OSSL_CMP_PKIBODY_P10CR: {
+        X509_REQ *req = msg->body->value.p10cr;
 
-            if (X509_REQ_verify_ex(req, X509_REQ_get0_pubkey(req), ctx->libctx,
-                                   ctx->propq) <= 0) {
+        if (X509_REQ_verify_ex(req, X509_REQ_get0_pubkey(req), ctx->libctx,
+                               ctx->propq)
+            <= 0) {
 #ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
-                ERR_raise(ERR_LIB_CMP, CMP_R_REQUEST_NOT_ACCEPTED);
-                return 0;
+            ERR_raise(ERR_LIB_CMP, CMP_R_REQUEST_NOT_ACCEPTED);
+            return 0;
 #endif
-            }
         }
-        break;
+    } break;
     case OSSL_CMP_PKIBODY_IR:
     case OSSL_CMP_PKIBODY_CR:
     case OSSL_CMP_PKIBODY_KUR:
         if (!OSSL_CRMF_MSGS_verify_popo(msg->body->value.ir, OSSL_CMP_CERTREQID,
-                                        acceptRAVerified,
-                                        ctx->libctx, ctx->propq)) {
+                                        acceptRAVerified, ctx->libctx,
+                                        ctx->propq)) {
 #ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
             return 0;
 #endif

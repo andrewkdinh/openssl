@@ -26,20 +26,20 @@
 /* Number of octets per line */
 #define LABELED_BUF_PRINT_WIDTH    15
 
-# ifdef SIXTY_FOUR_BIT_LONG
-#  define BN_FMTu "%lu"
-#  define BN_FMTx "%lx"
-# endif
+#ifdef SIXTY_FOUR_BIT_LONG
+# define BN_FMTu "%lu"
+# define BN_FMTx "%lx"
+#endif
 
-# ifdef SIXTY_FOUR_BIT
-#  define BN_FMTu "%llu"
-#  define BN_FMTx "%llx"
-# endif
+#ifdef SIXTY_FOUR_BIT
+# define BN_FMTu "%llu"
+# define BN_FMTx "%llx"
+#endif
 
-# ifdef THIRTY_TWO_BIT
-#  define BN_FMTu "%u"
-#  define BN_FMTx "%x"
-# endif
+#ifdef THIRTY_TWO_BIT
+# define BN_FMTu "%u"
+# define BN_FMTx "%x"
+#endif
 
 struct encoder_process_data_st {
     OSSL_ENCODER_CTX *ctx;
@@ -130,8 +130,7 @@ int OSSL_ENCODER_to_data(OSSL_ENCODER_CTX *ctx, unsigned char **pdata,
 
     out = BIO_new(BIO_s_mem());
 
-    if (out != NULL
-        && OSSL_ENCODER_to_bio(ctx, out)
+    if (out != NULL && OSSL_ENCODER_to_bio(ctx, out)
         && BIO_get_mem_ptr(out, &buf) > 0) {
         ret = 1; /* Hope for the best. A too small buffer will clear this */
 
@@ -254,13 +253,13 @@ static OSSL_ENCODER_INSTANCE *ossl_encoder_instance_new(OSSL_ENCODER *encoder,
     /* The "structure" property is optional */
     prop = ossl_property_find_property(props, libctx, "structure");
     if (prop != NULL)
-        encoder_inst->output_structure
-            = ossl_property_get_string_value(libctx, prop);
+        encoder_inst->output_structure =
+            ossl_property_get_string_value(libctx, prop);
 
     encoder_inst->encoder = encoder;
     encoder_inst->encoderctx = encoderctx;
     return encoder_inst;
- err:
+err:
     ossl_encoder_instance_free(encoder_inst);
     return NULL;
 }
@@ -283,22 +282,23 @@ static int ossl_encoder_ctx_add_encoder_inst(OSSL_ENCODER_CTX *ctx,
     int ok;
 
     if (ctx->encoder_insts == NULL
-        && (ctx->encoder_insts =
-            sk_OSSL_ENCODER_INSTANCE_new_null()) == NULL) {
+        && (ctx->encoder_insts = sk_OSSL_ENCODER_INSTANCE_new_null()) == NULL) {
         ERR_raise(ERR_LIB_OSSL_ENCODER, ERR_R_CRYPTO_LIB);
         return 0;
     }
 
     ok = (sk_OSSL_ENCODER_INSTANCE_push(ctx->encoder_insts, ei) > 0);
     if (ok) {
-        OSSL_TRACE_BEGIN(ENCODER) {
+        OSSL_TRACE_BEGIN(ENCODER)
+        {
             BIO_printf(trc_out,
                        "(ctx %p) Added encoder instance %p (encoder %p):\n"
                        "    %s with %s\n",
                        (void *)ctx, (void *)ei, (void *)ei->encoder,
                        OSSL_ENCODER_get0_name(ei->encoder),
                        OSSL_ENCODER_get0_properties(ei->encoder));
-        } OSSL_TRACE_END(ENCODER);
+        }
+        OSSL_TRACE_END(ENCODER);
     }
     return ok;
 }
@@ -319,8 +319,8 @@ int OSSL_ENCODER_CTX_add_encoder(OSSL_ENCODER_CTX *ctx, OSSL_ENCODER *encoder)
     provctx = OSSL_PROVIDER_get0_provider_ctx(prov);
 
     if ((encoderctx = encoder->newctx(provctx)) == NULL
-        || (encoder_inst =
-            ossl_encoder_instance_new(encoder, encoderctx)) == NULL)
+        || (encoder_inst = ossl_encoder_instance_new(encoder, encoderctx))
+            == NULL)
         goto err;
     /* Avoid double free of encoderctx on further errors */
     encoderctx = NULL;
@@ -329,15 +329,15 @@ int OSSL_ENCODER_CTX_add_encoder(OSSL_ENCODER_CTX *ctx, OSSL_ENCODER *encoder)
         goto err;
 
     return 1;
- err:
+err:
     ossl_encoder_instance_free(encoder_inst);
     if (encoderctx != NULL)
         encoder->freectx(encoderctx);
     return 0;
 }
 
-int OSSL_ENCODER_CTX_add_extra(OSSL_ENCODER_CTX *ctx,
-                               OSSL_LIB_CTX *libctx, const char *propq)
+int OSSL_ENCODER_CTX_add_extra(OSSL_ENCODER_CTX *ctx, OSSL_LIB_CTX *libctx,
+                               const char *propq)
 {
     return 1;
 }
@@ -390,8 +390,7 @@ OSSL_ENCODER_INSTANCE_get_encoder(OSSL_ENCODER_INSTANCE *encoder_inst)
     return encoder_inst->encoder;
 }
 
-void *
-OSSL_ENCODER_INSTANCE_get_encoder_ctx(OSSL_ENCODER_INSTANCE *encoder_inst)
+void *OSSL_ENCODER_INSTANCE_get_encoder_ctx(OSSL_ENCODER_INSTANCE *encoder_inst)
 {
     if (encoder_inst == NULL)
         return NULL;
@@ -424,7 +423,7 @@ static int encoder_process(struct encoder_process_data_st *data)
     OSSL_PARAM abstract[10];
     const OSSL_PARAM *current_abstract = NULL;
     int i;
-    int ok = -1;  /* -1 signifies that the lookup loop gave nothing */
+    int ok = -1; /* -1 signifies that the lookup loop gave nothing */
     int top = 0;
 
     if (data->next_encoder_inst == NULL) {
@@ -462,12 +461,15 @@ static int encoder_process(struct encoder_process_data_st *data)
         new_data.count_output_structure = data->count_output_structure;
         new_data.level = data->level + 1;
 
-        OSSL_TRACE_BEGIN(ENCODER) {
-            BIO_printf(trc_out,
-                       "[%d] (ctx %p) Considering encoder instance %p (encoder %p)\n",
-                       data->level, (void *)data->ctx,
-                       (void *)current_encoder_inst, (void *)current_encoder);
-        } OSSL_TRACE_END(ENCODER);
+        OSSL_TRACE_BEGIN(ENCODER)
+        {
+            BIO_printf(
+                trc_out,
+                "[%d] (ctx %p) Considering encoder instance %p (encoder %p)\n",
+                data->level, (void *)data->ctx, (void *)current_encoder_inst,
+                (void *)current_encoder);
+        }
+        OSSL_TRACE_END(ENCODER);
 
         /*
          * If this is the top call, we check if the output type of the current
@@ -479,23 +481,29 @@ static int encoder_process(struct encoder_process_data_st *data)
         if (top) {
             if (data->ctx->output_type != NULL
                 && OPENSSL_strcasecmp(current_output_type,
-                                      data->ctx->output_type) != 0) {
-                OSSL_TRACE_BEGIN(ENCODER) {
-                    BIO_printf(trc_out,
-                               "[%d]    Skipping because current encoder output type (%s) != desired output type (%s)\n",
-                               data->level,
-                               current_output_type, data->ctx->output_type);
-                } OSSL_TRACE_END(ENCODER);
+                                      data->ctx->output_type)
+                    != 0) {
+                OSSL_TRACE_BEGIN(ENCODER)
+                {
+                    BIO_printf(
+                        trc_out,
+                        "[%d]    Skipping because current encoder output type (%s) != desired output type (%s)\n",
+                        data->level, current_output_type,
+                        data->ctx->output_type);
+                }
+                OSSL_TRACE_END(ENCODER);
                 continue;
             }
         } else {
             if (!OSSL_ENCODER_is_a(next_encoder, current_output_type)) {
-                OSSL_TRACE_BEGIN(ENCODER) {
-                    BIO_printf(trc_out,
-                               "[%d]    Skipping because current encoder output type (%s) != name of encoder %p\n",
-                               data->level,
-                               current_output_type, (void *)next_encoder);
-                } OSSL_TRACE_END(ENCODER);
+                OSSL_TRACE_BEGIN(ENCODER)
+                {
+                    BIO_printf(
+                        trc_out,
+                        "[%d]    Skipping because current encoder output type (%s) != name of encoder %p\n",
+                        data->level, current_output_type, (void *)next_encoder);
+                }
+                OSSL_TRACE_END(ENCODER);
                 continue;
             }
         }
@@ -508,14 +516,17 @@ static int encoder_process(struct encoder_process_data_st *data)
         if (data->ctx->output_structure != NULL
             && current_output_structure != NULL) {
             if (OPENSSL_strcasecmp(data->ctx->output_structure,
-                                   current_output_structure) != 0) {
-                OSSL_TRACE_BEGIN(ENCODER) {
-                    BIO_printf(trc_out,
-                               "[%d]    Skipping because current encoder output structure (%s) != ctx output structure (%s)\n",
-                               data->level,
-                               current_output_structure,
-                               data->ctx->output_structure);
-                } OSSL_TRACE_END(ENCODER);
+                                   current_output_structure)
+                != 0) {
+                OSSL_TRACE_BEGIN(ENCODER)
+                {
+                    BIO_printf(
+                        trc_out,
+                        "[%d]    Skipping because current encoder output structure (%s) != ctx output structure (%s)\n",
+                        data->level, current_output_structure,
+                        data->ctx->output_structure);
+                }
+                OSSL_TRACE_END(ENCODER);
                 continue;
             }
 
@@ -546,11 +557,13 @@ static int encoder_process(struct encoder_process_data_st *data)
         if (ok != 0)
             break;
 
-        OSSL_TRACE_BEGIN(ENCODER) {
+        OSSL_TRACE_BEGIN(ENCODER)
+        {
             BIO_printf(trc_out,
                        "[%d]    Skipping because recursion level %d failed\n",
                        data->level, new_data.level);
-        } OSSL_TRACE_END(ENCODER);
+        }
+        OSSL_TRACE_END(ENCODER);
     }
 
     /*
@@ -560,11 +573,12 @@ static int encoder_process(struct encoder_process_data_st *data)
     if (i < 0) {
         ok = -1;
 
-        OSSL_TRACE_BEGIN(ENCODER) {
-            BIO_printf(trc_out,
-                       "[%d] (ctx %p) No suitable encoder found\n",
+        OSSL_TRACE_BEGIN(ENCODER)
+        {
+            BIO_printf(trc_out, "[%d] (ctx %p) No suitable encoder found\n",
                        data->level, (void *)data->ctx);
-        } OSSL_TRACE_END(ENCODER);
+        }
+        OSSL_TRACE_END(ENCODER);
     } else {
         /* Preparations */
 
@@ -590,9 +604,8 @@ static int encoder_process(struct encoder_process_data_st *data)
             if (data->count_output_structure == 0)
                 return 0;
 
-            original_data =
-                data->ctx->construct(current_encoder_inst,
-                                     data->ctx->construct_data);
+            original_data = data->ctx->construct(current_encoder_inst,
+                                                 data->ctx->construct_data);
 
             /* Also set the data type, using the encoder implementation name */
             data->data_type = OSSL_ENCODER_get0_name(current_encoder);
@@ -618,20 +631,18 @@ static int encoder_process(struct encoder_process_data_st *data)
 
                 OSSL_PARAM *abstract_p = abstract;
                 const char *prev_output_structure =
-                    OSSL_ENCODER_INSTANCE_get_output_structure(data->prev_encoder_inst);
+                    OSSL_ENCODER_INSTANCE_get_output_structure(
+                        data->prev_encoder_inst);
 
-                *abstract_p++ =
-                    OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_DATA_TYPE,
-                                                     (char *)data->data_type, 0);
+                *abstract_p++ = OSSL_PARAM_construct_utf8_string(
+                    OSSL_OBJECT_PARAM_DATA_TYPE, (char *)data->data_type, 0);
                 if (prev_output_structure != NULL)
-                    *abstract_p++ =
-                        OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_DATA_STRUCTURE,
-                                                         (char *)prev_output_structure,
-                                                         0);
-                *abstract_p++ =
-                    OSSL_PARAM_construct_octet_string(OSSL_OBJECT_PARAM_DATA,
-                                                      data->running_output,
-                                                      data->running_output_length);
+                    *abstract_p++ = OSSL_PARAM_construct_utf8_string(
+                        OSSL_OBJECT_PARAM_DATA_STRUCTURE,
+                        (char *)prev_output_structure, 0);
+                *abstract_p++ = OSSL_PARAM_construct_octet_string(
+                    OSSL_OBJECT_PARAM_DATA, data->running_output,
+                    data->running_output_length);
                 *abstract_p = OSSL_PARAM_construct_end();
                 current_abstract = abstract;
             }
@@ -652,22 +663,24 @@ static int encoder_process(struct encoder_process_data_st *data)
                 current_out = data->bio;
             else if ((current_out = allocated_out = BIO_new(BIO_s_mem()))
                      == NULL)
-                ok = 0;     /* Assume BIO_new() recorded an error */
+                ok = 0; /* Assume BIO_new() recorded an error */
 
             if (ok)
                 ok = (cbio = ossl_core_bio_new_from_bio(current_out)) != NULL;
             if (ok) {
-                ok = current_encoder->encode(current_encoder_ctx, cbio,
-                                             original_data, current_abstract,
-                                             data->ctx->selection,
-                                             ossl_pw_passphrase_callback_enc,
-                                             &data->ctx->pwdata);
-                OSSL_TRACE_BEGIN(ENCODER) {
-                    BIO_printf(trc_out,
-                               "[%d] (ctx %p) Running encoder instance %p => %d\n",
-                               data->level, (void *)data->ctx,
-                               (void *)current_encoder_inst, ok);
-                } OSSL_TRACE_END(ENCODER);
+                ok = current_encoder->encode(
+                    current_encoder_ctx, cbio, original_data, current_abstract,
+                    data->ctx->selection, ossl_pw_passphrase_callback_enc,
+                    &data->ctx->pwdata);
+                OSSL_TRACE_BEGIN(ENCODER)
+                {
+                    BIO_printf(
+                        trc_out,
+                        "[%d] (ctx %p) Running encoder instance %p => %d\n",
+                        data->level, (void *)data->ctx,
+                        (void *)current_encoder_inst, ok);
+                }
+                OSSL_TRACE_END(ENCODER);
             }
 
             ossl_core_bio_free(cbio);
@@ -725,8 +738,8 @@ int ossl_bio_print_labeled_bignum(BIO *out, const char *label, const BIGNUM *bn)
         if (BN_is_negative(bn))
             neg = "-";
 
-        return BIO_printf(out, "%s%s%s" BN_FMTu " (%s0x" BN_FMTx ")\n",
-                          label, post_label_spc, neg, words[0], neg, words[0]);
+        return BIO_printf(out, "%s%s%s" BN_FMTu " (%s0x" BN_FMTx ")\n", label,
+                          post_label_spc, neg, words[0], neg, words[0]);
     }
 
     hex_str = BN_bn2hex(bn);
@@ -763,7 +776,8 @@ int ossl_bio_print_labeled_bignum(BIO *out, const char *label, const BIGNUM *bn)
         }
         if (BIO_printf(out, "%s%c%c", use_sep ? ":" : "",
                        tolower((unsigned char)p[0]),
-                       tolower((unsigned char)p[1])) <= 0)
+                       tolower((unsigned char)p[1]))
+            <= 0)
             goto err;
         ++bytes;
         p += 2;
@@ -778,7 +792,7 @@ err:
 }
 
 int ossl_bio_print_labeled_buf(BIO *out, const char *label,
-                           const unsigned char *buf, size_t buflen)
+                               const unsigned char *buf, size_t buflen)
 {
     size_t i;
 
@@ -793,8 +807,8 @@ int ossl_bio_print_labeled_buf(BIO *out, const char *label,
                 return 0;
         }
 
-        if (BIO_printf(out, "%02x%s", buf[i],
-                                 (i == buflen - 1) ? "" : ":") <= 0)
+        if (BIO_printf(out, "%02x%s", buf[i], (i == buflen - 1) ? "" : ":")
+            <= 0)
             return 0;
     }
     if (BIO_printf(out, "\n") <= 0)
@@ -807,7 +821,7 @@ int ossl_bio_print_labeled_buf(BIO *out, const char *label,
 int ossl_bio_print_ffc_params(BIO *out, const FFC_PARAMS *ffc)
 {
     if (ffc->nid != NID_undef) {
-#ifndef OPENSSL_NO_DH
+# ifndef OPENSSL_NO_DH
         const DH_NAMED_GROUP *group = ossl_ffc_uid_to_dh_named_group(ffc->nid);
         const char *name = ossl_ffc_named_group_get_name(group);
 
@@ -816,10 +830,10 @@ int ossl_bio_print_ffc_params(BIO *out, const FFC_PARAMS *ffc)
         if (BIO_printf(out, "GROUP: %s\n", name) <= 0)
             goto err;
         return 1;
-#else
+# else
         /* How could this be? We should not have a nid in a no-dh build. */
         goto err;
-#endif
+# endif
     }
 
     if (!ossl_bio_print_labeled_bignum(out, "P:   ", ffc->p))

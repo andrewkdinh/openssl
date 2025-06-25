@@ -20,24 +20,21 @@ static int dl_load(DSO *dso);
 static int dl_unload(DSO *dso);
 static DSO_FUNC_TYPE dl_bind_func(DSO *dso, const char *symname);
 static char *dl_name_converter(DSO *dso, const char *filename);
-static char *dl_merger(DSO *dso, const char *filespec1,
-                       const char *filespec2);
+static char *dl_merger(DSO *dso, const char *filespec1, const char *filespec2);
 static int dl_pathbyaddr(void *addr, char *path, int sz);
 static void *dl_globallookup(const char *name);
 
-static DSO_METHOD dso_meth_dl = {
-    "OpenSSL 'dl' shared library method",
-    dl_load,
-    dl_unload,
-    dl_bind_func,
-    NULL,                       /* ctrl */
-    dl_name_converter,
-    dl_merger,
-    NULL,                       /* init */
-    NULL,                       /* finish */
-    dl_pathbyaddr,
-    dl_globallookup
-};
+static DSO_METHOD dso_meth_dl = {"OpenSSL 'dl' shared library method",
+                                 dl_load,
+                                 dl_unload,
+                                 dl_bind_func,
+                                 NULL,                       /* ctrl */
+                                 dl_name_converter,
+                                 dl_merger,
+                                 NULL,                       /* init */
+                                 NULL,                       /* finish */
+                                 dl_pathbyaddr,
+                                 dl_globallookup};
 
 DSO_METHOD *DSO_METHOD_openssl(void)
 {
@@ -64,15 +61,17 @@ static int dl_load(DSO *dso)
         ERR_raise(ERR_LIB_DSO, DSO_R_NO_FILENAME);
         goto err;
     }
-    ptr = shl_load(filename, BIND_IMMEDIATE |
-                   (dso->flags & DSO_FLAG_NO_NAME_TRANSLATION ? 0 :
-                    DYNAMIC_PATH), 0L);
+    ptr = shl_load(
+        filename,
+        BIND_IMMEDIATE
+            | (dso->flags & DSO_FLAG_NO_NAME_TRANSLATION ? 0 : DYNAMIC_PATH),
+        0L);
     if (ptr == NULL) {
         char errbuf[160];
 
         if (openssl_strerror_r(errno, errbuf, sizeof(errbuf)))
-            ERR_raise_data(ERR_LIB_DSO, DSO_R_LOAD_FAILED,
-                           "filename(%s): %s", filename, errbuf);
+            ERR_raise_data(ERR_LIB_DSO, DSO_R_LOAD_FAILED, "filename(%s): %s",
+                           filename, errbuf);
         else
             ERR_raise_data(ERR_LIB_DSO, DSO_R_LOAD_FAILED,
                            "filename(%s): errno %d", filename, errno);
@@ -88,7 +87,7 @@ static int dl_load(DSO *dso)
      */
     dso->loaded_filename = filename;
     return 1;
- err:
+err:
     /* Cleanup! */
     OPENSSL_free(filename);
     if (ptr != NULL)
@@ -106,7 +105,7 @@ static int dl_unload(DSO *dso)
     if (sk_num(dso->meth_data) < 1)
         return 1;
     /* Is this statement legal? */
-    ptr = (shl_t) sk_pop(dso->meth_data);
+    ptr = (shl_t)sk_pop(dso->meth_data);
     if (ptr == NULL) {
         ERR_raise(ERR_LIB_DSO, DSO_R_NULL_HANDLE);
         /*
@@ -132,7 +131,7 @@ static DSO_FUNC_TYPE dl_bind_func(DSO *dso, const char *symname)
         ERR_raise(ERR_LIB_DSO, DSO_R_STACK_ERROR);
         return NULL;
     }
-    ptr = (shl_t) sk_value(dso->meth_data, sk_num(dso->meth_data) - 1);
+    ptr = (shl_t)sk_value(dso->meth_data, sk_num(dso->meth_data) - 1);
     if (ptr == NULL) {
         ERR_raise(ERR_LIB_DSO, DSO_R_NULL_HANDLE);
         return NULL;
@@ -141,8 +140,8 @@ static DSO_FUNC_TYPE dl_bind_func(DSO *dso, const char *symname)
         char errbuf[160];
 
         if (openssl_strerror_r(errno, errbuf, sizeof(errbuf)))
-            ERR_raise_data(ERR_LIB_DSO, DSO_R_SYM_FAILURE,
-                           "symname(%s): %s", symname, errbuf);
+            ERR_raise_data(ERR_LIB_DSO, DSO_R_SYM_FAILURE, "symname(%s): %s",
+                           symname, errbuf);
         else
             ERR_raise_data(ERR_LIB_DSO, DSO_R_SYM_FAILURE,
                            "symname(%s): errno %d", symname, errno);
@@ -232,7 +231,9 @@ static char *dl_name_converter(DSO *dso, const char *filename)
     if (transform)
         BIO_snprintf(translated, rsize,
                      (DSO_flags(dso) & DSO_FLAG_NAME_TRANSLATION_EXT_ONLY) == 0
-                     ? "lib%s%s" : "%s%s", filename, DSO_EXTENSION);
+                         ? "lib%s%s"
+                         : "%s%s",
+                     filename, DSO_EXTENSION);
     else
         BIO_snprintf(translated, rsize, "%s", filename);
     return translated;
@@ -245,17 +246,15 @@ static int dl_pathbyaddr(void *addr, char *path, int sz)
 
     if (addr == NULL) {
         union {
-            int (*f) (void *, char *, int);
+            int (*f)(void *, char *, int);
             void *p;
-        } t = {
-            dl_pathbyaddr
-        };
+        } t = {dl_pathbyaddr};
         addr = t.p;
     }
 
     for (i = -1; shl_get_r(i, &inf) == 0; i++) {
-        if (((size_t)addr >= inf.tstart && (size_t)addr < inf.tend) ||
-            ((size_t)addr >= inf.dstart && (size_t)addr < inf.dend)) {
+        if (((size_t)addr >= inf.tstart && (size_t)addr < inf.tend)
+            || ((size_t)addr >= inf.dstart && (size_t)addr < inf.dend)) {
             len = (int)strlen(inf.filename);
             if (sz <= 0)
                 return len + 1;

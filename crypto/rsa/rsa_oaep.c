@@ -131,18 +131,16 @@ int ossl_rsa_padding_add_PKCS1_OAEP_mgf1_ex(OSSL_LIB_CTX *libctx,
     if (PKCS1_MGF1(dbmask, dbmask_len, seed, mdlen, mgf1md) < 0)
         goto err;
     /* step 3f: maskedDB = DB XOR dbMask */
-    for (i = 0; i < dbmask_len; i++)
-        db[i] ^= dbmask[i];
+    for (i = 0; i < dbmask_len; i++) db[i] ^= dbmask[i];
 
     /* step 3g: mgfSeed = MGF(maskedDB, HLen) */
     if (PKCS1_MGF1(seedmask, mdlen, db, dbmask_len, mgf1md) < 0)
         goto err;
     /* stepo 3h: maskedMGFSeed = mgfSeed XOR mgfSeedMask */
-    for (i = 0; i < mdlen; i++)
-        seed[i] ^= seedmask[i];
+    for (i = 0; i < mdlen; i++) seed[i] ^= seedmask[i];
     rv = 1;
 
- err:
+err:
     OPENSSL_cleanse(seedmask, sizeof(seedmask));
     OPENSSL_clear_free(dbmask, dbmask_len);
     return rv;
@@ -161,8 +159,8 @@ int RSA_padding_check_PKCS1_OAEP(unsigned char *to, int tlen,
                                  const unsigned char *from, int flen, int num,
                                  const unsigned char *param, int plen)
 {
-    return RSA_padding_check_PKCS1_OAEP_mgf1(to, tlen, from, flen, num,
-                                             param, plen, NULL, NULL);
+    return RSA_padding_check_PKCS1_OAEP_mgf1(to, tlen, from, flen, num, param,
+                                             plen, NULL, NULL);
 }
 
 int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
@@ -179,7 +177,7 @@ int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
      * Y || maskedSeed || maskedDB
      */
     unsigned char *db = NULL, *em = NULL, seed[EVP_MAX_MD_SIZE],
-        phash[EVP_MAX_MD_SIZE];
+                  phash[EVP_MAX_MD_SIZE];
     int mdlen;
 
     if (md == NULL) {
@@ -257,13 +255,11 @@ int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
 
     if (PKCS1_MGF1(seed, mdlen, maskeddb, dblen, mgf1md))
         goto cleanup;
-    for (i = 0; i < mdlen; i++)
-        seed[i] ^= maskedseed[i];
+    for (i = 0; i < mdlen; i++) seed[i] ^= maskedseed[i];
 
     if (PKCS1_MGF1(db, dblen, seed, mdlen, mgf1md))
         goto cleanup;
-    for (i = 0; i < dblen; i++)
-        db[i] ^= maskeddb[i];
+    for (i = 0; i < dblen; i++) db[i] ^= maskeddb[i];
 
     if (!EVP_Digest((void *)param, plen, phash, NULL, md, NULL))
         goto cleanup;
@@ -277,8 +273,8 @@ int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
          */
         unsigned int equals1 = constant_time_eq(db[i], 1);
         unsigned int equals0 = constant_time_is_zero(db[i]);
-        one_index = constant_time_select_int(~found_one_byte & equals1,
-                                             i, one_index);
+        one_index =
+            constant_time_select_int(~found_one_byte & equals1, i, one_index);
         found_one_byte |= equals1;
         good &= (found_one_byte | equals0);
     }
@@ -332,7 +328,7 @@ int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
     ERR_raise(ERR_LIB_RSA, RSA_R_OAEP_DECODING_ERROR);
     err_clear_last_constant_time(1 & good);
 #endif
- cleanup:
+cleanup:
     OPENSSL_cleanse(seed, sizeof(seed));
     OPENSSL_clear_free(db, dblen);
     OPENSSL_clear_free(em, num);
@@ -347,8 +343,8 @@ int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
  *      seed (mgfSeed).
  * The range checking steps inm the process are performed outside.
  */
-int PKCS1_MGF1(unsigned char *mask, long len,
-               const unsigned char *seed, long seedlen, const EVP_MD *dgst)
+int PKCS1_MGF1(unsigned char *mask, long len, const unsigned char *seed,
+               long seedlen, const EVP_MD *dgst)
 {
     long i, outlen = 0;
     unsigned char cnt[4];
@@ -386,7 +382,7 @@ int PKCS1_MGF1(unsigned char *mask, long len,
         }
     }
     rv = 0;
- err:
+err:
     OPENSSL_cleanse(md, sizeof(md));
     EVP_MD_CTX_free(c);
     return rv;

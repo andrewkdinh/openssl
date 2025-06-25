@@ -46,8 +46,8 @@ void ripemd160_block_data_order(RIPEMD160_CTX *ctx, const void *p, size_t num)
     unsigned MD32_REG_T a, b, c, d, e, l;
 # ifndef MD32_XARRAY
     /* See comment in crypto/sha/sha_local.h for details. */
-    unsigned MD32_REG_T XX0, XX1, XX2, XX3, XX4, XX5, XX6, XX7,
-        XX8, XX9, XX10, XX11, XX12, XX13, XX14, XX15;
+    unsigned MD32_REG_T XX0, XX1, XX2, XX3, XX4, XX5, XX6, XX7, XX8, XX9, XX10,
+        XX11, XX12, XX13, XX14, XX15;
 #  define X(i)   XX##i
 # else
     RIPEMD160_LONG XX[16];
@@ -282,7 +282,6 @@ void ripemd160_block_data_order(RIPEMD160_CTX *ctx, const void *p, size_t num)
         ctx->D = ctx->E + a + B;
         ctx->E = ctx->A + b + C;
         ctx->A = D;
-
     }
 }
 #endif

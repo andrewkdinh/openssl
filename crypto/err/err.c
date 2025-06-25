@@ -155,14 +155,11 @@ static LHASH_OF(ERR_STRING_DATA) *int_error_hash = NULL;
 #endif
 static int int_err_library_number = ERR_LIB_USER;
 
-typedef enum ERR_GET_ACTION_e {
-    EV_POP, EV_PEEK, EV_PEEK_LAST
-} ERR_GET_ACTION;
+typedef enum ERR_GET_ACTION_e { EV_POP, EV_PEEK, EV_PEEK_LAST } ERR_GET_ACTION;
 
-static unsigned long get_error_values(ERR_GET_ACTION g,
-                                      const char **file, int *line,
-                                      const char **func, const char **data,
-                                      int *flags);
+static unsigned long get_error_values(ERR_GET_ACTION g, const char **file,
+                                      int *line, const char **func,
+                                      const char **data, int *flags);
 
 #ifndef OPENSSL_NO_ERR
 static unsigned long err_string_data_hash(const ERR_STRING_DATA *a)
@@ -201,9 +198,7 @@ void OSSL_ERR_STATE_free(ERR_STATE *state)
 
     if (state == NULL)
         return;
-    for (i = 0; i < ERR_NUM_ERRORS; i++) {
-        err_clear(state, i, 1);
-    }
+    for (i = 0; i < ERR_NUM_ERRORS; i++) { err_clear(state, i, 1); }
     CRYPTO_free(state, OPENSSL_FILE, OPENSSL_LINE);
 }
 
@@ -215,8 +210,8 @@ DEFINE_RUN_ONCE_STATIC(do_err_strings_init)
     if (err_string_lock == NULL)
         return 0;
 #ifndef OPENSSL_NO_ERR
-    int_error_hash = lh_ERR_STRING_DATA_new(err_string_data_hash,
-                                            err_string_data_cmp);
+    int_error_hash =
+        lh_ERR_STRING_DATA_new(err_string_data_hash, err_string_data_cmp);
     if (int_error_hash == NULL) {
         CRYPTO_THREAD_lock_free(err_string_lock);
         err_string_lock = NULL;
@@ -244,8 +239,7 @@ static void err_patch(int lib, ERR_STRING_DATA *str)
 {
     unsigned long plib = ERR_PACK(lib, 0, 0);
 
-    for (; str->error != 0; str++)
-        str->error |= plib;
+    for (; str->error != 0; str++) str->error |= plib;
 }
 
 /*
@@ -256,8 +250,7 @@ static int err_load_strings(const ERR_STRING_DATA *str)
     if (!CRYPTO_THREAD_write_lock(err_string_lock))
         return 0;
     for (; str->error; str++)
-        (void)lh_ERR_STRING_DATA_insert(int_error_hash,
-                                       (ERR_STRING_DATA *)str);
+        (void)lh_ERR_STRING_DATA_insert(int_error_hash, (ERR_STRING_DATA *)str);
     CRYPTO_THREAD_unlock(err_string_lock);
     return 1;
 }
@@ -335,9 +328,7 @@ void ERR_clear_error(void)
     if (es == NULL)
         return;
 
-    for (i = 0; i < ERR_NUM_ERRORS; i++) {
-        err_clear(es, i, 0);
-    }
+    for (i = 0; i < ERR_NUM_ERRORS; i++) { err_clear(es, i, 0); }
     es->top = es->bottom = 0;
 }
 
@@ -346,8 +337,7 @@ unsigned long ERR_get_error(void)
     return get_error_values(EV_POP, NULL, NULL, NULL, NULL, NULL);
 }
 
-unsigned long ERR_get_error_all(const char **file, int *line,
-                                const char **func,
+unsigned long ERR_get_error_all(const char **file, int *line, const char **func,
                                 const char **data, int *flags)
 {
     return get_error_values(EV_POP, file, line, func, data, flags);
@@ -387,8 +377,8 @@ unsigned long ERR_peek_error_data(const char **data, int *flags)
 }
 
 unsigned long ERR_peek_error_all(const char **file, int *line,
-                                 const char **func,
-                                 const char **data, int *flags)
+                                 const char **func, const char **data,
+                                 int *flags)
 {
     return get_error_values(EV_PEEK, file, line, func, data, flags);
 }
@@ -422,8 +412,8 @@ unsigned long ERR_peek_last_error_data(const char **data, int *flags)
 }
 
 unsigned long ERR_peek_last_error_all(const char **file, int *line,
-                                      const char **func,
-                                      const char **data, int *flags)
+                                      const char **func, const char **data,
+                                      int *flags)
 {
     return get_error_values(EV_PEEK_LAST, file, line, func, data, flags);
 }
@@ -436,9 +426,8 @@ unsigned long ERR_peek_last_error_line_data(const char **file, int *line,
 }
 #endif
 
-static unsigned long get_error_values(ERR_GET_ACTION g,
-                                      const char **file, int *line,
-                                      const char **func,
+static unsigned long get_error_values(ERR_GET_ACTION g, const char **file,
+                                      int *line, const char **func,
                                       const char **data, int *flags)
 {
     int i = 0;
@@ -513,8 +502,8 @@ static unsigned long get_error_values(ERR_GET_ACTION g,
     return ret;
 }
 
-void ossl_err_string_int(unsigned long e, const char *func,
-                         char *buf, size_t len)
+void ossl_err_string_int(unsigned long e, const char *func, char *buf,
+                         size_t len)
 {
     char lsbuf[64], rsbuf[256];
     const char *ls, *rs = NULL;
@@ -557,7 +546,6 @@ void ossl_err_string_int(unsigned long e, const char *func,
         BIO_snprintf(buf, len, "err:%lx:%lx:%lx:%lx", e, l, 0L, r);
     }
 }
-
 
 void ERR_error_string_n(unsigned long e, char *buf, size_t len)
 {
@@ -676,7 +664,8 @@ ERR_STATE *ossl_err_get_state_int(void)
 
     if (state == NULL) {
         if (!CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_ERR_KEY,
-                                        CRYPTO_THREAD_NO_CONTEXT, (ERR_STATE *)-1))
+                                        CRYPTO_THREAD_NO_CONTEXT,
+                                        (ERR_STATE *)-1))
             return NULL;
 
         state = OSSL_ERR_STATE_new();
@@ -687,8 +676,8 @@ ERR_STATE *ossl_err_get_state_int(void)
         }
 
         if (!ossl_init_thread_start(NULL, NULL, err_delete_thread_state)
-                || !CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_ERR_KEY,
-                                               CRYPTO_THREAD_NO_CONTEXT, state)) {
+            || !CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_ERR_KEY,
+                                           CRYPTO_THREAD_NO_CONTEXT, state)) {
             OSSL_ERR_STATE_free(state);
             CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_ERR_KEY,
                                        CRYPTO_THREAD_NO_CONTEXT, NULL);
@@ -709,7 +698,6 @@ ERR_STATE *ERR_get_state(void)
     return ossl_err_get_state_int();
 }
 #endif
-
 
 /*
  * err_shelve_state returns the current thread local error state
@@ -748,11 +736,12 @@ int err_shelve_state(void **state)
  * err_unshelve_state restores the error state that was returned
  * by err_shelve_state previously.
  */
-void err_unshelve_state(void* state)
+void err_unshelve_state(void *state)
 {
-    if (state != (void*)-1)
+    if (state != (void *)-1)
         CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_ERR_KEY,
-                                   CRYPTO_THREAD_NO_CONTEXT, (ERR_STATE *)state);
+                                   CRYPTO_THREAD_NO_CONTEXT,
+                                   (ERR_STATE *)state);
 }
 
 int ERR_get_next_error_library(void)
@@ -829,7 +818,7 @@ void ERR_add_error_vdata(int num, va_list args)
      * Otherwise, allocate a small new buffer.
      */
     if ((es->err_data_flags[i] & flags) == flags
-            && ossl_assert(es->err_data[i] != NULL)) {
+        && ossl_assert(es->err_data[i] != NULL)) {
         str = es->err_data[i];
         size = es->err_data_size[i];
 
@@ -886,7 +875,7 @@ void err_clear_last_constant_time(int clear)
      * Flag error as cleared but remove it elsewhere to avoid two errors
      * accessing the same error stack location, revealing timing information.
      */
-    clear = constant_time_select_int(constant_time_eq_int(clear, 0),
-                                     0, ERR_FLAG_CLEAR);
+    clear = constant_time_select_int(constant_time_eq_int(clear, 0), 0,
+                                     ERR_FLAG_CLEAR);
     es->err_flags[top] |= clear;
 }

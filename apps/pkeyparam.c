@@ -18,8 +18,12 @@
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_IN, OPT_OUT, OPT_TEXT, OPT_NOOUT,
-    OPT_ENGINE, OPT_CHECK,
+    OPT_IN,
+    OPT_OUT,
+    OPT_TEXT,
+    OPT_NOOUT,
+    OPT_ENGINE,
+    OPT_CHECK,
     OPT_PROV_ENUM
 } OPTION_CHOICE;
 
@@ -40,8 +44,7 @@ const OPTIONS pkeyparam_options[] = {
     {"noout", OPT_NOOUT, '-', "Don't output encoded parameters"},
 
     OPT_PROV_OPTIONS,
-    {NULL}
-};
+    {NULL}};
 
 int pkeyparam_main(int argc, char **argv)
 {
@@ -58,7 +61,7 @@ int pkeyparam_main(int argc, char **argv)
         switch (o) {
         case OPT_EOF:
         case OPT_ERR:
- opthelp:
+opthelp:
             BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);
             goto end;
         case OPT_HELP:
@@ -142,7 +145,7 @@ int pkeyparam_main(int argc, char **argv)
 
     ret = EXIT_SUCCESS;
 
- end:
+end:
     EVP_PKEY_CTX_free(ctx);
     EVP_PKEY_free(pkey);
     release_engine(e);

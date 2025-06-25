@@ -46,9 +46,9 @@ static int ring_buf_init(struct ring_buf *r, size_t nbytes)
 static void ring_buf_destroy(struct ring_buf *r)
 {
     OPENSSL_free(r->start);
-    r->start    = NULL;
-    r->len      = 0;
-    r->count    = 0;
+    r->start = NULL;
+    r->len = 0;
+    r->count = 0;
 }
 
 /*
@@ -59,7 +59,8 @@ static void ring_buf_destroy(struct ring_buf *r)
  * ring_buf_push/pop() with the number of bytes actually read/written, which
  * must not exceed the returned length.
  */
-static void ring_buf_head_tail(struct ring_buf *r, int idx, uint8_t **buf, size_t *len)
+static void ring_buf_head_tail(struct ring_buf *r, int idx, uint8_t **buf,
+                               size_t *len)
 {
     size_t max_len = r->len - r->idx[idx];
 
@@ -72,8 +73,8 @@ static void ring_buf_head_tail(struct ring_buf *r, int idx, uint8_t **buf, size_
     *len = max_len;
 }
 
-#define ring_buf_head(r, buf, len) ring_buf_head_tail((r), 0, (buf), (len))
-#define ring_buf_tail(r, buf, len) ring_buf_head_tail((r), 1, (buf), (len))
+# define ring_buf_head(r, buf, len) ring_buf_head_tail((r), 0, (buf), (len))
+# define ring_buf_tail(r, buf, len) ring_buf_head_tail((r), 1, (buf), (len))
 
 /*
  * Commit bytes to the ring buffer previously filled after a call to
@@ -109,8 +110,8 @@ static void ring_buf_push_pop(struct ring_buf *r, int idx, size_t num_bytes)
         r->count += num_bytes;
 }
 
-#define ring_buf_push(r, num_bytes) ring_buf_push_pop((r), 0, (num_bytes))
-#define ring_buf_pop(r, num_bytes) ring_buf_push_pop((r), 1, (num_bytes))
+# define ring_buf_push(r, num_bytes) ring_buf_push_pop((r), 0, (num_bytes))
+# define ring_buf_pop(r, num_bytes) ring_buf_push_pop((r), 1, (num_bytes))
 
 static void ring_buf_clear(struct ring_buf *r)
 {
@@ -194,7 +195,7 @@ static int dgram_pair_ctrl_destroy_bio_pair(BIO *bio1);
 static size_t dgram_pair_read_inner(struct bio_dgram_pair_st *b, uint8_t *buf,
                                     size_t sz);
 
-#define BIO_MSG_N(array, n) (*(BIO_MSG *)((char *)(array) + (n)*stride))
+# define BIO_MSG_N(array, n) (*(BIO_MSG *)((char *)(array) + (n)*stride))
 
 static const BIO_METHOD dgram_pair_method = {
     BIO_TYPE_DGRAM_PAIR,
@@ -264,15 +265,15 @@ struct bio_dgram_pair_st {
      * reads.
      */
     CRYPTO_RWLOCK *lock;
-    unsigned int no_trunc          : 1; /* Reads fail if they would truncate */
-    unsigned int local_addr_enable : 1; /* Can use BIO_MSG->local? */
-    unsigned int role              : 1; /* Determines lock order */
-    unsigned int grows_on_write    : 1; /* Set for BIO_s_dgram_mem only */
+    unsigned int no_trunc:1; /* Reads fail if they would truncate */
+    unsigned int local_addr_enable:1; /* Can use BIO_MSG->local? */
+    unsigned int role:1; /* Determines lock order */
+    unsigned int grows_on_write:1; /* Set for BIO_s_dgram_mem only */
 };
 
-#define MIN_BUF_LEN (1024)
+# define MIN_BUF_LEN (1024)
 
-#define is_dgram_pair(b) (b->peer != NULL)
+# define is_dgram_pair(b) (b->peer != NULL)
 
 static int dgram_pair_init(BIO *bio)
 {
@@ -281,7 +282,7 @@ static int dgram_pair_init(BIO *bio)
     if (b == NULL)
         return 0;
 
-    b->mtu         = 1472;    /* conservative default MTU */
+    b->mtu = 1472; /* conservative default MTU */
     /* default buffer size */
     b->req_buf_len = 9 * (sizeof(struct dgram_hdr) + b->mtu);
 
@@ -346,7 +347,8 @@ static int dgram_pair_ctrl_make_bio_pair(BIO *bio1, BIO *bio2)
     }
 
     /* Ensure the BIO we have been passed is actually a dgram pair BIO. */
-    if (bio1->method != &dgram_pair_method || bio2->method != &dgram_pair_method) {
+    if (bio1->method != &dgram_pair_method
+        || bio2->method != &dgram_pair_method) {
         ERR_raise_data(ERR_LIB_BIO, BIO_R_INVALID_ARGUMENT,
                        "both BIOs must be BIO_dgram_pair");
         return 0;
@@ -365,13 +367,14 @@ static int dgram_pair_ctrl_make_bio_pair(BIO *bio1, BIO *bio2)
      * associated.
      */
     if (b1->peer != NULL || b2->peer != NULL) {
-        ERR_raise_data(ERR_LIB_BIO, BIO_R_IN_USE,
-                       "cannot associate a BIO_dgram_pair which is already in use");
+        ERR_raise_data(
+            ERR_LIB_BIO, BIO_R_IN_USE,
+            "cannot associate a BIO_dgram_pair which is already in use");
         return 0;
     }
 
     if (!ossl_assert(b1->req_buf_len >= MIN_BUF_LEN
-                        && b2->req_buf_len >= MIN_BUF_LEN)) {
+                     && b2->req_buf_len >= MIN_BUF_LEN)) {
         ERR_raise(ERR_LIB_BIO, BIO_R_UNINITIALIZED);
         return 0;
     }
@@ -389,12 +392,12 @@ static int dgram_pair_ctrl_make_bio_pair(BIO *bio1, BIO *bio2)
             return 0;
         }
 
-    b1->peer    = bio2;
-    b2->peer    = bio1;
-    b1->role    = 0;
-    b2->role    = 1;
-    bio1->init  = 1;
-    bio2->init  = 1;
+    b1->peer = bio2;
+    b2->peer = bio1;
+    b1->role = 0;
+    b2->role = 1;
+    bio1->init = 1;
+    bio2->init = 1;
     return 1;
 }
 
@@ -442,7 +445,6 @@ static int dgram_pair_ctrl_eof(BIO *bio)
         return 1;
     if (!is_dgram_pair(b))
         return 0;
-
 
     peerb = b->peer->ptr;
     if (!ossl_assert(peerb != NULL))
@@ -508,13 +510,13 @@ static size_t dgram_pair_ctrl_pending(BIO *bio)
     if (CRYPTO_THREAD_write_lock(readb->lock) == 0)
         return 0;
 
-    saved_idx   = readb->rbuf.idx[1];
+    saved_idx = readb->rbuf.idx[1];
     saved_count = readb->rbuf.count;
 
     l = dgram_pair_read_inner(readb, (uint8_t *)&hdr, sizeof(hdr));
 
     readb->rbuf.idx[1] = saved_idx;
-    readb->rbuf.count  = saved_count;
+    readb->rbuf.count = saved_count;
 
     CRYPTO_THREAD_unlock(readb->lock);
 
@@ -561,8 +563,10 @@ static int dgram_pair_ctrl_get_local_addr_cap(BIO *bio)
     else
         readb = b;
 
-    return (~readb->cap & (BIO_DGRAM_CAP_HANDLES_SRC_ADDR
-                           | BIO_DGRAM_CAP_PROVIDES_DST_ADDR)) == 0;
+    return (~readb->cap
+            & (BIO_DGRAM_CAP_HANDLES_SRC_ADDR
+               | BIO_DGRAM_CAP_PROVIDES_DST_ADDR))
+        == 0;
 }
 
 /* BIO_dgram_get_effective_caps (BIO_CTRL_DGRAM_GET_EFFECTIVE_CAPS) */
@@ -800,8 +804,8 @@ static long dgram_pair_ctrl(BIO *bio, int cmd, long num, void *ptr)
     return ret;
 }
 
-int BIO_new_bio_dgram_pair(BIO **pbio1, size_t writebuf1,
-                           BIO **pbio2, size_t writebuf2)
+int BIO_new_bio_dgram_pair(BIO **pbio1, size_t writebuf1, BIO **pbio2,
+                           size_t writebuf2)
 {
     int ret = 0;
     long r;
@@ -846,7 +850,8 @@ err:
 }
 
 /* Must hold peer write lock */
-static size_t dgram_pair_read_inner(struct bio_dgram_pair_st *b, uint8_t *buf, size_t sz)
+static size_t dgram_pair_read_inner(struct bio_dgram_pair_st *b, uint8_t *buf,
+                                    size_t sz)
 {
     size_t total_read = 0;
 
@@ -878,8 +883,8 @@ static size_t dgram_pair_read_inner(struct bio_dgram_pair_st *b, uint8_t *buf, s
 
         if (buf != NULL)
             buf += src_len;
-        total_read  += src_len;
-        sz          -= src_len;
+        total_read += src_len;
+        sz -= src_len;
     }
 
     return total_read;
@@ -921,7 +926,7 @@ static ossl_ssize_t dgram_pair_read_actual(BIO *bio, char *buf, size_t sz,
         return -BIO_R_LOCAL_ADDR_NOT_AVAILABLE;
 
     /* Read the header. */
-    saved_idx   = readb->rbuf.idx[1];
+    saved_idx = readb->rbuf.idx[1];
     saved_count = readb->rbuf.count;
     l = dgram_pair_read_inner(readb, (uint8_t *)&hdr, sizeof(hdr));
     if (l == 0) {
@@ -946,7 +951,7 @@ static ossl_ssize_t dgram_pair_read_actual(BIO *bio, char *buf, size_t sz,
         if (b->no_trunc) {
             /* Restore original state. */
             readb->rbuf.idx[1] = saved_idx;
-            readb->rbuf.count  = saved_count;
+            readb->rbuf.count = saved_count;
             return -BIO_R_NON_FATAL;
         }
     }
@@ -960,14 +965,15 @@ static ossl_ssize_t dgram_pair_read_actual(BIO *bio, char *buf, size_t sz,
      * If the datagram was truncated due to an inadequate buffer, discard the
      * remainder.
      */
-    if (trunc > 0 && !ossl_assert(dgram_pair_read_inner(readb, NULL, trunc) == trunc))
+    if (trunc > 0
+        && !ossl_assert(dgram_pair_read_inner(readb, NULL, trunc) == trunc))
         /* We were somehow not able to read/skip the entire datagram. */
         return -BIO_R_TRANSFER_ERROR;
 
     if (local != NULL)
         *local = hdr.dst_addr;
     if (peer != NULL)
-        *peer  = hdr.src_addr;
+        *peer = hdr.src_addr;
 
     return (ossl_ssize_t)l;
 }
@@ -1048,9 +1054,8 @@ static int dgram_pair_read(BIO *bio, char *buf, int sz_)
 }
 
 /* Threadsafe */
-static int dgram_pair_recvmmsg(BIO *bio, BIO_MSG *msg,
-                               size_t stride, size_t num_msg,
-                               uint64_t flags,
+static int dgram_pair_recvmmsg(BIO *bio, BIO_MSG *msg, size_t stride,
+                               size_t num_msg, uint64_t flags,
                                size_t *num_processed)
 {
     int ret;
@@ -1083,8 +1088,8 @@ static int dgram_pair_recvmmsg(BIO *bio, BIO_MSG *msg,
 
     for (i = 0; i < num_msg; ++i) {
         m = &BIO_MSG_N(msg, i);
-        l = dgram_pair_read_actual(bio, m->data, m->data_len,
-                                   m->local, m->peer, 1);
+        l = dgram_pair_read_actual(bio, m->data, m->data_len, m->local, m->peer,
+                                   1);
         if (l < 0) {
             *num_processed = i;
             if (i > 0) {
@@ -1097,7 +1102,7 @@ static int dgram_pair_recvmmsg(BIO *bio, BIO_MSG *msg,
         }
 
         m->data_len = l;
-        m->flags    = 0;
+        m->flags = 0;
     }
 
     *num_processed = i;
@@ -1203,9 +1208,9 @@ static size_t dgram_pair_write_inner(struct bio_dgram_pair_st *b,
         memcpy(dst_buf, buf, dst_len);
         ring_buf_push(&b->rbuf, dst_len);
 
-        buf             += dst_len;
-        sz              -= dst_len;
-        total_written   += dst_len;
+        buf += dst_len;
+        sz -= dst_len;
+        total_written += dst_len;
     }
 
     return total_written;
@@ -1215,9 +1220,9 @@ static size_t dgram_pair_write_inner(struct bio_dgram_pair_st *b,
  * Must hold local write lock. Returns number of bytes processed or negated BIO
  * response code.
  */
-static ossl_ssize_t dgram_pair_write_actual(BIO *bio, const char *buf, size_t sz,
-                                            const BIO_ADDR *local, const BIO_ADDR *peer,
-                                            int is_multi)
+static ossl_ssize_t dgram_pair_write_actual(BIO *bio, const char *buf,
+                                            size_t sz, const BIO_ADDR *local,
+                                            const BIO_ADDR *peer, int is_multi)
 {
     static const BIO_ADDR zero_addr;
     size_t saved_idx, saved_count;
@@ -1252,16 +1257,17 @@ static ossl_ssize_t dgram_pair_write_actual(BIO *bio, const char *buf, size_t sz
         local = b->local_addr;
     hdr.src_addr = (local != NULL ? *local : zero_addr);
 
-    saved_idx   = b->rbuf.idx[0];
+    saved_idx = b->rbuf.idx[0];
     saved_count = b->rbuf.count;
-    if (dgram_pair_write_inner(b, (const uint8_t *)&hdr, sizeof(hdr)) != sizeof(hdr)
-            || dgram_pair_write_inner(b, (const uint8_t *)buf, sz) != sz) {
+    if (dgram_pair_write_inner(b, (const uint8_t *)&hdr, sizeof(hdr))
+            != sizeof(hdr)
+        || dgram_pair_write_inner(b, (const uint8_t *)buf, sz) != sz) {
         /*
          * We were not able to push the header and the entirety of the payload
          * onto the ring buffer, so abort and roll back the ring buffer state.
          */
         b->rbuf.idx[0] = saved_idx;
-        b->rbuf.count  = saved_count;
+        b->rbuf.count = saved_count;
         if (!is_multi)
             BIO_set_retry_write(bio);
         return -BIO_R_NON_FATAL;
@@ -1300,9 +1306,9 @@ static int dgram_pair_write(BIO *bio, const char *buf, int sz_)
 }
 
 /* Threadsafe */
-static int dgram_pair_sendmmsg(BIO *bio, BIO_MSG *msg,
-                               size_t stride, size_t num_msg,
-                               uint64_t flags, size_t *num_processed)
+static int dgram_pair_sendmmsg(BIO *bio, BIO_MSG *msg, size_t stride,
+                               size_t num_msg, uint64_t flags,
+                               size_t *num_processed)
 {
     ossl_ssize_t ret, l;
     BIO_MSG *m;
@@ -1322,8 +1328,8 @@ static int dgram_pair_sendmmsg(BIO *bio, BIO_MSG *msg,
 
     for (i = 0; i < num_msg; ++i) {
         m = &BIO_MSG_N(msg, i);
-        l = dgram_pair_write_actual(bio, m->data, m->data_len,
-                                    m->local, m->peer, 1);
+        l = dgram_pair_write_actual(bio, m->data, m->data_len, m->local,
+                                    m->peer, 1);
         if (l < 0) {
             *num_processed = i;
             if (i > 0) {

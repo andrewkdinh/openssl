@@ -8,8 +8,8 @@
 */
 
 #ifndef OSSL_INTERNAL_QUIC_STREAM_H
-# define OSSL_INTERNAL_QUIC_STREAM_H
-# pragma once
+#define OSSL_INTERNAL_QUIC_STREAM_H
+#pragma once
 
 #include "internal/e_os.h"
 #include "internal/time.h"
@@ -21,7 +21,7 @@
 #include "internal/quic_fc.h"
 #include "internal/quic_statm.h"
 
-# ifndef OPENSSL_NO_QUIC
+#ifndef OPENSSL_NO_QUIC
 
 /*
  * QUIC Send Stream
@@ -125,11 +125,9 @@ void ossl_quic_sstream_free(QUIC_SSTREAM *qss);
  * transmission, or on other error (such as if the caller provides fewer
  * than two IOVs.)
  */
-int ossl_quic_sstream_get_stream_frame(QUIC_SSTREAM *qss,
-                                       size_t skip,
+int ossl_quic_sstream_get_stream_frame(QUIC_SSTREAM *qss, size_t skip,
                                        OSSL_QUIC_FRAME_STREAM *hdr,
-                                       OSSL_QTX_IOVEC *iov,
-                                       size_t *num_iov);
+                                       OSSL_QTX_IOVEC *iov, size_t *num_iov);
 
 /*
  * Returns 1 if there is data pending transmission. Equivalent to calling
@@ -160,8 +158,7 @@ uint64_t ossl_quic_sstream_get_cur_size(QUIC_SSTREAM *qss);
  *
  * Returns 1 on success and 0 on error (e.g. if end < start).
  */
-int ossl_quic_sstream_mark_transmitted(QUIC_SSTREAM *qss,
-                                       uint64_t start,
+int ossl_quic_sstream_mark_transmitted(QUIC_SSTREAM *qss, uint64_t start,
                                        uint64_t end);
 
 /*
@@ -187,8 +184,7 @@ int ossl_quic_sstream_mark_transmitted_fin(QUIC_SSTREAM *qss,
  *
  * Returns 1 on success and 0 on error (e.g. if end < start).
  */
-int ossl_quic_sstream_mark_lost(QUIC_SSTREAM *qss,
-                                uint64_t start,
+int ossl_quic_sstream_mark_lost(QUIC_SSTREAM *qss, uint64_t start,
                                 uint64_t end);
 
 /*
@@ -211,8 +207,7 @@ int ossl_quic_sstream_mark_lost_fin(QUIC_SSTREAM *qss);
  *
  * Returns 1 on success and 0 on error (e.g. if end < start).
  */
-int ossl_quic_sstream_mark_acked(QUIC_SSTREAM *qss,
-                                 uint64_t start,
+int ossl_quic_sstream_mark_acked(QUIC_SSTREAM *qss, uint64_t start,
                                  uint64_t end);
 
 /*
@@ -236,10 +231,8 @@ int ossl_quic_sstream_mark_acked_fin(QUIC_SSTREAM *qss);
  *
  * Returns 1 on success or 0 on failure.
  */
-int ossl_quic_sstream_append(QUIC_SSTREAM *qss,
-                             const unsigned char *buf,
-                             size_t buf_len,
-                             size_t *consumed);
+int ossl_quic_sstream_append(QUIC_SSTREAM *qss, const unsigned char *buf,
+                             size_t buf_len, size_t *consumed);
 
 /*
  * Marks a stream as finished. ossl_quic_sstream_append() may not be called anymore
@@ -291,8 +284,7 @@ size_t ossl_quic_sstream_get_buffer_avail(QUIC_SSTREAM *qss);
  * length given as len. Trailing iovecs have their length values reduced or set
  * to 0 as necessary.
  */
-void ossl_quic_sstream_adjust_iov(size_t len,
-                                  OSSL_QTX_IOVEC *iov,
+void ossl_quic_sstream_adjust_iov(size_t len, OSSL_QTX_IOVEC *iov,
                                   size_t num_iov);
 
 /*
@@ -321,8 +313,8 @@ void ossl_quic_sstream_set_cleanse(QUIC_SSTREAM *qss, int cleanse);
  * `rbuf_size` is the initial size of the ring buffer to be used
  * when ossl_quic_rstream_move_to_rbuf() is called.
  */
-QUIC_RSTREAM *ossl_quic_rstream_new(QUIC_RXFC *rxfc,
-                                    OSSL_STATM *statm, size_t rbuf_size);
+QUIC_RSTREAM *ossl_quic_rstream_new(QUIC_RXFC *rxfc, OSSL_STATM *statm,
+                                    size_t rbuf_size);
 
 /*
  * Frees a QUIC_RSTREAM and any associated storage.
@@ -340,9 +332,8 @@ void ossl_quic_rstream_free(QUIC_RSTREAM *qrs);
  */
 
 int ossl_quic_rstream_queue_data(QUIC_RSTREAM *qrs, OSSL_QRX_PKT *pkt,
-                                 uint64_t offset,
-                                 const unsigned char *data, uint64_t data_len,
-                                 int fin);
+                                 uint64_t offset, const unsigned char *data,
+                                 uint64_t data_len, int fin);
 
 /*
  * Copies the data from the stream storage to buffer `buf` of size `size`.
@@ -423,6 +414,6 @@ int ossl_quic_rstream_resize_rbuf(QUIC_RSTREAM *qrs, size_t rbuf_size);
  * Sets flag to cleanse the buffered data when user reads it.
  */
 void ossl_quic_rstream_set_cleanse(QUIC_RSTREAM *qrs, int cleanse);
-# endif
+#endif
 
 #endif

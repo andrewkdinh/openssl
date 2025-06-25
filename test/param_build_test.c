@@ -14,7 +14,7 @@
 #include "internal/nelem.h"
 #include "testutil.h"
 
-static const OSSL_PARAM params_empty[] = { OSSL_PARAM_END };
+static const OSSL_PARAM params_empty[] = {OSSL_PARAM_END};
 
 static int template_public_single_zero_test(int idx)
 {
@@ -23,10 +23,9 @@ static int template_public_single_zero_test(int idx)
     BIGNUM *zbn = NULL, *zbn_res = NULL;
     int res = 0;
 
-    if (!TEST_ptr(bld = OSSL_PARAM_BLD_new())
-        || !TEST_ptr(zbn = BN_new())
-        || !TEST_true(OSSL_PARAM_BLD_push_BN(bld, "zeronumber",
-                                             idx == 0 ? zbn : NULL))
+    if (!TEST_ptr(bld = OSSL_PARAM_BLD_new()) || !TEST_ptr(zbn = BN_new())
+        || !TEST_true(
+            OSSL_PARAM_BLD_push_BN(bld, "zeronumber", idx == 0 ? zbn : NULL))
         || !TEST_ptr(params_blt = OSSL_PARAM_BLD_to_param(bld)))
         goto err;
 
@@ -100,16 +99,14 @@ static int template_public_test(int tstid)
     const char *cutf;
     int res = 0;
 
-    if (!TEST_ptr(bld)
-        || !TEST_true(OSSL_PARAM_BLD_push_long(bld, "l", 42))
+    if (!TEST_ptr(bld) || !TEST_true(OSSL_PARAM_BLD_push_long(bld, "l", 42))
         || !TEST_true(OSSL_PARAM_BLD_push_int32(bld, "i32", 1532))
         || !TEST_true(OSSL_PARAM_BLD_push_int64(bld, "i64", -9999999))
         || !TEST_true(OSSL_PARAM_BLD_push_time_t(bld, "t", 11224))
         || !TEST_true(OSSL_PARAM_BLD_push_double(bld, "d", 1.61803398875))
         || !TEST_ptr(zbn = BN_new())
         || !TEST_true(OSSL_PARAM_BLD_push_BN(bld, "zeronumber", zbn))
-        || !TEST_ptr(pbn = BN_new())
-        || !TEST_true(BN_set_word(pbn, 1729))
+        || !TEST_ptr(pbn = BN_new()) || !TEST_true(BN_set_word(pbn, 1729))
         || !TEST_true(OSSL_PARAM_BLD_push_BN(bld, "bignumber", pbn))
         || !TEST_ptr(nbn = BN_secure_new())
         || !TEST_true(BN_set_word(nbn, 1733))
@@ -117,8 +114,8 @@ static int template_public_test(int tstid)
         || !TEST_true(OSSL_PARAM_BLD_push_BN(bld, "negativebignumber", nbn))
         || !TEST_true(OSSL_PARAM_BLD_push_utf8_string(bld, "utf8_s", "foo",
                                                       sizeof("foo")))
-        || !TEST_true(OSSL_PARAM_BLD_push_utf8_ptr(bld, "utf8_p", "bar-boom",
-                                                   0))
+        || !TEST_true(
+            OSSL_PARAM_BLD_push_utf8_ptr(bld, "utf8_p", "bar-boom", 0))
         || !TEST_true(OSSL_PARAM_BLD_push_int(bld, "i", -6))
         || !TEST_ptr(params_blt = OSSL_PARAM_BLD_to_param(bld)))
         goto err;
@@ -144,8 +141,7 @@ static int template_public_test(int tstid)
     }
     /* Check int */
     if (!TEST_ptr(p = OSSL_PARAM_locate(params, "i"))
-        || !TEST_true(OSSL_PARAM_get_int(p, &i))
-        || !TEST_str_eq(p->key, "i")
+        || !TEST_true(OSSL_PARAM_get_int(p, &i)) || !TEST_str_eq(p->key, "i")
         || !TEST_uint_eq(p->data_type, OSSL_PARAM_INTEGER)
         || !TEST_size_t_eq(p->data_size, sizeof(int))
         || !TEST_int_eq(i, -6)
@@ -179,8 +175,7 @@ static int template_public_test(int tstid)
         || !TEST_time_t_eq(t, 11224)
         /* Check double */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "d"))
-        || !TEST_true(OSSL_PARAM_get_double(p, &d))
-        || !TEST_str_eq(p->key, "d")
+        || !TEST_true(OSSL_PARAM_get_double(p, &d)) || !TEST_str_eq(p->key, "d")
         || !TEST_uint_eq(p->data_type, OSSL_PARAM_REAL)
         || !TEST_size_t_eq(p->data_size, sizeof(double))
         || !TEST_double_eq(d, 1.61803398875)
@@ -249,14 +244,12 @@ static int template_private_test(int tstid)
     int res = 0;
 
     if (!TEST_ptr(data1 = OPENSSL_secure_malloc(data1_size))
-            || !TEST_ptr(data2 = OPENSSL_secure_malloc(data2_size))
-            || !TEST_ptr(bld = OSSL_PARAM_BLD_new()))
+        || !TEST_ptr(data2 = OPENSSL_secure_malloc(data2_size))
+        || !TEST_ptr(bld = OSSL_PARAM_BLD_new()))
         goto err;
 
-    for (j = 0; j < data1_num; j++)
-        data1[j] = -16 * j;
-    for (j = 0; j < data2_num; j++)
-        data2[j] = 2 * j;
+    for (j = 0; j < data1_num; j++) data1[j] = -16 * j;
+    for (j = 0; j < data2_num; j++) data2[j] = 2 * j;
 
     if (!TEST_true(OSSL_PARAM_BLD_push_uint(bld, "i", 6))
         || !TEST_true(OSSL_PARAM_BLD_push_ulong(bld, "l", 42))
@@ -272,10 +265,10 @@ static int template_private_test(int tstid)
         || !TEST_true(BN_set_word(nbn, 1733))
         || !TEST_true((BN_set_negative(nbn, 1), 1))
         || !TEST_true(OSSL_PARAM_BLD_push_BN(bld, "negativebignumber", nbn))
-        || !TEST_true(OSSL_PARAM_BLD_push_octet_string(bld, "oct_s", data1,
-                                                       data1_size))
-        || !TEST_true(OSSL_PARAM_BLD_push_octet_ptr(bld, "oct_p", data2,
-                                                    data2_size))
+        || !TEST_true(
+            OSSL_PARAM_BLD_push_octet_string(bld, "oct_s", data1, data1_size))
+        || !TEST_true(
+            OSSL_PARAM_BLD_push_octet_ptr(bld, "oct_p", data2, data2_size))
         || !TEST_ptr(params_blt = OSSL_PARAM_BLD_to_param(bld)))
         goto err;
     switch (tstid) {
@@ -300,8 +293,7 @@ static int template_private_test(int tstid)
     /* Check unsigned int */
     if (!TEST_ptr(p = OSSL_PARAM_locate(params, "i"))
         || !TEST_false(CRYPTO_secure_allocated(p->data))
-        || !TEST_true(OSSL_PARAM_get_uint(p, &i))
-        || !TEST_str_eq(p->key, "i")
+        || !TEST_true(OSSL_PARAM_get_uint(p, &i)) || !TEST_str_eq(p->key, "i")
         || !TEST_uint_eq(p->data_type, OSSL_PARAM_UNSIGNED_INTEGER)
         || !TEST_size_t_eq(p->data_size, sizeof(int))
         || !TEST_uint_eq(i, 6)
@@ -438,8 +430,8 @@ err:
 
 static int builder_merge_test(void)
 {
-    static int data1[] = { 2, 3, 5, 7, 11, 15, 17 };
-    static unsigned char data2[] = { 2, 4, 6, 8, 10 };
+    static int data1[] = {2, 3, 5, 7, 11, 15, 17};
+    static unsigned char data2[] = {2, 4, 6, 8, 10};
     OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
     OSSL_PARAM_BLD *bld2 = OSSL_PARAM_BLD_new();
     OSSL_PARAM *params = NULL, *params_blt = NULL, *params2_blt = NULL, *p;
@@ -452,8 +444,7 @@ static int builder_merge_test(void)
     BIGNUM *bn_pub = NULL, *bn_pub_res = NULL;
     int res = 0;
 
-    if (!TEST_ptr(bld)
-        || !TEST_true(OSSL_PARAM_BLD_push_uint(bld, "i", 6))
+    if (!TEST_ptr(bld) || !TEST_true(OSSL_PARAM_BLD_push_uint(bld, "i", 6))
         || !TEST_true(OSSL_PARAM_BLD_push_ulong(bld, "l", 42))
         || !TEST_true(OSSL_PARAM_BLD_push_uint32(bld, "i32", 1532))
         || !TEST_true(OSSL_PARAM_BLD_push_uint64(bld, "i64", 9999999))
@@ -467,11 +458,10 @@ static int builder_merge_test(void)
     if (!TEST_ptr(bld2)
         || !TEST_true(OSSL_PARAM_BLD_push_octet_string(bld2, "oct_s", data1,
                                                        sizeof(data1)))
-        || !TEST_true(OSSL_PARAM_BLD_push_octet_ptr(bld2, "oct_p", data2,
-                                                    sizeof(data2)))
+        || !TEST_true(
+            OSSL_PARAM_BLD_push_octet_ptr(bld2, "oct_p", data2, sizeof(data2)))
         || !TEST_true(OSSL_PARAM_BLD_push_uint32(bld2, "i32", 99))
-        || !TEST_ptr(bn_pub = BN_new())
-        || !TEST_true(BN_set_word(bn_pub, 0x42))
+        || !TEST_ptr(bn_pub = BN_new()) || !TEST_true(BN_set_word(bn_pub, 0x42))
         || !TEST_true(OSSL_PARAM_BLD_push_BN(bld2, "bignumber_pub", bn_pub))
         || !TEST_ptr(params2_blt = OSSL_PARAM_BLD_to_param(bld2)))
         goto err;
@@ -480,8 +470,7 @@ static int builder_merge_test(void)
         goto err;
 
     if (!TEST_ptr(p = OSSL_PARAM_locate(params, "i"))
-        || !TEST_true(OSSL_PARAM_get_uint(p, &i))
-        || !TEST_str_eq(p->key, "i")
+        || !TEST_true(OSSL_PARAM_get_uint(p, &i)) || !TEST_str_eq(p->key, "i")
         || !TEST_uint_eq(p->data_type, OSSL_PARAM_UNSIGNED_INTEGER)
         || !TEST_size_t_eq(p->data_size, sizeof(int))
         || !TEST_uint_eq(i, 6)
@@ -554,7 +543,7 @@ int setup_tests(void)
     ADD_ALL_TESTS(template_public_single_zero_test, 2);
     ADD_ALL_TESTS(template_public_test, 5);
     /* Only run the secure memory testing if we have secure memory available */
-    if (CRYPTO_secure_malloc_init(1<<16, 16)) {
+    if (CRYPTO_secure_malloc_init(1 << 16, 16)) {
         ADD_TEST(template_private_single_zero_test);
         ADD_ALL_TESTS(template_private_test, 5);
     }

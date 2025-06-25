@@ -25,37 +25,40 @@ static int sxnet_i2r(X509V3_EXT_METHOD *method, SXNET *sx, BIO *out,
 static SXNET *sxnet_v2i(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
                         STACK_OF(CONF_VALUE) *nval);
 #endif
-const X509V3_EXT_METHOD ossl_v3_sxnet = {
-    NID_sxnet, X509V3_EXT_MULTILINE, ASN1_ITEM_ref(SXNET),
-    0, 0, 0, 0,
-    0, 0,
-    0,
+const X509V3_EXT_METHOD ossl_v3_sxnet = {NID_sxnet,
+                                         X509V3_EXT_MULTILINE,
+                                         ASN1_ITEM_ref(SXNET),
+                                         0,
+                                         0,
+                                         0,
+                                         0,
+                                         0,
+                                         0,
+                                         0,
 #ifdef SXNET_TEST
-    (X509V3_EXT_V2I)sxnet_v2i,
+                                         (X509V3_EXT_V2I)sxnet_v2i,
 #else
-    0,
+                                         0,
 #endif
-    (X509V3_EXT_I2R)sxnet_i2r,
-    0,
-    NULL
-};
+                                         (X509V3_EXT_I2R)sxnet_i2r,
+                                         0,
+                                         NULL};
 
-ASN1_SEQUENCE(SXNETID) = {
-        ASN1_SIMPLE(SXNETID, zone, ASN1_INTEGER),
-        ASN1_SIMPLE(SXNETID, user, ASN1_OCTET_STRING)
-} ASN1_SEQUENCE_END(SXNETID)
+ASN1_SEQUENCE(SXNETID)
+    = {ASN1_SIMPLE(SXNETID, zone, ASN1_INTEGER),
+       ASN1_SIMPLE(SXNETID, user, ASN1_OCTET_STRING)}
+ASN1_SEQUENCE_END(SXNETID)
 
 IMPLEMENT_ASN1_FUNCTIONS(SXNETID)
 
-ASN1_SEQUENCE(SXNET) = {
-        ASN1_SIMPLE(SXNET, version, ASN1_INTEGER),
-        ASN1_SEQUENCE_OF(SXNET, ids, SXNETID)
-} ASN1_SEQUENCE_END(SXNET)
+ASN1_SEQUENCE(SXNET)
+    = {ASN1_SIMPLE(SXNET, version, ASN1_INTEGER),
+       ASN1_SEQUENCE_OF(SXNET, ids, SXNETID)}
+ASN1_SEQUENCE_END(SXNET)
 
 IMPLEMENT_ASN1_FUNCTIONS(SXNET)
 
-static int sxnet_i2r(X509V3_EXT_METHOD *method, SXNET *sx, BIO *out,
-                     int indent)
+static int sxnet_i2r(X509V3_EXT_METHOD *method, SXNET *sx, BIO *out, int indent)
 {
     int64_t v;
     char *tmp;
@@ -66,9 +69,8 @@ static int sxnet_i2r(X509V3_EXT_METHOD *method, SXNET *sx, BIO *out,
      * Since we add 1 to the version number to display it, we don't support
      * LONG_MAX since that would cause on overflow.
      */
-    if (!ASN1_INTEGER_get_int64(&v, sx->version)
-            || v >= LONG_MAX
-            || v < LONG_MIN) {
+    if (!ASN1_INTEGER_get_int64(&v, sx->version) || v >= LONG_MAX
+        || v < LONG_MIN) {
         BIO_printf(out, "%*sVersion: <unsupported>", indent, "");
     } else {
         long vl = (long)v;
@@ -106,7 +108,7 @@ static SXNET *sxnet_v2i(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
         if (!SXNET_add_id_asc(&sx, cnf->name, cnf->value, -1)) {
             SXNET_free(sx);
             return NULL;
-	}
+        }
     }
     return sx;
 }
@@ -117,7 +119,8 @@ static SXNET *sxnet_v2i(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
 
 /* Add an id given the zone as an ASCII number */
 
-int SXNET_add_id_asc(SXNET **psx, const char *zone, const char *user, int userlen)
+int SXNET_add_id_asc(SXNET **psx, const char *zone, const char *user,
+                     int userlen)
 {
     ASN1_INTEGER *izone;
 
@@ -196,7 +199,8 @@ int SXNET_add_id_INTEGER(SXNET **psx, ASN1_INTEGER *zone, const char *user,
         goto err;
     }
 
-    if (!ASN1_OCTET_STRING_set(id->user, (const unsigned char *)user, userlen)){
+    if (!ASN1_OCTET_STRING_set(id->user, (const unsigned char *)user,
+                               userlen)) {
         ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
         goto err;
     }
@@ -209,7 +213,7 @@ int SXNET_add_id_INTEGER(SXNET **psx, ASN1_INTEGER *zone, const char *user,
     *psx = sx;
     return 1;
 
- err:
+err:
     SXNETID_free(id);
     if (*psx == NULL)
         SXNET_free(sx);

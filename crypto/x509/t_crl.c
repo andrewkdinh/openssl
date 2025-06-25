@@ -34,7 +34,7 @@ int X509_CRL_print_fp(FILE *fp, X509_CRL *x)
 
 int X509_CRL_print(BIO *out, X509_CRL *x)
 {
-  return X509_CRL_print_ex(out, x, XN_FLAG_COMPAT);
+    return X509_CRL_print_ex(out, x, XN_FLAG_COMPAT);
 }
 
 int X509_CRL_print_ex(BIO *out, X509_CRL *x, unsigned long nmflag)
@@ -56,7 +56,8 @@ int X509_CRL_print_ex(BIO *out, X509_CRL *x, unsigned long nmflag)
     BIO_printf(out, "Certificate Revocation List (CRL):\n");
     l = X509_CRL_get_version(x);
     if (l >= X509_CRL_VERSION_1 && l <= X509_CRL_VERSION_2)
-        BIO_printf(out, "%4sVersion %ld (0x%lx)\n", "", l + 1, (unsigned long)l);
+        BIO_printf(out, "%4sVersion %ld (0x%lx)\n", "", l + 1,
+                   (unsigned long)l);
     else
         BIO_printf(out, "%4sVersion unknown (%ld)\n", "", l);
     X509_CRL_get0_signature(x, &sig, &sig_alg);
@@ -73,8 +74,8 @@ int X509_CRL_print_ex(BIO *out, X509_CRL *x, unsigned long nmflag)
         BIO_printf(out, "NONE");
     BIO_printf(out, "\n");
 
-    X509V3_extensions_print(out, "CRL extensions",
-                            X509_CRL_get0_extensions(x), 0, 4);
+    X509V3_extensions_print(out, "CRL extensions", X509_CRL_get0_extensions(x),
+                            0, 4);
 
     rev = X509_CRL_get_REVOKED(x);
 
@@ -96,5 +97,4 @@ int X509_CRL_print_ex(BIO *out, X509_CRL *x, unsigned long nmflag)
     X509_signature_print(out, sig_alg, sig);
 
     return 1;
-
 }

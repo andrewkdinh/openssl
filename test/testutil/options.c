@@ -12,8 +12,7 @@
 #include "tu_local.h"
 #include "output.h"
 
-
-static int used[100] = { 0 };
+static int used[100] = {0};
 
 int test_skip_common_options(void)
 {
@@ -22,7 +21,7 @@ int test_skip_common_options(void)
     while ((o = (OPTION_CHOICE_DEFAULT)opt_next()) != OPT_EOF) {
         switch (o) {
         case OPT_TEST_CASES:
-           break;
+            break;
         default:
         case OPT_ERR:
             return 0;
@@ -76,4 +75,3 @@ int opt_printf_stderr(const char *fmt, ...)
     va_end(ap);
     return ret;
 }
-

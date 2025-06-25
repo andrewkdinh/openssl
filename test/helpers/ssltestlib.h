@@ -8,9 +8,9 @@
  */
 
 #ifndef OSSL_TEST_SSLTESTLIB_H
-# define OSSL_TEST_SSLTESTLIB_H
+#define OSSL_TEST_SSLTESTLIB_H
 
-# include <openssl/ssl.h>
+#include <openssl/ssl.h>
 
 #define TLS13_AES_128_GCM_SHA256_BYTES  ((const unsigned char *)"\x13\x01")
 #define TLS13_AES_256_GCM_SHA384_BYTES  ((const unsigned char *)"\x13\x02")
@@ -29,9 +29,10 @@ int create_ssl_objects(SSL_CTX *serverctx, SSL_CTX *clientctx, SSL **sssl,
 int create_bare_ssl_connection(SSL *serverssl, SSL *clientssl, int want,
                                int read, int listen);
 int create_bare_ssl_connection_ex(SSL *serverssl, SSL *clientssl, int want,
-                                  int read, int listen, int *cm_count, int *sm_count);
+                                  int read, int listen, int *cm_count,
+                                  int *sm_count);
 int create_ssl_objects2(SSL_CTX *serverctx, SSL_CTX *clientctx, SSL **sssl,
-                       SSL **cssl, int sfd, int cfd);
+                        SSL **cssl, int sfd, int cfd);
 int wait_until_sock_readable(int sock);
 int create_test_sockets(int *cfdp, int *sfdp, int socktype, BIO_ADDR *saddr);
 int create_ssl_connection(SSL *serverssl, SSL *clientssl, int want);

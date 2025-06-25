@@ -19,8 +19,13 @@
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_KDFOPT, OPT_BIN, OPT_KEYLEN, OPT_OUT,
-    OPT_CIPHER, OPT_DIGEST, OPT_MAC,
+    OPT_KDFOPT,
+    OPT_BIN,
+    OPT_KEYLEN,
+    OPT_OUT,
+    OPT_CIPHER,
+    OPT_DIGEST,
+    OPT_MAC,
     OPT_PROV_ENUM
 } OPTION_CHOICE;
 
@@ -39,14 +44,13 @@ const OPTIONS kdf_options[] = {
     OPT_SECTION("Output"),
     {"out", OPT_OUT, '>', "Output to filename rather than stdout"},
     {"binary", OPT_BIN, '-',
-        "Output in binary format (default is hexadecimal)"},
+     "Output in binary format (default is hexadecimal)"},
 
     OPT_PROV_OPTIONS,
 
     OPT_PARAMETERS(),
     {"kdf_name", 0, 0, "Name of the KDF algorithm"},
-    {NULL}
-};
+    {NULL}};
 
 static char *alloc_kdf_algorithm_name(STACK_OF(OPENSSL_STRING) **optp,
                                       const char *name, const char *arg)
@@ -138,8 +142,8 @@ opthelp:
     if (argc != 1)
         goto opthelp;
 
-    if ((kdf = EVP_KDF_fetch(app_get0_libctx(), argv[0],
-                             app_get0_propq())) == NULL) {
+    if ((kdf = EVP_KDF_fetch(app_get0_libctx(), argv[0], app_get0_propq()))
+        == NULL) {
         BIO_printf(bio_err, "Invalid KDF name %s\n", argv[0]);
         goto opthelp;
     }

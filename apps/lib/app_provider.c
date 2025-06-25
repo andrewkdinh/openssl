@@ -37,16 +37,16 @@ int app_provider_load(OSSL_LIB_CTX *libctx, const char *provider_name)
 
     prov = OSSL_PROVIDER_load(libctx, provider_name);
     if (prov == NULL) {
-        opt_printf_stderr("%s: unable to load provider %s\n"
-                          "Hint: use -provider-path option or OPENSSL_MODULES environment variable.\n",
-                          opt_getprog(), provider_name);
+        opt_printf_stderr(
+            "%s: unable to load provider %s\n"
+            "Hint: use -provider-path option or OPENSSL_MODULES environment variable.\n",
+            opt_getprog(), provider_name);
         ERR_print_errors(bio_err);
         return 0;
     }
     if (app_providers == NULL)
         app_providers = sk_OSSL_PROVIDER_new_null();
-    if (app_providers == NULL
-        || !sk_OSSL_PROVIDER_push(app_providers, prov)) {
+    if (app_providers == NULL || !sk_OSSL_PROVIDER_push(app_providers, prov)) {
         app_providers_cleanup();
         return 0;
     }
@@ -98,10 +98,8 @@ static int opt_provider_param(const char *arg)
 
     /* Drop whitespace on both sides of the '=' sign */
     *(tmp = p.val++) = '\0';
-    while (tmp > copy && isspace(_UC(*--tmp)))
-        *tmp = '\0';
-    while (isspace(_UC(*p.val)))
-        ++p.val;
+    while (tmp > copy && isspace(_UC(*--tmp))) *tmp = '\0';
+    while (isspace(_UC(*p.val))) ++p.val;
 
     /*
      * Split the key on ':', to get the optional provider, empty or missing
@@ -133,7 +131,7 @@ static int opt_provider_param(const char *arg)
         ret = 0;
     }
 
- end:
+end:
     OPENSSL_free(copy);
     return ret;
 }

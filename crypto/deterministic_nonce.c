@@ -25,8 +25,8 @@
  *     in, inlen The input Bit String (in bytes).
  * Returns: 1 if successful, or  0 otherwise.
  */
-static int bits2int(BIGNUM *out, int qlen_bits,
-                    const unsigned char *in, size_t inlen)
+static int bits2int(BIGNUM *out, int qlen_bits, const unsigned char *in,
+                    size_t inlen)
 {
     int blen_bits = inlen * 8;
     int shift;
@@ -99,22 +99,20 @@ static int int2octets(unsigned char *out, const BIGNUM *num, int rlen)
 static int bits2octets(unsigned char *out, const BIGNUM *q, int qlen_bits,
                        int rlen, const unsigned char *in, size_t inlen)
 {
-   int ret = 0;
-   BIGNUM *z = BN_new();
+    int ret = 0;
+    BIGNUM *z = BN_new();
 
-   if (z == NULL
-           || !bits2int(z, qlen_bits, in, inlen))
-       goto err;
+    if (z == NULL || !bits2int(z, qlen_bits, in, inlen))
+        goto err;
 
    /* z2 = z1 mod q (Do a simple subtract, since z1 < 2^qlen_bits) */
-   if (BN_cmp(z, q) >= 0
-           && !BN_usub(z, z, q))
-       goto err;
+    if (BN_cmp(z, q) >= 0 && !BN_usub(z, z, q))
+        goto err;
 
-   ret = int2octets(out, z, rlen);
+    ret = int2octets(out, z, rlen);
 err:
-   BN_free(z);
-   return ret;
+    BN_free(z);
+    return ret;
 }
 
 /*
@@ -213,7 +211,7 @@ int ossl_gen_deterministic_nonce_rfc6979(BIGNUM *out, const BIGNUM *q,
     memset(T, 0xff, prefsz);
 
     if (!int2octets(entropyx, priv, rlen)
-            || !bits2octets(nonceh, q, qlen_bits, rlen, hm, hmlen))
+        || !bits2octets(nonceh, q, qlen_bits, rlen, hm, hmlen))
         goto end;
 
     kdfctx = kdf_setup(digestname, entropyx, rlen, nonceh, rlen, libctx, propq);
@@ -222,11 +220,10 @@ int ossl_gen_deterministic_nonce_rfc6979(BIGNUM *out, const BIGNUM *q,
 
     do {
         if (!EVP_KDF_derive(kdfctx, rbits, rlen, NULL)
-                || !bits2int_consttime(out, qlen_bits, T, rlen + prefsz))
+            || !bits2int_consttime(out, qlen_bits, T, rlen + prefsz))
             goto end;
     } while (ossl_bn_is_word_fixed_top(out, 0)
-            || ossl_bn_is_word_fixed_top(out, 1)
-            || BN_ucmp(out, q) >= 0);
+             || ossl_bn_is_word_fixed_top(out, 1) || BN_ucmp(out, q) >= 0);
 #ifdef BN_DEBUG
     /* With BN_DEBUG on a fixed top number cannot be returned */
     bn_correct_top(out);

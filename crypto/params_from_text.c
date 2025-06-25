@@ -164,8 +164,7 @@ static int construct_from_text(OSSL_PARAM *to, const OSSL_PARAM *paramdef,
                 unsigned char *cp;
                 size_t i = buf_n;
 
-                for (cp = buf; i-- > 0; cp++)
-                    *cp ^= 0xFF;
+                for (cp = buf; i-- > 0; cp++) *cp ^= 0xFF;
             }
             break;
         case OSSL_PARAM_UTF8_STRING:
@@ -303,8 +302,7 @@ end:
     return ok == -1 ? 0 : 1;
 }
 
-int OSSL_PARAM_allocate_from_text(OSSL_PARAM *to,
-                                  const OSSL_PARAM *paramdefs,
+int OSSL_PARAM_allocate_from_text(OSSL_PARAM *to, const OSSL_PARAM *paramdefs,
                                   const char *key, const char *value,
                                   size_t value_n, int *found)
 {
@@ -318,20 +316,20 @@ int OSSL_PARAM_allocate_from_text(OSSL_PARAM *to,
     if (to == NULL || paramdefs == NULL)
         return 0;
 
-    if (!prepare_from_text(paramdefs, key, value, value_n,
-                           &paramdef, &ishex, &buf_n, &tmpbn, found))
+    if (!prepare_from_text(paramdefs, key, value, value_n, &paramdef, &ishex,
+                           &buf_n, &tmpbn, found))
         goto err;
 
     if ((buf = OPENSSL_zalloc(buf_n > 0 ? buf_n : 1)) == NULL)
         goto err;
 
-    ok = construct_from_text(to, paramdef, value, value_n, ishex,
-                             buf, buf_n, tmpbn);
+    ok = construct_from_text(to, paramdef, value, value_n, ishex, buf, buf_n,
+                             tmpbn);
     BN_free(tmpbn);
     if (!ok)
         OPENSSL_free(buf);
     return ok;
- err:
+err:
     BN_free(tmpbn);
     return 0;
 }

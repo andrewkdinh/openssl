@@ -104,8 +104,8 @@ QUIC_PORT *ossl_quic_port_new(const QUIC_PORT_ARGS *args)
     if ((port = OPENSSL_zalloc(sizeof(QUIC_PORT))) == NULL)
         return NULL;
 
-    port->engine        = args->engine;
-    port->channel_ctx   = args->channel_ctx;
+    port->engine = args->engine;
+    port->channel_ctx = args->channel_ctx;
     port->is_multi_conn = args->is_multi_conn;
     port->validate_addr = args->do_addr_validation;
     port->get_conn_user_ssl = args->get_conn_user_ssl;
@@ -144,33 +144,36 @@ static int port_init(QUIC_PORT *port)
 
     if ((port->demux = ossl_quic_demux_new(/*BIO=*/NULL,
                                            /*Short CID Len=*/rx_short_dcid_len,
-                                           get_time, port)) == NULL)
+                                           get_time, port))
+        == NULL)
         goto err;
 
     ossl_quic_demux_set_default_handler(port->demux,
-                                        port_default_packet_handler,
-                                        port);
+                                        port_default_packet_handler, port);
 
-    if ((port->srtm = ossl_quic_srtm_new(port->engine->libctx,
-                                         port->engine->propq)) == NULL)
+    if ((port->srtm =
+             ossl_quic_srtm_new(port->engine->libctx, port->engine->propq))
+        == NULL)
         goto err;
 
-    if ((port->lcidm = ossl_quic_lcidm_new(port->engine->libctx,
-                                           rx_short_dcid_len)) == NULL)
+    if ((port->lcidm =
+             ossl_quic_lcidm_new(port->engine->libctx, rx_short_dcid_len))
+        == NULL)
         goto err;
 
     port->rx_short_dcid_len = (unsigned char)rx_short_dcid_len;
-    port->tx_init_dcid_len  = INIT_DCID_LEN;
-    port->state             = QUIC_PORT_STATE_RUNNING;
+    port->tx_init_dcid_len = INIT_DCID_LEN;
+    port->state = QUIC_PORT_STATE_RUNNING;
 
     ossl_list_port_insert_tail(&port->engine->port_list, port);
-    port->on_engine_list    = 1;
-    port->bio_changed       = 1;
+    port->on_engine_list = 1;
+    port->bio_changed = 1;
 
     /* Generate random key for token encryption */
     if ((port->token_ctx = EVP_CIPHER_CTX_new()) == NULL
-        || (cipher = EVP_CIPHER_fetch(port->engine->libctx,
-                                      "AES-256-GCM", NULL)) == NULL
+        || (cipher =
+                EVP_CIPHER_fetch(port->engine->libctx, "AES-256-GCM", NULL))
+            == NULL
         || !EVP_EncryptInit_ex(port->token_ctx, cipher, NULL, NULL, NULL)
         || (key_len = EVP_CIPHER_CTX_get_key_length(port->token_ctx)) <= 0
         || (token_key = OPENSSL_malloc(key_len)) == NULL
@@ -402,7 +405,8 @@ int ossl_quic_port_is_addressed_w(const QUIC_PORT *port)
 
 int ossl_quic_port_is_addressed(const QUIC_PORT *port)
 {
-    return ossl_quic_port_is_addressed_r(port) && ossl_quic_port_is_addressed_w(port);
+    return ossl_quic_port_is_addressed_r(port)
+        && ossl_quic_port_is_addressed_w(port);
 }
 
 /*
@@ -436,7 +440,7 @@ int ossl_quic_port_set_net_wbio(QUIC_PORT *port, BIO *net_wbio)
         return 0;
 
     OSSL_LIST_FOREACH(ch, ch, &port->channel_list)
-        ossl_qtx_set_bio(ch->qtx, net_wbio);
+    ossl_qtx_set_bio(ch->qtx, net_wbio);
 
     port->net_wbio = net_wbio;
     port_update_addressing_mode(port);
@@ -482,7 +486,8 @@ static SSL *port_new_handshake_layer(QUIC_PORT *port, QUIC_CHANNEL *ch)
         return NULL;
     }
 
-    tls = ossl_ssl_connection_new_int(port->channel_ctx, user_ssl, TLS_method());
+    tls =
+        ossl_ssl_connection_new_int(port->channel_ctx, user_ssl, TLS_method());
     qc->tls = tls;
     if (tls == NULL || (tls_conn = SSL_CONNECTION_FROM_SSL(tls)) == NULL) {
         SSL_free(user_ssl);
@@ -490,18 +495,19 @@ static SSL *port_new_handshake_layer(QUIC_PORT *port, QUIC_CHANNEL *ch)
     }
 
     if (ql != NULL && ql->obj.ssl.ctx->new_pending_conn_cb != NULL)
-        if (!ql->obj.ssl.ctx->new_pending_conn_cb(ql->obj.ssl.ctx, user_ssl,
-                                                  ql->obj.ssl.ctx->new_pending_conn_arg)) {
+        if (!ql->obj.ssl.ctx->new_pending_conn_cb(
+                ql->obj.ssl.ctx, user_ssl,
+                ql->obj.ssl.ctx->new_pending_conn_arg)) {
             SSL_free(user_ssl);
             return NULL;
         }
 
     /* Override the user_ssl of the inner connection. */
-    tls_conn->s3.flags      |= TLS1_FLAGS_QUIC | TLS1_FLAGS_QUIC_INTERNAL;
+    tls_conn->s3.flags |= TLS1_FLAGS_QUIC | TLS1_FLAGS_QUIC_INTERNAL;
 
     /* Restrict options derived from the SSL_CTX. */
-    tls_conn->options       &= OSSL_QUIC_PERMITTED_OPTIONS_CONN;
-    tls_conn->pha_enabled   = 0;
+    tls_conn->options &= OSSL_QUIC_PERMITTED_OPTIONS_CONN;
+    tls_conn->pha_enabled = 0;
     return tls;
 }
 
@@ -511,11 +517,11 @@ static QUIC_CHANNEL *port_make_channel(QUIC_PORT *port, SSL *tls, OSSL_QRX *qrx,
     QUIC_CHANNEL_ARGS args = {0};
     QUIC_CHANNEL *ch;
 
-    args.port          = port;
-    args.is_server     = is_server;
-    args.lcidm         = port->lcidm;
-    args.srtm          = port->srtm;
-    args.qrx           = qrx;
+    args.port = port;
+    args.is_server = is_server;
+    args.lcidm = port->lcidm;
+    args.srtm = port->srtm;
+    args.qrx = qrx;
     args.is_tserver_ch = is_tserver;
 
     /*
@@ -549,7 +555,8 @@ static QUIC_CHANNEL *port_make_channel(QUIC_PORT *port, SSL *tls, OSSL_QRX *qrx,
      */
     ch->use_qlog = 1;
     if (ch->tls->ctx->qlog_title != NULL) {
-        if ((ch->qlog_title = OPENSSL_strdup(ch->tls->ctx->qlog_title)) == NULL) {
+        if ((ch->qlog_title = OPENSSL_strdup(ch->tls->ctx->qlog_title))
+            == NULL) {
             OPENSSL_free(ch);
             return NULL;
         }
@@ -662,10 +669,10 @@ void ossl_quic_port_subtick(QUIC_PORT *port, QUIC_TICK_RESULT *res,
 {
     QUIC_CHANNEL *ch;
 
-    res->net_read_desired       = ossl_quic_port_is_running(port);
-    res->net_write_desired      = 0;
-    res->notify_other_threads   = 0;
-    res->tick_deadline          = ossl_time_infinite();
+    res->net_read_desired = ossl_quic_port_is_running(port);
+    res->net_write_desired = 0;
+    res->notify_other_threads = 0;
+    res->tick_deadline = ossl_time_infinite();
 
     if (!port->engine->inhibit_tick) {
         /* Handle any incoming data from network. */
@@ -673,7 +680,8 @@ void ossl_quic_port_subtick(QUIC_PORT *port, QUIC_TICK_RESULT *res,
             port_rx_pre(port);
 
         /* Iterate through all channels and service them. */
-        OSSL_LIST_FOREACH(ch, ch, &port->channel_list) {
+        OSSL_LIST_FOREACH(ch, ch, &port->channel_list)
+        {
             QUIC_TICK_RESULT subr = {0};
 
             ossl_quic_channel_subtick(ch, &subr, flags);
@@ -727,7 +735,8 @@ static void port_rx_pre(QUIC_PORT *port)
  * to *new_ch.
  */
 static void port_bind_channel(QUIC_PORT *port, const BIO_ADDR *peer,
-                              const QUIC_CONN_ID *scid, const QUIC_CONN_ID *dcid,
+                              const QUIC_CONN_ID *scid,
+                              const QUIC_CONN_ID *dcid,
                               const QUIC_CONN_ID *odcid, OSSL_QRX *qrx,
                               QUIC_CHANNEL **new_ch)
 {
@@ -762,9 +771,8 @@ static void port_bind_channel(QUIC_PORT *port, const BIO_ADDR *peer,
      */
     if (qrx == NULL)
         if (!ossl_quic_provide_initial_secret(ch->port->engine->libctx,
-                                              ch->port->engine->propq,
-                                              dcid, /* is_server */ 1,
-                                              ch->qrx, NULL))
+                                              ch->port->engine->propq, dcid,
+                                              /* is_server */ 1, ch->qrx, NULL))
             return;
 
     if (odcid->id_len != 0) {
@@ -826,10 +834,12 @@ static int port_try_handle_stateless_reset(QUIC_PORT *port, const QUIC_URXE *e)
         return 0;
 
     for (i = 0;; ++i) {
-        if (!ossl_quic_srtm_lookup(port->srtm,
-                                   (QUIC_STATELESS_RESET_TOKEN *)(data + e->data_len
-                                   - sizeof(QUIC_STATELESS_RESET_TOKEN)),
-                                   i, &opaque, NULL))
+        if (!ossl_quic_srtm_lookup(
+                port->srtm,
+                (QUIC_STATELESS_RESET_TOKEN *)(data + e->data_len
+                                               - sizeof(
+                                                   QUIC_STATELESS_RESET_TOKEN)),
+                i, &opaque, NULL))
             break;
 
         assert(opaque != NULL);
@@ -901,17 +911,16 @@ static int marshal_validation_token(QUIC_VALIDATION_TOKEN *token,
 
     if (!WPACKET_init(&wpkt, buf_mem)
         || !WPACKET_memset(&wpkt, token->is_retry, 1)
-        || !WPACKET_memcpy(&wpkt, &token->timestamp,
-                           sizeof(token->timestamp))
+        || !WPACKET_memcpy(&wpkt, &token->timestamp, sizeof(token->timestamp))
         || (token->is_retry
             && (!WPACKET_sub_memcpy_u8(&wpkt, &token->odcid.id,
                                        token->odcid.id_len)
                 || !WPACKET_sub_memcpy_u8(&wpkt, &token->rscid.id,
                                           token->rscid.id_len)))
-        || !WPACKET_sub_memcpy_u8(&wpkt, token->remote_addr, token->remote_addr_len)
+        || !WPACKET_sub_memcpy_u8(&wpkt, token->remote_addr,
+                                  token->remote_addr_len)
         || !WPACKET_get_total_written(&wpkt, buffer_len)
-        || *buffer_len > MARSHALLED_TOKEN_MAX_LEN
-        || !WPACKET_finish(&wpkt)) {
+        || *buffer_len > MARSHALLED_TOKEN_MAX_LEN || !WPACKET_finish(&wpkt)) {
         WPACKET_cleanup(&wpkt);
         BUF_MEM_free(buf_mem);
         return 0;
@@ -941,8 +950,7 @@ static int marshal_validation_token(QUIC_VALIDATION_TOKEN *token,
  */
 static int encrypt_validation_token(const QUIC_PORT *port,
                                     const unsigned char *plaintext,
-                                    size_t pt_len,
-                                    unsigned char *ciphertext,
+                                    size_t pt_len, unsigned char *ciphertext,
                                     size_t *ct_len)
 {
     int iv_len, len, ret = 0;
@@ -966,7 +974,8 @@ static int encrypt_validation_token(const QUIC_PORT *port,
         || !EVP_EncryptInit_ex(port->token_ctx, NULL, NULL, NULL, iv)
         || !EVP_EncryptUpdate(port->token_ctx, data, &len, plaintext, pt_len)
         || !EVP_EncryptFinal_ex(port->token_ctx, data + pt_len, &len)
-        || !EVP_CIPHER_CTX_ctrl(port->token_ctx, EVP_CTRL_GCM_GET_TAG, tag_len, tag))
+        || !EVP_CIPHER_CTX_ctrl(port->token_ctx, EVP_CTRL_GCM_GET_TAG, tag_len,
+                                tag))
         goto err;
 
     ret = 1;
@@ -991,8 +1000,7 @@ err:
  */
 static int decrypt_validation_token(const QUIC_PORT *port,
                                     const unsigned char *ciphertext,
-                                    size_t ct_len,
-                                    unsigned char *plaintext,
+                                    size_t ct_len, unsigned char *plaintext,
                                     size_t *pt_len)
 {
     int iv_len, len = 0, ret = 0;
@@ -1056,20 +1064,24 @@ static int parse_validation_token(QUIC_VALIDATION_TOKEN *token,
                               sizeof(token->timestamp))
         || (token->is_retry
             && (!PACKET_get_length_prefixed_1(&pkt, &subpkt)
-                || (token->odcid.id_len = (unsigned char)PACKET_remaining(&subpkt))
+                || (token->odcid.id_len =
+                        (unsigned char)PACKET_remaining(&subpkt))
                     > QUIC_MAX_CONN_ID_LEN
                 || !PACKET_copy_bytes(&subpkt,
                                       (unsigned char *)&token->odcid.id,
                                       token->odcid.id_len)
                 || !PACKET_get_length_prefixed_1(&pkt, &subpkt)
-                || (token->rscid.id_len = (unsigned char)PACKET_remaining(&subpkt))
+                || (token->rscid.id_len =
+                        (unsigned char)PACKET_remaining(&subpkt))
                     > QUIC_MAX_CONN_ID_LEN
-                || !PACKET_copy_bytes(&subpkt, (unsigned char *)&token->rscid.id,
+                || !PACKET_copy_bytes(&subpkt,
+                                      (unsigned char *)&token->rscid.id,
                                       token->rscid.id_len)))
         || !PACKET_get_length_prefixed_1(&pkt, &subpkt)
         || (token->remote_addr_len = PACKET_remaining(&subpkt)) == 0
         || (token->remote_addr = OPENSSL_malloc(token->remote_addr_len)) == NULL
-        || !PACKET_copy_bytes(&subpkt, token->remote_addr, token->remote_addr_len)
+        || !PACKET_copy_bytes(&subpkt, token->remote_addr,
+                              token->remote_addr_len)
         || PACKET_remaining(&pkt) != 0) {
         cleanup_validation_token(token);
         return 0;
@@ -1100,8 +1112,7 @@ static int parse_validation_token(QUIC_VALIDATION_TOKEN *token,
  * Error handling is included for failures in CID generation, encoding, and
  * network transmiss
  */
-static void port_send_retry(QUIC_PORT *port,
-                            BIO_ADDR *peer,
+static void port_send_retry(QUIC_PORT *port, BIO_ADDR *peer,
                             QUIC_PKT_HDR *client_hdr)
 {
     BIO_MSG msg[1];
@@ -1139,11 +1150,10 @@ static void port_send_retry(QUIC_PORT *port,
     memset(&token, 0, sizeof(QUIC_VALIDATION_TOKEN));
 
     /* Generate retry validation token */
-    if (!generate_token(peer, client_hdr->dst_conn_id,
-                        hdr.src_conn_id, &token, 1)
+    if (!generate_token(peer, client_hdr->dst_conn_id, hdr.src_conn_id, &token,
+                        1)
         || !marshal_validation_token(&token, buffer, &token_buf_len)
-        || !encrypt_validation_token(port, buffer, token_buf_len, NULL,
-                                     &ct_len)
+        || !encrypt_validation_token(port, buffer, token_buf_len, NULL, &ct_len)
         || ct_len > ENCRYPTED_TOKEN_MAX_LEN
         || !encrypt_validation_token(port, buffer, token_buf_len, ct_buf,
                                      &ct_len)
@@ -1156,11 +1166,10 @@ static void port_send_retry(QUIC_PORT *port,
     hdr.version = 1;
     hdr.len = ct_len;
     hdr.data = ct_buf;
-    ok = ossl_quic_calculate_retry_integrity_tag(port->engine->libctx,
-                                                 port->engine->propq, &hdr,
-                                                 &client_hdr->dst_conn_id,
-                                                 ct_buf + ct_len
-                                                 - QUIC_RETRY_INTEGRITY_TAG_LEN);
+    ok = ossl_quic_calculate_retry_integrity_tag(
+        port->engine->libctx, port->engine->propq, &hdr,
+        &client_hdr->dst_conn_id,
+        ct_buf + ct_len - QUIC_RETRY_INTEGRITY_TAG_LEN);
     if (ok == 0)
         goto err;
 
@@ -1334,7 +1343,7 @@ static int port_validate_token(QUIC_PKT_HDR *hdr, QUIC_PORT *port,
                                QUIC_CONN_ID *scid, uint8_t *gen_new_token)
 {
     int ret = 0;
-    QUIC_VALIDATION_TOKEN token = { 0 };
+    QUIC_VALIDATION_TOKEN token = {0};
     uint64_t time_diff;
     size_t remote_addr_len, dec_token_len;
     unsigned char *remote_addr = NULL, dec_token[MARSHALLED_TOKEN_MAX_LEN];
@@ -1356,8 +1365,8 @@ static int port_validate_token(QUIC_PKT_HDR *hdr, QUIC_PORT *port,
      */
     if (ossl_time_compare(now, token.timestamp) < 0)
         goto err;
-    time_diff = ossl_time2seconds(ossl_time_abs_difference(token.timestamp,
-                                                           now));
+    time_diff =
+        ossl_time2seconds(ossl_time_abs_difference(token.timestamp, now));
     if ((token.is_retry && time_diff > RETRY_LIFETIME)
         || (!token.is_retry && time_diff > NEW_TOKEN_LIFETIME))
         goto err;
@@ -1386,8 +1395,8 @@ static int port_validate_token(QUIC_PKT_HDR *hdr, QUIC_PORT *port,
          * this.
          */
         if (token.rscid.id_len != hdr->dst_conn_id.id_len
-            || memcmp(&token.rscid.id, &hdr->dst_conn_id.id,
-                      token.rscid.id_len) != 0)
+            || memcmp(&token.rscid.id, &hdr->dst_conn_id.id, token.rscid.id_len)
+                != 0)
             goto err;
         *odcid = token.odcid;
         *scid = token.rscid;
@@ -1424,7 +1433,7 @@ err:
 
 static void generate_new_token(QUIC_CHANNEL *ch, BIO_ADDR *peer)
 {
-    QUIC_CONN_ID rscid = { 0 };
+    QUIC_CONN_ID rscid = {0};
     QUIC_VALIDATION_TOKEN token;
     unsigned char buffer[ENCRYPTED_TOKEN_MAX_LEN];
     unsigned char *ct_buf;
@@ -1499,8 +1508,7 @@ static void port_default_packet_handler(QUIC_URXE *e, void *arg,
         goto undesirable;
 
     if (dcid != NULL
-        && ossl_quic_lcidm_lookup(port->lcidm, dcid, NULL,
-                                  (void **)&ch)) {
+        && ossl_quic_lcidm_lookup(port->lcidm, dcid, NULL, (void **)&ch)) {
         assert(ch != NULL);
         ossl_quic_channel_inject(ch, e);
         return;
@@ -1577,10 +1585,10 @@ static void port_default_packet_handler(QUIC_URXE *e, void *arg,
      * Create qrx now so we can check integrity of packet
      * which does not belong to any channel.
      */
-    qrx_args.libctx             = port->engine->libctx;
-    qrx_args.demux              = port->demux;
-    qrx_args.short_conn_id_len  = dcid->id_len;
-    qrx_args.max_deferred       = 32;
+    qrx_args.libctx = port->engine->libctx;
+    qrx_args.demux = port->demux;
+    qrx_args.short_conn_id_len = dcid->id_len;
+    qrx_args.max_deferred = 32;
     qrx = ossl_qrx_new(&qrx_args);
     if (qrx == NULL)
         goto undesirable;
@@ -1589,13 +1597,12 @@ static void port_default_packet_handler(QUIC_URXE *e, void *arg,
      * Derive secrets for qrx only.
      */
     if (!ossl_quic_provide_initial_secret(port->engine->libctx,
-                                          port->engine->propq,
-                                          &hdr.dst_conn_id,
-                                          /* is_server */ 1,
-                                          qrx, NULL))
+                                          port->engine->propq, &hdr.dst_conn_id,
+                                          /* is_server */ 1, qrx, NULL))
         goto undesirable;
 
-    if (ossl_qrx_validate_initial_packet(qrx, e, (const QUIC_CONN_ID *)dcid) == 0)
+    if (ossl_qrx_validate_initial_packet(qrx, e, (const QUIC_CONN_ID *)dcid)
+        == 0)
         goto undesirable;
 
     if (port->validate_addr == 0) {
@@ -1612,8 +1619,8 @@ static void port_default_packet_handler(QUIC_URXE *e, void *arg,
          * going to create. We use qrx_src alias so we can read packets from
          * qrx and inject them to channel.
          */
-         qrx_src = qrx;
-         qrx = NULL;
+        qrx_src = qrx;
+        qrx = NULL;
     }
     /*
      * TODO(QUIC FUTURE): there should be some logic similar to accounting half-open
@@ -1632,9 +1639,9 @@ static void port_default_packet_handler(QUIC_URXE *e, void *arg,
      * validate here
      */
     if (hdr.token != NULL
-        && port_validate_token(&hdr, port, &e->peer,
-                               &odcid, &scid,
-                               &gen_new_token) == 0) {
+        && port_validate_token(&hdr, port, &e->peer, &odcid, &scid,
+                               &gen_new_token)
+            == 0) {
         /*
          * RFC 9000 s 8.1.3
          * When a server receives an Initial packet with an address
@@ -1666,8 +1673,8 @@ static void port_default_packet_handler(QUIC_URXE *e, void *arg,
         qrx = NULL;
     }
 
-    port_bind_channel(port, &e->peer, &scid, &hdr.dst_conn_id,
-                      &odcid, qrx, &new_ch);
+    port_bind_channel(port, &e->peer, &scid, &hdr.dst_conn_id, &odcid, qrx,
+                      &new_ch);
 
     /*
      * if packet validates it gets moved to channel, we've just bound
@@ -1738,8 +1745,8 @@ void ossl_quic_port_raise_net_error(QUIC_PORT *port,
         ossl_quic_channel_raise_net_error(triggering_ch);
 
     OSSL_LIST_FOREACH(ch, ch, &port->channel_list)
-        if (ch != triggering_ch)
-            ossl_quic_channel_raise_net_error(ch);
+    if (ch != triggering_ch)
+        ossl_quic_channel_raise_net_error(ch);
 }
 
 void ossl_quic_port_restore_err_state(const QUIC_PORT *port)

@@ -64,7 +64,7 @@ int OCSP_request_set1_name(OCSP_REQUEST *req, const X509_NAME *nm)
 int OCSP_request_add1_cert(OCSP_REQUEST *req, X509 *cert)
 {
     if (req->optionalSignature == NULL
-            && (req->optionalSignature = OCSP_SIGNATURE_new()) == NULL)
+        && (req->optionalSignature = OCSP_SIGNATURE_new()) == NULL)
         return 0;
     if (cert == NULL)
         return 1;
@@ -77,11 +77,9 @@ int OCSP_request_add1_cert(OCSP_REQUEST *req, X509 *cert)
  * optional signers certificate and include one or more optional certificates
  * in the request. Behaves like PKCS7_sign().
  */
-int OCSP_request_sign(OCSP_REQUEST *req,
-                      X509 *signer,
-                      EVP_PKEY *key,
-                      const EVP_MD *dgst,
-                      STACK_OF(X509) *certs, unsigned long flags)
+int OCSP_request_sign(OCSP_REQUEST *req, X509 *signer, EVP_PKEY *key,
+                      const EVP_MD *dgst, STACK_OF(X509) *certs,
+                      unsigned long flags)
 {
     if (!OCSP_request_set1_name(req, X509_get_subject_name(signer)))
         goto err;
@@ -106,7 +104,7 @@ int OCSP_request_sign(OCSP_REQUEST *req,
     }
 
     return 1;
- err:
+err:
     OCSP_SIGNATURE_free(req->optionalSignature);
     req->optionalSignature = NULL;
     return 0;
@@ -180,8 +178,7 @@ const STACK_OF(X509) *OCSP_resp_get0_certs(const OCSP_BASICRESP *bs)
     return bs->certs;
 }
 
-int OCSP_resp_get0_id(const OCSP_BASICRESP *bs,
-                      const ASN1_OCTET_STRING **pid,
+int OCSP_resp_get0_id(const OCSP_BASICRESP *bs, const ASN1_OCTET_STRING **pid,
                       const X509_NAME **pname)
 {
     const OCSP_RESPID *rid = &bs->tbsResponseData.responderId;
@@ -198,8 +195,7 @@ int OCSP_resp_get0_id(const OCSP_BASICRESP *bs,
     return 1;
 }
 
-int OCSP_resp_get1_id(const OCSP_BASICRESP *bs,
-                      ASN1_OCTET_STRING **pid,
+int OCSP_resp_get1_id(const OCSP_BASICRESP *bs, ASN1_OCTET_STRING **pid,
                       X509_NAME **pname)
 {
     const OCSP_RESPID *rid = &bs->tbsResponseData.responderId;
@@ -281,8 +277,7 @@ int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason,
  * found extract status information. Return 0 is successful.
  */
 int OCSP_resp_find_status(OCSP_BASICRESP *bs, OCSP_CERTID *id, int *status,
-                          int *reason,
-                          ASN1_GENERALIZEDTIME **revtime,
+                          int *reason, ASN1_GENERALIZEDTIME **revtime,
                           ASN1_GENERALIZEDTIME **thisupd,
                           ASN1_GENERALIZEDTIME **nextupd)
 {

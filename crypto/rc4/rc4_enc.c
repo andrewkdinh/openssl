@@ -35,7 +35,7 @@ void RC4(RC4_KEY *key, size_t len, const unsigned char *indata,
     y = key->y;
     d = key->data;
 
-#define LOOP(in,out) \
+#define LOOP(in, out) \
                 x=((x+1)&0xff); \
                 tx=d[x]; \
                 y=(tx+y)&0xff; \

@@ -75,7 +75,8 @@ int main(int argc, char *argv[])
 
     digest_value = OPENSSL_malloc(digest_size);
     if (digest_value == NULL) {
-        fprintf(stderr, "Can't allocate %lu bytes for the digest value.\n", (unsigned long)digest_size);
+        fprintf(stderr, "Can't allocate %lu bytes for the digest value.\n",
+                (unsigned long)digest_size);
         goto cleanup;
     }
     /* Make a bio that uses the digest */
@@ -86,8 +87,8 @@ int main(int argc, char *argv[])
     }
     /* set our bio_digest BIO to digest data */
     if (BIO_set_md(bio_digest, md) != 1) {
-           fprintf(stderr, "BIO_set_md failed.\n");
-           goto cleanup;
+        fprintf(stderr, "BIO_set_md failed.\n");
+        goto cleanup;
     }
     /*-
      * We will use BIO chaining so that as we read, the digest gets updated
@@ -95,8 +96,7 @@ int main(int argc, char *argv[])
      */
     reading = BIO_push(bio_digest, input);
 
-    while (BIO_read(reading, buffer, sizeof(buffer)) > 0)
-        ;
+    while (BIO_read(reading, buffer, sizeof(buffer)) > 0);
 
     /*-
      * BIO_gets must be used to calculate the final

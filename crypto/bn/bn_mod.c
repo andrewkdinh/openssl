@@ -28,7 +28,7 @@ int BN_nnmod(BIGNUM *r, const BIGNUM *m, const BIGNUM *d, BN_CTX *ctx)
     if (!r->neg)
         return 1;
     /* now   -|d| < r < 0,  so we have to set  r := r + |d| */
-    return (d->neg ? BN_sub : BN_add) (r, r, d);
+    return (d->neg ? BN_sub : BN_add)(r, r, d);
 }
 
 int BN_mod_add(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, const BIGNUM *m,
@@ -227,7 +227,7 @@ int BN_mod_mul(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, const BIGNUM *m,
         goto err;
     bn_check_top(r);
     ret = 1;
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }

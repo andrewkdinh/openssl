@@ -32,18 +32,16 @@ static int test_is_prime_enhanced(void)
 
     ret = TEST_ptr(bn = BN_new())
           /* test passing a prime returns the correct status */
-          && TEST_true(BN_set_word(bn, 11))
+        && TEST_true(BN_set_word(bn, 11))
           /* return extra parameters related to composite */
-          && TEST_true(ossl_bn_miller_rabin_is_prime(bn, 10, ctx, NULL, 1,
-                                                     &status))
-          && TEST_int_eq(status, BN_PRIMETEST_PROBABLY_PRIME);
+        && TEST_true(
+              ossl_bn_miller_rabin_is_prime(bn, 10, ctx, NULL, 1, &status))
+        && TEST_int_eq(status, BN_PRIMETEST_PROBABLY_PRIME);
     BN_free(bn);
     return ret;
 }
 
-static int composites[] = {
-    9, 21, 77, 81, 265
-};
+static int composites[] = {9, 21, 77, 81, 265};
 
 static int test_is_composite_enhanced(int id)
 {
@@ -53,10 +51,10 @@ static int test_is_composite_enhanced(int id)
 
     ret = TEST_ptr(bn = BN_new())
           /* negative tests for different composite numbers */
-          && TEST_true(BN_set_word(bn, composites[id]))
-          && TEST_true(ossl_bn_miller_rabin_is_prime(bn, 10, ctx, NULL, 1,
-                                                     &status))
-          && TEST_int_ne(status, BN_PRIMETEST_PROBABLY_PRIME);
+        && TEST_true(BN_set_word(bn, composites[id]))
+        && TEST_true(
+              ossl_bn_miller_rabin_is_prime(bn, 10, ctx, NULL, 1, &status))
+        && TEST_int_ne(status, BN_PRIMETEST_PROBABLY_PRIME);
 
     BN_free(bn);
     return ret;
@@ -102,4 +100,3 @@ void cleanup_tests(void)
 {
     BN_CTX_free(ctx);
 }
-

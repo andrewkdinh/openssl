@@ -13,7 +13,8 @@
 #endif
 #include "internal/sha3.h"
 
-void SHA3_squeeze(uint64_t A[5][5], unsigned char *out, size_t len, size_t r, int next);
+void SHA3_squeeze(uint64_t A[5][5], unsigned char *out, size_t len, size_t r,
+                  int next);
 
 void ossl_sha3_reset(KECCAK1600_CTX *ctx)
 {
@@ -40,7 +41,8 @@ int ossl_sha3_init(KECCAK1600_CTX *ctx, unsigned char pad, size_t bitlen)
     return 0;
 }
 
-int ossl_keccak_init(KECCAK1600_CTX *ctx, unsigned char pad, size_t bitlen, size_t mdlen)
+int ossl_keccak_init(KECCAK1600_CTX *ctx, unsigned char pad, size_t bitlen,
+                     size_t mdlen)
 {
     int ret = ossl_sha3_init(ctx, pad, bitlen);
 

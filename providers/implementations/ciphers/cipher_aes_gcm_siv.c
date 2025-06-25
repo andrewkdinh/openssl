@@ -22,7 +22,8 @@
 #include "prov/provider_ctx.h"
 #include "cipher_aes_gcm_siv.h"
 
-static int ossl_aes_gcm_siv_set_ctx_params(void *vctx, const OSSL_PARAM params[]);
+static int ossl_aes_gcm_siv_set_ctx_params(void *vctx,
+                                           const OSSL_PARAM params[]);
 
 static void *ossl_aes_gcm_siv_newctx(void *provctx, size_t keybits)
 {
@@ -80,7 +81,7 @@ static void *ossl_aes_gcm_siv_dupctx(void *vctx)
         goto err;
 
     return ret;
- err:
+err:
     if (ret != NULL) {
         OPENSSL_clear_free(ret->aad, ret->aad_len);
         OPENSSL_free(ret);
@@ -88,9 +89,10 @@ static void *ossl_aes_gcm_siv_dupctx(void *vctx)
     return NULL;
 }
 
-static int ossl_aes_gcm_siv_init(void *vctx, const unsigned char *key, size_t keylen,
-                                 const unsigned char *iv, size_t ivlen,
-                                 const OSSL_PARAM params[], int enc)
+static int ossl_aes_gcm_siv_init(void *vctx, const unsigned char *key,
+                                 size_t keylen, const unsigned char *iv,
+                                 size_t ivlen, const OSSL_PARAM params[],
+                                 int enc)
 {
     PROV_AES_GCM_SIV_CTX *ctx = (PROV_AES_GCM_SIV_CTX *)vctx;
 
@@ -120,23 +122,24 @@ static int ossl_aes_gcm_siv_init(void *vctx, const unsigned char *key, size_t ke
     return ossl_aes_gcm_siv_set_ctx_params(ctx, params);
 }
 
-static int ossl_aes_gcm_siv_einit(void *vctx, const unsigned char *key, size_t keylen,
-                                  const unsigned char *iv, size_t ivlen,
-                                  const OSSL_PARAM params[])
+static int ossl_aes_gcm_siv_einit(void *vctx, const unsigned char *key,
+                                  size_t keylen, const unsigned char *iv,
+                                  size_t ivlen, const OSSL_PARAM params[])
 {
     return ossl_aes_gcm_siv_init(vctx, key, keylen, iv, ivlen, params, 1);
 }
 
-static int ossl_aes_gcm_siv_dinit(void *vctx, const unsigned char *key, size_t keylen,
-                                  const unsigned char *iv, size_t ivlen,
-                                  const OSSL_PARAM params[])
+static int ossl_aes_gcm_siv_dinit(void *vctx, const unsigned char *key,
+                                  size_t keylen, const unsigned char *iv,
+                                  size_t ivlen, const OSSL_PARAM params[])
 {
     return ossl_aes_gcm_siv_init(vctx, key, keylen, iv, ivlen, params, 0);
 }
 
 #define ossl_aes_gcm_siv_stream_update ossl_aes_gcm_siv_cipher
 static int ossl_aes_gcm_siv_cipher(void *vctx, unsigned char *out, size_t *outl,
-                                   size_t outsize, const unsigned char *in, size_t inl)
+                                   size_t outsize, const unsigned char *in,
+                                   size_t inl)
 {
     PROV_AES_GCM_SIV_CTX *ctx = (PROV_AES_GCM_SIV_CTX *)vctx;
     int error = 0;
@@ -156,8 +159,8 @@ static int ossl_aes_gcm_siv_cipher(void *vctx, unsigned char *out, size_t *outl,
     return !error;
 }
 
-static int ossl_aes_gcm_siv_stream_final(void *vctx, unsigned char *out, size_t *outl,
-                                         size_t outsize)
+static int ossl_aes_gcm_siv_stream_final(void *vctx, unsigned char *out,
+                                         size_t *outl, size_t outsize)
 {
     PROV_AES_GCM_SIV_CTX *ctx = (PROV_AES_GCM_SIV_CTX *)vctx;
     int error = 0;
@@ -179,9 +182,8 @@ static int ossl_aes_gcm_siv_get_ctx_params(void *vctx, OSSL_PARAM params[])
 
     p = OSSL_PARAM_locate(params, OSSL_CIPHER_PARAM_AEAD_TAG);
     if (p != NULL && p->data_type == OSSL_PARAM_OCTET_STRING) {
-        if (!ctx->enc || !ctx->generated_tag
-                || p->data_size != sizeof(ctx->tag)
-                || !OSSL_PARAM_set_octet_string(p, ctx->tag, sizeof(ctx->tag))) {
+        if (!ctx->enc || !ctx->generated_tag || p->data_size != sizeof(ctx->tag)
+            || !OSSL_PARAM_set_octet_string(p, ctx->tag, sizeof(ctx->tag))) {
             ERR_raise(ERR_LIB_PROV, PROV_R_FAILED_TO_SET_PARAMETER);
             return 0;
         }
@@ -203,16 +205,17 @@ static const OSSL_PARAM aes_gcm_siv_known_gettable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_AEAD_TAGLEN, NULL),
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 
-static const OSSL_PARAM *ossl_aes_gcm_siv_gettable_ctx_params(ossl_unused void *cctx,
-                                                              ossl_unused void *provctx)
+static const OSSL_PARAM *
+ossl_aes_gcm_siv_gettable_ctx_params(ossl_unused void *cctx,
+                                     ossl_unused void *provctx)
 {
     return aes_gcm_siv_known_gettable_ctx_params;
 }
 
-static int ossl_aes_gcm_siv_set_ctx_params(void *vctx, const OSSL_PARAM params[])
+static int ossl_aes_gcm_siv_set_ctx_params(void *vctx,
+                                           const OSSL_PARAM params[])
 {
     PROV_AES_GCM_SIV_CTX *ctx = (PROV_AES_GCM_SIV_CTX *)vctx;
     const OSSL_PARAM *p;
@@ -224,7 +227,7 @@ static int ossl_aes_gcm_siv_set_ctx_params(void *vctx, const OSSL_PARAM params[]
     p = OSSL_PARAM_locate_const(params, OSSL_CIPHER_PARAM_AEAD_TAG);
     if (p != NULL) {
         if (p->data_type != OSSL_PARAM_OCTET_STRING
-                || p->data_size != sizeof(ctx->user_tag)) {
+            || p->data_size != sizeof(ctx->user_tag)) {
             ERR_raise(ERR_LIB_PROV, PROV_R_FAILED_TO_GET_PARAMETER);
             return 0;
         }
@@ -262,10 +265,10 @@ static const OSSL_PARAM aes_gcm_siv_known_settable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
     OSSL_PARAM_uint(OSSL_CIPHER_PARAM_SPEED, NULL),
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, NULL, 0),
-    OSSL_PARAM_END
-};
-static const OSSL_PARAM *ossl_aes_gcm_siv_settable_ctx_params(ossl_unused void *cctx,
-                                                              ossl_unused void *provctx)
+    OSSL_PARAM_END};
+static const OSSL_PARAM *
+ossl_aes_gcm_siv_settable_ctx_params(ossl_unused void *cctx,
+                                     ossl_unused void *provctx)
 {
     return aes_gcm_siv_known_settable_ctx_params;
 }

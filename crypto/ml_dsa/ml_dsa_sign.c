@@ -35,9 +35,8 @@
  * @param c_tilde A preallocated buffer
  * @param c_tilde_len The size of |c_tilde|
  */
-static void signature_init(ML_DSA_SIG *sig,
-                           POLY *hint, uint32_t k, POLY *z, uint32_t l,
-                           uint8_t *c_tilde, size_t c_tilde_len)
+static void signature_init(ML_DSA_SIG *sig, POLY *hint, uint32_t k, POLY *z,
+                           uint32_t l, uint8_t *c_tilde, size_t c_tilde_len)
 {
     vector_init(&sig->z, z, l);
     vector_init(&sig->hint, hint, k);
@@ -116,7 +115,8 @@ err:
  * @param msg_len: The length of the msg buffer to process
  * @returns 1 on success, 0 on error
  */
-int ossl_ml_dsa_mu_update(EVP_MD_CTX *md_ctx, const uint8_t *msg, size_t msg_len)
+int ossl_ml_dsa_mu_update(EVP_MD_CTX *md_ctx, const uint8_t *msg,
+                          size_t msg_len)
 {
     return EVP_DigestUpdate(md_ctx, msg, msg_len);
 }
@@ -152,10 +152,9 @@ int ossl_ml_dsa_mu_finalize(EVP_MD_CTX *md_ctx, uint8_t *mu, size_t mu_len)
  * @param out_sig: The output signature buffer
  * @returns 1 on success, 0 on error
  */
-static int ml_dsa_sign_internal(const ML_DSA_KEY *priv,
-                                const uint8_t *mu, size_t mu_len,
-                                const uint8_t *rnd, size_t rnd_len,
-                                uint8_t *out_sig)
+static int ml_dsa_sign_internal(const ML_DSA_KEY *priv, const uint8_t *mu,
+                                size_t mu_len, const uint8_t *rnd,
+                                size_t rnd_len, uint8_t *out_sig)
 {
     int ret = 0;
     const ML_DSA_PARAMS *params = priv->params;
@@ -188,8 +187,9 @@ static int ml_dsa_sign_internal(const ML_DSA_KEY *priv,
      */
     w1_encoded_len = k * (gamma2 == ML_DSA_GAMMA2_Q_MINUS1_DIV88 ? 192 : 128);
     alloc_len = w1_encoded_len
-        + sizeof(*p) * (1 + num_polys_k + num_polys_l
-                        + num_polys_k_by_l + num_polys_sig_k);
+        + sizeof(*p)
+            * (1 + num_polys_k + num_polys_l + num_polys_k_by_l
+               + num_polys_sig_k);
     alloc = OPENSSL_malloc(alloc_len);
     if (alloc == NULL)
         return 0;
@@ -219,9 +219,8 @@ static int ml_dsa_sign_internal(const ML_DSA_KEY *priv,
     if (!matrix_expand_A(md_ctx, priv->shake128_md, priv->rho, &a_ntt))
         goto err;
 
-    if (!shake_xof_3(md_ctx, priv->shake256_md, priv->K, sizeof(priv->K),
-                     rnd, rnd_len, mu, mu_len,
-                     rho_prime, sizeof(rho_prime)))
+    if (!shake_xof_3(md_ctx, priv->shake256_md, priv->K, sizeof(priv->K), rnd,
+                     rnd_len, mu, mu_len, rho_prime, sizeof(rho_prime)))
         goto err;
 
     vector_copy(&s1_ntt, &priv->s1);
@@ -235,14 +234,14 @@ static int ml_dsa_sign_internal(const ML_DSA_KEY *priv,
      * kappa must not exceed 2^16. But the probability of it
      * exceeding even 1000 iterations is vanishingly small.
      */
-    for (kappa = 0; ; kappa += l) {
+    for (kappa = 0;; kappa += l) {
         VECTOR *y_ntt = &cs1;
         VECTOR *r0 = &w1;
         VECTOR *ct0 = &w1;
         uint32_t z_max, r0_max, ct0_max, h_ones;
 
-        vector_expand_mask(&y, rho_prime, sizeof(rho_prime), kappa,
-                           gamma1, md_ctx, priv->shake256_md);
+        vector_expand_mask(&y, rho_prime, sizeof(rho_prime), kappa, gamma1,
+                           md_ctx, priv->shake256_md);
         vector_copy(y_ntt, &y);
         vector_ntt(y_ntt);
 
@@ -252,12 +251,12 @@ static int ml_dsa_sign_internal(const ML_DSA_KEY *priv,
         vector_high_bits(&w, gamma2, &w1);
         ossl_ml_dsa_w1_encode(&w1, gamma2, w1_encoded, w1_encoded_len);
 
-        if (!shake_xof_2(md_ctx, priv->shake256_md, mu, mu_len,
-                         w1_encoded, w1_encoded_len, c_tilde, c_tilde_len))
+        if (!shake_xof_2(md_ctx, priv->shake256_md, mu, mu_len, w1_encoded,
+                         w1_encoded_len, c_tilde, c_tilde_len))
             break;
 
-        if (!poly_sample_in_ball_ntt(c_ntt, c_tilde, c_tilde_len,
-                                     md_ctx, priv->shake256_md, params->tau))
+        if (!poly_sample_in_ball_ntt(c_ntt, c_tilde, c_tilde_len, md_ctx,
+                                     priv->shake256_md, params->tau))
             break;
 
         vector_mult_scalar(&s1_ntt, c_ntt, &cs1);
@@ -314,9 +313,8 @@ err:
  * @param sig_enc_len: the encoded csignature length
  * @returns 1 on success, 0 on error
  */
-static int ml_dsa_verify_internal(const ML_DSA_KEY *pub,
-                                  const uint8_t *mu, size_t mu_len,
-                                  const uint8_t *sig_enc,
+static int ml_dsa_verify_internal(const ML_DSA_KEY *pub, const uint8_t *mu,
+                                  size_t mu_len, const uint8_t *sig_enc,
                                   size_t sig_enc_len)
 {
     int ret = 0;
@@ -345,14 +343,12 @@ static int ml_dsa_verify_internal(const ML_DSA_KEY *pub,
         return 0;
     }
 
-
     /* Allocate space for all the POLYNOMIALS used by temporary VECTORS */
     w1_encoded_len = k * (gamma2 == ML_DSA_GAMMA2_Q_MINUS1_DIV88 ? 192 : 128);
     alloc = OPENSSL_malloc(w1_encoded_len
-                           + sizeof(*p) * (1 + num_polys_k
-                                           + num_polys_l
-                                           + num_polys_k_by_l
-                                           + num_polys_sig));
+                           + sizeof(*p)
+                               * (1 + num_polys_k + num_polys_l
+                                  + num_polys_k_by_l + num_polys_sig));
     if (alloc == NULL)
         return 0;
     md_ctx = EVP_MD_CTX_new();
@@ -371,12 +367,12 @@ static int ml_dsa_verify_internal(const ML_DSA_KEY *pub,
     vector_init(&ct1_ntt, p + k, k);
 
     if (!ossl_ml_dsa_sig_decode(&sig, sig_enc, sig_enc_len, pub->params)
-            || !matrix_expand_A(md_ctx, pub->shake128_md, pub->rho, &a_ntt))
+        || !matrix_expand_A(md_ctx, pub->shake128_md, pub->rho, &a_ntt))
         goto err;
 
     /* Compute verifiers challenge c_ntt = NTT(SampleInBall(c_tilde)) */
-    if (!poly_sample_in_ball_ntt(c_ntt, c_tilde_sig, c_tilde_len,
-                                 md_ctx, pub->shake256_md, params->tau))
+    if (!poly_sample_in_ball_ntt(c_ntt, c_tilde_sig, c_tilde_len, md_ctx,
+                                 pub->shake256_md, params->tau))
         goto err;
 
     /* ct1_ntt = NTT(c) * NTT(t1 * 2^d) */
@@ -399,8 +395,8 @@ static int ml_dsa_verify_internal(const ML_DSA_KEY *pub,
     vector_use_hint(&sig.hint, w_approx, gamma2, w1);
     ossl_ml_dsa_w1_encode(w1, gamma2, w1_encoded, w1_encoded_len);
 
-    if (!shake_xof_3(md_ctx, pub->shake256_md, mu, mu_len,
-                     w1_encoded, w1_encoded_len, NULL, 0, c_tilde, c_tilde_len))
+    if (!shake_xof_3(md_ctx, pub->shake256_md, mu, mu_len, w1_encoded,
+                     w1_encoded_len, NULL, 0, c_tilde, c_tilde_len))
         goto err;
 
     ret = (z_max < (uint32_t)(params->gamma1 - params->beta))
@@ -416,9 +412,8 @@ err:
  *
  * @returns 1 on success, or 0 on error.
  */
-int ossl_ml_dsa_sign(const ML_DSA_KEY *priv, int msg_is_mu,
-                     const uint8_t *msg, size_t msg_len,
-                     const uint8_t *context, size_t context_len,
+int ossl_ml_dsa_sign(const ML_DSA_KEY *priv, int msg_is_mu, const uint8_t *msg,
+                     size_t msg_len, const uint8_t *context, size_t context_len,
                      const uint8_t *rand, size_t rand_len, int encode,
                      unsigned char *sig, size_t *sig_len, size_t sig_size)
 {
@@ -466,10 +461,10 @@ err:
  * See FIPS 203 Section 5.3 Algorithm 3 ML-DSA.Verify()
  * @returns 1 on success, or 0 on error.
  */
-int ossl_ml_dsa_verify(const ML_DSA_KEY *pub, int msg_is_mu,
-                       const uint8_t *msg, size_t msg_len,
-                       const uint8_t *context, size_t context_len, int encode,
-                       const uint8_t *sig, size_t sig_len)
+int ossl_ml_dsa_verify(const ML_DSA_KEY *pub, int msg_is_mu, const uint8_t *msg,
+                       size_t msg_len, const uint8_t *context,
+                       size_t context_len, int encode, const uint8_t *sig,
+                       size_t sig_len)
 {
     EVP_MD_CTX *md_ctx = NULL;
     uint8_t mu[ML_DSA_MU_BYTES];

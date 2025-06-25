@@ -409,9 +409,10 @@ static int setup_session_cache(SSL *ssl, SSL_CTX *ctx, const char *filename)
      * properly.  The documentation is a bit unclear under what conditions
      * the callback is made, so play it safe here, by enforcing enablement
      */
-    if (!SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_CLIENT |
-                                             SSL_SESS_CACHE_NO_INTERNAL_STORE |
-                                             SSL_SESS_CACHE_NO_AUTO_CLEAR))
+    if (!SSL_CTX_set_session_cache_mode(ctx,
+                                        SSL_SESS_CACHE_CLIENT
+                                            | SSL_SESS_CACHE_NO_INTERNAL_STORE
+                                            | SSL_SESS_CACHE_NO_AUTO_CLEAR))
         return rc;
 
     /* open our cache file */
@@ -567,15 +568,14 @@ static size_t build_request_set(SSL *ssl)
         /*
          * Expand our poll_list, outbiolist, and outnames arrays
          */
-        poll_list = OPENSSL_realloc(poll_list,
-                                    sizeof(SSL_POLL_ITEM) * poll_count);
+        poll_list =
+            OPENSSL_realloc(poll_list, sizeof(SSL_POLL_ITEM) * poll_count);
         if (poll_list == NULL) {
             fprintf(stderr, "Unable to realloc poll_list\n");
             goto err;
         }
 
-        outbiolist = OPENSSL_realloc(outbiolist,
-                                     sizeof(BIO *) * poll_count);
+        outbiolist = OPENSSL_realloc(outbiolist, sizeof(BIO *) * poll_count);
         if (outbiolist == NULL) {
             fprintf(stderr, "Unable to realloc outbiolist\n");
             goto err;
@@ -617,8 +617,7 @@ static size_t build_request_set(SSL *ssl)
             for (retry_count = 0; retry_count < 10; retry_count++) {
                 ERR_clear_error();
                 new_stream = SSL_new_stream(ssl, 0);
-                if (new_stream == NULL
-                    && (error = ERR_get_error()) != 0
+                if (new_stream == NULL && (error = ERR_get_error()) != 0
                     && ERR_GET_REASON(error) == SSL_R_STREAM_COUNT_LIMITED) {
                     /*
                      * Kick the SSL state machine in the hopes that
@@ -649,9 +648,9 @@ static size_t build_request_set(SSL *ssl)
         poll_list[poll_idx].events = SSL_POLL_EVENT_R;
 
         /* Write an HTTP GET request to the peer */
-        while (!SSL_write_ex2(poll_list[poll_idx].desc.value.ssl,
-                              req_string, strlen(req_string),
-                              SSL_WRITE_FLAG_CONCLUDE, &written)) {
+        while (!SSL_write_ex2(poll_list[poll_idx].desc.value.ssl, req_string,
+                              strlen(req_string), SSL_WRITE_FLAG_CONCLUDE,
+                              &written)) {
             if (handle_io_failure(poll_list[poll_idx].desc.value.ssl, 0) == 1)
                 continue; /* Retry */
             fprintf(stderr, "Failed to write start of HTTP request\n");
@@ -698,10 +697,11 @@ static BIO_ADDR *peer_addr = NULL;
  *
  * @return Returns 0 on success, 1 on error.
  */
-static int setup_connection(char *hostname, char *port,
-                            SSL_CTX **ctx, SSL **ssl)
+static int setup_connection(char *hostname, char *port, SSL_CTX **ctx,
+                            SSL **ssl)
 {
-    unsigned char alpn[] = {10, 'h', 'q', '-', 'i', 'n', 't', 'e', 'r', 'o', 'p'};
+    unsigned char alpn[] = {10,  'h', 'q', '-', 'i', 'n',
+                            't', 'e', 'r', 'o', 'p'};
     int ret = 0;
     BIO *bio = NULL;
 
@@ -730,7 +730,8 @@ static int setup_connection(char *hostname, char *port,
      * When running this application to direct where the store is loaded from
      */
     if (!SSL_CTX_set_default_verify_paths(*ctx)) {
-        fprintf(stderr, "Failed to set the default trusted certificate store\n");
+        fprintf(stderr,
+                "Failed to set the default trusted certificate store\n");
         goto end;
     }
 
@@ -895,7 +896,8 @@ int main(int argc, char *argv[])
 
     /* Get the list of requests */
     while (!BIO_eof(req_bio)) {
-        if (!BIO_read_ex(req_bio, &reqnames[read_offset], REQ_STRING_SZ, &bytes_read)) {
+        if (!BIO_read_ex(req_bio, &reqnames[read_offset], REQ_STRING_SZ,
+                         &bytes_read)) {
             fprintf(stderr, "Failed to read some data from request file\n");
             goto end;
         }
@@ -969,8 +971,8 @@ int main(int argc, char *argv[])
                 /* Read our data, and handle any errors/eof conditions */
                 if (!SSL_read_ex(poll_list[poll_idx].desc.value.ssl, buf,
                                  sizeof(buf), &readbytes)) {
-                    switch (handle_io_failure(poll_list[poll_idx].desc.value.ssl,
-                                              0)) {
+                    switch (handle_io_failure(
+                        poll_list[poll_idx].desc.value.ssl, 0)) {
                     case 1:
                         eof = 0;
                         break; /* Retry on next poll */
@@ -1021,7 +1023,7 @@ int main(int argc, char *argv[])
 
     /* Success! */
     res = EXIT_SUCCESS;
- end:
+end:
     /*
      * If something bad happened then we will dump the contents of the
      * OpenSSL error stack to stderr. There might be some useful diagnostic

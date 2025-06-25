@@ -8,9 +8,9 @@
  */
 
 #ifndef OSSL_QUIC_TLS_H
-# define OSSL_QUIC_TLS_H
+#define OSSL_QUIC_TLS_H
 
-# include <openssl/ssl.h>
+#include <openssl/ssl.h>
 
 typedef struct quic_tls_st QUIC_TLS;
 
@@ -59,8 +59,7 @@ typedef struct quic_tls_args_st {
      * marked as completed.
      */
     int (*got_transport_params_cb)(const unsigned char *params,
-                                   size_t params_len,
-                                   void *arg);
+                                   size_t params_len, void *arg);
     void *got_transport_params_cb_arg;
 
     /*
@@ -102,10 +101,8 @@ int ossl_quic_tls_set_transport_params(QUIC_TLS *qtls,
                                        const unsigned char *transport_params,
                                        size_t transport_params_len);
 
-int ossl_quic_tls_get_error(QUIC_TLS *qtls,
-                            uint64_t *error_code,
-                            const char **error_msg,
-                            ERR_STATE **error_state);
+int ossl_quic_tls_get_error(QUIC_TLS *qtls, uint64_t *error_code,
+                            const char **error_msg, ERR_STATE **error_state);
 
 int ossl_quic_tls_is_cert_request(QUIC_TLS *qtls);
 int ossl_quic_tls_has_bad_max_early_data(QUIC_TLS *qtls);

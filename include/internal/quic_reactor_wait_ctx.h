@@ -7,13 +7,13 @@
  * https://www.openssl.org/source/license.html
  */
 #ifndef OSSL_QUIC_REACTOR_WAIT_CTX_H
-# define OSSL_QUIC_REACTOR_WAIT_CTX_H
+#define OSSL_QUIC_REACTOR_WAIT_CTX_H
 
-# include "internal/quic_predef.h"
-# include "internal/quic_reactor.h"
-# include "internal/list.h"
+#include "internal/quic_predef.h"
+#include "internal/quic_reactor.h"
+#include "internal/list.h"
 
-# ifndef OPENSSL_NO_QUIC
+#ifndef OPENSSL_NO_QUIC
 
 /*
  * QUIC_REACTOR_WAIT_CTX
@@ -109,6 +109,6 @@ void ossl_quic_reactor_wait_ctx_leave(QUIC_REACTOR_WAIT_CTX *ctx,
  */
 void ossl_quic_reactor_wait_ctx_cleanup(QUIC_REACTOR_WAIT_CTX *ctx);
 
-# endif
+#endif
 
 #endif

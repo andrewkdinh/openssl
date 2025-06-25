@@ -23,15 +23,10 @@
  * moved out of libssl.
  */
 
-static int ssl3_cbc_copy_mac(size_t *reclen,
-                             size_t origreclen,
-                             unsigned char *recdata,
-                             unsigned char **mac,
-                             int *alloced,
-                             size_t block_size,
-                             size_t mac_size,
-                             size_t good,
-                             OSSL_LIB_CTX *libctx);
+static int ssl3_cbc_copy_mac(size_t *reclen, size_t origreclen,
+                             unsigned char *recdata, unsigned char **mac,
+                             int *alloced, size_t block_size, size_t mac_size,
+                             size_t good, OSSL_LIB_CTX *libctx);
 
 /*-
  * ssl3_cbc_remove_padding removes padding from the decrypted, SSLv3, CBC
@@ -50,17 +45,14 @@ static int ssl3_cbc_copy_mac(size_t *reclen,
  *   1: if the record is publicly valid. If the padding removal fails then the
  *      MAC returned is random.
  */
-int ssl3_cbc_remove_padding_and_mac(size_t *reclen,
-                                    size_t origreclen,
-                                    unsigned char *recdata,
-                                    unsigned char **mac,
-                                    int *alloced,
-                                    size_t block_size, size_t mac_size,
-                                    OSSL_LIB_CTX *libctx)
+int ssl3_cbc_remove_padding_and_mac(size_t *reclen, size_t origreclen,
+                                    unsigned char *recdata, unsigned char **mac,
+                                    int *alloced, size_t block_size,
+                                    size_t mac_size, OSSL_LIB_CTX *libctx)
 {
     size_t padding_length;
     size_t good;
-    const size_t overhead = 1 /* padding length byte */  + mac_size;
+    const size_t overhead = 1 /* padding length byte */ + mac_size;
 
     /*
      * These lengths are all public so we can test them in non-constant time.
@@ -95,19 +87,16 @@ int ssl3_cbc_remove_padding_and_mac(size_t *reclen,
  *   1: if the record is publicly valid. If the padding removal fails then the
  *      MAC returned is random.
  */
-int tls1_cbc_remove_padding_and_mac(size_t *reclen,
-                                    size_t origreclen,
-                                    unsigned char *recdata,
-                                    unsigned char **mac,
-                                    int *alloced,
-                                    size_t block_size, size_t mac_size,
-                                    int aead,
+int tls1_cbc_remove_padding_and_mac(size_t *reclen, size_t origreclen,
+                                    unsigned char *recdata, unsigned char **mac,
+                                    int *alloced, size_t block_size,
+                                    size_t mac_size, int aead,
                                     OSSL_LIB_CTX *libctx)
 {
     size_t good = -1;
     size_t padding_length, to_check, i;
     size_t overhead = ((block_size == 1) ? 0 : 1) /* padding length byte */
-                      + mac_size;
+        + mac_size;
 
     /*
      * These lengths are all public so we can test them in non-constant
@@ -136,7 +125,7 @@ int tls1_cbc_remove_padding_and_mac(size_t *reclen,
          * maximum amount of padding possible. (Again, the length of the record
          * is public information so we can use it.)
          */
-        to_check = 256;        /* maximum amount of padding, inc length byte. */
+        to_check = 256; /* maximum amount of padding, inc length byte. */
         if (to_check > *reclen)
             to_check = *reclen;
 
@@ -179,15 +168,10 @@ int tls1_cbc_remove_padding_and_mac(size_t *reclen,
  */
 #define CBC_MAC_ROTATE_IN_PLACE
 
-static int ssl3_cbc_copy_mac(size_t *reclen,
-                             size_t origreclen,
-                             unsigned char *recdata,
-                             unsigned char **mac,
-                             int *alloced,
-                             size_t block_size,
-                             size_t mac_size,
-                             size_t good,
-                             OSSL_LIB_CTX *libctx)
+static int ssl3_cbc_copy_mac(size_t *reclen, size_t origreclen,
+                             unsigned char *recdata, unsigned char **mac,
+                             int *alloced, size_t block_size, size_t mac_size,
+                             size_t good, OSSL_LIB_CTX *libctx)
 {
 #if defined(CBC_MAC_ROTATE_IN_PLACE)
     unsigned char rotated_mac_buf[64 + EVP_MAX_MD_SIZE];
@@ -213,8 +197,7 @@ static int ssl3_cbc_copy_mac(size_t *reclen,
     size_t i, j;
     size_t rotate_offset;
 
-    if (!ossl_assert(origreclen >= mac_size
-                     && mac_size <= EVP_MAX_MD_SIZE))
+    if (!ossl_assert(origreclen >= mac_size && mac_size <= EVP_MAX_MD_SIZE))
         return 0;
 
     /* If no MAC then nothing to be done */
@@ -285,8 +268,7 @@ static int ssl3_cbc_copy_mac(size_t *reclen,
         rotate_offset++;
 
         /* If the padding wasn't good we emit a random MAC */
-        out[j++] = constant_time_select_8((unsigned char)(good & 0xff),
-                                          aux3,
+        out[j++] = constant_time_select_8((unsigned char)(good & 0xff), aux3,
                                           randmac[i]);
         rotate_offset &= constant_time_lt_s(rotate_offset, mac_size);
     }

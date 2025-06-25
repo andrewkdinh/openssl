@@ -96,7 +96,7 @@ static int test_alt_chains_cert_forgery(void)
         /* This is the result we were expecting: Test passed */
         ret = 1;
     }
- err:
+err:
     X509_STORE_CTX_free(sctx);
     X509_free(x);
     OSSL_STACK_OF_X509_free(untrusted);
@@ -128,12 +128,11 @@ static int test_distinguishing_id(void)
     X509_set0_distinguishing_id(x, v);
 
     v2 = X509_get0_distinguishing_id(x);
-    if (!TEST_ptr(v2)
-            || !TEST_int_eq(ASN1_OCTET_STRING_cmp(v, v2), 0))
+    if (!TEST_ptr(v2) || !TEST_int_eq(ASN1_OCTET_STRING_cmp(v, v2), 0))
         goto err;
 
     ret = 1;
- err:
+err:
     X509_free(x);
     return ret;
 }
@@ -167,12 +166,11 @@ static int test_req_distinguishing_id(void)
     X509_REQ_set0_distinguishing_id(x, v);
 
     v2 = X509_REQ_get0_distinguishing_id(x);
-    if (!TEST_ptr(v2)
-            || !TEST_int_eq(ASN1_OCTET_STRING_cmp(v, v2), 0))
+    if (!TEST_ptr(v2) || !TEST_int_eq(ASN1_OCTET_STRING_cmp(v, v2), 0))
         goto err;
 
     ret = 1;
- err:
+err:
     X509_REQ_free(x);
     BIO_free(bio);
     return ret;
@@ -232,14 +230,9 @@ static int do_test_purpose(int purpose, int expected)
     X509_STORE_CTX *ctx = X509_STORE_CTX_new();
     int testresult = 0;
 
-    if (!TEST_ptr(eecert)
-            || !TEST_ptr(untrcert)
-            || !TEST_ptr(trcert)
-            || !TEST_ptr(trusted)
-            || !TEST_ptr(untrusted)
-            || !TEST_ptr(ctx))
+    if (!TEST_ptr(eecert) || !TEST_ptr(untrcert) || !TEST_ptr(trcert)
+        || !TEST_ptr(trusted) || !TEST_ptr(untrusted) || !TEST_ptr(ctx))
         goto err;
-
 
     if (!TEST_true(sk_X509_push(trusted, trcert)))
         goto err;
@@ -265,7 +258,7 @@ static int do_test_purpose(int purpose, int expected)
         goto err;
 
     testresult = 1;
- err:
+err:
     OSSL_STACK_OF_X509_free(trusted);
     OSSL_STACK_OF_X509_free(untrusted);
     X509_STORE_CTX_free(ctx);
@@ -303,13 +296,15 @@ int setup_tests(void)
         return 0;
 
     if (!TEST_ptr(root_f = test_mk_file_path(certs_dir, "rootCA.pem"))
-            || !TEST_ptr(roots_f = test_mk_file_path(certs_dir, "roots.pem"))
-            || !TEST_ptr(untrusted_f = test_mk_file_path(certs_dir, "untrusted.pem"))
-            || !TEST_ptr(bad_f = test_mk_file_path(certs_dir, "bad.pem"))
-            || !TEST_ptr(req_f = test_mk_file_path(certs_dir, "sm2-csr.pem"))
-            || !TEST_ptr(sroot_cert = test_mk_file_path(certs_dir, "sroot-cert.pem"))
-            || !TEST_ptr(ca_cert = test_mk_file_path(certs_dir, "ca-cert.pem"))
-            || !TEST_ptr(ee_cert = test_mk_file_path(certs_dir, "ee-cert.pem")))
+        || !TEST_ptr(roots_f = test_mk_file_path(certs_dir, "roots.pem"))
+        || !TEST_ptr(untrusted_f =
+                         test_mk_file_path(certs_dir, "untrusted.pem"))
+        || !TEST_ptr(bad_f = test_mk_file_path(certs_dir, "bad.pem"))
+        || !TEST_ptr(req_f = test_mk_file_path(certs_dir, "sm2-csr.pem"))
+        || !TEST_ptr(sroot_cert =
+                         test_mk_file_path(certs_dir, "sroot-cert.pem"))
+        || !TEST_ptr(ca_cert = test_mk_file_path(certs_dir, "ca-cert.pem"))
+        || !TEST_ptr(ee_cert = test_mk_file_path(certs_dir, "ee-cert.pem")))
         goto err;
 
     ADD_TEST(test_alt_chains_cert_forgery);
@@ -323,7 +318,7 @@ int setup_tests(void)
     ADD_TEST(test_purpose_ssl_server);
     ADD_TEST(test_purpose_any);
     return 1;
- err:
+err:
     cleanup_tests();
     return 0;
 }

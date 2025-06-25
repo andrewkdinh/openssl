@@ -105,18 +105,12 @@ static int bio_core_free(BIO *bio)
 }
 
 static const BIO_METHOD corebiometh = {
-    BIO_TYPE_CORE_TO_PROV,
-    "BIO to Core filter",
-    bio_core_write_ex,
-    NULL,
-    bio_core_read_ex,
-    NULL,
-    bio_core_puts,
-    bio_core_gets,
-    bio_core_ctrl,
-    bio_core_new,
-    bio_core_free,
-    NULL,
+    BIO_TYPE_CORE_TO_PROV, "BIO to Core filter",
+    bio_core_write_ex,     NULL,
+    bio_core_read_ex,      NULL,
+    bio_core_puts,         bio_core_gets,
+    bio_core_ctrl,         bio_core_new,
+    bio_core_free,         NULL,
 };
 
 const BIO_METHOD *BIO_s_core(void)
@@ -130,7 +124,8 @@ BIO *BIO_new_from_core_bio(OSSL_LIB_CTX *libctx, OSSL_CORE_BIO *corebio)
     BIO_CORE_GLOBALS *bcgbl = get_globals(libctx);
 
     /* Check the library context has been initialised with the callbacks */
-    if (bcgbl == NULL || (bcgbl->c_bio_write_ex == NULL && bcgbl->c_bio_read_ex == NULL))
+    if (bcgbl == NULL
+        || (bcgbl->c_bio_write_ex == NULL && bcgbl->c_bio_read_ex == NULL))
         return NULL;
 
     if ((outbio = BIO_new_ex(libctx, BIO_s_core())) == NULL)
@@ -149,7 +144,7 @@ int ossl_bio_init_core(OSSL_LIB_CTX *libctx, const OSSL_DISPATCH *fns)
     BIO_CORE_GLOBALS *bcgbl = get_globals(libctx);
 
     if (bcgbl == NULL)
-	    return 0;
+        return 0;
 
     for (; fns->function_id != 0; fns++) {
         switch (fns->function_id) {

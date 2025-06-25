@@ -95,4 +95,4 @@ int configure_handshake_ctx_for_srp(SSL_CTX *server_ctx, SSL_CTX *server2_ctx,
                                     CTX_DATA *server2_ctx_data,
                                     CTX_DATA *client_ctx_data);
 
-#endif  /* OSSL_TEST_HANDSHAKE_HELPER_H */
+#endif /* OSSL_TEST_HANDSHAKE_HELPER_H */

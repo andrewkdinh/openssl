@@ -40,30 +40,30 @@ DEFINE_LHASH_OF_EX(SRTM_ITEM);
  * all connections for that QUIC_PORT.
  */
 struct srtm_item_st {
-    SRTM_ITEM                   *next_by_srt_blinded; /* SORT BY opaque  DESC */
-    SRTM_ITEM                   *next_by_seq_num;     /* SORT BY seq_num DESC */
-    void                        *opaque; /* \__ unique identity for item */
-    uint64_t                    seq_num; /* /                            */
-    QUIC_STATELESS_RESET_TOKEN  srt;
-    unsigned char               srt_blinded[BLINDED_SRT_LEN]; /* H(srt) */
+    SRTM_ITEM *next_by_srt_blinded; /* SORT BY opaque  DESC */
+    SRTM_ITEM *next_by_seq_num;     /* SORT BY seq_num DESC */
+    void *opaque; /* \__ unique identity for item */
+    uint64_t seq_num; /* /                            */
+    QUIC_STATELESS_RESET_TOKEN srt;
+    unsigned char srt_blinded[BLINDED_SRT_LEN]; /* H(srt) */
 
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
-    uint32_t                    debug_token;
+    uint32_t debug_token;
 #endif
 };
 
 struct quic_srtm_st {
     /* Crypto context used to calculate blinded SRTs H(srt). */
-    EVP_CIPHER_CTX              *blind_ctx; /* kept with key */
+    EVP_CIPHER_CTX *blind_ctx; /* kept with key */
 
-    LHASH_OF(SRTM_ITEM)         *items_fwd; /* (opaque)  -> SRTM_ITEM */
-    LHASH_OF(SRTM_ITEM)         *items_rev; /* (H(srt))  -> SRTM_ITEM */
+    LHASH_OF(SRTM_ITEM) * items_fwd; /* (opaque)  -> SRTM_ITEM */
+    LHASH_OF(SRTM_ITEM) * items_rev; /* (H(srt))  -> SRTM_ITEM */
 
     /*
      * Monotonically transitions to 1 in event of allocation failure. The only
      * valid operation on such an object is to free it.
      */
-    unsigned int                alloc_failed : 1;
+    unsigned int alloc_failed:1;
 };
 
 static unsigned long items_fwd_hash(const SRTM_ITEM *item)
@@ -97,7 +97,7 @@ static int items_rev_cmp(const SRTM_ITEM *a, const SRTM_ITEM *b)
     return memcmp(a->srt_blinded, b->srt_blinded, sizeof(a->srt_blinded));
 }
 
-static int srtm_check_lh(QUIC_SRTM *srtm, LHASH_OF(SRTM_ITEM) *lh)
+static int srtm_check_lh(QUIC_SRTM *srtm, LHASH_OF(SRTM_ITEM) * lh)
 {
     if (lh_SRTM_ITEM_error(lh)) {
         srtm->alloc_failed = 1;
@@ -133,8 +133,10 @@ QUIC_SRTM *ossl_quic_srtm_new(OSSL_LIB_CTX *libctx, const char *propq)
     ecb = NULL;
 
     /* Create mappings. */
-    if ((srtm->items_fwd = lh_SRTM_ITEM_new(items_fwd_hash, items_fwd_cmp)) == NULL
-        || (srtm->items_rev = lh_SRTM_ITEM_new(items_rev_hash, items_rev_cmp)) == NULL)
+    if ((srtm->items_fwd = lh_SRTM_ITEM_new(items_fwd_hash, items_fwd_cmp))
+            == NULL
+        || (srtm->items_rev = lh_SRTM_ITEM_new(items_rev_hash, items_rev_cmp))
+            == NULL)
         goto err;
 
     return srtm;
@@ -188,7 +190,7 @@ static SRTM_ITEM *srtm_find(QUIC_SRTM *srtm, void *opaque, uint64_t seq_num,
 {
     SRTM_ITEM key, *item = NULL, *prev = NULL;
 
-    key.opaque  = opaque;
+    key.opaque = opaque;
 
     item = lh_SRTM_ITEM_retrieve(srtm->items_fwd, &key);
     if (head_p != NULL)
@@ -217,7 +219,8 @@ static SRTM_ITEM *srtm_find(QUIC_SRTM *srtm, void *opaque, uint64_t seq_num,
  * The new head pointer is written to *new_head (which may or may not be
  * unchanged).
  */
-static void sorted_insert_seq_num(SRTM_ITEM *head, SRTM_ITEM *item, SRTM_ITEM **new_head)
+static void sorted_insert_seq_num(SRTM_ITEM *head, SRTM_ITEM *item,
+                                  SRTM_ITEM **new_head)
 {
     uint64_t seq_num = item->seq_num;
     SRTM_ITEM *cur = head, **fixup = new_head;
@@ -238,7 +241,8 @@ static void sorted_insert_seq_num(SRTM_ITEM *head, SRTM_ITEM *item, SRTM_ITEM **
  * The new head pointer is written to *new_head (which may or may not be
  * unchanged).
  */
-static void sorted_insert_srt(SRTM_ITEM *head, SRTM_ITEM *item, SRTM_ITEM **new_head)
+static void sorted_insert_srt(SRTM_ITEM *head, SRTM_ITEM *item,
+                              SRTM_ITEM **new_head)
 {
     uintptr_t opaque = (uintptr_t)item->opaque;
     SRTM_ITEM *cur = head, **fixup = new_head;
@@ -294,9 +298,9 @@ int ossl_quic_srtm_add(QUIC_SRTM *srtm, void *opaque, uint64_t seq_num,
     if ((item = OPENSSL_zalloc(sizeof(*item))) == NULL)
         return 0;
 
-    item->opaque    = opaque;
-    item->seq_num   = seq_num;
-    item->srt       = *token;
+    item->opaque = opaque;
+    item->seq_num = seq_num;
+    item->srt = *token;
     if (!srtm_compute_blinded(srtm, item, &item->srt)) {
         OPENSSL_free(item);
         return 0;
@@ -369,7 +373,7 @@ static int srtm_remove_from_rev(QUIC_SRTM *srtm, SRTM_ITEM *item)
     } else {
         /* Find our entry in the SRT list */
         for (; rh_item->next_by_srt_blinded != item;
-               rh_item = rh_item->next_by_srt_blinded);
+             rh_item = rh_item->next_by_srt_blinded);
         rh_item->next_by_srt_blinded = item->next_by_srt_blinded;
     }
 
@@ -439,8 +443,7 @@ int ossl_quic_srtm_cull(QUIC_SRTM *srtm, void *opaque)
 }
 
 int ossl_quic_srtm_lookup(QUIC_SRTM *srtm,
-                          const QUIC_STATELESS_RESET_TOKEN *token,
-                          size_t idx,
+                          const QUIC_STATELESS_RESET_TOKEN *token, size_t idx,
                           void **opaque, uint64_t *seq_num)
 {
     SRTM_ITEM key, *item;
@@ -457,9 +460,9 @@ int ossl_quic_srtm_lookup(QUIC_SRTM *srtm,
         return 0;
 
     if (opaque != NULL)
-        *opaque     = item->opaque;
+        *opaque = item->opaque;
     if (seq_num != NULL)
-        *seq_num    = item->seq_num;
+        *seq_num = item->seq_num;
 
     return 1;
 }
@@ -471,7 +474,7 @@ static size_t tokens_seen;
 
 struct check_args {
     uint32_t token;
-    int      mode;
+    int mode;
 };
 
 static void check_mark(SRTM_ITEM *item, void *arg)
@@ -486,14 +489,16 @@ static void check_mark(SRTM_ITEM *item, void *arg)
 
     while (item != NULL) {
         if (have_prev) {
-            assert(!(item->opaque == prev_opaque && item->seq_num == prev_seq_num));
+            assert(!(item->opaque == prev_opaque
+                     && item->seq_num == prev_seq_num));
             if (!arg_->mode)
-                assert(item->opaque != prev_opaque || item->seq_num < prev_seq_num);
+                assert(item->opaque != prev_opaque
+                       || item->seq_num < prev_seq_num);
         }
 
         ++tokens_seen;
         item->debug_token = token;
-        prev_opaque  = item->opaque;
+        prev_opaque = item->opaque;
         prev_seq_num = item->seq_num;
         have_prev = 1;
 

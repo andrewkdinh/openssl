@@ -13,8 +13,7 @@
 #include "ec_local.h"
 
 /* the return value must be freed (using OPENSSL_free()) */
-char *EC_POINT_point2hex(const EC_GROUP *group,
-                         const EC_POINT *point,
+char *EC_POINT_point2hex(const EC_GROUP *group, const EC_POINT *point,
                          point_conversion_form_t form, BN_CTX *ctx)
 {
     char *ret, *p;
@@ -31,17 +30,16 @@ char *EC_POINT_point2hex(const EC_GROUP *group,
         goto err;
 
     p = ret;
-    for (i = 0; i < buf_len; ++i)
-        p += ossl_to_hex(p, buf[i]);
+    for (i = 0; i < buf_len; ++i) p += ossl_to_hex(p, buf[i]);
     *p = '\0';
 
- err:
+err:
     OPENSSL_free(buf);
     return ret;
 }
 
-EC_POINT *EC_POINT_hex2point(const EC_GROUP *group,
-                             const char *hex, EC_POINT *point, BN_CTX *ctx)
+EC_POINT *EC_POINT_hex2point(const EC_GROUP *group, const char *hex,
+                             EC_POINT *point, BN_CTX *ctx)
 {
     int ok = 0;
     unsigned char *oct_buf = NULL;

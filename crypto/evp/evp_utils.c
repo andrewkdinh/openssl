@@ -48,9 +48,7 @@ int name (const type *obj, void *algctx, OSSL_PARAM params[])                  \
     return obj->func(algctx, params);                                          \
 }
 
-#define PARAM_FUNCTIONS(type,                                                  \
-                        getname, getfunc,                                      \
-                        getctxname, getctxfunc,                                \
+#define PARAM_FUNCTIONS(type, getname, getfunc, getctxname, getctxfunc, \
                         setctxname, setctxfunc)                                \
     PARAM_FUNC(getname, getfunc, type, geterr)                                 \
     PARAM_CTX_FUNC(getctxname, getctxfunc, type, geterr)                       \
@@ -70,12 +68,10 @@ static void seterr(void)
     ERR_raise(ERR_LIB_EVP, EVP_R_CANNOT_SET_PARAMETERS);
 }
 
-PARAM_FUNCTIONS(EVP_CIPHER,
-                evp_do_ciph_getparams, get_params,
+PARAM_FUNCTIONS(EVP_CIPHER, evp_do_ciph_getparams, get_params,
                 evp_do_ciph_ctx_getparams, get_ctx_params,
                 evp_do_ciph_ctx_setparams, set_ctx_params)
 
-PARAM_FUNCTIONS(EVP_MD,
-                evp_do_md_getparams, get_params,
+PARAM_FUNCTIONS(EVP_MD, evp_do_md_getparams, get_params,
                 evp_do_md_ctx_getparams, get_ctx_params,
                 evp_do_md_ctx_setparams, set_ctx_params)

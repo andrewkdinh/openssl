@@ -10,11 +10,11 @@
 #include "internal/quic_rcidm.h"
 #include "testutil.h"
 
-static const QUIC_CONN_ID cid8_1 = { 8, { 1 } };
-static const QUIC_CONN_ID cid8_2 = { 8, { 2 } };
-static const QUIC_CONN_ID cid8_3 = { 8, { 3 } };
-static const QUIC_CONN_ID cid8_4 = { 8, { 4 } };
-static const QUIC_CONN_ID cid8_5 = { 8, { 5 } };
+static const QUIC_CONN_ID cid8_1 = {8, {1}};
+static const QUIC_CONN_ID cid8_2 = {8, {2}};
+static const QUIC_CONN_ID cid8_3 = {8, {3}};
+static const QUIC_CONN_ID cid8_4 = {8, {4}};
+static const QUIC_CONN_ID cid8_5 = {8, {5}};
 
 /*
  * 0: Client, Initial ODCID
@@ -30,13 +30,13 @@ static int test_rcidm(int idx)
     const QUIC_CONN_ID *odcid = NULL;
     uint64_t seq_num_out;
 
-    ncid_frame_1.seq_num        = 2;
+    ncid_frame_1.seq_num = 2;
     ncid_frame_1.conn_id.id_len = 8;
-    ncid_frame_1.conn_id.id[0]  = 3;
+    ncid_frame_1.conn_id.id[0] = 3;
 
-    ncid_frame_2.seq_num        = 3;
+    ncid_frame_2.seq_num = 3;
     ncid_frame_2.conn_id.id_len = 8;
-    ncid_frame_2.conn_id.id[0]  = 4;
+    ncid_frame_2.conn_id.id[0] = 4;
 
     odcid = ((idx == 2) ? NULL : &cid8_1);
     if (!TEST_ptr(rcidm = ossl_quic_rcidm_new(odcid)))
@@ -45,8 +45,10 @@ static int test_rcidm(int idx)
     if (idx != 2) {
         if (/* ODCID not counted */
             !TEST_true(ossl_quic_rcidm_get_preferred_tx_dcid_changed(rcidm, 1))
-            || !TEST_false(ossl_quic_rcidm_get_preferred_tx_dcid_changed(rcidm, 0))
-            || !TEST_true(ossl_quic_rcidm_get_preferred_tx_dcid(rcidm, &dcid_out))
+            || !TEST_false(
+                ossl_quic_rcidm_get_preferred_tx_dcid_changed(rcidm, 0))
+            || !TEST_true(
+                ossl_quic_rcidm_get_preferred_tx_dcid(rcidm, &dcid_out))
 
             || !TEST_true(ossl_quic_conn_id_eq(&dcid_out, &cid8_1))
             || !TEST_size_t_eq(ossl_quic_rcidm_get_num_active(rcidm), 0))
@@ -59,9 +61,12 @@ static int test_rcidm(int idx)
 
     if (idx == 1) {
         if (!TEST_true(ossl_quic_rcidm_add_from_server_retry(rcidm, &cid8_5))
-            || !TEST_true(ossl_quic_rcidm_get_preferred_tx_dcid_changed(rcidm, 1))
-            || !TEST_false(ossl_quic_rcidm_get_preferred_tx_dcid_changed(rcidm, 0))
-            || !TEST_true(ossl_quic_rcidm_get_preferred_tx_dcid(rcidm, &dcid_out))
+            || !TEST_true(
+                ossl_quic_rcidm_get_preferred_tx_dcid_changed(rcidm, 1))
+            || !TEST_false(
+                ossl_quic_rcidm_get_preferred_tx_dcid_changed(rcidm, 0))
+            || !TEST_true(
+                ossl_quic_rcidm_get_preferred_tx_dcid(rcidm, &dcid_out))
 
             || !TEST_true(ossl_quic_conn_id_eq(&dcid_out, &cid8_5))
             || !TEST_size_t_eq(ossl_quic_rcidm_get_num_active(rcidm), 0))

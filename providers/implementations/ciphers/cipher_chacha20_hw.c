@@ -91,20 +91,20 @@ static int chacha20_cipher(PROV_CIPHER_CTX *bctx, unsigned char *out,
         out += blocks;
 
         ctx->counter[0] = ctr32;
-        if (ctr32 == 0) ctx->counter[1]++;
+        if (ctr32 == 0)
+            ctx->counter[1]++;
     }
 
     if (rem > 0) {
         memset(ctx->buf, 0, sizeof(ctx->buf));
-        ChaCha20_ctr32(ctx->buf, ctx->buf, CHACHA_BLK_SIZE,
-                       ctx->key.d, ctx->counter);
+        ChaCha20_ctr32(ctx->buf, ctx->buf, CHACHA_BLK_SIZE, ctx->key.d,
+                       ctx->counter);
 
         /* propagate counter overflow */
         if (++ctx->counter[0] == 0)
             ctx->counter[1]++;
 
-        for (n = 0; n < rem; n++)
-            out[n] = in[n] ^ ctx->buf[n];
+        for (n = 0; n < rem; n++) out[n] = in[n] ^ ctx->buf[n];
         ctx->partial_len = rem;
     }
 
@@ -112,12 +112,9 @@ static int chacha20_cipher(PROV_CIPHER_CTX *bctx, unsigned char *out,
 }
 
 static const PROV_CIPHER_HW_CHACHA20 chacha20_hw = {
-    { chacha20_initkey, chacha20_cipher },
-    chacha20_initiv
-};
+    {chacha20_initkey, chacha20_cipher}, chacha20_initiv};
 
 const PROV_CIPHER_HW *ossl_prov_cipher_hw_chacha20(size_t keybits)
 {
     return (PROV_CIPHER_HW *)&chacha20_hw;
 }
-

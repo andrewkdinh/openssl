@@ -181,8 +181,8 @@ int ossl_asn1_enc_save(ASN1_VALUE **pval, const unsigned char *in, int inlen,
     return 1;
 }
 
-int ossl_asn1_enc_restore(int *len, unsigned char **out, const ASN1_VALUE **pval,
-                          const ASN1_ITEM *it)
+int ossl_asn1_enc_restore(int *len, unsigned char **out,
+                          const ASN1_VALUE **pval, const ASN1_ITEM *it)
 {
     const ASN1_ENCODING *enc = asn1_get_const_enc_ptr(pval, it);
 
@@ -222,8 +222,7 @@ const ASN1_VALUE **ossl_asn1_get_const_field_ptr(const ASN1_VALUE **pval,
  */
 
 const ASN1_TEMPLATE *ossl_asn1_do_adb(const ASN1_VALUE *val,
-                                      const ASN1_TEMPLATE *tt,
-                                      int nullerr)
+                                      const ASN1_TEMPLATE *tt, int nullerr)
 {
     const ASN1_ADB *adb;
     const ASN1_ADB_TABLE *atbl;
@@ -280,7 +279,7 @@ const ASN1_TEMPLATE *ossl_asn1_do_adb(const ASN1_VALUE *val,
         goto err;
     return adb->default_tt;
 
- err:
+err:
     /* FIXME: should log the value or OID of unsupported type */
     if (nullerr)
         ERR_raise(ERR_LIB_ASN1, ASN1_R_UNSUPPORTED_ANY_DEFINED_BY_TYPE);

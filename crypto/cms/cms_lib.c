@@ -21,8 +21,8 @@
 #include "cms_local.h"
 #include "internal/cms.h"
 
-static STACK_OF(CMS_CertificateChoices)
-**cms_get0_certificate_choices(CMS_ContentInfo *cms);
+static STACK_OF(CMS_CertificateChoices) **
+cms_get0_certificate_choices(CMS_ContentInfo *cms);
 
 IMPLEMENT_ASN1_ALLOC_FUNCTIONS(CMS_ContentInfo)
 IMPLEMENT_ASN1_PRINT_FUNCTION(CMS_ContentInfo)
@@ -33,10 +33,9 @@ CMS_ContentInfo *d2i_CMS_ContentInfo(CMS_ContentInfo **a,
     CMS_ContentInfo *ci;
     const CMS_CTX *ctx = ossl_cms_get0_cmsctx(a == NULL ? NULL : *a);
 
-    ci = (CMS_ContentInfo *)ASN1_item_d2i_ex((ASN1_VALUE **)a, in, len,
-                                          (CMS_ContentInfo_it()),
-                                          ossl_cms_ctx_get0_libctx(ctx),
-                                          ossl_cms_ctx_get0_propq(ctx));
+    ci = (CMS_ContentInfo *)ASN1_item_d2i_ex(
+        (ASN1_VALUE **)a, in, len, (CMS_ContentInfo_it()),
+        ossl_cms_ctx_get0_libctx(ctx), ossl_cms_ctx_get0_propq(ctx));
     if (ci != NULL) {
         ERR_set_mark();
         ossl_cms_resolve_libctx(ci);
@@ -194,7 +193,6 @@ err:
     if (!icont)
         BIO_free(cont);
     return NULL;
-
 }
 
 /* unfortunately cannot constify SMIME_write_ASN1() due to this function */
@@ -244,7 +242,8 @@ int ossl_cms_DataFinal(CMS_ContentInfo *cms, BIO *cmsbio,
         return ossl_cms_AuthEnvelopedData_final(cms, cmsbio);
 
     case NID_pkcs7_signed:
-        return ossl_cms_SignedData_final(cms, cmsbio, precomp_md, precomp_mdlen);
+        return ossl_cms_SignedData_final(cms, cmsbio, precomp_md,
+                                         precomp_mdlen);
 
     case NID_pkcs7_digest:
         return ossl_cms_DigestedData_do_final(cms, cmsbio, 0);
@@ -281,7 +280,7 @@ ASN1_OCTET_STRING **CMS_get0_content(CMS_ContentInfo *cms)
 
     case NID_id_smime_ct_authEnvelopedData:
         return &cms->d.authEnvelopedData->authEncryptedContentInfo
-                                        ->encryptedContent;
+                    ->encryptedContent;
 
     case NID_id_smime_ct_authData:
         return &cms->d.authenticatedData->encapContentInfo->eContent;
@@ -294,7 +293,6 @@ ASN1_OCTET_STRING **CMS_get0_content(CMS_ContentInfo *cms)
             return &cms->d.other->value.octet_string;
         ERR_raise(ERR_LIB_CMS, CMS_R_UNSUPPORTED_CONTENT_TYPE);
         return NULL;
-
     }
 }
 
@@ -320,8 +318,7 @@ static ASN1_OBJECT **cms_get0_econtent_type(CMS_ContentInfo *cms)
         return &cms->d.encryptedData->encryptedContentInfo->contentType;
 
     case NID_id_smime_ct_authEnvelopedData:
-        return &cms->d.authEnvelopedData->authEncryptedContentInfo
-                                        ->contentType;
+        return &cms->d.authEnvelopedData->authEncryptedContentInfo->contentType;
     case NID_id_smime_ct_authData:
         return &cms->d.authenticatedData->encapContentInfo->eContentType;
 
@@ -331,7 +328,6 @@ static ASN1_OBJECT **cms_get0_econtent_type(CMS_ContentInfo *cms)
     default:
         ERR_raise(ERR_LIB_CMS, CMS_R_UNSUPPORTED_CONTENT_TYPE);
         return NULL;
-
     }
 }
 
@@ -444,8 +440,8 @@ BIO *ossl_cms_DigestAlgorithm_init_bio(X509_ALGOR *digestAlgorithm,
 
             if (BIO_get_md_ctx(mdbio, &mdctx) <= 0 || mdctx == NULL)
                 goto err;
-            params[0] = OSSL_PARAM_construct_size_t(OSSL_DIGEST_PARAM_XOFLEN,
-                                                    &xof_len);
+            params[0] =
+                OSSL_PARAM_construct_size_t(OSSL_DIGEST_PARAM_XOFLEN, &xof_len);
             params[1] = OSSL_PARAM_construct_end();
             if (!EVP_MD_CTX_set_params(mdctx, params))
                 goto err;
@@ -453,7 +449,7 @@ BIO *ossl_cms_DigestAlgorithm_init_bio(X509_ALGOR *digestAlgorithm,
     }
     EVP_MD_free(fetched_digest);
     return mdbio;
- err:
+err:
     EVP_MD_free(fetched_digest);
     BIO_free(mdbio);
     return NULL;
@@ -488,8 +484,8 @@ int ossl_cms_DigestAlgorithm_find_ctx(EVP_MD_CTX *mctx, BIO *chain,
     }
 }
 
-static STACK_OF(CMS_CertificateChoices)
-**cms_get0_certificate_choices(CMS_ContentInfo *cms)
+static STACK_OF(CMS_CertificateChoices) **
+cms_get0_certificate_choices(CMS_ContentInfo *cms)
 {
     switch (OBJ_obj2nid(cms->contentType)) {
 
@@ -509,7 +505,6 @@ static STACK_OF(CMS_CertificateChoices)
     default:
         ERR_raise(ERR_LIB_CMS, CMS_R_UNSUPPORTED_CONTENT_TYPE);
         return NULL;
-
     }
 }
 
@@ -571,8 +566,8 @@ int CMS_add1_cert(CMS_ContentInfo *cms, X509 *cert)
     return 0;
 }
 
-static STACK_OF(CMS_RevocationInfoChoice)
-**cms_get0_revocation_choices(CMS_ContentInfo *cms)
+static STACK_OF(CMS_RevocationInfoChoice) **
+cms_get0_revocation_choices(CMS_ContentInfo *cms)
 {
     switch (OBJ_obj2nid(cms->contentType)) {
 
@@ -592,7 +587,6 @@ static STACK_OF(CMS_RevocationInfoChoice)
     default:
         ERR_raise(ERR_LIB_CMS, CMS_R_UNSUPPORTED_CONTENT_TYPE);
         return NULL;
-
     }
 }
 
@@ -767,7 +761,7 @@ int ossl_cms_set1_ias(CMS_IssuerAndSerialNumber **pias, X509 *cert)
     M_ASN1_free_of(*pias, CMS_IssuerAndSerialNumber);
     *pias = ias;
     return 1;
- err:
+err:
     M_ASN1_free_of(ias, CMS_IssuerAndSerialNumber);
     return 0;
 }
@@ -791,35 +785,41 @@ int ossl_cms_set1_keyid(ASN1_OCTET_STRING **pkeyid, X509 *cert)
     return 1;
 }
 
-CMS_EnvelopedData *ossl_cms_sign_encrypt(BIO *data, X509 *sign_cert, STACK_OF(X509) *certs,
-                                         EVP_PKEY *sign_key, unsigned int sign_flags,
-                                         STACK_OF(X509) *enc_recip, const EVP_CIPHER *cipher,
-                                         unsigned int enc_flags, OSSL_LIB_CTX *libctx,
-                                         const char *propq)
+CMS_EnvelopedData *
+ossl_cms_sign_encrypt(BIO *data, X509 *sign_cert, STACK_OF(X509) *certs,
+                      EVP_PKEY *sign_key, unsigned int sign_flags,
+                      STACK_OF(X509) *enc_recip, const EVP_CIPHER *cipher,
+                      unsigned int enc_flags, OSSL_LIB_CTX *libctx,
+                      const char *propq)
 {
     CMS_EnvelopedData *evd = NULL;
     BIO *privbio = NULL, *signbio = NULL;
     CMS_ContentInfo *signcms = NULL, *evpcms = NULL;
 
-    if (data == NULL || sign_key == NULL || sign_cert == NULL || enc_recip == NULL) {
+    if (data == NULL || sign_key == NULL || sign_cert == NULL
+        || enc_recip == NULL) {
         ERR_raise(ERR_LIB_CMS, ERR_R_PASSED_NULL_PARAMETER);
         return NULL;
     }
-    signcms = CMS_sign_ex(sign_cert, sign_key, certs, data, sign_flags, libctx, propq);
+    signcms = CMS_sign_ex(sign_cert, sign_key, certs, data, sign_flags, libctx,
+                          propq);
     if (signcms == NULL)
         goto err;
 
     signbio = BIO_new(BIO_s_mem());
     if (signbio == NULL
-        || ASN1_item_i2d_bio(ASN1_ITEM_rptr(CMS_SignedData), signbio, signcms->d.signedData) <= 0)
+        || ASN1_item_i2d_bio(ASN1_ITEM_rptr(CMS_SignedData), signbio,
+                             signcms->d.signedData)
+            <= 0)
         goto err;
 
-    evpcms = CMS_encrypt_ex(enc_recip, signbio, cipher, enc_flags, libctx, propq);
+    evpcms =
+        CMS_encrypt_ex(enc_recip, signbio, cipher, enc_flags, libctx, propq);
     if (evpcms == NULL)
         goto err;
     evd = CMS_EnvelopedData_dup(evpcms->d.envelopedData);
 
- err:
+err:
     BIO_free(privbio);
     BIO_free(signbio);
     CMS_ContentInfo_free(signcms);

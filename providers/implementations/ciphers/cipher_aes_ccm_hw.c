@@ -36,7 +36,7 @@ static int ccm_generic_aes_initkey(PROV_CCM_CTX *ctx, const unsigned char *key,
 #endif /* HWAES_CAPABLE */
 
 #ifdef VPAES_CAPABLE
-    if (VPAES_CAPABLE) {
+        if (VPAES_CAPABLE) {
         AES_HW_CCM_SET_KEY_FN(vpaes_set_encrypt_key, vpaes_encrypt, NULL, NULL);
     } else
 #endif
@@ -47,13 +47,9 @@ static int ccm_generic_aes_initkey(PROV_CCM_CTX *ctx, const unsigned char *key,
 }
 
 static const PROV_CCM_HW aes_ccm = {
-    ccm_generic_aes_initkey,
-    ossl_ccm_generic_setiv,
-    ossl_ccm_generic_setaad,
-    ossl_ccm_generic_auth_encrypt,
-    ossl_ccm_generic_auth_decrypt,
-    ossl_ccm_generic_gettag
-};
+    ccm_generic_aes_initkey,       ossl_ccm_generic_setiv,
+    ossl_ccm_generic_setaad,       ossl_ccm_generic_auth_encrypt,
+    ossl_ccm_generic_auth_decrypt, ossl_ccm_generic_gettag};
 
 #if defined(S390X_aes_128_CAPABLE)
 # include "cipher_aes_ccm_hw_s390x.inc"

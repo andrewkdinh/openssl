@@ -30,8 +30,7 @@ int WPACKET_sub_allocate_bytes__(WPACKET *pkt, size_t len,
                                  unsigned char **allocbytes, size_t lenbytes)
 {
     if (!WPACKET_start_sub_packet_len__(pkt, lenbytes)
-            || !WPACKET_allocate_bytes(pkt, len, allocbytes)
-            || !WPACKET_close(pkt))
+        || !WPACKET_allocate_bytes(pkt, len, allocbytes) || !WPACKET_close(pkt))
         return 0;
 
     return 1;
@@ -251,12 +250,10 @@ static int wpacket_intern_close(WPACKET *pkt, WPACKET_SUB *sub, int doclose)
 {
     size_t packlen = pkt->written - sub->pwritten;
 
-    if (packlen == 0
-            && (sub->flags & WPACKET_FLAGS_NON_ZERO_LENGTH) != 0)
+    if (packlen == 0 && (sub->flags & WPACKET_FLAGS_NON_ZERO_LENGTH) != 0)
         return 0;
 
-    if (packlen == 0
-            && sub->flags & WPACKET_FLAGS_ABANDON_ON_ZERO_LENGTH) {
+    if (packlen == 0 && sub->flags & WPACKET_FLAGS_ABANDON_ON_ZERO_LENGTH) {
         /* We can't handle this case. Return an error */
         if (!doclose)
             return 0;
@@ -282,7 +279,8 @@ static int wpacket_intern_close(WPACKET *pkt, WPACKET_SUB *sub, int doclose)
                 if (!put_value(&buf[sub->packet_len], packlen, sub->lenbytes))
                     return 0;
             } else {
-                if (!put_quic_value(&buf[sub->packet_len], packlen, sub->lenbytes))
+                if (!put_quic_value(&buf[sub->packet_len], packlen,
+                                    sub->lenbytes))
                     return 0;
             }
 #else
@@ -292,13 +290,12 @@ static int wpacket_intern_close(WPACKET *pkt, WPACKET_SUB *sub, int doclose)
         }
     } else if (pkt->endfirst && sub->parent != NULL
                && (packlen != 0
-                   || (sub->flags
-                       & WPACKET_FLAGS_ABANDON_ON_ZERO_LENGTH) == 0)) {
+                   || (sub->flags & WPACKET_FLAGS_ABANDON_ON_ZERO_LENGTH)
+                       == 0)) {
         size_t tmplen = packlen;
         size_t numlenbytes = 1;
 
-        while ((tmplen = tmplen >> 8) > 0)
-            numlenbytes++;
+        while ((tmplen = tmplen >> 8) > 0) numlenbytes++;
         if (!WPACKET_put_bytes__(pkt, packlen, numlenbytes))
             return 0;
         if (packlen > 0x7f) {
@@ -408,8 +405,8 @@ int WPACKET_put_bytes__(WPACKET *pkt, uint64_t val, size_t size)
 
     /* Internal API, so should not fail */
     if (!ossl_assert(size <= sizeof(uint64_t))
-            || !WPACKET_allocate_bytes(pkt, size, &data)
-            || !put_value(data, val, size))
+        || !WPACKET_allocate_bytes(pkt, size, &data)
+        || !put_value(data, val, size))
         return 0;
 
     return 1;
@@ -425,8 +422,7 @@ int WPACKET_set_max_size(WPACKET *pkt, size_t maxsize)
         return 0;
 
     /* Find the WPACKET_SUB for the top level */
-    for (sub = pkt->subs; sub->parent != NULL; sub = sub->parent)
-        continue;
+    for (sub = pkt->subs; sub->parent != NULL; sub = sub->parent) continue;
 
     lenbytes = sub->lenbytes;
     if (lenbytes == 0)
@@ -476,8 +472,7 @@ int WPACKET_sub_memcpy__(WPACKET *pkt, const void *src, size_t len,
                          size_t lenbytes)
 {
     if (!WPACKET_start_sub_packet_len__(pkt, lenbytes)
-            || !WPACKET_memcpy(pkt, src, len)
-            || !WPACKET_close(pkt))
+        || !WPACKET_memcpy(pkt, src, len) || !WPACKET_close(pkt))
         return 0;
 
     return 1;
@@ -559,11 +554,11 @@ int WPACKET_start_quic_sub_packet(WPACKET *pkt)
     return WPACKET_start_quic_sub_packet_bound(pkt, OSSL_QUIC_VLINT_4B_MIN);
 }
 
-int WPACKET_quic_sub_allocate_bytes(WPACKET *pkt, size_t len, unsigned char **allocbytes)
+int WPACKET_quic_sub_allocate_bytes(WPACKET *pkt, size_t len,
+                                    unsigned char **allocbytes)
 {
     if (!WPACKET_start_quic_sub_packet_bound(pkt, len)
-            || !WPACKET_allocate_bytes(pkt, len, allocbytes)
-            || !WPACKET_close(pkt))
+        || !WPACKET_allocate_bytes(pkt, len, allocbytes) || !WPACKET_close(pkt))
         return 0;
 
     return 1;

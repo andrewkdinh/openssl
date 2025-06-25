@@ -46,9 +46,8 @@ typedef struct prov_aes_wrap_ctx_st {
 
 } PROV_AES_WRAP_CTX;
 
-
-static void *aes_wrap_newctx(size_t kbits, size_t blkbits,
-                             size_t ivbits, unsigned int mode, uint64_t flags)
+static void *aes_wrap_newctx(size_t kbits, size_t blkbits, size_t ivbits,
+                             unsigned int mode, uint64_t flags)
 {
     PROV_AES_WRAP_CTX *wctx;
     PROV_CIPHER_CTX *ctx;
@@ -79,8 +78,8 @@ static void *aes_wrap_dupctx(void *wctx)
     dctx = OPENSSL_memdup(ctx, sizeof(*ctx));
 
     if (dctx != NULL && dctx->base.tlsmac != NULL && dctx->base.alloced) {
-        dctx->base.tlsmac = OPENSSL_memdup(dctx->base.tlsmac,
-                                           dctx->base.tlsmacsize);
+        dctx->base.tlsmac =
+            OPENSSL_memdup(dctx->base.tlsmac, dctx->base.tlsmacsize);
         if (dctx->base.tlsmac == NULL) {
             OPENSSL_free(dctx);
             dctx = NULL;
@@ -94,12 +93,12 @@ static void aes_wrap_freectx(void *vctx)
     PROV_AES_WRAP_CTX *wctx = (PROV_AES_WRAP_CTX *)vctx;
 
     ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
-    OPENSSL_clear_free(wctx,  sizeof(*wctx));
+    OPENSSL_clear_free(wctx, sizeof(*wctx));
 }
 
-static int aes_wrap_init(void *vctx, const unsigned char *key,
-                         size_t keylen, const unsigned char *iv,
-                         size_t ivlen, const OSSL_PARAM params[], int enc)
+static int aes_wrap_init(void *vctx, const unsigned char *key, size_t keylen,
+                         const unsigned char *iv, size_t ivlen,
+                         const OSSL_PARAM params[], int enc)
 {
     PROV_CIPHER_CTX *ctx = (PROV_CIPHER_CTX *)vctx;
     PROV_AES_WRAP_CTX *wctx = (PROV_AES_WRAP_CTX *)vctx;
@@ -121,8 +120,8 @@ static int aes_wrap_init(void *vctx, const unsigned char *key,
         int use_forward_transform;
 
         if (keylen != ctx->keylen) {
-           ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY_LENGTH);
-           return 0;
+            ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY_LENGTH);
+            return 0;
         }
         /*
          * See SP800-38F : Section 5.1
@@ -232,9 +231,8 @@ static int aes_wrap_final(void *vctx, unsigned char *out, size_t *outl,
     return 1;
 }
 
-static int aes_wrap_cipher(void *vctx,
-                           unsigned char *out, size_t *outl, size_t outsize,
-                           const unsigned char *in, size_t inl)
+static int aes_wrap_cipher(void *vctx, unsigned char *out, size_t *outl,
+                           size_t outsize, const unsigned char *in, size_t inl)
 {
     PROV_AES_WRAP_CTX *ctx = (PROV_AES_WRAP_CTX *)vctx;
     size_t len;
@@ -320,16 +318,28 @@ static int aes_wrap_set_ctx_params(void *vctx, const OSSL_PARAM params[])
         OSSL_DISPATCH_END                                                      \
     }
 
-IMPLEMENT_cipher(wrap, wrap, WRAP, WRAP_FLAGS, 256, 64, AES_WRAP_NOPAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrap, WRAP, WRAP_FLAGS, 192, 64, AES_WRAP_NOPAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrap, WRAP, WRAP_FLAGS, 128, 64, AES_WRAP_NOPAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrappad, WRAP, WRAP_FLAGS, 256, 64, AES_WRAP_PAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrappad, WRAP, WRAP_FLAGS, 192, 64, AES_WRAP_PAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrappad, WRAP, WRAP_FLAGS, 128, 64, AES_WRAP_PAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrap, WRAP, WRAP_FLAGS, 256, 64,
+                 AES_WRAP_NOPAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrap, WRAP, WRAP_FLAGS, 192, 64,
+                 AES_WRAP_NOPAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrap, WRAP, WRAP_FLAGS, 128, 64,
+                 AES_WRAP_NOPAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrappad, WRAP, WRAP_FLAGS, 256, 64,
+                 AES_WRAP_PAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrappad, WRAP, WRAP_FLAGS, 192, 64,
+                 AES_WRAP_PAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrappad, WRAP, WRAP_FLAGS, 128, 64,
+                 AES_WRAP_PAD_IVLEN * 8);
 
-IMPLEMENT_cipher(wrap, wrapinv, WRAP, WRAP_FLAGS_INV, 256, 64, AES_WRAP_NOPAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrapinv, WRAP, WRAP_FLAGS_INV, 192, 64, AES_WRAP_NOPAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrapinv, WRAP, WRAP_FLAGS_INV, 128, 64, AES_WRAP_NOPAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrappadinv, WRAP, WRAP_FLAGS_INV, 256, 64, AES_WRAP_PAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrappadinv, WRAP, WRAP_FLAGS_INV, 192, 64, AES_WRAP_PAD_IVLEN * 8);
-IMPLEMENT_cipher(wrap, wrappadinv, WRAP, WRAP_FLAGS_INV, 128, 64, AES_WRAP_PAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrapinv, WRAP, WRAP_FLAGS_INV, 256, 64,
+                 AES_WRAP_NOPAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrapinv, WRAP, WRAP_FLAGS_INV, 192, 64,
+                 AES_WRAP_NOPAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrapinv, WRAP, WRAP_FLAGS_INV, 128, 64,
+                 AES_WRAP_NOPAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrappadinv, WRAP, WRAP_FLAGS_INV, 256, 64,
+                 AES_WRAP_PAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrappadinv, WRAP, WRAP_FLAGS_INV, 192, 64,
+                 AES_WRAP_PAD_IVLEN * 8);
+IMPLEMENT_cipher(wrap, wrappadinv, WRAP, WRAP_FLAGS_INV, 128, 64,
+                 AES_WRAP_PAD_IVLEN * 8);

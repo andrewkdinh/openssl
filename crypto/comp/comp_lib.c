@@ -92,7 +92,7 @@ int COMP_expand_block(COMP_CTX *ctx, unsigned char *out, int olen,
     return ret;
 }
 
-int COMP_CTX_get_type(const COMP_CTX* comp)
+int COMP_CTX_get_type(const COMP_CTX *comp)
 {
     return comp->meth ? comp->meth->type : NID_undef;
 }

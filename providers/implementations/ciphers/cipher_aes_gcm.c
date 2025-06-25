@@ -57,7 +57,7 @@ static void aes_gcm_freectx(void *vctx)
 {
     PROV_AES_GCM_CTX *ctx = (PROV_AES_GCM_CTX *)vctx;
 
-    OPENSSL_clear_free(ctx,  sizeof(*ctx));
+    OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
 /* ossl_aes128gcm_functions */

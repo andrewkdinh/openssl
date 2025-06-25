@@ -49,7 +49,7 @@ int ossl_policy_cache_set_mapping(X509 *x, POLICY_MAPPINGS *maps)
         if (data == NULL) {
             data = ossl_policy_data_new(NULL, map->issuerDomainPolicy,
                                         cache->anyPolicy->flags
-                                        & POLICY_DATA_FLAG_CRITICAL);
+                                            & POLICY_DATA_FLAG_CRITICAL);
             if (data == NULL)
                 goto bad_mapping;
             data->qualifier_set = cache->anyPolicy->qualifier_set;
@@ -68,12 +68,10 @@ int ossl_policy_cache_set_mapping(X509 *x, POLICY_MAPPINGS *maps)
                                  map->subjectDomainPolicy))
             goto bad_mapping;
         map->subjectDomainPolicy = NULL;
-
     }
 
     ret = 1;
- bad_mapping:
+bad_mapping:
     sk_POLICY_MAPPING_pop_free(maps, POLICY_MAPPING_free);
     return ret;
-
 }

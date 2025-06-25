@@ -58,7 +58,7 @@ static HT *fuzzer_table = NULL;
 #define OP_FLUSH   3
 #define OP_FOREACH 4
 #define OP_FILTER  5
-#define OP_END     6 
+#define OP_END     6
 
 #define OP_MASK 0x3f
 #define INSERT_REPLACE_MASK 0x40
@@ -152,7 +152,7 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
     /*
      * Now do our operation
      */
-    switch(OPERATION(op_flags)) {
+    switch (OPERATION(op_flags)) {
     case OP_INSERT:
         valptr = &prediction_table[keyval];
 
@@ -341,8 +341,9 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
         /*
          * now check to make sure everything is free
          */
-       for (i = 0; i < USHRT_MAX; i++)
-            OPENSSL_assert((prediction_table[i].flags & FZ_FLAG_ALLOCATED) == 0);
+        for (i = 0; i < USHRT_MAX; i++)
+            OPENSSL_assert((prediction_table[i].flags & FZ_FLAG_ALLOCATED)
+                           == 0);
 
         /* good flush */
         flushes++;

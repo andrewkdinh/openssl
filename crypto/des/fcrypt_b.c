@@ -20,13 +20,13 @@
 #undef DES_FCRYPT
 
 #undef PERM_OP
-#define PERM_OP(a,b,t,n,m) ((t)=((((a)>>(n))^(b))&(m)),\
+#define PERM_OP(a, b, t, n, m) ((t)=((((a)>>(n))^(b))&(m)),\
         (b)^=(t),\
         (a)^=((t)<<(n)))
 
 #undef HPERM_OP
-#define HPERM_OP(a,t,n,m) ((t)=((((a)<<(16-(n)))^(a))&(m)),\
-        (a)=(a)^(t)^(t>>(16-(n))))\
+#define HPERM_OP(a, t, n, m) ((t)=((((a)<<(16-(n)))^(a))&(m)),\
+        (a)=(a)^(t)^(t>>(16-(n))))
 
 void fcrypt_body(DES_LONG *out, DES_key_schedule *ks, DES_LONG Eswap0,
                  DES_LONG Eswap1)
@@ -67,11 +67,11 @@ void fcrypt_body(DES_LONG *out, DES_key_schedule *ks, DES_LONG Eswap0,
     l = ROTATE(l, 3) & 0xffffffffL;
     r = ROTATE(r, 3) & 0xffffffffL;
 
-    PERM_OP(l, r, t,  1, 0x55555555L);
-    PERM_OP(r, l, t,  8, 0x00ff00ffL);
-    PERM_OP(l, r, t,  2, 0x33333333L);
+    PERM_OP(l, r, t, 1, 0x55555555L);
+    PERM_OP(r, l, t, 8, 0x00ff00ffL);
+    PERM_OP(l, r, t, 2, 0x33333333L);
     PERM_OP(r, l, t, 16, 0x0000ffffL);
-    PERM_OP(l, r, t,  4, 0x0f0f0f0fL);
+    PERM_OP(l, r, t, 4, 0x0f0f0f0fL);
 
     out[0] = r;
     out[1] = l;

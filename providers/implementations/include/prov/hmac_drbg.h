@@ -8,8 +8,8 @@
  */
 
 #ifndef OSSL_PROV_HMAC_DRBG_H
-# define OSSL_PROV_HMAC_DRBG_H
-# pragma once
+#define OSSL_PROV_HMAC_DRBG_H
+#pragma once
 
 #include <openssl/evp.h>
 #include "prov/provider_util.h"
@@ -22,12 +22,12 @@ typedef struct drbg_hmac_st {
     unsigned char V[EVP_MAX_MD_SIZE];
 } PROV_DRBG_HMAC;
 
-int ossl_drbg_hmac_init(PROV_DRBG_HMAC *drbg,
-                        const unsigned char *ent, size_t ent_len,
-                        const unsigned char *nonce, size_t nonce_len,
-                        const unsigned char *pstr, size_t pstr_len);
-int ossl_drbg_hmac_generate(PROV_DRBG_HMAC *hmac,
-                            unsigned char *out, size_t outlen,
-                            const unsigned char *adin, size_t adin_len);
+int ossl_drbg_hmac_init(PROV_DRBG_HMAC *drbg, const unsigned char *ent,
+                        size_t ent_len, const unsigned char *nonce,
+                        size_t nonce_len, const unsigned char *pstr,
+                        size_t pstr_len);
+int ossl_drbg_hmac_generate(PROV_DRBG_HMAC *hmac, unsigned char *out,
+                            size_t outlen, const unsigned char *adin,
+                            size_t adin_len);
 
 #endif /* OSSL_PROV_HMAC_DRBG_H */

@@ -21,7 +21,7 @@ static int aes_siv_initkey(void *vctx, const unsigned char *key, size_t keylen)
 {
     PROV_AES_SIV_CTX *ctx = (PROV_AES_SIV_CTX *)vctx;
     SIV128_CONTEXT *sctx = &ctx->siv;
-    size_t klen  = keylen / 2;
+    size_t klen = keylen / 2;
     OSSL_LIB_CTX *libctx = ctx->libctx;
     const char *propq = NULL;
 
@@ -52,8 +52,7 @@ static int aes_siv_initkey(void *vctx, const unsigned char *key, size_t keylen)
      * klen is the length of the underlying cipher, not the input key,
      * which should be twice as long
      */
-    return ossl_siv128_init(sctx, key, klen, ctx->cbc, ctx->ctr, libctx,
-                              propq);
+    return ossl_siv128_init(sctx, key, klen, ctx->cbc, ctx->ctr, libctx, propq);
 }
 
 static int aes_siv_dupctx(void *in_vctx, void *out_vctx)
@@ -125,12 +124,8 @@ static int aes_siv_cipher(void *vctx, unsigned char *out,
 }
 
 static const PROV_CIPHER_HW_AES_SIV aes_siv_hw = {
-    aes_siv_initkey,
-    aes_siv_cipher,
-    aes_siv_setspeed,
-    aes_siv_settag,
-    aes_siv_cleanup,
-    aes_siv_dupctx,
+    aes_siv_initkey, aes_siv_cipher,  aes_siv_setspeed,
+    aes_siv_settag,  aes_siv_cleanup, aes_siv_dupctx,
 };
 
 const PROV_CIPHER_HW_AES_SIV *ossl_prov_cipher_hw_aes_siv(size_t keybits)

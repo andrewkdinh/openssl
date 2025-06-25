@@ -19,7 +19,7 @@
 /*
  * Common verification options.
  */
-# define OPT_V_ENUM \
+#define OPT_V_ENUM \
         OPT_V__FIRST=2000, \
         OPT_V_POLICY, OPT_V_PURPOSE, OPT_V_VERIFY_NAME, OPT_V_VERIFY_DEPTH, \
         OPT_V_ATTIME, OPT_V_VERIFY_HOSTNAME, OPT_V_VERIFY_EMAIL, \
@@ -33,7 +33,7 @@
         OPT_V_VERIFY_AUTH_LEVEL, OPT_V_ALLOW_PROXY_CERTS, \
         OPT_V__LAST
 
-# define OPT_V_OPTIONS \
+#define OPT_V_OPTIONS \
         OPT_SECTION("Validation"), \
         { "policy", OPT_V_POLICY, 's', "adds policy to the acceptable policy set"}, \
         { "purpose", OPT_V_PURPOSE, 's', \
@@ -84,7 +84,7 @@
         { "no_check_time", OPT_V_NO_CHECK_TIME, '-', "ignore certificate validity time" }, \
         { "allow_proxy_certs", OPT_V_ALLOW_PROXY_CERTS, '-', "allow the use of proxy certificates" }
 
-# define OPT_V_CASES \
+#define OPT_V_CASES \
         OPT_V__FIRST: case OPT_V__LAST: break; \
         case OPT_V_POLICY: \
         case OPT_V_PURPOSE: \
@@ -120,13 +120,13 @@
 /*
  * Common "extended validation" options.
  */
-# define OPT_X_ENUM \
+#define OPT_X_ENUM \
         OPT_X__FIRST=1000, \
         OPT_X_KEY, OPT_X_CERT, OPT_X_CHAIN, OPT_X_CHAIN_BUILD, \
         OPT_X_CERTFORM, OPT_X_KEYFORM, \
         OPT_X__LAST
 
-# define OPT_X_OPTIONS \
+#define OPT_X_OPTIONS \
         OPT_SECTION("Extended certificate"), \
         { "xkey", OPT_X_KEY, '<', "key for Extended certificates"}, \
         { "xcert", OPT_X_CERT, '<', "cert for Extended certificates"}, \
@@ -138,7 +138,7 @@
         { "xkeyform", OPT_X_KEYFORM, 'F', \
             "format of Extended certificate's key (DER/PEM/P12); has no effect"}
 
-# define OPT_X_CASES \
+#define OPT_X_CASES \
         OPT_X__FIRST: case OPT_X__LAST: break; \
         case OPT_X_KEY: \
         case OPT_X_CERT: \
@@ -151,7 +151,7 @@
  * Common SSL options.
  * Any changes here must be coordinated with ../ssl/ssl_conf.c
  */
-# define OPT_S_ENUM \
+#define OPT_S_ENUM \
         OPT_S__FIRST=3000, \
         OPT_S_NOSSL3, OPT_S_NOTLS1, OPT_S_NOTLS1_1, OPT_S_NOTLS1_2, \
         OPT_S_NOTLS1_3, OPT_S_BUGS, OPT_S_NO_COMP, OPT_S_NOTICKET, \
@@ -170,7 +170,7 @@
         OPT_S_NO_RX_CERT_COMP, \
         OPT_S__LAST
 
-# define OPT_S_OPTIONS \
+#define OPT_S_OPTIONS \
         OPT_SECTION("TLS/SSL"), \
         {"no_ssl3", OPT_S_NOSSL3, '-',"Just disable SSLv3" }, \
         {"no_tls1", OPT_S_NOTLS1, '-', "Just disable TLSv1"}, \
@@ -231,7 +231,7 @@
         {"no_ems", OPT_S_NO_EMS, '-', \
             "Disable Extended master secret extension"}
 
-# define OPT_S_CASES \
+#define OPT_S_CASES \
         OPT_S__FIRST: case OPT_S__LAST: break; \
         case OPT_S_NOSSL3: \
         case OPT_S_NOTLS1: \
@@ -277,38 +277,38 @@
 /*
  * Random state options.
  */
-# define OPT_R_ENUM \
+#define OPT_R_ENUM \
         OPT_R__FIRST=1500, OPT_R_RAND, OPT_R_WRITERAND, OPT_R__LAST
 
-# define OPT_R_OPTIONS \
+#define OPT_R_OPTIONS \
     OPT_SECTION("Random state"), \
     {"rand", OPT_R_RAND, 's', "Load the given file(s) into the random number generator"}, \
     {"writerand", OPT_R_WRITERAND, '>', "Write random data to the specified file"}
 
-# define OPT_R_CASES \
+#define OPT_R_CASES \
         OPT_R__FIRST: case OPT_R__LAST: break; \
         case OPT_R_RAND: case OPT_R_WRITERAND
 
 /*
  * Provider options.
  */
-# define OPT_PROV_ENUM \
+#define OPT_PROV_ENUM \
         OPT_PROV__FIRST=1600, \
         OPT_PROV_PROVIDER, OPT_PROV_PROVIDER_PATH, OPT_PROV_PROPQUERY, \
         OPT_PROV_PARAM, \
         OPT_PROV__LAST
 
-# define OPT_CONFIG_OPTION \
+#define OPT_CONFIG_OPTION \
         { "config", OPT_CONFIG, '<', "Load a configuration file (this may load modules)" }
 
-# define OPT_PROV_OPTIONS \
+#define OPT_PROV_OPTIONS \
         OPT_SECTION("Provider"), \
         { "provider-path", OPT_PROV_PROVIDER_PATH, 's', "Provider load path (must be before 'provider' argument if required)" }, \
         { "provider", OPT_PROV_PROVIDER, 's', "Provider to load (can be specified multiple times)" }, \
         { "provparam", OPT_PROV_PARAM, 's', "Set a provider key-value parameter" }, \
         { "propquery", OPT_PROV_PROPQUERY, 's', "Property query used when fetching algorithms" }
 
-# define OPT_PROV_CASES \
+#define OPT_PROV_CASES \
         OPT_PROV__FIRST: case OPT_PROV__LAST: break; \
         case OPT_PROV_PROVIDER: \
         case OPT_PROV_PROVIDER_PATH: \
@@ -367,23 +367,23 @@ typedef struct string_int_pair_st {
 } OPT_PAIR, STRINT_PAIR;
 
 /* Flags to pass into opt_format; see FORMAT_xxx, below. */
-# define OPT_FMT_PEM             (1L <<  1)
-# define OPT_FMT_DER             (1L <<  2)
-# define OPT_FMT_B64             (1L <<  3)
-# define OPT_FMT_PKCS12          (1L <<  4)
-# define OPT_FMT_SMIME           (1L <<  5)
-# define OPT_FMT_ENGINE          (1L <<  6)
-# define OPT_FMT_MSBLOB          (1L <<  7)
-# define OPT_FMT_NSS             (1L <<  8)
-# define OPT_FMT_TEXT            (1L <<  9)
-# define OPT_FMT_HTTP            (1L << 10)
-# define OPT_FMT_PVK             (1L << 11)
+#define OPT_FMT_PEM             (1L <<  1)
+#define OPT_FMT_DER             (1L <<  2)
+#define OPT_FMT_B64             (1L <<  3)
+#define OPT_FMT_PKCS12          (1L <<  4)
+#define OPT_FMT_SMIME           (1L <<  5)
+#define OPT_FMT_ENGINE          (1L <<  6)
+#define OPT_FMT_MSBLOB          (1L <<  7)
+#define OPT_FMT_NSS             (1L <<  8)
+#define OPT_FMT_TEXT            (1L <<  9)
+#define OPT_FMT_HTTP            (1L << 10)
+#define OPT_FMT_PVK             (1L << 11)
 
-# define OPT_FMT_PEMDER  (OPT_FMT_PEM | OPT_FMT_DER)
-# define OPT_FMT_ASN1    (OPT_FMT_PEM | OPT_FMT_DER | OPT_FMT_B64)
-# define OPT_FMT_PDE     (OPT_FMT_PEMDER | OPT_FMT_ENGINE)
-# define OPT_FMT_PDS     (OPT_FMT_PEMDER | OPT_FMT_SMIME)
-# define OPT_FMT_ANY     ( \
+#define OPT_FMT_PEMDER  (OPT_FMT_PEM | OPT_FMT_DER)
+#define OPT_FMT_ASN1    (OPT_FMT_PEM | OPT_FMT_DER | OPT_FMT_B64)
+#define OPT_FMT_PDE     (OPT_FMT_PEMDER | OPT_FMT_ENGINE)
+#define OPT_FMT_PDS     (OPT_FMT_PEMDER | OPT_FMT_SMIME)
+#define OPT_FMT_ANY     ( \
         OPT_FMT_PEM | OPT_FMT_DER | OPT_FMT_B64 | \
         OPT_FMT_PKCS12 | OPT_FMT_SMIME |                     \
         OPT_FMT_ENGINE | OPT_FMT_MSBLOB | OPT_FMT_NSS | \
@@ -439,6 +439,5 @@ int opt_check_rest_arg(const char *expected);
 
 /* Returns non-zero if legacy paths are still available */
 int opt_legacy_okay(void);
-
 
 #endif /* OSSL_APPS_OPT_H */

@@ -61,7 +61,7 @@ ENGINE *setup_engine_methods(const char *id, unsigned int methods, int debug)
             (void)ENGINE_ctrl(e, ENGINE_CTRL_SET_LOGSTREAM, 0, bio_err, 0);
         if (!ENGINE_ctrl_cmd(e, "SET_USER_INTERFACE", 0,
                              (void *)get_ui_method(), 0, 1)
-                || !ENGINE_set_default(e, methods)) {
+            || !ENGINE_set_default(e, methods)) {
             BIO_printf(bio_err, "Cannot use engine \"%s\"\n", ENGINE_get_id(e));
             ERR_print_errors(bio_err);
             ENGINE_free(e);
@@ -110,15 +110,13 @@ char *make_engine_uri(ENGINE *e, const char *key_id, const char *desc)
     if (e == NULL) {
         BIO_printf(bio_err, "No engine specified for loading %s\n", desc);
     } else if (key_id == NULL) {
-        BIO_printf(bio_err, "No engine key id specified for loading %s\n", desc);
+        BIO_printf(bio_err, "No engine key id specified for loading %s\n",
+                   desc);
     } else {
         const char *engineid = ENGINE_get_id(e);
-        size_t uri_sz =
-            sizeof(ENGINE_SCHEME_COLON) - 1
-            + strlen(engineid)
+        size_t uri_sz = sizeof(ENGINE_SCHEME_COLON) - 1 + strlen(engineid)
             + 1 /* : */
-            + strlen(key_id)
-            + 1 /* \0 */
+            + strlen(key_id) + 1 /* \0 */
             ;
 
         new_uri = OPENSSL_malloc(uri_sz);
@@ -152,8 +150,8 @@ int get_legacy_pkey_id(OSSL_LIB_CTX *libctx, const char *algname, ENGINE *e)
     else
 #endif
     /* We're only interested if it comes from an ENGINE */
-    if (tmpeng == NULL)
-        ameth = NULL;
+        if (tmpeng == NULL)
+            ameth = NULL;
 
     ERR_pop_to_mark();
     if (ameth == NULL)

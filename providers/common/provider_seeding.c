@@ -59,7 +59,8 @@ int ossl_prov_seeding_from_dispatch(const OSSL_DISPATCH *fns)
             set_func(c_cleanup_entropy, OSSL_FUNC_cleanup_entropy(fns));
             break;
         case OSSL_FUNC_CLEANUP_USER_ENTROPY:
-            set_func(c_cleanup_user_entropy, OSSL_FUNC_cleanup_user_entropy(fns));
+            set_func(c_cleanup_user_entropy,
+                     OSSL_FUNC_cleanup_user_entropy(fns));
             break;
         case OSSL_FUNC_GET_NONCE:
             set_func(c_get_nonce, OSSL_FUNC_get_nonce(fns));
@@ -103,8 +104,8 @@ void ossl_prov_cleanup_entropy(PROV_CTX *prov_ctx, unsigned char *buf,
 }
 
 size_t ossl_prov_get_nonce(PROV_CTX *prov_ctx, unsigned char **pout,
-                           size_t min_len, size_t max_len,
-                           const void *salt, size_t salt_len)
+                           size_t min_len, size_t max_len, const void *salt,
+                           size_t salt_len)
 {
     const OSSL_CORE_HANDLE *handle = CORE_HANDLE(prov_ctx);
 

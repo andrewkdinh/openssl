@@ -28,31 +28,29 @@ static struct record_functions_st ossl_ktls_funcs;
  */
 static int ktls_int_check_supported_cipher(OSSL_RECORD_LAYER *rl,
                                            const EVP_CIPHER *c,
-                                           const EVP_MD *md,
-                                           size_t taglen)
+                                           const EVP_MD *md, size_t taglen)
 {
     switch (rl->version) {
     case TLS1_VERSION:
     case TLS1_1_VERSION:
     case TLS1_2_VERSION:
-#ifdef OPENSSL_KTLS_TLS13
+# ifdef OPENSSL_KTLS_TLS13
     case TLS1_3_VERSION:
-#endif
+# endif
         break;
     default:
         return 0;
     }
 
-    if (EVP_CIPHER_is_a(c, "AES-128-GCM")
-            || EVP_CIPHER_is_a(c, "AES-256-GCM")
+    if (EVP_CIPHER_is_a(c, "AES-128-GCM") || EVP_CIPHER_is_a(c, "AES-256-GCM")
 # ifdef OPENSSL_KTLS_CHACHA20_POLY1305
-            || EVP_CIPHER_is_a(c, "CHACHA20-POLY1305")
+        || EVP_CIPHER_is_a(c, "CHACHA20-POLY1305")
 # endif
-       )
+    )
         return 1;
 
     if (!EVP_CIPHER_is_a(c, "AES-128-CBC")
-            && !EVP_CIPHER_is_a(c, "AES-256-CBC"))
+        && !EVP_CIPHER_is_a(c, "AES-256-CBC"))
         return 0;
 
     if (rl->use_etm)
@@ -61,36 +59,36 @@ static int ktls_int_check_supported_cipher(OSSL_RECORD_LAYER *rl,
     if (md == NULL)
         return 0;
 
-    if (EVP_MD_is_a(md, "SHA1")
-            || EVP_MD_is_a(md, "SHA2-256")
-            || EVP_MD_is_a(md, "SHA2-384"))
+    if (EVP_MD_is_a(md, "SHA1") || EVP_MD_is_a(md, "SHA2-256")
+        || EVP_MD_is_a(md, "SHA2-384"))
         return 1;
 
     return 0;
 }
 
 /* Function to configure kernel TLS structure */
-static
-int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c,
-                          EVP_MD *md, void *rl_sequence,
-                          ktls_crypto_info_t *crypto_info, int is_tx,
-                          unsigned char *iv, size_t ivlen,
-                          unsigned char *key, size_t keylen,
-                          unsigned char *mac_key, size_t mac_secret_size)
+static int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version,
+                                 const EVP_CIPHER *c, EVP_MD *md,
+                                 void *rl_sequence,
+                                 ktls_crypto_info_t *crypto_info, int is_tx,
+                                 unsigned char *iv, size_t ivlen,
+                                 unsigned char *key, size_t keylen,
+                                 unsigned char *mac_key, size_t mac_secret_size)
 {
     memset(crypto_info, 0, sizeof(*crypto_info));
     if (EVP_CIPHER_is_a(c, "AES-128-GCM")
-            || EVP_CIPHER_is_a(c, "AES-256-GCM")) {
+        || EVP_CIPHER_is_a(c, "AES-256-GCM")) {
         crypto_info->cipher_algorithm = CRYPTO_AES_NIST_GCM_16;
         crypto_info->iv_len = ivlen;
     } else
 # ifdef OPENSSL_KTLS_CHACHA20_POLY1305
-    if (EVP_CIPHER_is_a(c, "CHACHA20-POLY1305")) {
+        if (EVP_CIPHER_is_a(c, "CHACHA20-POLY1305")) {
         crypto_info->cipher_algorithm = CRYPTO_CHACHA20_POLY1305;
         crypto_info->iv_len = ivlen;
     } else
 # endif
-    if (EVP_CIPHER_is_a(c, "AES-128-CBC") || EVP_CIPHER_is_a(c, "AES-256-CBC")) {
+        if (EVP_CIPHER_is_a(c, "AES-128-CBC")
+            || EVP_CIPHER_is_a(c, "AES-256-CBC")) {
         if (md == NULL)
             return 0;
         if (EVP_MD_is_a(md, "SHA1"))
@@ -128,14 +126,13 @@ int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c
 /* Function to check supported ciphers in Linux */
 static int ktls_int_check_supported_cipher(OSSL_RECORD_LAYER *rl,
                                            const EVP_CIPHER *c,
-                                           const EVP_MD *md,
-                                           size_t taglen)
+                                           const EVP_MD *md, size_t taglen)
 {
     switch (rl->version) {
     case TLS1_2_VERSION:
-#ifdef OPENSSL_KTLS_TLS13
+# ifdef OPENSSL_KTLS_TLS13
     case TLS1_3_VERSION:
-#endif
+# endif
         break;
     default:
         return 0;
@@ -152,15 +149,15 @@ static int ktls_int_check_supported_cipher(OSSL_RECORD_LAYER *rl,
         return 1;
     } else
 # endif
-    if (0
+        if (0
 # ifdef OPENSSL_KTLS_AES_GCM_128
-        || EVP_CIPHER_is_a(c, "AES-128-GCM")
+            || EVP_CIPHER_is_a(c, "AES-128-GCM")
 # endif
 # ifdef OPENSSL_KTLS_AES_GCM_256
-        || EVP_CIPHER_is_a(c, "AES-256-GCM")
+            || EVP_CIPHER_is_a(c, "AES-256-GCM")
 # endif
 # ifdef OPENSSL_KTLS_CHACHA20_POLY1305
-        || EVP_CIPHER_is_a(c, "ChaCha20-Poly1305")
+            || EVP_CIPHER_is_a(c, "ChaCha20-Poly1305")
 # endif
         ) {
         return 1;
@@ -169,13 +166,13 @@ static int ktls_int_check_supported_cipher(OSSL_RECORD_LAYER *rl,
 }
 
 /* Function to configure kernel TLS structure */
-static
-int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c,
-                          const EVP_MD *md, void *rl_sequence,
-                          ktls_crypto_info_t *crypto_info, int is_tx,
-                          unsigned char *iv, size_t ivlen,
-                          unsigned char *key, size_t keylen,
-                          unsigned char *mac_key, size_t mac_secret_size)
+static int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version,
+                                 const EVP_CIPHER *c, const EVP_MD *md,
+                                 void *rl_sequence,
+                                 ktls_crypto_info_t *crypto_info, int is_tx,
+                                 unsigned char *iv, size_t ivlen,
+                                 unsigned char *key, size_t keylen,
+                                 unsigned char *mac_key, size_t mac_secret_size)
 {
     unsigned char geniv[EVP_GCM_TLS_EXPLICIT_IV_LEN];
     unsigned char *eiv = NULL;
@@ -186,25 +183,26 @@ int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c
 # endif
 
     if (EVP_CIPHER_get_mode(c) == EVP_CIPH_GCM_MODE
-            || EVP_CIPHER_get_mode(c) == EVP_CIPH_CCM_MODE) {
+        || EVP_CIPHER_get_mode(c) == EVP_CIPH_CCM_MODE) {
         if (!ossl_assert(EVP_GCM_TLS_FIXED_IV_LEN == EVP_CCM_TLS_FIXED_IV_LEN)
-                || !ossl_assert(EVP_GCM_TLS_EXPLICIT_IV_LEN
-                                == EVP_CCM_TLS_EXPLICIT_IV_LEN))
+            || !ossl_assert(EVP_GCM_TLS_EXPLICIT_IV_LEN
+                            == EVP_CCM_TLS_EXPLICIT_IV_LEN))
             return 0;
         if (version == TLS1_2_VERSION) {
             if (!ossl_assert(ivlen == EVP_GCM_TLS_FIXED_IV_LEN))
                 return 0;
             if (is_tx) {
-                if (RAND_bytes_ex(libctx, geniv,
-                                EVP_GCM_TLS_EXPLICIT_IV_LEN, 0) <= 0)
+                if (RAND_bytes_ex(libctx, geniv, EVP_GCM_TLS_EXPLICIT_IV_LEN, 0)
+                    <= 0)
                     return 0;
             } else {
                 memset(geniv, 0, EVP_GCM_TLS_EXPLICIT_IV_LEN);
             }
             eiv = geniv;
         } else {
-            if (!ossl_assert(ivlen == EVP_GCM_TLS_FIXED_IV_LEN
-                                      + EVP_GCM_TLS_EXPLICIT_IV_LEN))
+            if (!ossl_assert(ivlen
+                             == EVP_GCM_TLS_FIXED_IV_LEN
+                                 + EVP_GCM_TLS_EXPLICIT_IV_LEN))
                 return 0;
             eiv = iv + TLS_CIPHER_AES_GCM_128_SALT_SIZE;
         }
@@ -216,8 +214,8 @@ int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c
     case NID_aes_128_gcm:
         if (!ossl_assert(TLS_CIPHER_AES_GCM_128_SALT_SIZE
                          == EVP_GCM_TLS_FIXED_IV_LEN)
-                || !ossl_assert(TLS_CIPHER_AES_GCM_128_IV_SIZE
-                                == EVP_GCM_TLS_EXPLICIT_IV_LEN))
+            || !ossl_assert(TLS_CIPHER_AES_GCM_128_IV_SIZE
+                            == EVP_GCM_TLS_EXPLICIT_IV_LEN))
             return 0;
         crypto_info->gcm128.info.cipher_type = TLS_CIPHER_AES_GCM_128;
         crypto_info->gcm128.info.version = version;
@@ -233,8 +231,8 @@ int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c
     case NID_aes_256_gcm:
         if (!ossl_assert(TLS_CIPHER_AES_GCM_256_SALT_SIZE
                          == EVP_GCM_TLS_FIXED_IV_LEN)
-                || !ossl_assert(TLS_CIPHER_AES_GCM_256_IV_SIZE
-                                == EVP_GCM_TLS_EXPLICIT_IV_LEN))
+            || !ossl_assert(TLS_CIPHER_AES_GCM_256_IV_SIZE
+                            == EVP_GCM_TLS_EXPLICIT_IV_LEN))
             return 0;
         crypto_info->gcm256.info.cipher_type = TLS_CIPHER_AES_GCM_256;
         crypto_info->gcm256.info.version = version;
@@ -251,8 +249,8 @@ int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c
     case NID_aes_128_ccm:
         if (!ossl_assert(TLS_CIPHER_AES_CCM_128_SALT_SIZE
                          == EVP_CCM_TLS_FIXED_IV_LEN)
-                || !ossl_assert(TLS_CIPHER_AES_CCM_128_IV_SIZE
-                                == EVP_CCM_TLS_EXPLICIT_IV_LEN))
+            || !ossl_assert(TLS_CIPHER_AES_CCM_128_IV_SIZE
+                            == EVP_CCM_TLS_EXPLICIT_IV_LEN))
             return 0;
         crypto_info->ccm128.info.cipher_type = TLS_CIPHER_AES_CCM_128;
         crypto_info->ccm128.info.version = version;
@@ -268,10 +266,11 @@ int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c
     case NID_chacha20_poly1305:
         if (!ossl_assert(ivlen == TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE))
             return 0;
-        crypto_info->chacha20poly1305.info.cipher_type
-            = TLS_CIPHER_CHACHA20_POLY1305;
+        crypto_info->chacha20poly1305.info.cipher_type =
+            TLS_CIPHER_CHACHA20_POLY1305;
         crypto_info->chacha20poly1305.info.version = version;
-        crypto_info->tls_crypto_info_len = sizeof(crypto_info->chacha20poly1305);
+        crypto_info->tls_crypto_info_len =
+            sizeof(crypto_info->chacha20poly1305);
         memcpy(crypto_info->chacha20poly1305.iv, iv, ivlen);
         memcpy(crypto_info->chacha20poly1305.key, key, keylen);
         memcpy(crypto_info->chacha20poly1305.rec_seq, rl_sequence,
@@ -281,7 +280,6 @@ int ktls_configure_crypto(OSSL_LIB_CTX *libctx, int version, const EVP_CIPHER *c
     default:
         return 0;
     }
-
 }
 
 #endif /* OPENSSL_SYS_LINUX */
@@ -290,10 +288,8 @@ static int ktls_set_crypto_state(OSSL_RECORD_LAYER *rl, int level,
                                  unsigned char *key, size_t keylen,
                                  unsigned char *iv, size_t ivlen,
                                  unsigned char *mackey, size_t mackeylen,
-                                 const EVP_CIPHER *ciph,
-                                 size_t taglen,
-                                 int mactype,
-                                 const EVP_MD *md,
+                                 const EVP_CIPHER *ciph, size_t taglen,
+                                 int mactype, const EVP_MD *md,
                                  COMP_METHOD *comp)
 {
     ktls_crypto_info_t crypto_info;
@@ -327,15 +323,15 @@ static int ktls_set_crypto_state(OSSL_RECORD_LAYER *rl, int level,
 
     if (!ktls_configure_crypto(rl->libctx, rl->version, ciph, md, rl->sequence,
                                &crypto_info,
-                               rl->direction == OSSL_RECORD_DIRECTION_WRITE,
-                               iv, ivlen, key, keylen, mackey, mackeylen))
-       return OSSL_RECORD_RETURN_NON_FATAL_ERR;
+                               rl->direction == OSSL_RECORD_DIRECTION_WRITE, iv,
+                               ivlen, key, keylen, mackey, mackeylen))
+        return OSSL_RECORD_RETURN_NON_FATAL_ERR;
 
     if (!BIO_set_ktls(rl->bio, &crypto_info, rl->direction))
         return OSSL_RECORD_RETURN_NON_FATAL_ERR;
 
-    if (rl->direction == OSSL_RECORD_DIRECTION_WRITE &&
-        (rl->options & SSL_OP_ENABLE_KTLS_TX_ZEROCOPY_SENDFILE) != 0)
+    if (rl->direction == OSSL_RECORD_DIRECTION_WRITE
+        && (rl->options & SSL_OP_ENABLE_KTLS_TX_ZEROCOPY_SENDFILE) != 0)
         /* Ignore errors. The application opts in to using the zerocopy
          * optimization. If the running kernel doesn't support it, just
          * continue without the optimization.
@@ -381,7 +377,8 @@ static int ktls_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *inrecs,
     return 1;
 }
 
-static int ktls_validate_record_header(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec)
+static int ktls_validate_record_header(OSSL_RECORD_LAYER *rl,
+                                       TLS_RL_RECORD *rec)
 {
     if (rec->rec_version != TLS1_2_VERSION) {
         RLAYERfatal(rl, SSL_AD_DECODE_ERROR, SSL_R_WRONG_VERSION_NUMBER);
@@ -399,27 +396,22 @@ static int ktls_post_process_record(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec)
     return 1;
 }
 
-static int
-ktls_new_record_layer(OSSL_LIB_CTX *libctx, const char *propq, int vers,
-                      int role, int direction, int level, uint16_t epoch,
-                      unsigned char *secret, size_t secretlen,
-                      unsigned char *key, size_t keylen, unsigned char *iv,
-                      size_t ivlen, unsigned char *mackey, size_t mackeylen,
-                      const EVP_CIPHER *ciph, size_t taglen,
-                      int mactype,
-                      const EVP_MD *md, COMP_METHOD *comp,
-                      const EVP_MD *kdfdigest, BIO *prev, BIO *transport,
-                      BIO *next, BIO_ADDR *local, BIO_ADDR *peer,
-                      const OSSL_PARAM *settings, const OSSL_PARAM *options,
-                      const OSSL_DISPATCH *fns, void *cbarg, void *rlarg,
-                      OSSL_RECORD_LAYER **retrl)
+static int ktls_new_record_layer(
+    OSSL_LIB_CTX *libctx, const char *propq, int vers, int role, int direction,
+    int level, uint16_t epoch, unsigned char *secret, size_t secretlen,
+    unsigned char *key, size_t keylen, unsigned char *iv, size_t ivlen,
+    unsigned char *mackey, size_t mackeylen, const EVP_CIPHER *ciph,
+    size_t taglen, int mactype, const EVP_MD *md, COMP_METHOD *comp,
+    const EVP_MD *kdfdigest, BIO *prev, BIO *transport, BIO *next,
+    BIO_ADDR *local, BIO_ADDR *peer, const OSSL_PARAM *settings,
+    const OSSL_PARAM *options, const OSSL_DISPATCH *fns, void *cbarg,
+    void *rlarg, OSSL_RECORD_LAYER **retrl)
 {
     int ret;
 
     ret = tls_int_new_record_layer(libctx, propq, vers, role, direction, level,
-                                   ciph, taglen, md, comp, prev,
-                                   transport, next, settings,
-                                   options, fns, cbarg, retrl);
+                                   ciph, taglen, md, comp, prev, transport,
+                                   next, settings, options, fns, cbarg, retrl);
 
     if (ret != OSSL_RECORD_RETURN_SUCCESS)
         return ret;
@@ -463,8 +455,7 @@ static int ktls_initialise_write_packets(OSSL_RECORD_LAYER *rl,
                                          OSSL_RECORD_TEMPLATE *templates,
                                          size_t numtempl,
                                          OSSL_RECORD_TEMPLATE *prefixtempl,
-                                         WPACKET *pkt,
-                                         TLS_BUFFER *bufs,
+                                         WPACKET *pkt, TLS_BUFFER *bufs,
                                          size_t *wpinited)
 {
     TLS_BUFFER *wb;
@@ -489,11 +480,9 @@ static int ktls_initialise_write_packets(OSSL_RECORD_LAYER *rl,
     return 1;
 }
 
-static int ktls_prepare_record_header(OSSL_RECORD_LAYER *rl,
-                                      WPACKET *thispkt,
+static int ktls_prepare_record_header(OSSL_RECORD_LAYER *rl, WPACKET *thispkt,
                                       OSSL_RECORD_TEMPLATE *templ,
-                                      uint8_t rectype,
-                                      unsigned char **recdata)
+                                      uint8_t rectype, unsigned char **recdata)
 {
     /* The kernel writes the record header, so nothing to do */
     *recdata = NULL;
@@ -501,10 +490,8 @@ static int ktls_prepare_record_header(OSSL_RECORD_LAYER *rl,
     return 1;
 }
 
-static int ktls_prepare_for_encryption(OSSL_RECORD_LAYER *rl,
-                                       size_t mac_size,
-                                       WPACKET *thispkt,
-                                       TLS_RL_RECORD *thiswr)
+static int ktls_prepare_for_encryption(OSSL_RECORD_LAYER *rl, size_t mac_size,
+                                       WPACKET *thispkt, TLS_RL_RECORD *thiswr)
 {
     /* No encryption, so nothing to do */
     return 1;
@@ -578,8 +565,7 @@ static struct record_functions_st ossl_ktls_funcs = {
     NULL,
     ktls_prepare_for_encryption,
     ktls_post_encryption_processing,
-    ktls_prepare_write_bio
-};
+    ktls_prepare_write_bio};
 
 const OSSL_RECORD_METHOD ossl_ktls_record_method = {
     ktls_new_record_layer,
@@ -606,5 +592,4 @@ const OSSL_RECORD_METHOD ossl_ktls_record_method = {
     NULL,
     tls_increment_sequence_ctr,
     ktls_alloc_buffers,
-    ktls_free_buffers
-};
+    ktls_free_buffers};

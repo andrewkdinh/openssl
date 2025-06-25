@@ -45,7 +45,8 @@ static int test_basic(void)
         goto err;
 
     ossl_quic_tserver_tick(qtserv);
-    if (!TEST_true(ossl_quic_tserver_read(qtserv, 0, buf, sizeof(buf), &bytesread)))
+    if (!TEST_true(
+            ossl_quic_tserver_read(qtserv, 0, buf, sizeof(buf), &bytesread)))
         goto err;
 
     /*
@@ -57,7 +58,7 @@ static int test_basic(void)
         goto err;
 
     testresult = 1;
- err:
+err:
     SSL_free(cssl);
     ossl_quic_tserver_free(qtserv);
     SSL_CTX_free(cctx);
@@ -76,9 +77,8 @@ static int add_unknown_frame_cb(QTEST_FAULT *fault, QUIC_PKT_HDR *hdr,
      * to use for testing purposes - but we just use the highest possible
      * value (8 byte length integer) and with no payload bytes
      */
-    unsigned char unknown_frame[] = {
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-    };
+    unsigned char unknown_frame[] = {0xff, 0xff, 0xff, 0xff,
+                                     0xff, 0xff, 0xff, 0xff};
 
     /* We only ever add the unknown frame to one packet */
     if (done++)
@@ -115,17 +115,16 @@ static int test_unknown_frame(void)
      * Write a message from the server to the client and add an unknown frame
      * type
      */
-    if (!TEST_true(qtest_fault_set_packet_plain_listener(fault,
-                                                         add_unknown_frame_cb,
-                                                         NULL)))
+    if (!TEST_true(qtest_fault_set_packet_plain_listener(
+            fault, add_unknown_frame_cb, NULL)))
         goto err;
 
     if (!TEST_true(ossl_quic_tserver_stream_new(qtserv, /*is_uni=*/0, &sid))
         || !TEST_uint64_t_eq(sid, 1))
         goto err;
 
-    if (!TEST_true(ossl_quic_tserver_write(qtserv, sid, (unsigned char *)msg, msglen,
-                                           &byteswritten)))
+    if (!TEST_true(ossl_quic_tserver_write(qtserv, sid, (unsigned char *)msg,
+                                           msglen, &byteswritten)))
         goto err;
 
     if (!TEST_size_t_eq(msglen, byteswritten))
@@ -149,7 +148,7 @@ static int test_unknown_frame(void)
         goto err;
 
     testresult = 1;
- err:
+err:
     qtest_fault_free(fault);
     SSL_free(cssl);
     ossl_quic_tserver_free(qtserv);
@@ -162,8 +161,8 @@ static int test_unknown_frame(void)
  * connected to.
  */
 static int drop_extensions_cb(QTEST_FAULT *fault,
-                                    QTEST_ENCRYPTED_EXTENSIONS *ee,
-                                    size_t eelen, void *encextcbarg)
+                              QTEST_ENCRYPTED_EXTENSIONS *ee, size_t eelen,
+                              void *encextcbarg)
 {
     int *ext = (int *)encextcbarg;
 
@@ -198,9 +197,8 @@ static int test_drop_extensions(int idx)
         err = OSSL_QUIC_ERR_CRYPTO_NO_APP_PROTO;
     }
 
-    if (!TEST_true(qtest_fault_set_hand_enc_ext_listener(fault,
-                                                         drop_extensions_cb,
-                                                         &ext)))
+    if (!TEST_true(qtest_fault_set_hand_enc_ext_listener(
+            fault, drop_extensions_cb, &ext)))
         goto err;
 
     /*
@@ -214,7 +212,7 @@ static int test_drop_extensions(int idx)
         goto err;
 
     testresult = 1;
- err:
+err:
     qtest_fault_free(fault);
     SSL_free(cssl);
     ossl_quic_tserver_free(qtserv);
@@ -280,15 +278,13 @@ static int test_corrupted_data(int idx)
 
     if (idx == 0) {
         /* Listen for encrypted packets being sent */
-        if (!TEST_true(qtest_fault_set_packet_cipher_listener(fault,
-                                                              on_packet_cipher_cb,
-                                                              NULL)))
+        if (!TEST_true(qtest_fault_set_packet_cipher_listener(
+                fault, on_packet_cipher_cb, NULL)))
             goto err;
     } else {
         /* Listen for datagrams being sent */
-        if (!TEST_true(qtest_fault_set_datagram_listener(fault,
-                                                         on_datagram_cb,
-                                                         NULL)))
+        if (!TEST_true(
+                qtest_fault_set_datagram_listener(fault, on_datagram_cb, NULL)))
             goto err;
     }
     if (!TEST_true(qtest_create_quic_connection(qtserv, cssl)))
@@ -321,8 +317,8 @@ static int test_corrupted_data(int idx)
     qtest_add_time(100);
 
     /* Send rest of message */
-    if (!TEST_true(ossl_quic_tserver_write(qtserv, sid, (unsigned char *)msg + 5,
-                                           msglen - 5, &byteswritten)))
+    if (!TEST_true(ossl_quic_tserver_write(
+            qtserv, sid, (unsigned char *)msg + 5, msglen - 5, &byteswritten)))
         goto err;
 
     if (!TEST_size_t_eq(byteswritten, msglen - 5))
@@ -361,7 +357,7 @@ static int test_corrupted_data(int idx)
         goto err;
 
     testresult = 1;
- err:
+err:
     qtest_fault_free(fault);
     SSL_free(cssl);
     ossl_quic_tserver_free(qtserv);
@@ -398,7 +394,7 @@ int setup_tests(void)
 
     return 1;
 
- err:
+err:
     OPENSSL_free(cert);
     OPENSSL_free(privkey);
     return 0;

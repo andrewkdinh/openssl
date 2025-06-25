@@ -7,7 +7,7 @@
  * https://www.openssl.org/source/license.html
  */
 
-#if defined (__TANDEM) && defined (_SPT_MODEL_)
+#if defined(__TANDEM) && defined(_SPT_MODEL_)
   /*
    * These definitions have to come first in SPT due to scoping of the
    * declarations in c99 associated with SPT use of stat.
@@ -126,7 +126,7 @@ static int new_dir(X509_LOOKUP *lu)
     lu->method_data = a;
     return 1;
 
- err:
+err:
     OPENSSL_free(a);
     return 0;
 }
@@ -240,7 +240,8 @@ static int get_cert_by_subject_ex(X509_LOOKUP *xl, X509_LOOKUP_TYPE type,
 
     stmp.type = type;
     if (type == X509_LU_X509) {
-        data.st_x509.cert_info.subject = (X509_NAME *)name; /* won't modify it */
+        data.st_x509.cert_info.subject =
+            (X509_NAME *)name; /* won't modify it */
         stmp.data.x509 = &data.st_x509;
     } else if (type == X509_LU_CRL) {
         data.crl.crl.issuer = (X509_NAME *)name; /* won't modify it */
@@ -310,13 +311,13 @@ static int get_cert_by_subject_ex(X509_LOOKUP *xl, X509_LOOKUP_TYPE type,
                  * This is special.  When c == '\0', no directory separator
                  * should be added.
                  */
-                BIO_snprintf(b->data, b->max,
-                             "%s%08lx.%s%d", ent->dir, h, postfix, k);
+                BIO_snprintf(b->data, b->max, "%s%08lx.%s%d", ent->dir, h,
+                             postfix, k);
             } else
 #endif
             {
-                BIO_snprintf(b->data, b->max,
-                             "%s%c%08lx.%s%d", ent->dir, c, h, postfix, k);
+                BIO_snprintf(b->data, b->max, "%s%c%08lx.%s%d", ent->dir, c, h,
+                             postfix, k);
             }
 #ifndef OPENSSL_NO_POSIX_IO
 # ifdef _WIN32
@@ -331,7 +332,8 @@ static int get_cert_by_subject_ex(X509_LOOKUP *xl, X509_LOOKUP_TYPE type,
             /* found one. */
             if (type == X509_LU_X509) {
                 if ((X509_load_cert_file_ex(xl, b->data, ent->dir_type, libctx,
-                                            propq)) == 0)
+                                            propq))
+                    == 0)
                     break;
             } else if (type == X509_LU_CRL) {
                 if ((X509_load_crl_file(xl, b->data, ent->dir_type)) == 0)
@@ -401,7 +403,6 @@ static int get_cert_by_subject_ex(X509_LOOKUP *xl, X509_LOOKUP_TYPE type,
             }
 
             CRYPTO_THREAD_unlock(ctx->lock);
-
         }
 
         if (tmp != NULL) {
@@ -418,7 +419,7 @@ static int get_cert_by_subject_ex(X509_LOOKUP *xl, X509_LOOKUP_TYPE type,
             goto finish;
         }
     }
- finish:
+finish:
     /* If we changed anything, resort the objects for faster lookup */
     if (X509_STORE_lock(xl->store_ctx)) {
         if (!sk_X509_OBJECT_is_sorted(xl->store_ctx->objs)) {

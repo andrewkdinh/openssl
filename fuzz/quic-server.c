@@ -31,7 +31,8 @@ int FuzzerInitialize(int *argc, char ***argv)
     STACK_OF(SSL_COMP) *comp_methods;
 
     FuzzerSetRand();
-    OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS | OPENSSL_INIT_ASYNC, NULL);
+    OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS | OPENSSL_INIT_ASYNC,
+                        NULL);
     OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS, NULL);
     ERR_clear_error();
     CRYPTO_free_ex_index(0, -1);
@@ -169,10 +170,11 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
                 state = READING;
                 ret = 1;
                 if (numstreams == OSSL_NELEM(allstreams)
-                        || SSL_get_accept_stream_queue_len(server) == 0)
+                    || SSL_get_accept_stream_queue_len(server) == 0)
                     break;
                 thisstream = numstreams;
-                stream = allstreams[numstreams++] = SSL_accept_stream(server, 0);
+                stream = allstreams[numstreams++] =
+                    SSL_accept_stream(server, 0);
                 if (stream == NULL)
                     goto end;
                 break;
@@ -221,8 +223,8 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
                 fake_now = nxtpkt;
                 break;
             } else {
-                nxttimeout = ossl_time_add(fake_now,
-                                           ossl_time_from_timeval(tv));
+                nxttimeout =
+                    ossl_time_add(fake_now, ossl_time_from_timeval(tv));
                 if (len > 3 && ossl_time_compare(nxttimeout, nxtpkt) >= 0) {
                     fake_now = nxtpkt;
                     break;
@@ -243,9 +245,8 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
         len -= size + 2;
         buf += size + 2;
     }
- end:
-    for (i = 0; i < numstreams; i++)
-        SSL_free(allstreams[i]);
+end:
+    for (i = 0; i < numstreams; i++) SSL_free(allstreams[i]);
     ERR_clear_error();
     SSL_CTX_free(ctx);
 

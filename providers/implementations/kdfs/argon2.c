@@ -94,8 +94,8 @@
     } while ((void)0, 0)
 
 # undef PERMUTATION_P
-# define PERMUTATION_P(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11,      \
-                       v12, v13, v14, v15)                                    \
+# define PERMUTATION_P(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, \
+                       v13, v14, v15)                                    \
     do {                                                                      \
         G(v0, v4, v8, v12);                                                   \
         G(v1, v5, v9, v13);                                                   \
@@ -141,11 +141,7 @@ typedef enum {
     ARGON2_VERSION_NUMBER = ARGON2_VERSION_13
 } ARGON2_VERSION;
 
-typedef enum {
-    ARGON2_D  = 0,
-    ARGON2_I  = 1,
-    ARGON2_ID = 2
-} ARGON2_TYPE;
+typedef enum { ARGON2_D = 0, ARGON2_I = 1, ARGON2_ID = 2 } ARGON2_TYPE;
 
 typedef struct {
     uint32_t pass;
@@ -217,10 +213,10 @@ static int kdf_argon2_ctx_set_ad(KDF_ARGON2 *ctx, const OSSL_PARAM *p);
 static int kdf_argon2_set_ctx_params(void *vctx, const OSSL_PARAM params[]);
 static int kdf_argon2_get_ctx_params(void *vctx, OSSL_PARAM params[]);
 static int kdf_argon2_ctx_set_version(KDF_ARGON2 *ctx, uint32_t version);
-static const OSSL_PARAM *kdf_argon2_settable_ctx_params(ossl_unused void *ctx,
-                                                        ossl_unused void *p_ctx);
-static const OSSL_PARAM *kdf_argon2_gettable_ctx_params(ossl_unused void *ctx,
-                                                        ossl_unused void *p_ctx);
+static const OSSL_PARAM *
+kdf_argon2_settable_ctx_params(ossl_unused void *ctx, ossl_unused void *p_ctx);
+static const OSSL_PARAM *
+kdf_argon2_gettable_ctx_params(ossl_unused void *ctx, ossl_unused void *p_ctx);
 
 static ossl_inline uint64_t load64(const uint8_t *src);
 static ossl_inline void store32(uint8_t *dst, uint32_t w);
@@ -241,9 +237,9 @@ static void next_addresses(BLOCK *address_block, BLOCK *input_block,
                            const BLOCK *zero_block);
 static int data_indep_addressing(const KDF_ARGON2 *ctx, uint32_t pass,
                                  uint8_t slice);
-static uint32_t index_alpha(const KDF_ARGON2 *ctx, uint32_t pass,
-                            uint8_t slice, uint32_t index,
-                            uint32_t pseudo_rand, int same_lane);
+static uint32_t index_alpha(const KDF_ARGON2 *ctx, uint32_t pass, uint8_t slice,
+                            uint32_t index, uint32_t pseudo_rand,
+                            int same_lane);
 
 static void fill_segment(const KDF_ARGON2 *ctx, uint32_t pass, uint32_t lane,
                          uint8_t slice);
@@ -268,15 +264,10 @@ static int blake2b_long(EVP_MD *md, EVP_MAC *mac, unsigned char *out,
 
 static ossl_inline uint64_t load64(const uint8_t *src)
 {
-    return
-      (((uint64_t)src[0]) << 0)
-    | (((uint64_t)src[1]) << 8)
-    | (((uint64_t)src[2]) << 16)
-    | (((uint64_t)src[3]) << 24)
-    | (((uint64_t)src[4]) << 32)
-    | (((uint64_t)src[5]) << 40)
-    | (((uint64_t)src[6]) << 48)
-    | (((uint64_t)src[7]) << 56);
+    return (((uint64_t)src[0]) << 0) | (((uint64_t)src[1]) << 8)
+        | (((uint64_t)src[2]) << 16) | (((uint64_t)src[3]) << 24)
+        | (((uint64_t)src[4]) << 32) | (((uint64_t)src[5]) << 40)
+        | (((uint64_t)src[6]) << 48) | (((uint64_t)src[7]) << 56);
 }
 
 static ossl_inline void store32(uint8_t *dst, uint32_t w)
@@ -324,8 +315,7 @@ static void xor_block(BLOCK *dst, const BLOCK *src)
 {
     int i;
 
-    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; ++i)
-        dst->v[i] ^= src->v[i];
+    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; ++i) dst->v[i] ^= src->v[i];
 }
 
 static void load_block(BLOCK *dst, const void *input)
@@ -358,19 +348,17 @@ static void fill_first_blocks(uint8_t *blockhash, const KDF_ARGON2 *ctx)
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH + 4, l);
         blake2b_long(ctx->md, ctx->mac, blockhash_bytes, ARGON2_BLOCK_SIZE,
                      blockhash, ARGON2_PREHASH_SEED_LENGTH);
-        load_block(&ctx->memory[l * ctx->lane_length + 0],
-                   blockhash_bytes);
+        load_block(&ctx->memory[l * ctx->lane_length + 0], blockhash_bytes);
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 1);
         blake2b_long(ctx->md, ctx->mac, blockhash_bytes, ARGON2_BLOCK_SIZE,
                      blockhash, ARGON2_PREHASH_SEED_LENGTH);
-        load_block(&ctx->memory[l * ctx->lane_length + 1],
-                   blockhash_bytes);
+        load_block(&ctx->memory[l * ctx->lane_length + 1], blockhash_bytes);
     }
     OPENSSL_cleanse(blockhash_bytes, ARGON2_BLOCK_SIZE);
 }
 
-static void fill_block(const BLOCK *prev, const BLOCK *ref,
-                       BLOCK *next, int with_xor)
+static void fill_block(const BLOCK *prev, const BLOCK *ref, BLOCK *next,
+                       int with_xor)
 {
     BLOCK blockR, tmp;
     unsigned i;
@@ -382,11 +370,9 @@ static void fill_block(const BLOCK *prev, const BLOCK *ref,
     if (with_xor)
         xor_block(&tmp, next);
 
-    for (i = 0; i < 8; ++i)
-        PERMUTATION_P_COLUMN(blockR.v, i);
+    for (i = 0; i < 8; ++i) PERMUTATION_P_COLUMN(blockR.v, i);
 
-    for (i = 0; i < 8; ++i)
-        PERMUTATION_P_ROW(blockR.v, i);
+    for (i = 0; i < 8; ++i) PERMUTATION_P_ROW(blockR.v, i);
 
     copy_block(next, &tmp);
     xor_block(next, &blockR);
@@ -425,9 +411,8 @@ static int data_indep_addressing(const KDF_ARGON2 *ctx, uint32_t pass,
  *            blocks in this segment
  * Other lanes: (SYNC_POINTS - 1) last segments
  */
-static uint32_t index_alpha(const KDF_ARGON2 *ctx, uint32_t pass,
-                            uint8_t slice, uint32_t index,
-                            uint32_t pseudo_rand, int same_lane)
+static uint32_t index_alpha(const KDF_ARGON2 *ctx, uint32_t pass, uint8_t slice,
+                            uint32_t index, uint32_t pseudo_rand, int same_lane)
 {
     uint32_t ref_area_sz;
     uint64_t rel_pos;
@@ -441,15 +426,15 @@ static uint32_t index_alpha(const KDF_ARGON2 *ctx, uint32_t pass,
         else if (same_lane)
             ref_area_sz = slice * ctx->segment_length + index - 1;
         else
-            ref_area_sz = slice * ctx->segment_length +
-                ((index == 0) ? (-1) : 0);
+            ref_area_sz =
+                slice * ctx->segment_length + ((index == 0) ? (-1) : 0);
         break;
     default:
         if (same_lane)
             ref_area_sz = ctx->lane_length - ctx->segment_length + index - 1;
         else
-            ref_area_sz = ctx->lane_length - ctx->segment_length +
-                ((index == 0) ? (-1) : 0);
+            ref_area_sz = ctx->lane_length - ctx->segment_length
+                + ((index == 0) ? (-1) : 0);
         if (slice != ARGON2_SYNC_POINTS - 1)
             start_pos = (slice + 1) * ctx->segment_length;
         break;
@@ -500,15 +485,16 @@ static void fill_segment(const KDF_ARGON2 *ctx, uint32_t pass, uint32_t lane,
             next_addresses(&address_block, &input_block, &zero_block);
     }
 
-    curr_offset = lane * ctx->lane_length + slice * ctx->segment_length
-        + start_idx;
+    curr_offset =
+        lane * ctx->lane_length + slice * ctx->segment_length + start_idx;
 
     if ((curr_offset % ctx->lane_length) == 0)
         prev_offset = curr_offset + ctx->lane_length - 1;
     else
         prev_offset = curr_offset - 1;
 
-    for (j = start_idx; j < ctx->segment_length; ++j, ++curr_offset, ++prev_offset) {
+    for (j = start_idx; j < ctx->segment_length;
+         ++j, ++curr_offset, ++prev_offset) {
         if (curr_offset % ctx->lane_length == 1)
             prev_offset = curr_offset - 1;
 
@@ -551,7 +537,7 @@ static uint32_t fill_segment_thr(void *thread_data)
 {
     ARGON2_THREAD_DATA *my_data;
 
-    my_data = (ARGON2_THREAD_DATA *) thread_data;
+    my_data = (ARGON2_THREAD_DATA *)thread_data;
     fill_segment(my_data->ctx, my_data->pos.pass, my_data->pos.lane,
                  my_data->pos.slice);
 
@@ -564,7 +550,7 @@ static int fill_mem_blocks_mt(KDF_ARGON2 *ctx)
     void **t;
     ARGON2_THREAD_DATA *t_data;
 
-    t = OPENSSL_zalloc(sizeof(void *)*ctx->lanes);
+    t = OPENSSL_zalloc(sizeof(void *) * ctx->lanes);
     t_data = OPENSSL_zalloc(ctx->lanes * sizeof(ARGON2_THREAD_DATA));
 
     if (t == NULL || t_data == NULL)
@@ -590,7 +576,7 @@ static int fill_mem_blocks_mt(KDF_ARGON2 *ctx)
                 t_data[l].ctx = ctx;
                 memcpy(&(t_data[l].pos), &p, sizeof(ARGON2_POS));
                 t[l] = ossl_crypto_thread_start(ctx->libctx, &fill_segment_thr,
-                                                (void *) &t_data[l]);
+                                                (void *)&t_data[l]);
                 if (t[l] == NULL) {
                     for (ll = 0; ll < l; ++ll) {
                         if (ossl_crypto_thread_join(t[ll], NULL) == 0)
@@ -633,15 +619,15 @@ static int fill_mem_blocks_st(KDF_ARGON2 *ctx)
 
     for (r = 0; r < ctx->passes; ++r)
         for (s = 0; s < ARGON2_SYNC_POINTS; ++s)
-            for (l = 0; l < ctx->lanes; ++l)
-                fill_segment(ctx, r, l, s);
+            for (l = 0; l < ctx->lanes; ++l) fill_segment(ctx, r, l, s);
     return 1;
 }
 
 static ossl_inline int fill_memory_blocks(KDF_ARGON2 *ctx)
 {
 # if !defined(ARGON2_NO_THREADS)
-    return ctx->threads == 1 ? fill_mem_blocks_st(ctx) : fill_mem_blocks_mt(ctx);
+    return ctx->threads == 1 ? fill_mem_blocks_st(ctx)
+                             : fill_mem_blocks_mt(ctx);
 # else
     return ctx->threads == 1 ? fill_mem_blocks_st(ctx) : 0;
 # endif
@@ -662,7 +648,7 @@ static void initial_hash(uint8_t *blockhash, KDF_ARGON2 *ctx)
     args[2] = ctx->m_cost;
     args[3] = ctx->t_cost;
     args[4] = ctx->version;
-    args[5] = (uint32_t) ctx->type;
+    args[5] = (uint32_t)ctx->type;
     args[6] = ctx->pwdlen;
 
     mdctx = EVP_MD_CTX_create();
@@ -670,7 +656,7 @@ static void initial_hash(uint8_t *blockhash, KDF_ARGON2 *ctx)
         goto fail;
 
     for (tmp = 0; tmp < sizeof(args) / sizeof(uint32_t); ++tmp) {
-        store32((uint8_t *) &value, args[tmp]);
+        store32((uint8_t *)&value, args[tmp]);
         if (EVP_DigestUpdate(mdctx, &value, sizeof(value)) != 1)
             goto fail;
     }
@@ -684,7 +670,7 @@ static void initial_hash(uint8_t *blockhash, KDF_ARGON2 *ctx)
         }
     }
 
-    store32((uint8_t *) &value, ctx->saltlen);
+    store32((uint8_t *)&value, ctx->saltlen);
 
     if (EVP_DigestUpdate(mdctx, &value, sizeof(value)) != 1)
         goto fail;
@@ -693,7 +679,7 @@ static void initial_hash(uint8_t *blockhash, KDF_ARGON2 *ctx)
         if (EVP_DigestUpdate(mdctx, ctx->salt, ctx->saltlen) != 1)
             goto fail;
 
-    store32((uint8_t *) &value, ctx->secretlen);
+    store32((uint8_t *)&value, ctx->secretlen);
     if (EVP_DigestUpdate(mdctx, &value, sizeof(value)) != 1)
         goto fail;
 
@@ -706,7 +692,7 @@ static void initial_hash(uint8_t *blockhash, KDF_ARGON2 *ctx)
         }
     }
 
-    store32((uint8_t *) &value, ctx->adlen);
+    store32((uint8_t *)&value, ctx->adlen);
     if (EVP_DigestUpdate(mdctx, &value, sizeof(value)) != 1)
         goto fail;
 
@@ -729,15 +715,14 @@ static int initialize(KDF_ARGON2 *ctx)
     if (ctx == NULL)
         return 0;
 
-    if (ctx->memory_blocks * sizeof(BLOCK) / sizeof(BLOCK) != ctx->memory_blocks)
+    if (ctx->memory_blocks * sizeof(BLOCK) / sizeof(BLOCK)
+        != ctx->memory_blocks)
         return 0;
 
     if (ctx->type != ARGON2_D)
-        ctx->memory = OPENSSL_secure_zalloc(ctx->memory_blocks *
-                                            sizeof(BLOCK));
+        ctx->memory = OPENSSL_secure_zalloc(ctx->memory_blocks * sizeof(BLOCK));
     else
-        ctx->memory = OPENSSL_zalloc(ctx->memory_blocks *
-                                     sizeof(BLOCK));
+        ctx->memory = OPENSSL_zalloc(ctx->memory_blocks * sizeof(BLOCK));
 
     if (ctx->memory == NULL) {
         ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_MEMORY_SIZE,
@@ -783,8 +768,7 @@ static void finalize(const KDF_ARGON2 *ctx, void *out)
         OPENSSL_secure_clear_free(ctx->memory,
                                   ctx->memory_blocks * sizeof(BLOCK));
     else
-        OPENSSL_clear_free(ctx->memory,
-                           ctx->memory_blocks * sizeof(BLOCK));
+        OPENSSL_clear_free(ctx->memory, ctx->memory_blocks * sizeof(BLOCK));
 }
 
 static int blake2b_mac(EVP_MAC *mac, void *out, size_t outlen, const void *in,
@@ -799,14 +783,14 @@ static int blake2b_mac(EVP_MAC *mac, void *out, size_t outlen, const void *in,
         goto fail;
 
     par[par_n++] = OSSL_PARAM_construct_octet_string(OSSL_MAC_PARAM_KEY,
-                                                     (void *) key, keylen);
+                                                     (void *)key, keylen);
     par[par_n++] = OSSL_PARAM_construct_size_t(OSSL_MAC_PARAM_SIZE, &outlen);
     par[par_n++] = OSSL_PARAM_construct_end();
 
     ret = EVP_MAC_CTX_set_params(ctx, par) == 1
         && EVP_MAC_init(ctx, NULL, 0, NULL) == 1
         && EVP_MAC_update(ctx, in, inlen) == 1
-        && EVP_MAC_final(ctx, out, (size_t *) &out_written, outlen) == 1;
+        && EVP_MAC_final(ctx, out, (size_t *)&out_written, outlen) == 1;
 
 fail:
     EVP_MAC_CTX_free(ctx);
@@ -875,7 +859,8 @@ static int blake2b_long(EVP_MD *md, EVP_MAC *mac, unsigned char *out,
         && EVP_DigestUpdate(ctx, outlen_bytes, sizeof(outlen_bytes)) == 1
         && EVP_DigestUpdate(ctx, in, inlen) == 1
         && EVP_DigestFinal_ex(ctx, (outlen > BLAKE2B_OUTBYTES) ? outbuf : out,
-                              NULL) == 1;
+                              NULL)
+            == 1;
 
     if (ret == 0)
         goto fail;
@@ -883,12 +868,13 @@ static int blake2b_long(EVP_MD *md, EVP_MAC *mac, unsigned char *out,
     if (outlen > BLAKE2B_OUTBYTES) {
         memcpy(out, outbuf, BLAKE2B_OUTBYTES / 2);
         out += BLAKE2B_OUTBYTES / 2;
-        outlen_curr = (uint32_t) outlen - BLAKE2B_OUTBYTES / 2;
+        outlen_curr = (uint32_t)outlen - BLAKE2B_OUTBYTES / 2;
 
         while (outlen_curr > BLAKE2B_OUTBYTES) {
             memcpy(inbuf, outbuf, BLAKE2B_OUTBYTES);
             if (blake2b(md, mac, outbuf, BLAKE2B_OUTBYTES, inbuf,
-                        BLAKE2B_OUTBYTES, NULL, 0) != 1)
+                        BLAKE2B_OUTBYTES, NULL, 0)
+                != 1)
                 goto fail;
             memcpy(out, outbuf, BLAKE2B_OUTBYTES / 2);
             out += BLAKE2B_OUTBYTES / 2;
@@ -896,8 +882,9 @@ static int blake2b_long(EVP_MD *md, EVP_MAC *mac, unsigned char *out,
         }
 
         memcpy(inbuf, outbuf, BLAKE2B_OUTBYTES);
-        if (blake2b(md, mac, outbuf, outlen_curr, inbuf, BLAKE2B_OUTBYTES,
-                    NULL, 0) != 1)
+        if (blake2b(md, mac, outbuf, outlen_curr, inbuf, BLAKE2B_OUTBYTES, NULL,
+                    0)
+            != 1)
             goto fail;
         memcpy(out, outbuf, outlen_curr);
     }
@@ -1048,7 +1035,7 @@ static int kdf_argon2_derive(void *vctx, unsigned char *out, size_t outlen,
             ERR_raise(ERR_LIB_PROV, PROV_R_OUTPUT_BUFFER_TOO_SMALL);
             return 0;
         }
-        if (!kdf_argon2_ctx_set_out_length(ctx, (uint32_t) outlen))
+        if (!kdf_argon2_ctx_set_out_length(ctx, (uint32_t)outlen))
             return 0;
     }
 
@@ -1058,21 +1045,23 @@ static int kdf_argon2_derive(void *vctx, unsigned char *out, size_t outlen,
     case ARGON2_ID:
         break;
     default:
-        ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_MODE, "invalid Argon2 type");
+        ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_MODE,
+                       "invalid Argon2 type");
         return 0;
     }
 
     if (ctx->threads > 1) {
 # ifdef ARGON2_NO_THREADS
-        ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_THREAD_POOL_SIZE,
-                       "requested %u threads, single-threaded mode supported only",
-                       ctx->threads);
+        ERR_raise_data(
+            ERR_LIB_PROV, PROV_R_INVALID_THREAD_POOL_SIZE,
+            "requested %u threads, single-threaded mode supported only",
+            ctx->threads);
         return 0;
 # else
         if (ctx->threads > ossl_get_avail_threads(ctx->libctx)) {
             ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_THREAD_POOL_SIZE,
-                           "requested %u threads, available: %u",
-                           ctx->threads, ossl_get_avail_threads(ctx->libctx));
+                           "requested %u threads, available: %u", ctx->threads,
+                           ossl_get_avail_threads(ctx->libctx));
             return 0;
         }
 # endif
@@ -1085,8 +1074,9 @@ static int kdf_argon2_derive(void *vctx, unsigned char *out, size_t outlen,
     }
 
     if (ctx->m_cost < 8 * ctx->lanes) {
-        ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_MEMORY_SIZE,
-                       "m_cost must be greater or equal than 8 times the number of lanes");
+        ERR_raise_data(
+            ERR_LIB_PROV, PROV_R_INVALID_MEMORY_SIZE,
+            "m_cost must be greater or equal than 8 times the number of lanes");
         return 0;
     }
 
@@ -1121,7 +1111,7 @@ static void kdf_argon2_reset(void *vctx)
     KDF_ARGON2 *ctx;
     ARGON2_TYPE type;
 
-    ctx = (KDF_ARGON2 *) vctx;
+    ctx = (KDF_ARGON2 *)vctx;
     type = ctx->type;
     libctx = ctx->libctx;
 
@@ -1188,8 +1178,8 @@ static int kdf_argon2_ctx_set_t_cost(KDF_ARGON2 *ctx, uint32_t t_cost)
     /* ARGON2_MAX_MEMORY == max m_cost value, so skip check  */
 
     if (t_cost < ARGON2_MIN_TIME) {
-        ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_ITERATION_COUNT,
-                       "min: %u", ARGON2_MIN_TIME);
+        ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_ITERATION_COUNT, "min: %u",
+                       ARGON2_MIN_TIME);
         return 0;
     }
 
@@ -1252,7 +1242,7 @@ static int kdf_argon2_ctx_set_secret(KDF_ARGON2 *ctx, const OSSL_PARAM *p)
         return 0;
     }
 
-    ctx->secretlen = (uint32_t) buflen;
+    ctx->secretlen = (uint32_t)buflen;
     return 1;
 }
 
@@ -1278,7 +1268,7 @@ static int kdf_argon2_ctx_set_pwd(KDF_ARGON2 *ctx, const OSSL_PARAM *p)
         goto fail;
     }
 
-    ctx->pwdlen = (uint32_t) buflen;
+    ctx->pwdlen = (uint32_t)buflen;
     return 1;
 
 fail:
@@ -1316,7 +1306,7 @@ static int kdf_argon2_ctx_set_salt(KDF_ARGON2 *ctx, const OSSL_PARAM *p)
         goto fail;
     }
 
-    ctx->saltlen = (uint32_t) buflen;
+    ctx->saltlen = (uint32_t)buflen;
     return 1;
 
 fail:
@@ -1349,7 +1339,7 @@ static int kdf_argon2_ctx_set_ad(KDF_ARGON2 *ctx, const OSSL_PARAM *p)
         return 0;
     }
 
-    ctx->adlen = (uint32_t) buflen;
+    ctx->adlen = (uint32_t)buflen;
     return 1;
 }
 
@@ -1397,7 +1387,7 @@ static int kdf_argon2_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     if (ossl_param_is_empty(params))
         return 1;
 
-    ctx = (KDF_ARGON2 *) vctx;
+    ctx = (KDF_ARGON2 *)vctx;
     if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_PASSWORD)) != NULL)
         if (!kdf_argon2_ctx_set_pwd(ctx, p))
             return 0;
@@ -1435,34 +1425,39 @@ static int kdf_argon2_set_ctx_params(void *vctx, const OSSL_PARAM params[])
             return 0;
     }
 
-    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_ARGON2_LANES)) != NULL) {
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_ARGON2_LANES))
+        != NULL) {
         if (!OSSL_PARAM_get_uint32(p, &u32_value))
             return 0;
         if (!kdf_argon2_ctx_set_lanes(ctx, u32_value))
             return 0;
     }
 
-    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_ARGON2_MEMCOST)) != NULL) {
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_ARGON2_MEMCOST))
+        != NULL) {
         if (!OSSL_PARAM_get_uint32(p, &u32_value))
             return 0;
         if (!kdf_argon2_ctx_set_m_cost(ctx, u32_value))
             return 0;
     }
 
-    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_EARLY_CLEAN)) != NULL) {
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_EARLY_CLEAN))
+        != NULL) {
         if (!OSSL_PARAM_get_uint32(p, &u32_value))
             return 0;
         kdf_argon2_ctx_set_flag_early_clean(ctx, u32_value);
     }
 
-    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_ARGON2_VERSION)) != NULL) {
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_ARGON2_VERSION))
+        != NULL) {
         if (!OSSL_PARAM_get_uint32(p, &u32_value))
             return 0;
         if (!kdf_argon2_ctx_set_version(ctx, u32_value))
             return 0;
     }
 
-    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_PROPERTIES)) != NULL) {
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_PROPERTIES))
+        != NULL) {
         if (p->data_type != OSSL_PARAM_UTF8_STRING
             || !set_property_query(ctx, p->data))
             return 0;
@@ -1487,8 +1482,7 @@ static const OSSL_PARAM *kdf_argon2_settable_ctx_params(ossl_unused void *ctx,
         OSSL_PARAM_uint32(OSSL_KDF_PARAM_EARLY_CLEAN, NULL),
         OSSL_PARAM_uint32(OSSL_KDF_PARAM_ARGON2_VERSION, NULL),
         OSSL_PARAM_utf8_string(OSSL_KDF_PARAM_PROPERTIES, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
 
     return known_settable_ctx_params;
 }
@@ -1497,7 +1491,7 @@ static int kdf_argon2_get_ctx_params(void *vctx, OSSL_PARAM params[])
 {
     OSSL_PARAM *p;
 
-    (void) vctx;
+    (void)vctx;
     if ((p = OSSL_PARAM_locate(params, OSSL_KDF_PARAM_SIZE)) != NULL)
         return OSSL_PARAM_set_size_t(p, SIZE_MAX);
 
@@ -1508,53 +1502,48 @@ static const OSSL_PARAM *kdf_argon2_gettable_ctx_params(ossl_unused void *ctx,
                                                         ossl_unused void *p_ctx)
 {
     static const OSSL_PARAM known_gettable_ctx_params[] = {
-        OSSL_PARAM_size_t(OSSL_KDF_PARAM_SIZE, NULL),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_size_t(OSSL_KDF_PARAM_SIZE, NULL), OSSL_PARAM_END};
 
     return known_gettable_ctx_params;
 }
 
 const OSSL_DISPATCH ossl_kdf_argon2i_functions[] = {
-    { OSSL_FUNC_KDF_NEWCTX, (void(*)(void))kdf_argon2i_new },
-    { OSSL_FUNC_KDF_FREECTX, (void(*)(void))kdf_argon2_free },
-    { OSSL_FUNC_KDF_RESET, (void(*)(void))kdf_argon2_reset },
-    { OSSL_FUNC_KDF_DERIVE, (void(*)(void))kdf_argon2_derive },
-    { OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
-      (void(*)(void))kdf_argon2_settable_ctx_params },
-    { OSSL_FUNC_KDF_SET_CTX_PARAMS, (void(*)(void))kdf_argon2_set_ctx_params },
-    { OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
-      (void(*)(void))kdf_argon2_gettable_ctx_params },
-    { OSSL_FUNC_KDF_GET_CTX_PARAMS, (void(*)(void))kdf_argon2_get_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_KDF_NEWCTX, (void (*)(void))kdf_argon2i_new},
+    {OSSL_FUNC_KDF_FREECTX, (void (*)(void))kdf_argon2_free},
+    {OSSL_FUNC_KDF_RESET, (void (*)(void))kdf_argon2_reset},
+    {OSSL_FUNC_KDF_DERIVE, (void (*)(void))kdf_argon2_derive},
+    {OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
+     (void (*)(void))kdf_argon2_settable_ctx_params},
+    {OSSL_FUNC_KDF_SET_CTX_PARAMS, (void (*)(void))kdf_argon2_set_ctx_params},
+    {OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
+     (void (*)(void))kdf_argon2_gettable_ctx_params},
+    {OSSL_FUNC_KDF_GET_CTX_PARAMS, (void (*)(void))kdf_argon2_get_ctx_params},
+    OSSL_DISPATCH_END};
 
 const OSSL_DISPATCH ossl_kdf_argon2d_functions[] = {
-    { OSSL_FUNC_KDF_NEWCTX, (void(*)(void))kdf_argon2d_new },
-    { OSSL_FUNC_KDF_FREECTX, (void(*)(void))kdf_argon2_free },
-    { OSSL_FUNC_KDF_RESET, (void(*)(void))kdf_argon2_reset },
-    { OSSL_FUNC_KDF_DERIVE, (void(*)(void))kdf_argon2_derive },
-    { OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
-      (void(*)(void))kdf_argon2_settable_ctx_params },
-    { OSSL_FUNC_KDF_SET_CTX_PARAMS, (void(*)(void))kdf_argon2_set_ctx_params },
-    { OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
-      (void(*)(void))kdf_argon2_gettable_ctx_params },
-    { OSSL_FUNC_KDF_GET_CTX_PARAMS, (void(*)(void))kdf_argon2_get_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_KDF_NEWCTX, (void (*)(void))kdf_argon2d_new},
+    {OSSL_FUNC_KDF_FREECTX, (void (*)(void))kdf_argon2_free},
+    {OSSL_FUNC_KDF_RESET, (void (*)(void))kdf_argon2_reset},
+    {OSSL_FUNC_KDF_DERIVE, (void (*)(void))kdf_argon2_derive},
+    {OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
+     (void (*)(void))kdf_argon2_settable_ctx_params},
+    {OSSL_FUNC_KDF_SET_CTX_PARAMS, (void (*)(void))kdf_argon2_set_ctx_params},
+    {OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
+     (void (*)(void))kdf_argon2_gettable_ctx_params},
+    {OSSL_FUNC_KDF_GET_CTX_PARAMS, (void (*)(void))kdf_argon2_get_ctx_params},
+    OSSL_DISPATCH_END};
 
 const OSSL_DISPATCH ossl_kdf_argon2id_functions[] = {
-    { OSSL_FUNC_KDF_NEWCTX, (void(*)(void))kdf_argon2id_new },
-    { OSSL_FUNC_KDF_FREECTX, (void(*)(void))kdf_argon2_free },
-    { OSSL_FUNC_KDF_RESET, (void(*)(void))kdf_argon2_reset },
-    { OSSL_FUNC_KDF_DERIVE, (void(*)(void))kdf_argon2_derive },
-    { OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
-      (void(*)(void))kdf_argon2_settable_ctx_params },
-    { OSSL_FUNC_KDF_SET_CTX_PARAMS, (void(*)(void))kdf_argon2_set_ctx_params },
-    { OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
-      (void(*)(void))kdf_argon2_gettable_ctx_params },
-    { OSSL_FUNC_KDF_GET_CTX_PARAMS, (void(*)(void))kdf_argon2_get_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_KDF_NEWCTX, (void (*)(void))kdf_argon2id_new},
+    {OSSL_FUNC_KDF_FREECTX, (void (*)(void))kdf_argon2_free},
+    {OSSL_FUNC_KDF_RESET, (void (*)(void))kdf_argon2_reset},
+    {OSSL_FUNC_KDF_DERIVE, (void (*)(void))kdf_argon2_derive},
+    {OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
+     (void (*)(void))kdf_argon2_settable_ctx_params},
+    {OSSL_FUNC_KDF_SET_CTX_PARAMS, (void (*)(void))kdf_argon2_set_ctx_params},
+    {OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
+     (void (*)(void))kdf_argon2_gettable_ctx_params},
+    {OSSL_FUNC_KDF_GET_CTX_PARAMS, (void (*)(void))kdf_argon2_get_ctx_params},
+    OSSL_DISPATCH_END};
 
 #endif

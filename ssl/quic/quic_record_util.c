@@ -19,12 +19,10 @@
  * QUIC Key Derivation Utilities
  * =============================
  */
-int ossl_quic_hkdf_extract(OSSL_LIB_CTX *libctx,
-                           const char *propq,
-                           const EVP_MD *md,
-                           const unsigned char *salt, size_t salt_len,
-                           const unsigned char *ikm, size_t ikm_len,
-                           unsigned char *out, size_t out_len)
+int ossl_quic_hkdf_extract(OSSL_LIB_CTX *libctx, const char *propq,
+                           const EVP_MD *md, const unsigned char *salt,
+                           size_t salt_len, const unsigned char *ikm,
+                           size_t ikm_len, unsigned char *out, size_t out_len)
 {
     int ret = 0;
     EVP_KDF *kdf = NULL;
@@ -76,14 +74,11 @@ static const unsigned char quic_server_in_label[] = {
 /* Salt used to derive Initial packet protection keys (RFC 9001 Section 5.2). */
 static const unsigned char quic_v1_initial_salt[] = {
     0x38, 0x76, 0x2c, 0xf7, 0xf5, 0x59, 0x34, 0xb3, 0x4d, 0x17,
-    0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a
-};
+    0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a};
 
-int ossl_quic_provide_initial_secret(OSSL_LIB_CTX *libctx,
-                                     const char *propq,
+int ossl_quic_provide_initial_secret(OSSL_LIB_CTX *libctx, const char *propq,
                                      const QUIC_CONN_ID *dst_conn_id,
-                                     int is_server,
-                                     struct ossl_qrx_st *qrx,
+                                     int is_server, struct ossl_qrx_st *qrx,
                                      struct ossl_qtx_st *qtx)
 {
     unsigned char initial_secret[32];
@@ -107,48 +102,34 @@ int ossl_quic_provide_initial_secret(OSSL_LIB_CTX *libctx,
     }
 
     /* Derive initial secret from destination connection ID. */
-    if (!ossl_quic_hkdf_extract(libctx, propq,
-                                sha256,
-                                quic_v1_initial_salt,
-                                sizeof(quic_v1_initial_salt),
-                                dst_conn_id->id,
-                                dst_conn_id->id_len,
-                                initial_secret,
+    if (!ossl_quic_hkdf_extract(libctx, propq, sha256, quic_v1_initial_salt,
+                                sizeof(quic_v1_initial_salt), dst_conn_id->id,
+                                dst_conn_id->id_len, initial_secret,
                                 sizeof(initial_secret)))
         goto err;
 
     /* Derive "client in" secret. */
     if (((qtx != NULL && tx_secret == client_initial_secret)
          || (qrx != NULL && rx_secret == client_initial_secret))
-        && !tls13_hkdf_expand_ex(libctx, propq,
-                                 sha256,
-                                 initial_secret,
-                                 quic_client_in_label,
-                                 sizeof(quic_client_in_label),
-                                 NULL, 0,
-                                 client_initial_secret,
-                                 sizeof(client_initial_secret), 1))
+        && !tls13_hkdf_expand_ex(
+            libctx, propq, sha256, initial_secret, quic_client_in_label,
+            sizeof(quic_client_in_label), NULL, 0, client_initial_secret,
+            sizeof(client_initial_secret), 1))
         goto err;
 
     /* Derive "server in" secret. */
     if (((qtx != NULL && tx_secret == server_initial_secret)
          || (qrx != NULL && rx_secret == server_initial_secret))
-        && !tls13_hkdf_expand_ex(libctx, propq,
-                                 sha256,
-                                 initial_secret,
-                                 quic_server_in_label,
-                                 sizeof(quic_server_in_label),
-                                 NULL, 0,
-                                 server_initial_secret,
-                                 sizeof(server_initial_secret), 1))
+        && !tls13_hkdf_expand_ex(
+            libctx, propq, sha256, initial_secret, quic_server_in_label,
+            sizeof(quic_server_in_label), NULL, 0, server_initial_secret,
+            sizeof(server_initial_secret), 1))
         goto err;
 
     /* Setup RX EL. Initial encryption always uses AES-128-GCM. */
     if (qrx != NULL
         && !ossl_qrx_provide_secret(qrx, QUIC_ENC_LEVEL_INITIAL,
-                                    QRL_SUITE_AES128GCM,
-                                    sha256,
-                                    rx_secret,
+                                    QRL_SUITE_AES128GCM, sha256, rx_secret,
                                     sizeof(server_initial_secret)))
         goto err;
 
@@ -165,9 +146,7 @@ int ossl_quic_provide_initial_secret(OSSL_LIB_CTX *libctx,
     /* Setup TX cipher. */
     if (qtx != NULL
         && !ossl_qtx_provide_secret(qtx, QUIC_ENC_LEVEL_INITIAL,
-                                    QRL_SUITE_AES128GCM,
-                                    sha256,
-                                    tx_secret,
+                                    QRL_SUITE_AES128GCM, sha256, tx_secret,
                                     sizeof(server_initial_secret)))
         goto err;
 
@@ -191,14 +170,26 @@ struct suite_info {
 };
 
 static const struct suite_info suite_aes128gcm = {
-    "AES-128-GCM", "SHA256", 32, 16, 12, 16, 16,
+    "AES-128-GCM",
+    "SHA256",
+    32,
+    16,
+    12,
+    16,
+    16,
     QUIC_HDR_PROT_CIPHER_AES_128,
     ((uint64_t)1) << 23, /* Limits as prescribed by RFC 9001 */
     ((uint64_t)1) << 52,
 };
 
 static const struct suite_info suite_aes256gcm = {
-    "AES-256-GCM", "SHA384", 48, 32, 12, 16, 32,
+    "AES-256-GCM",
+    "SHA384",
+    48,
+    32,
+    12,
+    16,
+    32,
     QUIC_HDR_PROT_CIPHER_AES_256,
     ((uint64_t)1) << 23, /* Limits as prescribed by RFC 9001 */
     ((uint64_t)1) << 52,
@@ -208,21 +199,21 @@ static const struct suite_info suite_chacha20poly1305 = {
     "ChaCha20-Poly1305", "SHA256", 32, 32, 12, 16, 32,
     QUIC_HDR_PROT_CIPHER_CHACHA,
     /* Do not use UINT64_MAX here as this represents an invalid value */
-    UINT64_MAX - 1,         /* No applicable limit for this suite (RFC 9001) */
-    ((uint64_t)1) << 36,    /* Limit as prescribed by RFC 9001 */
+    UINT64_MAX - 1, /* No applicable limit for this suite (RFC 9001) */
+    ((uint64_t)1) << 36, /* Limit as prescribed by RFC 9001 */
 };
 
 static const struct suite_info *get_suite(uint32_t suite_id)
 {
     switch (suite_id) {
-        case QRL_SUITE_AES128GCM:
-            return &suite_aes128gcm;
-        case QRL_SUITE_AES256GCM:
-            return &suite_aes256gcm;
-        case QRL_SUITE_CHACHA20POLY1305:
-            return &suite_chacha20poly1305;
-        default:
-            return NULL;
+    case QRL_SUITE_AES128GCM:
+        return &suite_aes128gcm;
+    case QRL_SUITE_AES256GCM:
+        return &suite_aes256gcm;
+    case QRL_SUITE_CHACHA20POLY1305:
+        return &suite_chacha20poly1305;
+    default:
+        return NULL;
     }
 }
 

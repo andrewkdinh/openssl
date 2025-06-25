@@ -134,7 +134,7 @@ ASN1_BIT_STRING *ossl_c2i_ASN1_BIT_STRING(ASN1_BIT_STRING **a,
         (*a) = ret;
     *pp = p;
     return ret;
- err:
+err:
     if (i != 0)
         ERR_raise(ERR_LIB_ASN1, i);
     if ((a == NULL) || (*a != ret))
@@ -166,7 +166,7 @@ int ASN1_BIT_STRING_set_bit(ASN1_BIT_STRING *a, int n, int value)
 
     if ((a->length < (w + 1)) || (a->data == NULL)) {
         if (!value)
-            return 1;         /* Don't need to set */
+            return 1; /* Don't need to set */
         c = OPENSSL_clear_realloc(a->data, a->length, w + 1);
         if (c == NULL)
             return 0;
@@ -176,8 +176,7 @@ int ASN1_BIT_STRING_set_bit(ASN1_BIT_STRING *a, int n, int value)
         a->length = w + 1;
     }
     a->data[w] = ((a->data[w]) & iv) | v;
-    while ((a->length > 0) && (a->data[a->length - 1] == 0))
-        a->length--;
+    while ((a->length > 0) && (a->data[a->length - 1] == 0)) a->length--;
     return 1;
 }
 
@@ -201,8 +200,8 @@ int ASN1_BIT_STRING_get_bit(const ASN1_BIT_STRING *a, int n)
  * which is not specified in 'flags', 1 otherwise.
  * 'len' is the length of 'flags'.
  */
-int ASN1_BIT_STRING_check(const ASN1_BIT_STRING *a,
-                          const unsigned char *flags, int flags_len)
+int ASN1_BIT_STRING_check(const ASN1_BIT_STRING *a, const unsigned char *flags,
+                          int flags_len)
 {
     int i, ok;
     /* Check if there is one bit set at all. */

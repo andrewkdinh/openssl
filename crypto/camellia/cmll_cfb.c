@@ -28,7 +28,7 @@ void Camellia_cfb128_encrypt(const unsigned char *in, unsigned char *out,
 {
 
     CRYPTO_cfb128_encrypt(in, out, length, key, ivec, num, enc,
-                          (block128_f) Camellia_encrypt);
+                          (block128_f)Camellia_encrypt);
 }
 
 /* N.B. This expects the input to be packed, MS bit first */
@@ -37,7 +37,7 @@ void Camellia_cfb1_encrypt(const unsigned char *in, unsigned char *out,
                            unsigned char *ivec, int *num, const int enc)
 {
     CRYPTO_cfb128_1_encrypt(in, out, length, key, ivec, num, enc,
-                            (block128_f) Camellia_encrypt);
+                            (block128_f)Camellia_encrypt);
 }
 
 void Camellia_cfb8_encrypt(const unsigned char *in, unsigned char *out,
@@ -45,5 +45,5 @@ void Camellia_cfb8_encrypt(const unsigned char *in, unsigned char *out,
                            unsigned char *ivec, int *num, const int enc)
 {
     CRYPTO_cfb128_8_encrypt(in, out, length, key, ivec, num, enc,
-                            (block128_f) Camellia_encrypt);
+                            (block128_f)Camellia_encrypt);
 }

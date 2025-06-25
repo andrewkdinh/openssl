@@ -58,18 +58,10 @@ static int fd_free(BIO *data);
 int BIO_fd_should_retry(int s);
 
 static const BIO_METHOD methods_fdp = {
-    BIO_TYPE_FD,
-    "file descriptor",
-    bwrite_conv,
-    fd_write,
-    bread_conv,
-    fd_read,
-    fd_puts,
-    fd_gets,
-    fd_ctrl,
-    fd_new,
-    fd_free,
-    NULL,                       /* fd_callback_ctrl */
+    BIO_TYPE_FD, "file descriptor", bwrite_conv,
+    fd_write,    bread_conv,        fd_read,
+    fd_puts,     fd_gets,           fd_ctrl,
+    fd_new,      fd_free,           NULL, /* fd_callback_ctrl */
 };
 
 const BIO_METHOD *BIO_s_fd(void)
@@ -213,7 +205,7 @@ static int fd_gets(BIO *bp, char *buf, int size)
 
     while (ptr < end && fd_read(bp, ptr, 1) > 0) {
         if (*ptr++ == '\n')
-           break;
+            break;
     }
 
     ptr[0] = '\0';

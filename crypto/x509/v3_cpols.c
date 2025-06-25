@@ -35,54 +35,64 @@ static int nref_nos(STACK_OF(ASN1_INTEGER) *nnums, STACK_OF(CONF_VALUE) *nos);
 static int displaytext_str2tag(const char *tagstr, unsigned int *tag_len);
 static int displaytext_get_tag_len(const char *tagstr);
 
-const X509V3_EXT_METHOD ossl_v3_cpols = {
-    NID_certificate_policies, 0, ASN1_ITEM_ref(CERTIFICATEPOLICIES),
-    0, 0, 0, 0,
-    0, 0,
-    0, 0,
-    (X509V3_EXT_I2R)i2r_certpol,
-    (X509V3_EXT_R2I)r2i_certpol,
-    NULL
-};
+const X509V3_EXT_METHOD ossl_v3_cpols = {NID_certificate_policies,
+                                         0,
+                                         ASN1_ITEM_ref(CERTIFICATEPOLICIES),
+                                         0,
+                                         0,
+                                         0,
+                                         0,
+                                         0,
+                                         0,
+                                         0,
+                                         0,
+                                         (X509V3_EXT_I2R)i2r_certpol,
+                                         (X509V3_EXT_R2I)r2i_certpol,
+                                         NULL};
 
-ASN1_ITEM_TEMPLATE(CERTIFICATEPOLICIES) =
-        ASN1_EX_TEMPLATE_TYPE(ASN1_TFLG_SEQUENCE_OF, 0, CERTIFICATEPOLICIES, POLICYINFO)
+ASN1_ITEM_TEMPLATE(CERTIFICATEPOLICIES)
+    = ASN1_EX_TEMPLATE_TYPE(ASN1_TFLG_SEQUENCE_OF, 0, CERTIFICATEPOLICIES,
+                            POLICYINFO)
 ASN1_ITEM_TEMPLATE_END(CERTIFICATEPOLICIES)
 
 IMPLEMENT_ASN1_FUNCTIONS(CERTIFICATEPOLICIES)
 
-ASN1_SEQUENCE(POLICYINFO) = {
-        ASN1_SIMPLE(POLICYINFO, policyid, ASN1_OBJECT),
-        ASN1_SEQUENCE_OF_OPT(POLICYINFO, qualifiers, POLICYQUALINFO)
-} ASN1_SEQUENCE_END(POLICYINFO)
+ASN1_SEQUENCE(POLICYINFO)
+    = {ASN1_SIMPLE(POLICYINFO, policyid, ASN1_OBJECT),
+       ASN1_SEQUENCE_OF_OPT(POLICYINFO, qualifiers, POLICYQUALINFO)}
+ASN1_SEQUENCE_END(POLICYINFO)
 
 IMPLEMENT_ASN1_FUNCTIONS(POLICYINFO)
 
-ASN1_ADB_TEMPLATE(policydefault) = ASN1_SIMPLE(POLICYQUALINFO, d.other, ASN1_ANY);
+ASN1_ADB_TEMPLATE(policydefault) = ASN1_SIMPLE(POLICYQUALINFO, d.other,
+                                               ASN1_ANY);
 
 ASN1_ADB(POLICYQUALINFO) = {
-        ADB_ENTRY(NID_id_qt_cps, ASN1_SIMPLE(POLICYQUALINFO, d.cpsuri, ASN1_IA5STRING)),
-        ADB_ENTRY(NID_id_qt_unotice, ASN1_SIMPLE(POLICYQUALINFO, d.usernotice, USERNOTICE))
-} ASN1_ADB_END(POLICYQUALINFO, 0, pqualid, 0, &policydefault_tt, NULL);
+    ADB_ENTRY(NID_id_qt_cps,
+              ASN1_SIMPLE(POLICYQUALINFO, d.cpsuri, ASN1_IA5STRING)),
+    ADB_ENTRY(NID_id_qt_unotice,
+              ASN1_SIMPLE(POLICYQUALINFO, d.usernotice, USERNOTICE))}
+ASN1_ADB_END
+(POLICYQUALINFO, 0, pqualid, 0, &policydefault_tt, NULL);
 
-ASN1_SEQUENCE(POLICYQUALINFO) = {
-        ASN1_SIMPLE(POLICYQUALINFO, pqualid, ASN1_OBJECT),
-        ASN1_ADB_OBJECT(POLICYQUALINFO)
-} ASN1_SEQUENCE_END(POLICYQUALINFO)
+ASN1_SEQUENCE(POLICYQUALINFO)
+    = {ASN1_SIMPLE(POLICYQUALINFO, pqualid, ASN1_OBJECT),
+       ASN1_ADB_OBJECT(POLICYQUALINFO)}
+ASN1_SEQUENCE_END(POLICYQUALINFO)
 
 IMPLEMENT_ASN1_FUNCTIONS(POLICYQUALINFO)
 
-ASN1_SEQUENCE(USERNOTICE) = {
-        ASN1_OPT(USERNOTICE, noticeref, NOTICEREF),
-        ASN1_OPT(USERNOTICE, exptext, DISPLAYTEXT)
-} ASN1_SEQUENCE_END(USERNOTICE)
+ASN1_SEQUENCE(USERNOTICE)
+    = {ASN1_OPT(USERNOTICE, noticeref, NOTICEREF),
+       ASN1_OPT(USERNOTICE, exptext, DISPLAYTEXT)}
+ASN1_SEQUENCE_END(USERNOTICE)
 
 IMPLEMENT_ASN1_FUNCTIONS(USERNOTICE)
 
-ASN1_SEQUENCE(NOTICEREF) = {
-        ASN1_SIMPLE(NOTICEREF, organization, DISPLAYTEXT),
-        ASN1_SEQUENCE_OF(NOTICEREF, noticenos, ASN1_INTEGER)
-} ASN1_SEQUENCE_END(NOTICEREF)
+ASN1_SEQUENCE(NOTICEREF)
+    = {ASN1_SIMPLE(NOTICEREF, organization, DISPLAYTEXT),
+       ASN1_SEQUENCE_OF(NOTICEREF, noticenos, ASN1_INTEGER)}
+ASN1_SEQUENCE_END(NOTICEREF)
 
 IMPLEMENT_ASN1_FUNCTIONS(NOTICEREF)
 
@@ -126,8 +136,8 @@ static STACK_OF(POLICYINFO) *r2i_certpol(X509V3_EXT_METHOD *method,
 
             polsect = X509V3_get_section(ctx, pstr + 1);
             if (polsect == NULL) {
-                ERR_raise_data(ERR_LIB_X509V3, X509V3_R_INVALID_SECTION,
-                               "%s", cnf->name);
+                ERR_raise_data(ERR_LIB_X509V3, X509V3_R_INVALID_SECTION, "%s",
+                               cnf->name);
                 goto err;
             }
             pol = policy_section(ctx, polsect, ia5org);
@@ -137,8 +147,8 @@ static STACK_OF(POLICYINFO) *r2i_certpol(X509V3_EXT_METHOD *method,
         } else {
             if ((pobj = OBJ_txt2obj(cnf->name, 0)) == NULL) {
                 ERR_raise_data(ERR_LIB_X509V3,
-                               X509V3_R_INVALID_OBJECT_IDENTIFIER,
-                               "%s", cnf->name);
+                               X509V3_R_INVALID_OBJECT_IDENTIFIER, "%s",
+                               cnf->name);
                 goto err;
             }
             pol = POLICYINFO_new();
@@ -157,7 +167,7 @@ static STACK_OF(POLICYINFO) *r2i_certpol(X509V3_EXT_METHOD *method,
     }
     sk_CONF_VALUE_pop_free(vals, X509V3_conf_free);
     return pols;
- err:
+err:
     sk_CONF_VALUE_pop_free(vals, X509V3_conf_free);
     sk_POLICYINFO_pop_free(pols, POLICYINFO_free);
     return NULL;
@@ -250,7 +260,7 @@ static POLICYINFO *policy_section(X509V3_CTX *ctx,
 
     return pol;
 
- err:
+err:
     POLICYINFO_free(pol);
     return NULL;
 }
@@ -282,7 +292,8 @@ static int displaytext_str2tag(const char *tagstr, unsigned int *tag_len)
         return V_ASN1_BMPSTRING;
     if (len == sizeof("VISIBLE") - 1 && HAS_PREFIX(tagstr, "VISIBLE"))
         return V_ASN1_VISIBLESTRING;
-    if (len == sizeof("VISIBLESTRING") - 1 && HAS_PREFIX(tagstr, "VISIBLESTRING"))
+    if (len == sizeof("VISIBLESTRING") - 1
+        && HAS_PREFIX(tagstr, "VISIBLESTRING"))
         return V_ASN1_VISIBLESTRING;
     *tag_len = 0;
     return V_ASN1_VISIBLESTRING;
@@ -294,7 +305,7 @@ static POLICYQUALINFO *notice_section(X509V3_CTX *ctx,
     int i, ret, len, tag;
     unsigned int tag_len;
     CONF_VALUE *cnf;
-    USERNOTICE *not;
+    USERNOTICE * not;
     POLICYQUALINFO *qual;
     char *value = NULL;
 
@@ -306,7 +317,7 @@ static POLICYQUALINFO *notice_section(X509V3_CTX *ctx,
         ERR_raise(ERR_LIB_X509V3, ERR_R_INTERNAL_ERROR);
         goto err;
     }
-    if ((not = USERNOTICE_new()) == NULL) {
+    if ((not= USERNOTICE_new()) == NULL) {
         ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
         goto err;
     }
@@ -378,15 +389,15 @@ static POLICYQUALINFO *notice_section(X509V3_CTX *ctx,
         }
     }
 
-    if (not->noticeref &&
-        (!not->noticeref->noticenos || !not->noticeref->organization)) {
+    if (not->noticeref
+        && (!not->noticeref->noticenos || !not->noticeref->organization)) {
         ERR_raise(ERR_LIB_X509V3, X509V3_R_NEED_ORGANIZATION_AND_NUMBERS);
         goto err;
     }
 
     return qual;
 
- err:
+err:
     POLICYQUALINFO_free(qual);
     return NULL;
 }
@@ -445,8 +456,7 @@ static void print_qualifiers(BIO *out, STACK_OF(POLICYQUALINFO) *quals,
         switch (OBJ_obj2nid(qualinfo->pqualid)) {
         case NID_id_qt_cps:
             BIO_printf(out, "%*sCPS: %.*s", indent, "",
-                       qualinfo->d.cpsuri->length,
-                       qualinfo->d.cpsuri->data);
+                       qualinfo->d.cpsuri->length, qualinfo->d.cpsuri->data);
             break;
 
         case NID_id_qt_unotice:
@@ -470,8 +480,7 @@ static void print_notice(BIO *out, USERNOTICE *notice, int indent)
         NOTICEREF *ref;
         ref = notice->noticeref;
         BIO_printf(out, "%*sOrganization: %.*s\n", indent, "",
-                   ref->organization->length,
-                   ref->organization->data);
+                   ref->organization->length, ref->organization->data);
         BIO_printf(out, "%*sNumber%s: ", indent, "",
                    sk_ASN1_INTEGER_num(ref->noticenos) > 1 ? "s" : "");
         for (i = 0; i < sk_ASN1_INTEGER_num(ref->noticenos); i++) {
@@ -495,8 +504,7 @@ static void print_notice(BIO *out, USERNOTICE *notice, int indent)
     }
     if (notice->exptext)
         BIO_printf(out, "%*sExplicit Text: %.*s", indent, "",
-                   notice->exptext->length,
-                   notice->exptext->data);
+                   notice->exptext->length, notice->exptext->data);
 }
 
 void X509_POLICY_NODE_print(BIO *out, X509_POLICY_NODE *node, int indent)
@@ -512,7 +520,6 @@ void X509_POLICY_NODE_print(BIO *out, X509_POLICY_NODE *node, int indent)
     if (dat->qualifier_set) {
         print_qualifiers(out, dat->qualifier_set, indent + 2);
         BIO_puts(out, "\n");
-    }
-    else
+    } else
         BIO_printf(out, "%*sNo Qualifiers\n", indent + 2, "");
 }

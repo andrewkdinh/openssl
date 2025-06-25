@@ -165,8 +165,9 @@ int main(int argc, char *argv[])
     if (SSL_CTX_use_PrivateKey_file(ctx, "pkey.pem", SSL_FILETYPE_PEM) <= 0) {
         SSL_CTX_free(ctx);
         ERR_print_errors_fp(stderr);
-        errx(res, "Error loading the server private key file, "
-                  "possible key/cert mismatch???");
+        errx(res,
+             "Error loading the server private key file, "
+             "possible key/cert mismatch???");
     }
 
     /*
@@ -264,8 +265,8 @@ int main(int argc, char *argv[])
         }
 
         while (SSL_read_ex(ssl, buf, sizeof(buf), &nread) > 0) {
-            if (SSL_write_ex(ssl, buf, nread, &nwritten) > 0 &&
-                nwritten == nread) {
+            if (SSL_write_ex(ssl, buf, nread, &nwritten) > 0
+                && nwritten == nread) {
                 total += nwritten;
                 continue;
             }

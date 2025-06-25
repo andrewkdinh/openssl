@@ -29,16 +29,14 @@ static int srp_Verify_N_and_g(const BIGNUM *N, const BIGNUM *g)
     BN_CTX *bn_ctx = BN_CTX_new();
     BIGNUM *p = BN_new();
     BIGNUM *r = BN_new();
-    int ret =
-        g != NULL && N != NULL && bn_ctx != NULL && BN_is_odd(N) &&
-        BN_check_prime(N, bn_ctx, NULL) == 1 &&
-        p != NULL && BN_rshift1(p, N) &&
+    int ret = g != NULL && N != NULL && bn_ctx != NULL && BN_is_odd(N)
+        && BN_check_prime(N, bn_ctx, NULL) == 1 && p != NULL && BN_rshift1(p, N)
+        &&
         /* p = (N-1)/2 */
-        BN_check_prime(p, bn_ctx, NULL) == 1 &&
-        r != NULL &&
+        BN_check_prime(p, bn_ctx, NULL) == 1 && r != NULL &&
         /* verify g^((N-1)/2) == -1 (mod N) */
-        BN_mod_exp(r, g, p, N, bn_ctx) &&
-        BN_add_word(r, 1) && BN_cmp(r, N) == 0;
+        BN_mod_exp(r, g, p, N, bn_ctx) && BN_add_word(r, 1)
+        && BN_cmp(r, N) == 0;
 
     BN_free(r);
     BN_free(p);
@@ -83,8 +81,9 @@ static int ssl_srp_verify_param_cb(SSL *s, void *arg)
 
     if (srp_arg->amp == 1) {
         if (srp_arg->debug)
-            BIO_printf(bio_err,
-                       "SRP param N and g are not known params, going to check deeper.\n");
+            BIO_printf(
+                bio_err,
+                "SRP param N and g are not known params, going to check deeper.\n");
 
         /*
          * The srp_moregroups is a real debugging feature. Implementers
@@ -144,7 +143,7 @@ static char *dummy_srp(SSL *ssl, void *arg)
 
 void set_up_dummy_srp(SSL_CTX *ctx)
 {
-        SSL_CTX_set_srp_client_pwd_callback(ctx, dummy_srp);
+    SSL_CTX_set_srp_client_pwd_callback(ctx, dummy_srp);
 }
 
 /*
@@ -157,7 +156,7 @@ void set_up_dummy_srp(SSL_CTX *ctx)
  */
 static int ssl_srp_server_param_cb(SSL *s, int *ad, void *arg)
 {
-    srpsrvparm *p = (srpsrvparm *) arg;
+    srpsrvparm *p = (srpsrvparm *)arg;
     int ret = SSL3_AL_FATAL;
 
     if (p->login == NULL && p->user == NULL) {
@@ -171,18 +170,17 @@ static int ssl_srp_server_param_cb(SSL *s, int *ad, void *arg)
         goto err;
     }
 
-    if (SSL_set_srp_server_param
-        (s, p->user->N, p->user->g, p->user->s, p->user->v,
-         p->user->info) < 0) {
+    if (SSL_set_srp_server_param(s, p->user->N, p->user->g, p->user->s,
+                                 p->user->v, p->user->info)
+        < 0) {
         *ad = SSL_AD_INTERNAL_ERROR;
         goto err;
     }
-    BIO_printf(bio_err,
-               "SRP parameters set: username = \"%s\" info=\"%s\"\n",
+    BIO_printf(bio_err, "SRP parameters set: username = \"%s\" info=\"%s\"\n",
                p->login, p->user->info);
     ret = SSL_ERROR_NONE;
 
- err:
+err:
     SRP_user_pwd_free(p->user);
     p->user = NULL;
     p->login = NULL;
@@ -202,12 +200,11 @@ int set_up_srp_verifier_file(SSL_CTX *ctx, srpsrvparm *srp_callback_parm,
         BIO_printf(bio_err, "Failed to initialize SRP verifier file\n");
         return 0;
     }
-    if ((ret =
-            SRP_VBASE_init(srp_callback_parm->vb,
-                           srp_verifier_file)) != SRP_NO_ERROR) {
+    if ((ret = SRP_VBASE_init(srp_callback_parm->vb, srp_verifier_file))
+        != SRP_NO_ERROR) {
         BIO_printf(bio_err,
-                    "Cannot initialize SRP verifier file \"%s\":ret=%d\n",
-                    srp_verifier_file, ret);
+                   "Cannot initialize SRP verifier file \"%s\":ret=%d\n",
+                   srp_verifier_file, ret);
         return 0;
     }
     SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, verify_callback);
@@ -220,12 +217,12 @@ int set_up_srp_verifier_file(SSL_CTX *ctx, srpsrvparm *srp_callback_parm,
 void lookup_srp_user(srpsrvparm *srp_callback_parm, BIO *bio_s_out)
 {
     SRP_user_pwd_free(srp_callback_parm->user);
-    srp_callback_parm->user = SRP_VBASE_get1_by_user(srp_callback_parm->vb,
-                                                     srp_callback_parm->login);
+    srp_callback_parm->user =
+        SRP_VBASE_get1_by_user(srp_callback_parm->vb, srp_callback_parm->login);
 
     if (srp_callback_parm->user != NULL)
         BIO_printf(bio_s_out, "LOOKUP done %s\n",
-                    srp_callback_parm->user->info);
+                   srp_callback_parm->user->info);
     else
         BIO_printf(bio_s_out, "LOOKUP not successful\n");
 }

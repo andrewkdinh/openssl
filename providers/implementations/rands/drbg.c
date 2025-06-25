@@ -64,9 +64,8 @@ static int ossl_drbg_lock_parent(PROV_DRBG *drbg)
 {
     void *parent = drbg->parent;
 
-    if (parent != NULL
-            && drbg->parent_lock != NULL
-            && !drbg->parent_lock(parent)) {
+    if (parent != NULL && drbg->parent_lock != NULL
+        && !drbg->parent_lock(parent)) {
         ERR_raise(ERR_LIB_PROV, PROV_R_PARENT_LOCKING_NOT_ENABLED);
         return 0;
     }
@@ -83,7 +82,7 @@ static void ossl_drbg_unlock_parent(PROV_DRBG *drbg)
 
 static int get_parent_strength(PROV_DRBG *drbg, unsigned int *str)
 {
-    OSSL_PARAM params[2] = { OSSL_PARAM_END, OSSL_PARAM_END };
+    OSSL_PARAM params[2] = {OSSL_PARAM_END, OSSL_PARAM_END};
     void *parent = drbg->parent;
     int res;
 
@@ -108,7 +107,7 @@ static int get_parent_strength(PROV_DRBG *drbg, unsigned int *str)
 
 static unsigned int get_parent_reseed_count(PROV_DRBG *drbg)
 {
-    OSSL_PARAM params[2] = { OSSL_PARAM_END, OSSL_PARAM_END };
+    OSSL_PARAM params[2] = {OSSL_PARAM_END, OSSL_PARAM_END};
     void *parent = drbg->parent;
     unsigned int r = 0;
 
@@ -122,7 +121,7 @@ static unsigned int get_parent_reseed_count(PROV_DRBG *drbg)
     ossl_drbg_unlock_parent(drbg);
     return r;
 
- err:
+err:
     r = tsan_load(&drbg->reseed_counter) - 2;
     if (r == 0)
         r = UINT_MAX;
@@ -141,10 +140,10 @@ static unsigned int get_parent_reseed_count(PROV_DRBG *drbg)
  * If a random pool has been added to the DRBG using RAND_add(), then
  * its entropy will be used up first.
  */
-size_t ossl_drbg_get_seed(void *vdrbg, unsigned char **pout,
-                          int entropy, size_t min_len,
-                          size_t max_len, int prediction_resistance,
-                          const unsigned char *adin, size_t adin_len)
+size_t ossl_drbg_get_seed(void *vdrbg, unsigned char **pout, int entropy,
+                          size_t min_len, size_t max_len,
+                          int prediction_resistance, const unsigned char *adin,
+                          size_t adin_len)
 {
     PROV_DRBG *drbg = (PROV_DRBG *)vdrbg;
     size_t bytes_needed;
@@ -171,9 +170,9 @@ size_t ossl_drbg_get_seed(void *vdrbg, unsigned char **pout,
      *       a warning in some static code analyzers, but it's
      *       intentional and correct here.
      */
-    if (!ossl_prov_drbg_generate(drbg, buffer, bytes_needed,
-                                 drbg->strength, prediction_resistance,
-                                 (unsigned char *)&drbg, sizeof(drbg))) {
+    if (!ossl_prov_drbg_generate(drbg, buffer, bytes_needed, drbg->strength,
+                                 prediction_resistance, (unsigned char *)&drbg,
+                                 sizeof(drbg))) {
         OPENSSL_secure_clear_free(buffer, bytes_needed);
         ERR_raise(ERR_LIB_PROV, PROV_R_GENERATE_ERROR);
         return 0;
@@ -183,8 +182,8 @@ size_t ossl_drbg_get_seed(void *vdrbg, unsigned char **pout,
 }
 
 /* Implements the cleanup_entropy() callback */
-void ossl_drbg_clear_seed(ossl_unused void *vdrbg,
-                          unsigned char *out, size_t outlen)
+void ossl_drbg_clear_seed(ossl_unused void *vdrbg, unsigned char *out,
+                          size_t outlen)
 {
     OPENSSL_secure_clear_free(out, outlen);
 }
@@ -236,7 +235,7 @@ static size_t get_entropy(PROV_DRBG *drbg, unsigned char **pout, int entropy,
      *       intentional and correct here.
      */
     bytes = drbg->parent_get_seed(drbg->parent, pout,
-                                  entropy > 0 ? entropy : (int) drbg->strength,
+                                  entropy > 0 ? entropy : (int)drbg->strength,
                                   min_len, max_len, prediction_resistance,
                                   (unsigned char *)&drbg, sizeof(drbg));
     ossl_drbg_unlock_parent(drbg);
@@ -303,8 +302,8 @@ static size_t prov_drbg_get_nonce(PROV_DRBG *drbg, unsigned char **pout,
     size_t ret = 0, n;
     unsigned char *buf = NULL;
     OSSL_LIB_CTX *libctx = ossl_prov_ctx_get0_libctx(drbg->provctx);
-    PROV_DRBG_NONCE_GLOBAL *dngbl
-        = ossl_lib_ctx_get_data(libctx, OSSL_LIB_CTX_DRBG_NONCE_INDEX);
+    PROV_DRBG_NONCE_GLOBAL *dngbl =
+        ossl_lib_ctx_get_data(libctx, OSSL_LIB_CTX_DRBG_NONCE_INDEX);
     struct {
         void *drbg;
         int count;
@@ -317,8 +316,8 @@ static size_t prov_drbg_get_nonce(PROV_DRBG *drbg, unsigned char **pout,
         n = drbg->parent_nonce(drbg->parent, NULL, 0, drbg->min_noncelen,
                                drbg->max_noncelen);
         if (n > 0 && (buf = OPENSSL_malloc(n)) != NULL) {
-            ret = drbg->parent_nonce(drbg->parent, buf, 0,
-                                     drbg->min_noncelen, drbg->max_noncelen);
+            ret = drbg->parent_nonce(drbg->parent, buf, 0, drbg->min_noncelen,
+                                     drbg->max_noncelen);
             if (ret == n) {
                 *pout = buf;
                 return ret;
@@ -333,8 +332,8 @@ static size_t prov_drbg_get_nonce(PROV_DRBG *drbg, unsigned char **pout,
     if (!CRYPTO_atomic_add(&dngbl->rand_nonce_count, 1, &data.count,
                            dngbl->rand_nonce_lock))
         return 0;
-    return ossl_prov_get_nonce(drbg->provctx, pout, min_len, max_len,
-                               &data, sizeof(data));
+    return ossl_prov_get_nonce(drbg->provctx, pout, min_len, max_len, &data,
+                               sizeof(data));
 }
 #endif /* PROV_RAND_GET_RANDOM_NONCE */
 
@@ -383,9 +382,9 @@ int ossl_prov_drbg_instantiate(PROV_DRBG *drbg, unsigned int strength,
 
     if (drbg->min_noncelen > 0) {
         if (drbg->parent_nonce != NULL) {
-            noncelen = drbg->parent_nonce(drbg->parent, NULL, drbg->strength,
-                                          drbg->min_noncelen,
-                                          drbg->max_noncelen);
+            noncelen =
+                drbg->parent_nonce(drbg->parent, NULL, drbg->strength,
+                                   drbg->min_noncelen, drbg->max_noncelen);
             if (noncelen == 0) {
                 ERR_raise(ERR_LIB_PROV, PROV_R_ERROR_RETRIEVING_NONCE);
                 goto end;
@@ -395,10 +394,9 @@ int ossl_prov_drbg_instantiate(PROV_DRBG *drbg, unsigned int strength,
                 ERR_raise(ERR_LIB_PROV, PROV_R_ERROR_RETRIEVING_NONCE);
                 goto end;
             }
-            if (noncelen != drbg->parent_nonce(drbg->parent, nonce,
-                                               drbg->strength,
-                                               drbg->min_noncelen,
-                                               drbg->max_noncelen)) {
+            if (noncelen
+                != drbg->parent_nonce(drbg->parent, nonce, drbg->strength,
+                                      drbg->min_noncelen, drbg->max_noncelen)) {
                 ERR_raise(ERR_LIB_PROV, PROV_R_ERROR_RETRIEVING_NONCE);
                 goto end;
             }
@@ -421,7 +419,7 @@ int ossl_prov_drbg_instantiate(PROV_DRBG *drbg, unsigned int strength,
             noncelen = prov_drbg_get_nonce(drbg, &nonce, drbg->min_noncelen,
                                            drbg->max_noncelen);
             if (noncelen < drbg->min_noncelen
-                    || noncelen > drbg->max_noncelen) {
+                || noncelen > drbg->max_noncelen) {
                 ERR_raise(ERR_LIB_PROV, PROV_R_ERROR_RETRIEVING_NONCE);
                 goto end;
             }
@@ -436,17 +434,15 @@ int ossl_prov_drbg_instantiate(PROV_DRBG *drbg, unsigned int strength,
             drbg->reseed_next_counter = 1;
     }
 
-    entropylen = get_entropy(drbg, &entropy, min_entropy,
-                             min_entropylen, max_entropylen,
-                             prediction_resistance);
-    if (entropylen < min_entropylen
-            || entropylen > max_entropylen) {
+    entropylen = get_entropy(drbg, &entropy, min_entropy, min_entropylen,
+                             max_entropylen, prediction_resistance);
+    if (entropylen < min_entropylen || entropylen > max_entropylen) {
         ERR_raise(ERR_LIB_PROV, PROV_R_ERROR_RETRIEVING_ENTROPY);
         goto end;
     }
 
-    if (!drbg->instantiate(drbg, entropy, entropylen, nonce, noncelen,
-                           pers, perslen)) {
+    if (!drbg->instantiate(drbg, entropy, entropylen, nonce, noncelen, pers,
+                           perslen)) {
         cleanup_entropy(drbg, entropy, entropylen);
         ERR_raise(ERR_LIB_PROV, PROV_R_ERROR_INSTANTIATING_DRBG);
         goto end;
@@ -458,7 +454,7 @@ int ossl_prov_drbg_instantiate(PROV_DRBG *drbg, unsigned int strength,
     drbg->reseed_time = time(NULL);
     tsan_store(&drbg->reseed_counter, drbg->reseed_next_counter);
 
- end:
+end:
     if (nonce != NULL)
         ossl_prov_cleanup_nonce(drbg->provctx, nonce, noncelen);
     if (drbg->state == EVP_RAND_STATE_READY)
@@ -479,12 +475,10 @@ int ossl_prov_drbg_uninstantiate(PROV_DRBG *drbg)
     return 1;
 }
 
-static int ossl_prov_drbg_reseed_unlocked(PROV_DRBG *drbg,
-                                          int prediction_resistance,
-                                          const unsigned char *ent,
-                                          size_t ent_len,
-                                          const unsigned char *adin,
-                                          size_t adinlen)
+static int
+ossl_prov_drbg_reseed_unlocked(PROV_DRBG *drbg, int prediction_resistance,
+                               const unsigned char *ent, size_t ent_len,
+                               const unsigned char *adin, size_t adinlen)
 {
     unsigned char *entropy = NULL;
     size_t entropylen = 0;
@@ -560,11 +554,11 @@ static int ossl_prov_drbg_reseed_unlocked(PROV_DRBG *drbg,
     }
 
     /* Reseed using our sources in addition */
-    entropylen = get_entropy(drbg, &entropy, drbg->strength,
-                             drbg->min_entropylen, drbg->max_entropylen,
-                             prediction_resistance);
+    entropylen =
+        get_entropy(drbg, &entropy, drbg->strength, drbg->min_entropylen,
+                    drbg->max_entropylen, prediction_resistance);
     if (entropylen < drbg->min_entropylen
-            || entropylen > drbg->max_entropylen) {
+        || entropylen > drbg->max_entropylen) {
         ERR_raise(ERR_LIB_PROV, PROV_R_ERROR_RETRIEVING_ENTROPY);
         goto end;
     }
@@ -579,7 +573,7 @@ static int ossl_prov_drbg_reseed_unlocked(PROV_DRBG *drbg,
     if (drbg->parent != NULL)
         drbg->parent_reseed_counter = get_parent_reseed_count(drbg);
 
- end:
+end:
     cleanup_entropy(drbg, entropy, entropylen);
     if (drbg->state == EVP_RAND_STATE_READY)
         return 1;
@@ -680,7 +674,7 @@ int ossl_prov_drbg_generate(PROV_DRBG *drbg, unsigned char *out, size_t outlen,
             reseed_required = 1;
     }
     if (drbg->parent != NULL
-            && get_parent_reseed_count(drbg) != drbg->parent_reseed_counter)
+        && get_parent_reseed_count(drbg) != drbg->parent_reseed_counter)
         reseed_required = 1;
 
     if (reseed_required || prediction_resistance) {
@@ -702,7 +696,7 @@ int ossl_prov_drbg_generate(PROV_DRBG *drbg, unsigned char *out, size_t outlen,
     drbg->generate_counter++;
 
     ret = 1;
- err:
+err:
     if (drbg->lock != NULL)
         CRYPTO_THREAD_unlock(drbg->lock);
 
@@ -780,19 +774,18 @@ int ossl_drbg_enable_locking(void *vctx)
  *
  * Returns a pointer to the new DRBG instance on success, NULL on failure.
  */
-PROV_DRBG *ossl_rand_drbg_new
-    (void *provctx, void *parent, const OSSL_DISPATCH *p_dispatch,
-     int (*dnew)(PROV_DRBG *ctx),
-     void (*dfree)(void *vctx),
-     int (*instantiate)(PROV_DRBG *drbg,
-                        const unsigned char *entropy, size_t entropylen,
-                        const unsigned char *nonce, size_t noncelen,
-                        const unsigned char *pers, size_t perslen),
-     int (*uninstantiate)(PROV_DRBG *ctx),
-     int (*reseed)(PROV_DRBG *drbg, const unsigned char *ent, size_t ent_len,
-                   const unsigned char *adin, size_t adin_len),
-     int (*generate)(PROV_DRBG *, unsigned char *out, size_t outlen,
-                     const unsigned char *adin, size_t adin_len))
+PROV_DRBG *ossl_rand_drbg_new(
+    void *provctx, void *parent, const OSSL_DISPATCH *p_dispatch,
+    int (*dnew)(PROV_DRBG *ctx), void (*dfree)(void *vctx),
+    int (*instantiate)(PROV_DRBG *drbg, const unsigned char *entropy,
+                       size_t entropylen, const unsigned char *nonce,
+                       size_t noncelen, const unsigned char *pers,
+                       size_t perslen),
+    int (*uninstantiate)(PROV_DRBG *ctx),
+    int (*reseed)(PROV_DRBG *drbg, const unsigned char *ent, size_t ent_len,
+                  const unsigned char *adin, size_t adin_len),
+    int (*generate)(PROV_DRBG *, unsigned char *out, size_t outlen,
+                    const unsigned char *adin, size_t adin_len))
 {
     PROV_DRBG *drbg;
     unsigned int p_str;
@@ -860,7 +853,7 @@ PROV_DRBG *ossl_rand_drbg_new
 #endif
     return drbg;
 
- err:
+err:
     dfree(drbg);
     return NULL;
 }
@@ -1012,9 +1005,9 @@ int ossl_drbg_verify_digest(PROV_DRBG *drbg, OSSL_LIB_CTX *libctx,
     int approved = digest_allowed(md);
 
     if (!approved) {
-        if (!OSSL_FIPS_IND_ON_UNAPPROVED(drbg, OSSL_FIPS_IND_SETTABLE0,
-                                         libctx, "DRBG", "Digest",
-                                         ossl_fips_config_restricted_drbg_digests)) {
+        if (!OSSL_FIPS_IND_ON_UNAPPROVED(
+                drbg, OSSL_FIPS_IND_SETTABLE0, libctx, "DRBG", "Digest",
+                ossl_fips_config_restricted_drbg_digests)) {
             ERR_raise(ERR_LIB_PROV, PROV_R_DIGEST_NOT_ALLOWED);
             return 0;
         }

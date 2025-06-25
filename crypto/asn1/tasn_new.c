@@ -45,7 +45,6 @@ ASN1_VALUE *ASN1_item_new_ex(const ASN1_ITEM *it, OSSL_LIB_CTX *libctx,
 
 /* Allocate an ASN1 structure */
 
-
 int ossl_asn1_item_ex_new_intern(ASN1_VALUE **pval, const ASN1_ITEM *it,
                                  OSSL_LIB_CTX *libctx, const char *propq)
 {
@@ -157,18 +156,17 @@ int asn1_item_embed_new(ASN1_VALUE **pval, const ASN1_ITEM *it, int embed,
     }
     return 1;
 
- asn1err2:
+asn1err2:
     ossl_asn1_item_embed_free(pval, it, embed);
- asn1err:
+asn1err:
     ERR_raise(ERR_LIB_ASN1, ERR_R_ASN1_LIB);
     return 0;
 
- auxerr2:
+auxerr2:
     ossl_asn1_item_embed_free(pval, it, embed);
- auxerr:
+auxerr:
     ERR_raise(ERR_LIB_ASN1, ASN1_R_AUX_ERROR);
     return 0;
-
 }
 
 static void asn1_item_clear(ASN1_VALUE **pval, const ASN1_ITEM *it)
@@ -240,7 +238,7 @@ static int asn1_template_new(ASN1_VALUE **pval, const ASN1_TEMPLATE *tt,
     }
     /* Otherwise pass it back to the item routine */
     ret = asn1_item_embed_new(pval, it, embed, libctx, propq);
- done:
+done:
     return ret;
 }
 
@@ -258,8 +256,7 @@ static void asn1_template_clear(ASN1_VALUE **pval, const ASN1_TEMPLATE *tt)
  * all the old functions.
  */
 
-static int asn1_primitive_new(ASN1_VALUE **pval, const ASN1_ITEM *it,
-                              int embed)
+static int asn1_primitive_new(ASN1_VALUE **pval, const ASN1_ITEM *it, int embed)
 {
     ASN1_TYPE *typ;
     ASN1_STRING *str;

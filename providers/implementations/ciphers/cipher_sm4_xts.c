@@ -123,13 +123,9 @@ static int sm4_xts_cipher(void *vctx, unsigned char *out, size_t *outl,
 {
     PROV_SM4_XTS_CTX *ctx = (PROV_SM4_XTS_CTX *)vctx;
 
-    if (!ossl_prov_is_running()
-            || ctx->xts.key1 == NULL
-            || ctx->xts.key2 == NULL
-            || !ctx->base.iv_set
-            || out == NULL
-            || in == NULL
-            || inl < SM4_BLOCK_SIZE)
+    if (!ossl_prov_is_running() || ctx->xts.key1 == NULL
+        || ctx->xts.key2 == NULL || !ctx->base.iv_set || out == NULL
+        || in == NULL || inl < SM4_BLOCK_SIZE)
         return 0;
 
     /*
@@ -191,8 +187,7 @@ static int sm4_xts_stream_final(void *vctx, unsigned char *out, size_t *outl,
 
 static const OSSL_PARAM sm4_xts_known_settable_ctx_params[] = {
     OSSL_PARAM_utf8_string(OSSL_CIPHER_PARAM_XTS_STANDARD, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 
 static const OSSL_PARAM *sm4_xts_settable_ctx_params(ossl_unused void *cctx,
                                                      ossl_unused void *provctx)

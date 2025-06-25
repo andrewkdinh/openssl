@@ -79,7 +79,7 @@ int ssl3_send_alert(SSL_CONNECTION *s, int level, int desc)
 int ssl3_dispatch_alert(SSL *s)
 {
     int i, j;
-    void (*cb) (const SSL *ssl, int type, int val) = NULL;
+    void (*cb)(const SSL *ssl, int type, int val) = NULL;
     SSL_CONNECTION *sc = SSL_CONNECTION_FROM_SSL(s);
     OSSL_RECORD_TEMPLATE templ;
 
@@ -93,12 +93,11 @@ int ssl3_dispatch_alert(SSL *s)
     }
 
     templ.type = SSL3_RT_ALERT;
-    templ.version = (sc->version == TLS1_3_VERSION) ? TLS1_2_VERSION
-                                                    : sc->version;
-    if (SSL_get_state(s) == TLS_ST_CW_CLNT_HELLO
-            && !sc->renegotiate
-            && TLS1_get_version(s) > TLS1_VERSION
-            && sc->hello_retry_request == SSL_HRR_NONE) {
+    templ.version =
+        (sc->version == TLS1_3_VERSION) ? TLS1_2_VERSION : sc->version;
+    if (SSL_get_state(s) == TLS_ST_CW_CLNT_HELLO && !sc->renegotiate
+        && TLS1_get_version(s) > TLS1_VERSION
+        && sc->hello_retry_request == SSL_HRR_NONE) {
         templ.version = TLS1_VERSION;
     }
     templ.buf = &sc->s3.send_alert[0];
@@ -115,8 +114,8 @@ int ssl3_dispatch_alert(SSL *s)
             return -1;
         }
         /* Retry what we've already got pending */
-        i = HANDLE_RLAYER_WRITE_RETURN(sc,
-                sc->rlayer.wrlmethod->retry_write_records(sc->rlayer.wrl));
+        i = HANDLE_RLAYER_WRITE_RETURN(
+            sc, sc->rlayer.wrlmethod->retry_write_records(sc->rlayer.wrl));
         if (i <= 0) {
             /* Could be NBIO. Keep alert_dispatch as SSL_ALERT_DISPATCH_RETRY */
             return -1;
@@ -126,8 +125,8 @@ int ssl3_dispatch_alert(SSL *s)
         return 1;
     }
 
-    i = HANDLE_RLAYER_WRITE_RETURN(sc,
-            sc->rlayer.wrlmethod->write_records(sc->rlayer.wrl, &templ, 1));
+    i = HANDLE_RLAYER_WRITE_RETURN(
+        sc, sc->rlayer.wrlmethod->write_records(sc->rlayer.wrl, &templ, 1));
 
     if (i <= 0) {
         sc->s3.alert_dispatch = SSL_ALERT_DISPATCH_RETRY;

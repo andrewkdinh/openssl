@@ -68,7 +68,7 @@
  * small value (HP-UX offers 14), so we need to check if we got a result, and
  * if it meets a minimum standard, and create or change it if not.
  */
-#if !defined(LP_ENTRY_SIZE) || LP_ENTRY_SIZE<255
+#if !defined(LP_ENTRY_SIZE) || LP_ENTRY_SIZE < 255
 # undef LP_ENTRY_SIZE
 # define LP_ENTRY_SIZE 255
 #endif
@@ -123,7 +123,7 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
     strncpy((*ctx)->previous_entry_name, (*ctx)->entry_name,
             sizeof((*ctx)->previous_entry_name));
 
- again:
+again:
 #endif
 
     direntry = readdir((*ctx)->dir);
@@ -137,12 +137,11 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
     if ((*ctx)->expect_file_generations) {
         char *p = (*ctx)->entry_name + strlen((*ctx)->entry_name);
 
-        while (p > (*ctx)->entry_name && isdigit((unsigned char)p[-1]))
-            p--;
+        while (p > (*ctx)->entry_name && isdigit((unsigned char)p[-1])) p--;
         if (p > (*ctx)->entry_name && p[-1] == ';')
             p[-1] = '\0';
-        if (OPENSSL_strcasecmp((*ctx)->entry_name,
-                               (*ctx)->previous_entry_name) == 0)
+        if (OPENSSL_strcasecmp((*ctx)->entry_name, (*ctx)->previous_entry_name)
+            == 0)
             goto again;
     }
 #endif

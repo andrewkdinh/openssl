@@ -9,13 +9,13 @@
  */
 
 #ifndef OSSL_CRYPTO_ENGINE_ENG_LOCAL_H
-# define OSSL_CRYPTO_ENGINE_ENG_LOCAL_H
+#define OSSL_CRYPTO_ENGINE_ENG_LOCAL_H
 
-# include <openssl/trace.h>
-# include "internal/cryptlib.h"
-# include "crypto/engine.h"
-# include "internal/thread_once.h"
-# include "internal/refcount.h"
+#include <openssl/trace.h>
+#include "internal/cryptlib.h"
+#include "crypto/engine.h"
+#include "internal/thread_once.h"
+#include "internal/refcount.h"
 
 extern CRYPTO_RWLOCK *global_engine_lock;
 
@@ -25,7 +25,7 @@ extern CRYPTO_RWLOCK *global_engine_lock;
  * the file:line-number pair. The "ENGINE_REF_PRINT" statements must come
  * *after* the change.
  */
-# define ENGINE_REF_PRINT(e, isfunct, diff)                             \
+#define ENGINE_REF_PRINT(e, isfunct, diff)                             \
     OSSL_TRACE6(ENGINE_REF_COUNT,                                       \
                "engine: %p %s from %d to %d (%s:%d)\n",                 \
                (void *)(e), (isfunct ? "funct" : "struct"),             \
@@ -41,7 +41,7 @@ extern CRYPTO_RWLOCK *global_engine_lock;
  * callbacks in order. NB: both the "add" functions assume the engine lock to
  * already be held (in "write" mode).
  */
-typedef void (ENGINE_CLEANUP_CB) (void);
+typedef void(ENGINE_CLEANUP_CB)(void);
 typedef struct st_engine_cleanup_item {
     ENGINE_CLEANUP_CB *cb;
 } ENGINE_CLEANUP_ITEM;
@@ -62,10 +62,10 @@ int engine_table_register(ENGINE_TABLE **table, ENGINE_CLEANUP_CB *cleanup,
                           int setdefault);
 void engine_table_unregister(ENGINE_TABLE **table, ENGINE *e);
 void engine_table_cleanup(ENGINE_TABLE **table);
-ENGINE *ossl_engine_table_select(ENGINE_TABLE **table, int nid,
-                                 const char *f, int l);
-typedef void (engine_table_doall_cb) (int nid, STACK_OF(ENGINE) *sk,
-                                      ENGINE *def, void *arg);
+ENGINE *ossl_engine_table_select(ENGINE_TABLE **table, int nid, const char *f,
+                                 int l);
+typedef void(engine_table_doall_cb)(int nid, STACK_OF(ENGINE) *sk, ENGINE *def,
+                                    void *arg);
 void engine_table_doall(ENGINE_TABLE *table, engine_table_doall_cb *cb,
                         void *arg);
 

@@ -96,8 +96,7 @@ static const ERR_STRING_DATA RAND_str_reasons[] = {
      "unsupported drbg flags"},
     {ERR_PACK(ERR_LIB_RAND, 0, RAND_R_UNSUPPORTED_DRBG_TYPE),
      "unsupported drbg type"},
-    {0, NULL}
-};
+    {0, NULL}};
 
 #endif
 

@@ -51,8 +51,7 @@ static OSSL_provider_init_fn ossl_child_provider_init;
 
 static int ossl_child_provider_init(const OSSL_CORE_HANDLE *handle,
                                     const OSSL_DISPATCH *in,
-                                    const OSSL_DISPATCH **out,
-                                    void **provctx)
+                                    const OSSL_DISPATCH **out, void **provctx)
 {
     OSSL_FUNC_core_get_libctx_fn *c_get_libctx = NULL;
     OSSL_LIB_CTX *ctx;
@@ -132,7 +131,8 @@ static int provider_create_child_cb(const OSSL_CORE_HANDLE *prov, void *cbdata)
          * init children
          */
         if ((cprov = ossl_provider_new(ctx, provname, ossl_child_provider_init,
-                                       NULL, 1)) == NULL)
+                                       NULL, 1))
+            == NULL)
             goto err;
 
         if (!ossl_provider_activate(cprov, 0, 0)) {
@@ -149,7 +149,7 @@ static int provider_create_child_cb(const OSSL_CORE_HANDLE *prov, void *cbdata)
     }
 
     ret = 1;
- err:
+err:
     CRYPTO_THREAD_unlock(gbl->lock);
     return ret;
 }
@@ -174,8 +174,7 @@ static int provider_remove_child_cb(const OSSL_CORE_HANDLE *prov, void *cbdata)
      * rely on the provider store reference count.
      */
     ossl_provider_free(cprov);
-    if (ossl_provider_is_child(cprov)
-            && !ossl_provider_deactivate(cprov, 1))
+    if (ossl_provider_is_child(cprov) && !ossl_provider_deactivate(cprov, 1))
         return 0;
 
     return 1;
@@ -208,26 +207,25 @@ int ossl_provider_init_as_child(OSSL_LIB_CTX *ctx,
             gbl->c_get_libctx = OSSL_FUNC_core_get_libctx(in);
             break;
         case OSSL_FUNC_PROVIDER_REGISTER_CHILD_CB:
-            gbl->c_provider_register_child_cb
-                = OSSL_FUNC_provider_register_child_cb(in);
+            gbl->c_provider_register_child_cb =
+                OSSL_FUNC_provider_register_child_cb(in);
             break;
         case OSSL_FUNC_PROVIDER_DEREGISTER_CHILD_CB:
-            gbl->c_provider_deregister_child_cb
-                = OSSL_FUNC_provider_deregister_child_cb(in);
+            gbl->c_provider_deregister_child_cb =
+                OSSL_FUNC_provider_deregister_child_cb(in);
             break;
         case OSSL_FUNC_PROVIDER_NAME:
             gbl->c_prov_name = OSSL_FUNC_provider_name(in);
             break;
         case OSSL_FUNC_PROVIDER_GET0_PROVIDER_CTX:
-            gbl->c_prov_get0_provider_ctx
-                = OSSL_FUNC_provider_get0_provider_ctx(in);
+            gbl->c_prov_get0_provider_ctx =
+                OSSL_FUNC_provider_get0_provider_ctx(in);
             break;
         case OSSL_FUNC_PROVIDER_GET0_DISPATCH:
             gbl->c_prov_get0_dispatch = OSSL_FUNC_provider_get0_dispatch(in);
             break;
         case OSSL_FUNC_PROVIDER_UP_REF:
-            gbl->c_prov_up_ref
-                = OSSL_FUNC_provider_up_ref(in);
+            gbl->c_prov_up_ref = OSSL_FUNC_provider_up_ref(in);
             break;
         case OSSL_FUNC_PROVIDER_FREE:
             gbl->c_prov_free = OSSL_FUNC_provider_free(in);
@@ -238,24 +236,19 @@ int ossl_provider_init_as_child(OSSL_LIB_CTX *ctx,
         }
     }
 
-    if (gbl->c_get_libctx == NULL
-            || gbl->c_provider_register_child_cb == NULL
-            || gbl->c_prov_name == NULL
-            || gbl->c_prov_get0_provider_ctx == NULL
-            || gbl->c_prov_get0_dispatch == NULL
-            || gbl->c_prov_up_ref == NULL
-            || gbl->c_prov_free == NULL)
+    if (gbl->c_get_libctx == NULL || gbl->c_provider_register_child_cb == NULL
+        || gbl->c_prov_name == NULL || gbl->c_prov_get0_provider_ctx == NULL
+        || gbl->c_prov_get0_dispatch == NULL || gbl->c_prov_up_ref == NULL
+        || gbl->c_prov_free == NULL)
         return 0;
 
     gbl->lock = CRYPTO_THREAD_lock_new();
     if (gbl->lock == NULL)
         return 0;
 
-    if (!gbl->c_provider_register_child_cb(gbl->handle,
-                                           provider_create_child_cb,
-                                           provider_remove_child_cb,
-                                           provider_global_props_cb,
-                                           ctx))
+    if (!gbl->c_provider_register_child_cb(
+            gbl->handle, provider_create_child_cb, provider_remove_child_cb,
+            provider_global_props_cb, ctx))
         return 0;
 
     return 1;
@@ -263,8 +256,8 @@ int ossl_provider_init_as_child(OSSL_LIB_CTX *ctx,
 
 void ossl_provider_deinit_child(OSSL_LIB_CTX *ctx)
 {
-    struct child_prov_globals *gbl
-        = ossl_lib_ctx_get_data(ctx, OSSL_LIB_CTX_CHILD_PROVIDER_INDEX);
+    struct child_prov_globals *gbl =
+        ossl_lib_ctx_get_data(ctx, OSSL_LIB_CTX_CHILD_PROVIDER_INDEX);
     if (gbl == NULL)
         return;
 

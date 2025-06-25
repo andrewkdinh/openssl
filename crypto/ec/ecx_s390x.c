@@ -38,8 +38,7 @@ static void s390x_x25519_mod_p(unsigned char u[32])
 
     c = (u_red[0] & 0x80) >> 7;
     u_red[0] &= 0x7f;
-    constant_time_cond_swap_buff(0 - (unsigned char)c,
-                                 u, u_red, sizeof(u_red));
+    constant_time_cond_swap_buff(0 - (unsigned char)c, u, u_red, sizeof(u_red));
 }
 
 static void s390x_x448_mod_p(unsigned char u[56])
@@ -70,12 +69,10 @@ static void s390x_x448_mod_p(unsigned char u[56])
         c >>= 8;
     }
 
-    constant_time_cond_swap_buff(0 - (unsigned char)c,
-                                 u, u_red, sizeof(u_red));
+    constant_time_cond_swap_buff(0 - (unsigned char)c, u, u_red, sizeof(u_red));
 }
 
-int s390x_x25519_mul(unsigned char u_dst[32],
-                     const unsigned char u_src[32],
+int s390x_x25519_mul(unsigned char u_dst[32], const unsigned char u_src[32],
                      const unsigned char d_src[32])
 {
     union {
@@ -107,8 +104,7 @@ int s390x_x25519_mul(unsigned char u_dst[32],
     return rc;
 }
 
-int s390x_x448_mul(unsigned char u_dst[56],
-                   const unsigned char u_src[56],
+int s390x_x448_mul(unsigned char u_dst[56], const unsigned char u_src[56],
                    const unsigned char d_src[56])
 {
     union {
@@ -143,8 +139,7 @@ int s390x_x448_mul(unsigned char u_dst[56],
     return rc;
 }
 
-int s390x_ed25519_mul(unsigned char x_dst[32],
-                      unsigned char y_dst[32],
+int s390x_ed25519_mul(unsigned char x_dst[32], unsigned char y_dst[32],
                       const unsigned char x_src[32],
                       const unsigned char y_src[32],
                       const unsigned char d_src[32])
@@ -177,8 +172,7 @@ int s390x_ed25519_mul(unsigned char x_dst[32],
     return rc;
 }
 
-int s390x_ed448_mul(unsigned char x_dst[57],
-                    unsigned char y_dst[57],
+int s390x_ed448_mul(unsigned char x_dst[57], unsigned char y_dst[57],
                     const unsigned char x_src[57],
                     const unsigned char y_src[57],
                     const unsigned char d_src[57])

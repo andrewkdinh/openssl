@@ -13,25 +13,23 @@ static int done;
 
 static void make_nv(nghttp3_nv *nv, const char *name, const char *value)
 {
-    nv->name        = (uint8_t *)name;
-    nv->value       = (uint8_t *)value;
-    nv->namelen     = strlen(name);
-    nv->valuelen    = strlen(value);
-    nv->flags       = NGHTTP3_NV_FLAG_NONE;
+    nv->name = (uint8_t *)name;
+    nv->value = (uint8_t *)value;
+    nv->namelen = strlen(name);
+    nv->valuelen = strlen(value);
+    nv->flags = NGHTTP3_NV_FLAG_NONE;
 }
 
 static int on_recv_header(nghttp3_conn *h3conn, int64_t stream_id,
-                          int32_t token,
-                          nghttp3_rcbuf *name, nghttp3_rcbuf *value,
-                          uint8_t flags,
-                          void *conn_user_data,
-                          void *stream_user_data)
+                          int32_t token, nghttp3_rcbuf *name,
+                          nghttp3_rcbuf *value, uint8_t flags,
+                          void *conn_user_data, void *stream_user_data)
 {
     nghttp3_vec vname, vvalue;
 
     /* Received a single HTTP header. */
-    vname   = nghttp3_rcbuf_get_buf(name);
-    vvalue  = nghttp3_rcbuf_get_buf(value);
+    vname = nghttp3_rcbuf_get_buf(name);
+    vvalue = nghttp3_rcbuf_get_buf(value);
 
     fwrite(vname.base, vname.len, 1, stderr);
     fprintf(stderr, ": ");
@@ -41,8 +39,7 @@ static int on_recv_header(nghttp3_conn *h3conn, int64_t stream_id,
     return 0;
 }
 
-static int on_end_headers(nghttp3_conn *h3conn, int64_t stream_id,
-                          int fin,
+static int on_end_headers(nghttp3_conn *h3conn, int64_t stream_id, int fin,
                           void *conn_user_data, void *stream_user_data)
 {
     fprintf(stderr, "\n");
@@ -61,7 +58,7 @@ static int on_recv_data(nghttp3_conn *h3conn, int64_t stream_id,
         if (ferror(stdout))
             return 1;
 
-        data    += wr;
+        data += wr;
         datalen -= wr;
     }
 
@@ -104,14 +101,15 @@ int main(int argc, char **argv)
         goto err;
 
     /* Setup callbacks. */
-    callbacks.recv_header   = on_recv_header;
-    callbacks.end_headers   = on_end_headers;
-    callbacks.recv_data     = on_recv_data;
-    callbacks.end_stream    = on_end_stream;
+    callbacks.recv_header = on_recv_header;
+    callbacks.end_headers = on_end_headers;
+    callbacks.recv_data = on_recv_data;
+    callbacks.end_stream = on_end_stream;
 
     /* Create connection. */
-    if ((conn = OSSL_DEMO_H3_CONN_new_for_addr(ctx, addr, &callbacks,
-                                               NULL, NULL)) == NULL) {
+    if ((conn =
+             OSSL_DEMO_H3_CONN_new_for_addr(ctx, addr, &callbacks, NULL, NULL))
+        == NULL) {
         ERR_raise_data(ERR_LIB_USER, ERR_R_OPERATION_FAIL,
                        "cannot create HTTP/3 connection");
         goto err;

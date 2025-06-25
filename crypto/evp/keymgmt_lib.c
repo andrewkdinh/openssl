@@ -74,9 +74,7 @@ EVP_PKEY *evp_keymgmt_util_make_pkey(EVP_KEYMGMT *keymgmt, void *keydata)
 {
     EVP_PKEY *pkey = NULL;
 
-    if (keymgmt == NULL
-        || keydata == NULL
-        || (pkey = EVP_PKEY_new()) == NULL
+    if (keymgmt == NULL || keydata == NULL || (pkey = EVP_PKEY_new()) == NULL
         || !evp_keymgmt_util_assign_pkey(pkey, keymgmt, keydata)) {
         EVP_PKEY_free(pkey);
         return NULL;
@@ -89,8 +87,8 @@ int evp_keymgmt_util_export(const EVP_PKEY *pk, int selection,
 {
     if (pk == NULL || export_cb == NULL)
         return 0;
-    return evp_keymgmt_export(pk->keymgmt, pk->keydata, selection,
-                              export_cb, export_cbarg);
+    return evp_keymgmt_export(pk->keymgmt, pk->keydata, selection, export_cb,
+                              export_cbarg);
 }
 
 void *evp_keymgmt_util_export_to_provider(EVP_PKEY *pk, EVP_KEYMGMT *keymgmt,
@@ -156,7 +154,7 @@ void *evp_keymgmt_util_export_to_provider(EVP_PKEY *pk, EVP_KEYMGMT *keymgmt,
      */
 
     /* Setup for the export callback */
-    import_data.keydata = NULL;  /* evp_keymgmt_util_try_import will create it */
+    import_data.keydata = NULL; /* evp_keymgmt_util_try_import will create it */
     import_data.keymgmt = keymgmt;
     import_data.selection = selection;
 
@@ -164,8 +162,8 @@ void *evp_keymgmt_util_export_to_provider(EVP_PKEY *pk, EVP_KEYMGMT *keymgmt,
      * The export function calls the callback (evp_keymgmt_util_try_import),
      * which does the import for us.  If successful, we're done.
      */
-    if (!evp_keymgmt_util_export(pk, selection,
-                                 &evp_keymgmt_util_try_import, &import_data))
+    if (!evp_keymgmt_util_export(pk, selection, &evp_keymgmt_util_try_import,
+                                 &import_data))
         /* If there was an error, bail out */
         return NULL;
 
@@ -245,9 +243,9 @@ OP_CACHE_ELEM *evp_keymgmt_util_find_operation_cache(EVP_PKEY *pk,
     for (i = 0; i < end; i++) {
         p = sk_OP_CACHE_ELEM_value(pk->operation_cache, i);
         if ((p->selection & selection) == selection
-                && (keymgmt == p->keymgmt
-                    || (keymgmt->name_id == p->keymgmt->name_id
-                        && keymgmt->prov == p->keymgmt->prov)))
+            && (keymgmt == p->keymgmt
+                || (keymgmt->name_id == p->keymgmt->name_id
+                    && keymgmt->prov == p->keymgmt->prov)))
             return p;
     }
     return NULL;
@@ -382,26 +380,23 @@ int evp_keymgmt_util_match(EVP_PKEY *pk1, EVP_PKEY *pk2, int selection)
         int ok = 0;
 
         /* Complex case, where the keymgmt differ */
-        if (keymgmt1 != NULL
-            && keymgmt2 != NULL
+        if (keymgmt1 != NULL && keymgmt2 != NULL
             && !match_type(keymgmt1, keymgmt2)) {
             ERR_raise(ERR_LIB_EVP, EVP_R_DIFFERENT_KEY_TYPES);
-            return -1;           /* Not the same type */
+            return -1; /* Not the same type */
         }
 
         /*
          * The key types are determined to match, so we try cross export,
          * but only to keymgmt's that supply a matching function.
          */
-        if (keymgmt2 != NULL
-            && keymgmt2->match != NULL) {
+        if (keymgmt2 != NULL && keymgmt2->match != NULL) {
             void *tmp_keydata = NULL;
 
             ok = 1;
             if (keydata1 != NULL) {
-                tmp_keydata =
-                    evp_keymgmt_util_export_to_provider(pk1, keymgmt2,
-                                                        selection);
+                tmp_keydata = evp_keymgmt_util_export_to_provider(pk1, keymgmt2,
+                                                                  selection);
                 ok = (tmp_keydata != NULL);
             }
             if (ok) {
@@ -413,16 +408,13 @@ int evp_keymgmt_util_match(EVP_PKEY *pk1, EVP_PKEY *pk2, int selection)
          * If we've successfully cross exported one way, there's no point
          * doing it the other way, hence the |!ok| check.
          */
-        if (!ok
-            && keymgmt1 != NULL
-            && keymgmt1->match != NULL) {
+        if (!ok && keymgmt1 != NULL && keymgmt1->match != NULL) {
             void *tmp_keydata = NULL;
 
             ok = 1;
             if (keydata2 != NULL) {
-                tmp_keydata =
-                    evp_keymgmt_util_export_to_provider(pk2, keymgmt1,
-                                                        selection);
+                tmp_keydata = evp_keymgmt_util_export_to_provider(pk2, keymgmt1,
+                                                                  selection);
                 ok = (tmp_keydata != NULL);
             }
             if (ok) {
@@ -466,9 +458,8 @@ int evp_keymgmt_util_copy(EVP_PKEY *to, EVP_PKEY *from, int selection)
 
     if (to_keymgmt == from->keymgmt && to_keymgmt->dup != NULL
         && to_keydata == NULL) {
-        to_keydata = alloc_keydata = evp_keymgmt_dup(to_keymgmt,
-                                                     from->keydata,
-                                                     selection);
+        to_keydata = alloc_keydata =
+            evp_keymgmt_dup(to_keymgmt, from->keydata, selection);
         if (to_keydata == NULL)
             return 0;
     } else if (match_type(to_keymgmt, from->keymgmt)) {
@@ -478,9 +469,8 @@ int evp_keymgmt_util_copy(EVP_PKEY *to, EVP_PKEY *from, int selection)
         import_data.keydata = to_keydata;
         import_data.selection = selection;
 
-        if (!evp_keymgmt_util_export(from, selection,
-                                     &evp_keymgmt_util_try_import,
-                                     &import_data))
+        if (!evp_keymgmt_util_export(
+                from, selection, &evp_keymgmt_util_try_import, &import_data))
             return 0;
 
         /*
@@ -503,8 +493,7 @@ int evp_keymgmt_util_copy(EVP_PKEY *to, EVP_PKEY *from, int selection)
      * meant to forcibly reassign an EVP_PKEY no matter what, which is
      * why we don't use that one here.
      */
-    if (to->keymgmt == NULL
-        && !EVP_PKEY_set_type_by_keymgmt(to, to_keymgmt)) {
+    if (to->keymgmt == NULL && !EVP_PKEY_set_type_by_keymgmt(to, to_keymgmt)) {
         evp_keymgmt_freedata(to_keymgmt, alloc_keydata);
         return 0;
     }
@@ -514,8 +503,8 @@ int evp_keymgmt_util_copy(EVP_PKEY *to, EVP_PKEY *from, int selection)
     return 1;
 }
 
-void *evp_keymgmt_util_gen(EVP_PKEY *target, EVP_KEYMGMT *keymgmt,
-                           void *genctx, OSSL_CALLBACK *cb, void *cbarg)
+void *evp_keymgmt_util_gen(EVP_PKEY *target, EVP_KEYMGMT *keymgmt, void *genctx,
+                           OSSL_CALLBACK *cb, void *cbarg)
 {
     void *keydata = NULL;
 
@@ -534,8 +523,7 @@ void *evp_keymgmt_util_gen(EVP_PKEY *target, EVP_KEYMGMT *keymgmt,
  * SN_undef, since that corresponds to what EVP_PKEY_get_default_nid()
  * returns for no digest.
  */
-int evp_keymgmt_util_get_deflt_digest_name(EVP_KEYMGMT *keymgmt,
-                                           void *keydata,
+int evp_keymgmt_util_get_deflt_digest_name(EVP_KEYMGMT *keymgmt, void *keydata,
                                            char *mdname, size_t mdname_sz)
 {
     OSSL_PARAM params[3];
@@ -544,13 +532,10 @@ int evp_keymgmt_util_get_deflt_digest_name(EVP_KEYMGMT *keymgmt,
     char *result = NULL;
     int rv = -2;
 
-    params[0] =
-        OSSL_PARAM_construct_utf8_string(OSSL_PKEY_PARAM_DEFAULT_DIGEST,
-                                         mddefault, sizeof(mddefault));
-    params[1] =
-        OSSL_PARAM_construct_utf8_string(OSSL_PKEY_PARAM_MANDATORY_DIGEST,
-                                         mdmandatory,
-                                         sizeof(mdmandatory));
+    params[0] = OSSL_PARAM_construct_utf8_string(OSSL_PKEY_PARAM_DEFAULT_DIGEST,
+                                                 mddefault, sizeof(mddefault));
+    params[1] = OSSL_PARAM_construct_utf8_string(
+        OSSL_PKEY_PARAM_MANDATORY_DIGEST, mdmandatory, sizeof(mdmandatory));
     params[2] = OSSL_PARAM_construct_end();
 
     if (!evp_keymgmt_get_params(keymgmt, keydata, params))

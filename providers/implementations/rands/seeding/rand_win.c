@@ -53,7 +53,6 @@ size_t ossl_pool_acquire_entropy(RAND_POOL *pool)
     size_t bytes_needed;
     size_t entropy_available = 0;
 
-
 # ifdef OPENSSL_RAND_SEED_RDTSC
     entropy_available = ossl_prov_acquire_entropy_from_tsc(pool);
     if (entropy_available > 0)
@@ -72,7 +71,8 @@ size_t ossl_pool_acquire_entropy(RAND_POOL *pool)
     if (buffer != NULL) {
         size_t bytes = 0;
         if (BCryptGenRandom(NULL, buffer, bytes_needed,
-                            BCRYPT_USE_SYSTEM_PREFERRED_RNG) == STATUS_SUCCESS)
+                            BCRYPT_USE_SYSTEM_PREFERRED_RNG)
+            == STATUS_SUCCESS)
             bytes = bytes_needed;
 
         ossl_rand_pool_add_end(pool, bytes, 8 * bytes);
@@ -87,7 +87,8 @@ size_t ossl_pool_acquire_entropy(RAND_POOL *pool)
         size_t bytes = 0;
         /* poll the CryptoAPI PRNG */
         if (CryptAcquireContextW(&hProvider, NULL, NULL, PROV_RSA_FULL,
-                                 CRYPT_VERIFYCONTEXT | CRYPT_SILENT) != 0) {
+                                 CRYPT_VERIFYCONTEXT | CRYPT_SILENT)
+            != 0) {
             if (CryptGenRandom(hProvider, bytes_needed, buffer) != 0)
                 bytes = bytes_needed;
 
@@ -105,9 +106,10 @@ size_t ossl_pool_acquire_entropy(RAND_POOL *pool)
     if (buffer != NULL) {
         size_t bytes = 0;
         /* poll the Pentium PRG with CryptoAPI */
-        if (CryptAcquireContextW(&hProvider, NULL,
-                                 INTEL_DEF_PROV, PROV_INTEL_SEC,
-                                 CRYPT_VERIFYCONTEXT | CRYPT_SILENT) != 0) {
+        if (CryptAcquireContextW(&hProvider, NULL, INTEL_DEF_PROV,
+                                 PROV_INTEL_SEC,
+                                 CRYPT_VERIFYCONTEXT | CRYPT_SILENT)
+            != 0) {
             if (CryptGenRandom(hProvider, bytes_needed, buffer) != 0)
                 bytes = bytes_needed;
 
@@ -122,7 +124,6 @@ size_t ossl_pool_acquire_entropy(RAND_POOL *pool)
 
     return ossl_rand_pool_entropy_available(pool);
 }
-
 
 int ossl_pool_add_nonce_data(RAND_POOL *pool)
 {

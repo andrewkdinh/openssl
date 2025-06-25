@@ -27,18 +27,18 @@ int ossl_cipher_hw_tdes_ede3_initkey(PROV_CIPHER_CTX *ctx,
     DES_cblock *deskey = (DES_cblock *)key;
 
     tctx->tstream.cbc = NULL;
-# if defined(SPARC_DES_CAPABLE)
+#if defined(SPARC_DES_CAPABLE)
     if (SPARC_DES_CAPABLE) {
         if (ctx->mode == EVP_CIPH_CBC_MODE) {
             des_t4_key_expand(&deskey[0], &tctx->ks1);
             des_t4_key_expand(&deskey[1], &tctx->ks2);
             des_t4_key_expand(&deskey[2], &tctx->ks3);
-            tctx->tstream.cbc = ctx->enc ? des_t4_ede3_cbc_encrypt :
-                                           des_t4_ede3_cbc_decrypt;
+            tctx->tstream.cbc =
+                ctx->enc ? des_t4_ede3_cbc_encrypt : des_t4_ede3_cbc_decrypt;
             return 1;
         }
     }
-# endif
+#endif
     DES_set_key_unchecked(&deskey[0], &tctx->ks1);
     DES_set_key_unchecked(&deskey[1], &tctx->ks2);
     DES_set_key_unchecked(&deskey[2], &tctx->ks3);
@@ -61,7 +61,7 @@ int ossl_cipher_hw_tdes_cbc(PROV_CIPHER_CTX *ctx, unsigned char *out,
     PROV_TDES_CTX *tctx = (PROV_TDES_CTX *)ctx;
 
     if (tctx->tstream.cbc != NULL) {
-        (*tctx->tstream.cbc) (in, out, inl, tctx->tks.ks, ctx->iv);
+        (*tctx->tstream.cbc)(in, out, inl, tctx->tks.ks, ctx->iv);
         return 1;
     }
 
@@ -94,5 +94,4 @@ int ossl_cipher_hw_tdes_ecb(PROV_CIPHER_CTX *ctx, unsigned char *out,
     return 1;
 }
 
-PROV_CIPHER_HW_tdes_mode(ede3, ecb)
-PROV_CIPHER_HW_tdes_mode(ede3, cbc)
+PROV_CIPHER_HW_tdes_mode(ede3, ecb) PROV_CIPHER_HW_tdes_mode(ede3, cbc)

@@ -152,8 +152,8 @@ void DES_encrypt2(DES_LONG *data, DES_key_schedule *ks, int enc)
     l = r = t = u = 0;
 }
 
-void DES_encrypt3(DES_LONG *data, DES_key_schedule *ks1,
-                  DES_key_schedule *ks2, DES_key_schedule *ks3)
+void DES_encrypt3(DES_LONG *data, DES_key_schedule *ks1, DES_key_schedule *ks2,
+                  DES_key_schedule *ks3)
 {
     register DES_LONG l, r;
 
@@ -172,8 +172,8 @@ void DES_encrypt3(DES_LONG *data, DES_key_schedule *ks1,
     data[1] = r;
 }
 
-void DES_decrypt3(DES_LONG *data, DES_key_schedule *ks1,
-                  DES_key_schedule *ks2, DES_key_schedule *ks3)
+void DES_decrypt3(DES_LONG *data, DES_key_schedule *ks1, DES_key_schedule *ks2,
+                  DES_key_schedule *ks3)
 {
     register DES_LONG l, r;
 

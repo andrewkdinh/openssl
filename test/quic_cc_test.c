@@ -51,37 +51,37 @@ typedef struct net_pkt_st {
     /*
      * The time at which the packet was sent.
      */
-    OSSL_TIME   tx_time;
+    OSSL_TIME tx_time;
 
     /*
      * The time at which the simulated packet arrives at the RX side (success)
      * or is dropped (!success).
      */
-    OSSL_TIME   arrive_time;
+    OSSL_TIME arrive_time;
 
     /*
      * The time at which the transmitting side makes a determination of
      * acknowledgement (if success) or loss (if !success).
      */
-    OSSL_TIME   determination_time;
+    OSSL_TIME determination_time;
 
     /*
      * Current earliest time there is something to be done for this packet.
      * min(arrive_time, determination_time).
      */
-    OSSL_TIME   next_time;
+    OSSL_TIME next_time;
 
     /* 1 if the packet will be successfully delivered, 0 if it is to be lost. */
-    int         success;
+    int success;
 
     /* 1 if we have already processed packet arrival. */
-    int         arrived;
+    int arrived;
 
     /* Size of simulated packet in bytes. */
-    size_t      size;
+    size_t size;
 
     /* pqueue internal index. */
-    size_t      idx;
+    size_t idx;
 } NET_PKT;
 
 DEFINE_PRIORITY_QUEUE_OF(NET_PKT);
@@ -93,31 +93,30 @@ static int net_pkt_cmp(const NET_PKT *a, const NET_PKT *b)
 
 struct net_sim {
     const OSSL_CC_METHOD *ccm;
-    OSSL_CC_DATA         *cc;
+    OSSL_CC_DATA *cc;
 
     uint64_t capacity; /* bytes/s */
-    uint64_t latency;  /* ms */
+    uint64_t latency; /* ms */
 
     uint64_t spare_capacity;
-    PRIORITY_QUEUE_OF(NET_PKT) *pkts;
+    PRIORITY_QUEUE_OF(NET_PKT) * pkts;
 
     uint64_t total_acked, total_lost; /* bytes */
 };
 
-static int net_sim_init(struct net_sim *s,
-                        const OSSL_CC_METHOD *ccm, OSSL_CC_DATA *cc,
-                        uint64_t capacity, uint64_t latency)
+static int net_sim_init(struct net_sim *s, const OSSL_CC_METHOD *ccm,
+                        OSSL_CC_DATA *cc, uint64_t capacity, uint64_t latency)
 {
-    s->ccm              = ccm;
-    s->cc               = cc;
+    s->ccm = ccm;
+    s->cc = cc;
 
-    s->capacity         = capacity;
-    s->latency          = latency;
+    s->capacity = capacity;
+    s->latency = latency;
 
-    s->spare_capacity   = capacity;
+    s->spare_capacity = capacity;
 
-    s->total_acked      = 0;
-    s->total_lost       = 0;
+    s->total_acked = 0;
+    s->total_lost = 0;
 
     if (!TEST_ptr(s->pkts = ossl_pqueue_NET_PKT_new(net_pkt_cmp)))
         return 0;
@@ -159,27 +158,27 @@ static int net_sim_send(struct net_sim *s, size_t sz)
     pkt->success = success;
     if (success) {
         /* This packet will arrive successfully after |latency| time. */
-        pkt->arrive_time        = ossl_time_add(pkt->tx_time,
-                                                ossl_ms2time(s->latency));
+        pkt->arrive_time =
+            ossl_time_add(pkt->tx_time, ossl_ms2time(s->latency));
         /* Assume all received packets are acknowledged immediately. */
-        pkt->determination_time = ossl_time_add(pkt->arrive_time,
-                                                ossl_ms2time(s->latency));
-        pkt->next_time          = pkt->arrive_time;
-        s->spare_capacity      -= sz;
+        pkt->determination_time =
+            ossl_time_add(pkt->arrive_time, ossl_ms2time(s->latency));
+        pkt->next_time = pkt->arrive_time;
+        s->spare_capacity -= sz;
     } else {
         /*
          * In our network model, assume all packets are dropped due to a
          * bottleneck at the peer's NIC RX queue; thus dropping occurs after
          * |latency|.
          */
-        pkt->arrive_time        = ossl_time_add(pkt->tx_time,
-                                                ossl_ms2time(s->latency));
+        pkt->arrive_time =
+            ossl_time_add(pkt->tx_time, ossl_ms2time(s->latency));
         /*
          * It will take longer to detect loss than to detect acknowledgement.
          */
-        pkt->determination_time = ossl_time_add(pkt->tx_time,
-                                                ossl_ms2time(3 * s->latency));
-        pkt->next_time          = pkt->determination_time;
+        pkt->determination_time =
+            ossl_time_add(pkt->tx_time, ossl_ms2time(3 * s->latency));
+        pkt->next_time = pkt->determination_time;
     }
 
     pkt->size = sz;
@@ -282,7 +281,7 @@ static FILE *logfile;
 #endif
 
 static int dump_state(const OSSL_CC_METHOD *ccm, OSSL_CC_DATA *cc,
-                                  struct net_sim *s)
+                      struct net_sim *s)
 {
 #ifdef GENERATE_LOG
     uint64_t cwnd_size, cur_bytes, state;
@@ -290,28 +289,21 @@ static int dump_state(const OSSL_CC_METHOD *ccm, OSSL_CC_DATA *cc,
     if (logfile == NULL)
         return 1;
 
-    if (!TEST_true(ccm->get_option_uint(cc, OSSL_CC_OPTION_CUR_CWND_SIZE,
-                                        &cwnd_size)))
+    if (!TEST_true(
+            ccm->get_option_uint(cc, OSSL_CC_OPTION_CUR_CWND_SIZE, &cwnd_size)))
         return 0;
 
     if (!TEST_true(ccm->get_option_uint(cc, OSSL_CC_OPTION_CUR_BYTES_IN_FLIGHT,
                                         &cur_bytes)))
         return 0;
 
-    if (!TEST_true(ccm->get_option_uint(cc, OSSL_CC_OPTION_CUR_STATE,
-                                        &state)))
+    if (!TEST_true(ccm->get_option_uint(cc, OSSL_CC_OPTION_CUR_STATE, &state)))
         return 0;
 
     fprintf(logfile, "%10lu,%10lu,%10lu,%10lu,%10lu,%10lu,%10lu,%10lu,\"%c\"\n",
-            ossl_time2ms(fake_time),
-            ccm->get_tx_allowance(cc),
-            cwnd_size,
-            cur_bytes,
-            s->total_acked,
-            s->total_lost,
-            s->capacity,
-            s->spare_capacity,
-            (char)state);
+            ossl_time2ms(fake_time), ccm->get_tx_allowance(cc), cwnd_size,
+            cur_bytes, s->total_acked, s->total_lost, s->capacity,
+            s->spare_capacity, (char)state);
 #endif
 
     return 1;
@@ -446,12 +438,12 @@ static int test_simulate(void)
     {
         uint64_t estimated_capacity = cwnd_sample_sum / cwnd_sample_count;
 
-        double error = ((double)estimated_capacity / (double)actual_capacity) - 1.0;
+        double error =
+            ((double)estimated_capacity / (double)actual_capacity) - 1.0;
 
         TEST_info("est = %6llu kB/s, act=%6llu kB/s (error=%.02f%%)\n",
                   (unsigned long long)estimated_capacity,
-                  (unsigned long long)actual_capacity,
-                  error * 100.0);
+                  (unsigned long long)actual_capacity, error * 100.0);
 
         /* Max 5% error */
         if (!TEST_double_le(error, 0.05))
@@ -614,13 +606,13 @@ int setup_tests(void)
 #ifdef GENERATE_LOG
     logfile = fopen("quic_cc_stats.csv", "w");
     fprintf(logfile,
-        "\"Time\","
-        "\"TX Allowance\","
-        "\"CWND Size\","
-        "\"Bytes in Flight\","
-        "\"Total Acked\",\"Total Lost\","
-        "\"Capacity\",\"Spare Capacity\","
-        "\"State\"\n");
+            "\"Time\","
+            "\"TX Allowance\","
+            "\"CWND Size\","
+            "\"Bytes in Flight\","
+            "\"Total Acked\",\"Total Lost\","
+            "\"Capacity\",\"Spare Capacity\","
+            "\"State\"\n");
 #endif
 
     ADD_TEST(test_simulate);

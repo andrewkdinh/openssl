@@ -95,8 +95,8 @@ static int uint64_c2i(ASN1_VALUE **pval, const unsigned char *cont, int len,
         ERR_raise(ERR_LIB_ASN1, ASN1_R_ILLEGAL_NEGATIVE_VALUE);
         return 0;
     }
-    if ((it->size & INTxx_FLAG_SIGNED) == INTxx_FLAG_SIGNED
-            && !neg && utmp > INT64_MAX) {
+    if ((it->size & INTxx_FLAG_SIGNED) == INTxx_FLAG_SIGNED && !neg
+        && utmp > INT64_MAX) {
         ERR_raise(ERR_LIB_ASN1, ASN1_R_TOO_LARGE);
         return 0;
     }
@@ -104,7 +104,7 @@ static int uint64_c2i(ASN1_VALUE **pval, const unsigned char *cont, int len,
         /* ossl_c2i_uint64_int() returns positive values */
         utmp = 0 - utmp;
 
- long_compat:
+long_compat:
     memcpy(cp, &utmp, sizeof(utmp));
     return 1;
 }
@@ -210,7 +210,7 @@ static int uint32_c2i(ASN1_VALUE **pval, const unsigned char *cont, int len,
         }
     }
 
- long_compat:
+long_compat:
     utmp2 = (uint32_t)utmp;
     memcpy(cp, &utmp2, sizeof(utmp2));
     return 1;
@@ -224,64 +224,46 @@ static int uint32_print(BIO *out, const ASN1_VALUE **pval, const ASN1_ITEM *it,
     return BIO_printf(out, "%u\n", (unsigned int)**(uint32_t **)pval);
 }
 
-
 /* Define the primitives themselves */
 
 static ASN1_PRIMITIVE_FUNCS uint32_pf = {
-    NULL, 0,
-    uint32_new,
-    uint32_free,
-    uint32_clear,
-    uint32_c2i,
-    uint32_i2c,
-    uint32_print
-};
+    NULL,         0,          uint32_new, uint32_free,
+    uint32_clear, uint32_c2i, uint32_i2c, uint32_print};
 
 static ASN1_PRIMITIVE_FUNCS uint64_pf = {
-    NULL, 0,
-    uint64_new,
-    uint64_free,
-    uint64_clear,
-    uint64_c2i,
-    uint64_i2c,
-    uint64_print
-};
+    NULL,         0,          uint64_new, uint64_free,
+    uint64_clear, uint64_c2i, uint64_i2c, uint64_print};
 
-ASN1_ITEM_start(INT32)
-    ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &uint32_pf,
-    INTxx_FLAG_SIGNED, "INT32"
-ASN1_ITEM_end(INT32)
+ASN1_ITEM_start(INT32) ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0,
+    &uint32_pf, INTxx_FLAG_SIGNED,
+    "INT32" ASN1_ITEM_end(INT32)
 
-ASN1_ITEM_start(UINT32)
-    ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &uint32_pf, 0, "UINT32"
-ASN1_ITEM_end(UINT32)
+        ASN1_ITEM_start(UINT32) ASN1_ITYPE_PRIMITIVE,
+    V_ASN1_INTEGER, NULL, 0, &uint32_pf, 0,
+    "UINT32" ASN1_ITEM_end(UINT32)
 
-ASN1_ITEM_start(INT64)
-    ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &uint64_pf,
-    INTxx_FLAG_SIGNED, "INT64"
-ASN1_ITEM_end(INT64)
+        ASN1_ITEM_start(INT64) ASN1_ITYPE_PRIMITIVE,
+    V_ASN1_INTEGER, NULL, 0, &uint64_pf, INTxx_FLAG_SIGNED,
+    "INT64" ASN1_ITEM_end(INT64)
 
-ASN1_ITEM_start(UINT64)
-    ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &uint64_pf, 0, "UINT64"
-ASN1_ITEM_end(UINT64)
+        ASN1_ITEM_start(UINT64) ASN1_ITYPE_PRIMITIVE,
+    V_ASN1_INTEGER, NULL, 0, &uint64_pf, 0,
+    "UINT64" ASN1_ITEM_end(UINT64)
 
-ASN1_ITEM_start(ZINT32)
-    ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &uint32_pf,
-    INTxx_FLAG_ZERO_DEFAULT|INTxx_FLAG_SIGNED, "ZINT32"
-ASN1_ITEM_end(ZINT32)
+        ASN1_ITEM_start(ZINT32) ASN1_ITYPE_PRIMITIVE,
+    V_ASN1_INTEGER, NULL, 0,
+    &uint32_pf, INTxx_FLAG_ZERO_DEFAULT | INTxx_FLAG_SIGNED,
+    "ZINT32" ASN1_ITEM_end(ZINT32)
 
-ASN1_ITEM_start(ZUINT32)
-    ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &uint32_pf,
-    INTxx_FLAG_ZERO_DEFAULT, "ZUINT32"
-ASN1_ITEM_end(ZUINT32)
+        ASN1_ITEM_start(ZUINT32) ASN1_ITYPE_PRIMITIVE,
+    V_ASN1_INTEGER, NULL, 0, &uint32_pf, INTxx_FLAG_ZERO_DEFAULT,
+    "ZUINT32" ASN1_ITEM_end(ZUINT32)
 
-ASN1_ITEM_start(ZINT64)
-    ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &uint64_pf,
-    INTxx_FLAG_ZERO_DEFAULT|INTxx_FLAG_SIGNED, "ZINT64"
-ASN1_ITEM_end(ZINT64)
+        ASN1_ITEM_start(ZINT64) ASN1_ITYPE_PRIMITIVE,
+    V_ASN1_INTEGER, NULL, 0,
+    &uint64_pf, INTxx_FLAG_ZERO_DEFAULT | INTxx_FLAG_SIGNED,
+    "ZINT64" ASN1_ITEM_end(ZINT64)
 
-ASN1_ITEM_start(ZUINT64)
-    ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &uint64_pf,
-    INTxx_FLAG_ZERO_DEFAULT, "ZUINT64"
-ASN1_ITEM_end(ZUINT64)
-
+        ASN1_ITEM_start(ZUINT64) ASN1_ITYPE_PRIMITIVE,
+    V_ASN1_INTEGER, NULL, 0, &uint64_pf, INTxx_FLAG_ZERO_DEFAULT,
+    "ZUINT64" ASN1_ITEM_end(ZUINT64)

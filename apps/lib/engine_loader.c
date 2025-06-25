@@ -103,8 +103,7 @@ static OSSL_STORE_LOADER_CTX *engine_open(const OSSL_STORE_LOADER *loader,
 
 static int engine_expect(OSSL_STORE_LOADER_CTX *ctx, int expected)
 {
-    if (expected == 0
-        || expected == OSSL_STORE_INFO_PUBKEY
+    if (expected == 0 || expected == OSSL_STORE_INFO_PUBKEY
         || expected == OSSL_STORE_INFO_PKEY) {
         ctx->expected = expected;
         return 1;
@@ -120,16 +119,13 @@ static OSSL_STORE_INFO *engine_load(OSSL_STORE_LOADER_CTX *ctx,
 
     if (ctx->loaded == 0) {
         if (ENGINE_init(ctx->e)) {
-            if (ctx->expected == 0
-                || ctx->expected == OSSL_STORE_INFO_PKEY)
-                pkey =
-                    ENGINE_load_private_key(ctx->e, ctx->keyid,
-                                            (UI_METHOD *)ui_method, ui_data);
+            if (ctx->expected == 0 || ctx->expected == OSSL_STORE_INFO_PKEY)
+                pkey = ENGINE_load_private_key(ctx->e, ctx->keyid,
+                                               (UI_METHOD *)ui_method, ui_data);
             if ((pkey == NULL && ctx->expected == 0)
                 || ctx->expected == OSSL_STORE_INFO_PUBKEY)
-                pubkey =
-                    ENGINE_load_public_key(ctx->e, ctx->keyid,
-                                           (UI_METHOD *)ui_method, ui_data);
+                pubkey = ENGINE_load_public_key(
+                    ctx->e, ctx->keyid, (UI_METHOD *)ui_method, ui_data);
             ENGINE_finish(ctx->e);
         }
     }

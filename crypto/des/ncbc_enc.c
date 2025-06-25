@@ -19,9 +19,8 @@
 void DES_cbc_encrypt(const unsigned char *in, unsigned char *out, long length,
                      DES_key_schedule *_schedule, DES_cblock *ivec, int enc)
 #else
-void DES_ncbc_encrypt(const unsigned char *in, unsigned char *out,
-                      long length, DES_key_schedule *_schedule,
-                      DES_cblock *ivec, int enc)
+void DES_ncbc_encrypt(const unsigned char *in, unsigned char *out, long length,
+                      DES_key_schedule *_schedule, DES_cblock *ivec, int enc)
 #endif
 {
     register DES_LONG tin0, tin1;

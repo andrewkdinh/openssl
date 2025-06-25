@@ -29,13 +29,12 @@ const OPTIONS *test_get_options(void)
 {
     static const OPTIONS test_options[] = {
         OPT_TEST_OPTIONS_WITH_EXTRA_USAGE("file\n"),
-        { "config", OPT_CONFIG_FILE, '<',
-          "The configuration file to use for the libctx" },
-        { "provider", OPT_PROVIDER_NAME, 's',
-          "The provider to load (The default value is 'default')" },
-        { OPT_HELP_STR, 1, '-', "file\tFile to decode.\n" },
-        { NULL }
-    };
+        {"config", OPT_CONFIG_FILE, '<',
+         "The configuration file to use for the libctx"},
+        {"provider", OPT_PROVIDER_NAME, 's',
+         "The provider to load (The default value is 'default')"},
+        {OPT_HELP_STR, 1, '-', "file\tFile to decode.\n"},
+        {NULL}};
     return test_options;
 }
 
@@ -64,14 +63,16 @@ static int test_decode_nonfipsalg(void)
      * If NULL is passed as the propq here it uses the global property "fips=true",
      * Which we expect to fail if the decode uses a non FIPS algorithm
      */
-    if (!TEST_ptr_null(PEM_read_bio_PrivateKey_ex(bio, &privkey, &passcb, NULL, libctx, NULL)))
+    if (!TEST_ptr_null(PEM_read_bio_PrivateKey_ex(bio, &privkey, &passcb, NULL,
+                                                  libctx, NULL)))
         goto err;
 
     /*
      * Pass if we override the libctx global prop query to optionally use fips=true
      * This assumes that the libctx contains the default provider
      */
-    if (!TEST_ptr_null(PEM_read_bio_PrivateKey_ex(bio, &privkey, &passcb, NULL, libctx, "?fips=true")))
+    if (!TEST_ptr_null(PEM_read_bio_PrivateKey_ex(bio, &privkey, &passcb, NULL,
+                                                  libctx, "?fips=true")))
         goto err;
 
     ret = 1;
@@ -96,7 +97,7 @@ int setup_tests(void)
             config_file = opt_arg();
             break;
         case OPT_TEST_CASES:
-           break;
+            break;
         default:
         case OPT_ERR:
             return 0;

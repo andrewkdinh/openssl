@@ -95,13 +95,13 @@ static int create_socket(int domain, int socktype, int protocol)
     if (fd == INVALID_SOCKET) {
         int err = get_last_socket_error();
 
-        ERR_raise_data(ERR_LIB_SYS, err,
-                       "calling WSASocketA() = %d", err);
+        ERR_raise_data(ERR_LIB_SYS, err, "calling WSASocketA() = %d", err);
         return INVALID_SOCKET;
     }
 
     /* Prevent interference with the socket from other processes on Windows. */
-    if (setsockopt(fd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (void *)&on, sizeof(on)) < 0) {
+    if (setsockopt(fd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (void *)&on, sizeof(on))
+        < 0) {
         ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(),
                        "calling setsockopt()");
         BIO_closesocket(fd);
@@ -166,12 +166,11 @@ int ossl_rio_notifier_init(RIO_NOTIFIER *nfy)
     }
 
     /* Bind the socket to a random loopback port. */
-    sa.sin_family       = AF_INET;
-    sa.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
+    sa.sin_family = AF_INET;
+    sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     rc = bind(lfd, (const struct sockaddr *)&sa, sizeof(sa));
     if (rc < 0) {
-        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(),
-                       "calling bind()");
+        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(), "calling bind()");
         goto err;
     }
 
@@ -186,8 +185,7 @@ int ossl_rio_notifier_init(RIO_NOTIFIER *nfy)
     /* Start listening. */
     rc = listen(lfd, 1);
     if (rc < 0) {
-        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(),
-                       "calling listen()");
+        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(), "calling listen()");
         goto err;
     }
 
@@ -214,8 +212,7 @@ int ossl_rio_notifier_init(RIO_NOTIFIER *nfy)
      */
     rc = connect(wfd, (struct sockaddr *)&sa, sizeof(sa));
     if (rc < 0) {
-        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(),
-                       "calling connect()");
+        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(), "calling connect()");
         goto err;
     }
 
@@ -224,8 +221,7 @@ int ossl_rio_notifier_init(RIO_NOTIFIER *nfy)
      */
     rfd = accept(lfd, (struct sockaddr *)&accept_sa, &accept_sa_len);
     if (rfd == INVALID_SOCKET) {
-        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(),
-                       "calling accept()");
+        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(), "calling accept()");
         goto err;
     }
 
@@ -367,10 +363,8 @@ int ossl_rio_notifier_unsignal(RIO_NOTIFIER *nfy)
      * signal() might have been called multiple times. Drain the buffer until
      * it's empty.
      */
-    do
-        rd = readsocket(nfy->rfd, (void *)buf, sizeof(buf));
-    while (rd == sizeof(buf)
-           || (rd < 0 && get_last_socket_error_is_eintr()));
+    do rd = readsocket(nfy->rfd, (void *)buf, sizeof(buf));
+    while (rd == sizeof(buf) || (rd < 0 && get_last_socket_error_is_eintr()));
 
     if (rd < 0 && !BIO_fd_non_fatal_error(get_last_socket_error()))
         return 0;

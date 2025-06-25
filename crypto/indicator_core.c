@@ -13,8 +13,7 @@
 #include "internal/cryptlib.h"
 #include "crypto/context.h"
 
-typedef struct indicator_cb_st
-{
+typedef struct indicator_cb_st {
     OSSL_INDICATOR_CALLBACK *cb;
 } INDICATOR_CB;
 

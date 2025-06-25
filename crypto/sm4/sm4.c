@@ -34,8 +34,7 @@ static const uint8_t SM4_S[256] = {
     0x2D, 0x74, 0xD0, 0x12, 0xB8, 0xE5, 0xB4, 0xB0, 0x89, 0x69, 0x97, 0x4A,
     0x0C, 0x96, 0x77, 0x7E, 0x65, 0xB9, 0xF1, 0x09, 0xC5, 0x6E, 0xC6, 0x84,
     0x18, 0xF0, 0x7D, 0xEC, 0x3A, 0xDC, 0x4D, 0x20, 0x79, 0xEE, 0x5F, 0x3E,
-    0xD7, 0xCB, 0x39, 0x48
-};
+    0xD7, 0xCB, 0x39, 0x48};
 
 /*
  * SM4_SBOX_T[j] == L(SM4_SBOX[j]).
@@ -83,7 +82,7 @@ static const uint32_t SM4_SBOX_T0[256] = {
     0x35F2C7C7, 0x2D092424, 0xD1C61717, 0xD66FB9B9, 0xDEC51B1B, 0x94861212,
     0x78186060, 0x30F3C3C3, 0x897CF5F5, 0x5CEFB3B3, 0xD23AE8E8, 0xACDF7373,
     0x794C3535, 0xA0208080, 0x9D78E5E5, 0x56EDBBBB, 0x235E7D7D, 0xC63EF8F8,
-    0x8BD45F5F, 0xE7C82F2F, 0xDD39E4E4, 0x68492121 };
+    0x8BD45F5F, 0xE7C82F2F, 0xDD39E4E4, 0x68492121};
 
 static uint32_t SM4_SBOX_T1[256] = {
     0x5B8ED55B, 0x42D09242, 0xA74DEAA7, 0xFB06FDFB, 0x33FCCF33, 0x8765E287,
@@ -227,10 +226,8 @@ static ossl_inline uint32_t rotl(uint32_t a, uint8_t n)
 
 static ossl_inline uint32_t load_u32_be(const uint8_t *b, uint32_t n)
 {
-    return ((uint32_t)b[4 * n] << 24) |
-           ((uint32_t)b[4 * n + 1] << 16) |
-           ((uint32_t)b[4 * n + 2] << 8) |
-           ((uint32_t)b[4 * n + 3]);
+    return ((uint32_t)b[4 * n] << 24) | ((uint32_t)b[4 * n + 1] << 16)
+        | ((uint32_t)b[4 * n + 2] << 8) | ((uint32_t)b[4 * n + 3]);
 }
 
 static ossl_inline void store_u32_be(uint32_t v, uint8_t *b)
@@ -265,10 +262,8 @@ static ossl_inline uint32_t SM4_T_slow(uint32_t X)
 
 static ossl_inline uint32_t SM4_T(uint32_t X)
 {
-    return SM4_SBOX_T0[(uint8_t)(X >> 24)] ^
-           SM4_SBOX_T1[(uint8_t)(X >> 16)] ^
-           SM4_SBOX_T2[(uint8_t)(X >> 8)] ^
-           SM4_SBOX_T3[(uint8_t)X];
+    return SM4_SBOX_T0[(uint8_t)(X >> 24)] ^ SM4_SBOX_T1[(uint8_t)(X >> 16)]
+        ^ SM4_SBOX_T2[(uint8_t)(X >> 8)] ^ SM4_SBOX_T3[(uint8_t)X];
 }
 
 static ossl_inline uint32_t SM4_key_sub(uint32_t X)
@@ -283,23 +278,19 @@ int ossl_sm4_set_key(const uint8_t *key, SM4_KEY *ks)
     /*
      * Family Key
      */
-    static const uint32_t FK[4] = {
-        0xa3b1bac6, 0x56aa3350, 0x677d9197, 0xb27022dc
-    };
+    static const uint32_t FK[4] = {0xa3b1bac6, 0x56aa3350, 0x677d9197,
+                                   0xb27022dc};
 
     /*
      * Constant Key
      */
     static const uint32_t CK[32] = {
-        0x00070E15, 0x1C232A31, 0x383F464D, 0x545B6269,
-        0x70777E85, 0x8C939AA1, 0xA8AFB6BD, 0xC4CBD2D9,
-        0xE0E7EEF5, 0xFC030A11, 0x181F262D, 0x343B4249,
-        0x50575E65, 0x6C737A81, 0x888F969D, 0xA4ABB2B9,
-        0xC0C7CED5, 0xDCE3EAF1, 0xF8FF060D, 0x141B2229,
-        0x30373E45, 0x4C535A61, 0x686F767D, 0x848B9299,
-        0xA0A7AEB5, 0xBCC3CAD1, 0xD8DFE6ED, 0xF4FB0209,
-        0x10171E25, 0x2C333A41, 0x484F565D, 0x646B7279
-    };
+        0x00070E15, 0x1C232A31, 0x383F464D, 0x545B6269, 0x70777E85, 0x8C939AA1,
+        0xA8AFB6BD, 0xC4CBD2D9, 0xE0E7EEF5, 0xFC030A11, 0x181F262D, 0x343B4249,
+        0x50575E65, 0x6C737A81, 0x888F969D, 0xA4ABB2B9, 0xC0C7CED5, 0xDCE3EAF1,
+        0xF8FF060D, 0x141B2229, 0x30373E45, 0x4C535A61, 0x686F767D, 0x848B9299,
+        0xA0A7AEB5, 0xBCC3CAD1, 0xD8DFE6ED, 0xF4FB0209, 0x10171E25, 0x2C333A41,
+        0x484F565D, 0x646B7279};
 
     uint32_t K[4];
     int i;
@@ -314,7 +305,7 @@ int ossl_sm4_set_key(const uint8_t *key, SM4_KEY *ks)
         K[1] ^= SM4_key_sub(K[2] ^ K[3] ^ K[0] ^ CK[i + 1]);
         K[2] ^= SM4_key_sub(K[3] ^ K[0] ^ K[1] ^ CK[i + 2]);
         K[3] ^= SM4_key_sub(K[0] ^ K[1] ^ K[2] ^ CK[i + 3]);
-        ks->rk[i    ] = K[0];
+        ks->rk[i] = K[0];
         ks->rk[i + 1] = K[1];
         ks->rk[i + 2] = K[2];
         ks->rk[i + 3] = K[3];
@@ -342,9 +333,9 @@ void ossl_sm4_encrypt(const uint8_t *in, uint8_t *out, const SM4_KEY *ks)
      * Uses byte-wise sbox in the first and last rounds to provide some
      * protection from cache based side channels.
      */
-    SM4_RNDS( 0,  1,  2,  3, SM4_T_slow);
-    SM4_RNDS( 4,  5,  6,  7, SM4_T);
-    SM4_RNDS( 8,  9, 10, 11, SM4_T);
+    SM4_RNDS(0, 1, 2, 3, SM4_T_slow);
+    SM4_RNDS(4, 5, 6, 7, SM4_T);
+    SM4_RNDS(8, 9, 10, 11, SM4_T);
     SM4_RNDS(12, 13, 14, 15, SM4_T);
     SM4_RNDS(16, 17, 18, 19, SM4_T);
     SM4_RNDS(20, 21, 22, 23, SM4_T);
@@ -369,9 +360,9 @@ void ossl_sm4_decrypt(const uint8_t *in, uint8_t *out, const SM4_KEY *ks)
     SM4_RNDS(23, 22, 21, 20, SM4_T);
     SM4_RNDS(19, 18, 17, 16, SM4_T);
     SM4_RNDS(15, 14, 13, 12, SM4_T);
-    SM4_RNDS(11, 10,  9,  8, SM4_T);
-    SM4_RNDS( 7,  6,  5,  4, SM4_T);
-    SM4_RNDS( 3,  2,  1,  0, SM4_T_slow);
+    SM4_RNDS(11, 10, 9, 8, SM4_T);
+    SM4_RNDS(7, 6, 5, 4, SM4_T);
+    SM4_RNDS(3, 2, 1, 0, SM4_T_slow);
 
     store_u32_be(B3, out);
     store_u32_be(B2, out + 4);

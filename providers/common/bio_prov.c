@@ -95,8 +95,8 @@ int ossl_prov_bio_read_ex(OSSL_CORE_BIO *bio, void *data, size_t data_len,
     return c_bio_read_ex(bio, data, data_len, bytes_read);
 }
 
-int ossl_prov_bio_write_ex(OSSL_CORE_BIO *bio, const void *data, size_t data_len,
-                           size_t *written)
+int ossl_prov_bio_write_ex(OSSL_CORE_BIO *bio, const void *data,
+                           size_t data_len, size_t *written)
 {
     if (c_bio_write_ex == NULL)
         return 0;
@@ -209,13 +209,13 @@ BIO_METHOD *ossl_bio_prov_init_bio_method(void)
 
     corebiometh = BIO_meth_new(BIO_TYPE_CORE_TO_PROV, "BIO to Core filter");
     if (corebiometh == NULL
-            || !BIO_meth_set_write_ex(corebiometh, bio_core_write_ex)
-            || !BIO_meth_set_read_ex(corebiometh, bio_core_read_ex)
-            || !BIO_meth_set_puts(corebiometh, bio_core_puts)
-            || !BIO_meth_set_gets(corebiometh, bio_core_gets)
-            || !BIO_meth_set_ctrl(corebiometh, bio_core_ctrl)
-            || !BIO_meth_set_create(corebiometh, bio_core_new)
-            || !BIO_meth_set_destroy(corebiometh, bio_core_free)) {
+        || !BIO_meth_set_write_ex(corebiometh, bio_core_write_ex)
+        || !BIO_meth_set_read_ex(corebiometh, bio_core_read_ex)
+        || !BIO_meth_set_puts(corebiometh, bio_core_puts)
+        || !BIO_meth_set_gets(corebiometh, bio_core_gets)
+        || !BIO_meth_set_ctrl(corebiometh, bio_core_ctrl)
+        || !BIO_meth_set_create(corebiometh, bio_core_new)
+        || !BIO_meth_set_destroy(corebiometh, bio_core_free)) {
         BIO_meth_free(corebiometh);
         return NULL;
     }

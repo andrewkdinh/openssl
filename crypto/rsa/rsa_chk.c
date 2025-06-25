@@ -26,8 +26,8 @@ static int rsa_validate_keypair_multiprime(const RSA *key, BN_GENCB *cb)
     int ret = 1, ex_primes = 0, idx;
     RSA_PRIME_INFO *pinfo;
 
-    if (key->p == NULL || key->q == NULL || key->n == NULL
-            || key->e == NULL || key->d == NULL) {
+    if (key->p == NULL || key->q == NULL || key->n == NULL || key->e == NULL
+        || key->d == NULL) {
         ERR_raise(ERR_LIB_RSA, RSA_R_VALUE_MISSING);
         return 0;
     }
@@ -36,7 +36,7 @@ static int rsa_validate_keypair_multiprime(const RSA *key, BN_GENCB *cb)
     if (key->version == RSA_ASN1_VERSION_MULTI) {
         ex_primes = sk_RSA_PRIME_INFO_num(key->prime_infos);
         if (ex_primes <= 0
-                || (ex_primes + 2) > ossl_rsa_multip_cap(BN_num_bits(key->n))) {
+            || (ex_primes + 2) > ossl_rsa_multip_cap(BN_num_bits(key->n))) {
             ERR_raise(ERR_LIB_RSA, RSA_R_INVALID_MULTI_PRIME_KEY);
             return 0;
         }
@@ -48,8 +48,8 @@ static int rsa_validate_keypair_multiprime(const RSA *key, BN_GENCB *cb)
     l = BN_new();
     m = BN_new();
     ctx = BN_CTX_new_ex(key->libctx);
-    if (i == NULL || j == NULL || k == NULL || l == NULL
-            || m == NULL || ctx == NULL) {
+    if (i == NULL || j == NULL || k == NULL || l == NULL || m == NULL
+        || ctx == NULL) {
         ret = -1;
         ERR_raise(ERR_LIB_RSA, ERR_R_BN_LIB);
         goto err;
@@ -223,7 +223,7 @@ static int rsa_validate_keypair_multiprime(const RSA *key, BN_GENCB *cb)
         }
     }
 
- err:
+err:
     BN_free(i);
     BN_free(j);
     BN_free(k);
@@ -261,9 +261,8 @@ int RSA_check_key(const RSA *key)
 int RSA_check_key_ex(const RSA *key, BN_GENCB *cb)
 {
 #ifdef FIPS_MODULE
-    return ossl_rsa_validate_public(key)
-           && ossl_rsa_validate_private(key)
-           && ossl_rsa_validate_pairwise(key);
+    return ossl_rsa_validate_public(key) && ossl_rsa_validate_private(key)
+        && ossl_rsa_validate_pairwise(key);
 #else
     return rsa_validate_keypair_multiprime(key, cb);
 #endif /* FIPS_MODULE */

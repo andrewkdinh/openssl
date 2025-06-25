@@ -56,7 +56,7 @@ static int send_fp_chars(void *arg, const void *buf, int len)
 }
 #endif
 
-typedef int char_io (void *arg, const void *buf, int len);
+typedef int char_io(void *arg, const void *buf, int len);
 
 /*
  * This function handles display of strings, one character at a time. It is
@@ -105,9 +105,9 @@ static int do_esc_char(unsigned long c, unsigned short flags, char *do_quotes,
             return -1;
         return 2;
     }
-    if (chflgs & (ASN1_STRFLGS_ESC_CTRL
-                  | ASN1_STRFLGS_ESC_MSB
-                  | ASN1_STRFLGS_ESC_2254)) {
+    if (chflgs
+        & (ASN1_STRFLGS_ESC_CTRL | ASN1_STRFLGS_ESC_MSB
+           | ASN1_STRFLGS_ESC_2254)) {
         BIO_snprintf(tmphex, 11, "\\%02X", chtmp);
         if (!io_ch(arg, tmphex, 3))
             return -1;
@@ -136,9 +136,8 @@ static int do_esc_char(unsigned long c, unsigned short flags, char *do_quotes,
  * appropriate.
  */
 
-static int do_buf(unsigned char *buf, int buflen,
-                  int type, unsigned short flags, char *quotes, char_io *io_ch,
-                  void *arg)
+static int do_buf(unsigned char *buf, int buflen, int type,
+                  unsigned short flags, char *quotes, char_io *io_ch, void *arg)
 {
     int i, outlen, len, charwidth;
     unsigned short orflags;
@@ -213,15 +212,14 @@ static int do_buf(unsigned char *buf, int buflen,
                  * otherwise each character will be > 0x7f and so the
                  * character will never be escaped on first and last.
                  */
-                len = do_esc_char(utfbuf[i], flags | orflags, quotes,
-                                  io_ch, arg);
+                len =
+                    do_esc_char(utfbuf[i], flags | orflags, quotes, io_ch, arg);
                 if (len < 0)
                     return -1;
                 outlen += len;
             }
         } else {
-            len = do_esc_char(c, flags | orflags, quotes,
-                              io_ch, arg);
+            len = do_esc_char(c, flags | orflags, quotes, io_ch, arg);
             if (len < 0)
                 return -1;
             outlen += len;
@@ -303,21 +301,21 @@ static const signed char tag2nbyte[] = {
     -1, -1, -1, -1, -1,         /* 0-4 */
     -1, -1, -1, -1, -1,         /* 5-9 */
     -1, -1,                     /* 10-11 */
-     0,                         /* 12 V_ASN1_UTF8STRING */
+    0,                         /* 12 V_ASN1_UTF8STRING */
     -1, -1, -1, -1, -1,         /* 13-17 */
-     1,                         /* 18 V_ASN1_NUMERICSTRING */
-     1,                         /* 19 V_ASN1_PRINTABLESTRING */
-     1,                         /* 20 V_ASN1_T61STRING */
+    1,                         /* 18 V_ASN1_NUMERICSTRING */
+    1,                         /* 19 V_ASN1_PRINTABLESTRING */
+    1,                         /* 20 V_ASN1_T61STRING */
     -1,                         /* 21 */
-     1,                         /* 22 V_ASN1_IA5STRING */
-     1,                         /* 23 V_ASN1_UTCTIME */
-     1,                         /* 24 V_ASN1_GENERALIZEDTIME */
+    1,                         /* 22 V_ASN1_IA5STRING */
+    1,                         /* 23 V_ASN1_UTCTIME */
+    1,                         /* 24 V_ASN1_GENERALIZEDTIME */
     -1,                         /* 25 */
-     1,                         /* 26 V_ASN1_ISO64STRING */
+    1,                         /* 26 V_ASN1_ISO64STRING */
     -1,                         /* 27 */
-     4,                         /* 28 V_ASN1_UNIVERSALSTRING */
+    4,                         /* 28 V_ASN1_UNIVERSALSTRING */
     -1,                         /* 29 */
-     2                          /* 30 V_ASN1_BMPSTRING */
+    2                          /* 30 V_ASN1_BMPSTRING */
 };
 
 /*
@@ -421,8 +419,8 @@ static int do_indent(char_io *io_ch, void *arg, int indent)
 #define FN_WIDTH_LN     25
 #define FN_WIDTH_SN     10
 
-static int do_name_ex(char_io *io_ch, void *arg, const X509_NAME *n,
-                      int indent, unsigned long flags)
+static int do_name_ex(char_io *io_ch, void *arg, const X509_NAME *n, int indent,
+                      unsigned long flags)
 {
     int i, prev = -1, orflags, cnt;
     int fn_opt, fn_nid;
@@ -513,7 +511,7 @@ static int do_name_ex(char_io *io_ch, void *arg, const X509_NAME *n,
             int objlen, fld_len;
             if ((fn_opt == XN_FLAG_FN_OID) || (fn_nid == NID_undef)) {
                 OBJ_obj2txt(objtmp, sizeof(objtmp), fn, 1);
-                fld_len = 0;    /* XXX: what should this be? */
+                fld_len = 0; /* XXX: what should this be? */
                 objbuf = objtmp;
             } else {
                 if (fn_opt == XN_FLAG_FN_SN) {
@@ -591,7 +589,8 @@ int ASN1_STRING_print_ex(BIO *out, const ASN1_STRING *str, unsigned long flags)
 }
 
 #ifndef OPENSSL_NO_STDIO
-int ASN1_STRING_print_ex_fp(FILE *fp, const ASN1_STRING *str, unsigned long flags)
+int ASN1_STRING_print_ex_fp(FILE *fp, const ASN1_STRING *str,
+                            unsigned long flags)
 {
     return do_print_ex(send_fp_chars, fp, flags, str);
 }
@@ -618,9 +617,8 @@ int ASN1_STRING_to_UTF8(unsigned char **out, const ASN1_STRING *in)
     stmp.data = NULL;
     stmp.length = 0;
     stmp.flags = 0;
-    ret =
-        ASN1_mbstring_copy(&str, in->data, in->length, mbflag,
-                           B_ASN1_UTF8STRING);
+    ret = ASN1_mbstring_copy(&str, in->data, in->length, mbflag,
+                             B_ASN1_UTF8STRING);
     if (ret < 0)
         return ret;
     *out = stmp.data;

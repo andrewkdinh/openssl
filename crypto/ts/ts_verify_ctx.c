@@ -103,8 +103,8 @@ unsigned char *TS_VERIFY_CTX_set_imprint(TS_VERIFY_CTX *ctx,
 }
 #endif
 
-int TS_VERIFY_CTX_set0_imprint(TS_VERIFY_CTX *ctx,
-                              unsigned char *hexstr, long len)
+int TS_VERIFY_CTX_set0_imprint(TS_VERIFY_CTX *ctx, unsigned char *hexstr,
+                               long len)
 {
     OPENSSL_free(ctx->imprint);
     ctx->imprint = hexstr;
@@ -176,7 +176,7 @@ TS_VERIFY_CTX *TS_REQ_to_TS_VERIFY_CTX(TS_REQ *req, TS_VERIFY_CTX *ctx)
         ret->flags &= ~TS_VFY_NONCE;
 
     return ret;
- err:
+err:
     if (ctx)
         TS_VERIFY_CTX_cleanup(ctx);
     else

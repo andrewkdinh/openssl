@@ -132,9 +132,7 @@ static int aes_get_ctx_params(void *vctx, OSSL_PARAM params[])
     p = OSSL_PARAM_locate(params, OSSL_CIPHER_HMAC_PARAM_MAC);
     if (p != NULL) {
         sz = p->data_size;
-        if (sz == 0
-            || sz > AES_CBC_MAX_HMAC_SIZE
-            || !ctx->base.enc
+        if (sz == 0 || sz > AES_CBC_MAX_HMAC_SIZE || !ctx->base.enc
             || ctx->taglen == UNINITIALISED_SIZET) {
             ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_TAG);
             return 0;
@@ -152,8 +150,7 @@ static const OSSL_PARAM cipher_aes_known_gettable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_IVLEN, NULL),
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_IV, NULL, 0),
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_UPDATED_IV, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 
 const OSSL_PARAM *aes_gettable_ctx_params(ossl_unused void *cctx,
                                           ossl_unused void *provctx)
@@ -164,9 +161,7 @@ const OSSL_PARAM *aes_gettable_ctx_params(ossl_unused void *cctx,
 static const OSSL_PARAM cipher_aes_known_settable_ctx_params[] = {
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_AEAD_MAC_KEY, NULL, 0),
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_AEAD_TLS1_AAD, NULL, 0),
-    OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL), OSSL_PARAM_END};
 
 const OSSL_PARAM *aes_settable_ctx_params(ossl_unused void *cctx,
                                           ossl_unused void *provctx)
@@ -180,8 +175,8 @@ static void base_ctx_init(void *provctx, PROV_AES_HMAC_SHA_ETM_CTX *ctx,
                           uint64_t flags)
 {
     ossl_cipher_generic_initkey(&ctx->base, kbits, blkbits, ivbits,
-                                EVP_CIPH_CBC_MODE, flags,
-                                &meths->base, provctx);
+                                EVP_CIPH_CBC_MODE, flags, &meths->base,
+                                provctx);
     ctx->hw = (PROV_CIPHER_HW_AES_HMAC_SHA_ETM *)ctx->base.hw;
 }
 
@@ -197,8 +192,8 @@ static void *aes_cbc_hmac_sha1_etm_newctx(void *provctx, size_t kbits,
     ctx = OPENSSL_zalloc(sizeof(*ctx));
     if (ctx != NULL)
         base_ctx_init(provctx, &ctx->base_ctx,
-                      ossl_prov_cipher_hw_aes_cbc_hmac_sha1_etm(), kbits, blkbits,
-                      ivbits, flags);
+                      ossl_prov_cipher_hw_aes_cbc_hmac_sha1_etm(), kbits,
+                      blkbits, ivbits, flags);
     return ctx;
 }
 
@@ -234,8 +229,8 @@ static void *aes_cbc_hmac_sha256_etm_newctx(void *provctx, size_t kbits,
     ctx = OPENSSL_zalloc(sizeof(*ctx));
     if (ctx != NULL)
         base_ctx_init(provctx, &ctx->base_ctx,
-                      ossl_prov_cipher_hw_aes_cbc_hmac_sha256_etm(), kbits, blkbits,
-                      ivbits, flags);
+                      ossl_prov_cipher_hw_aes_cbc_hmac_sha256_etm(), kbits,
+                      blkbits, ivbits, flags);
     return ctx;
 }
 
@@ -271,8 +266,8 @@ static void *aes_cbc_hmac_sha512_etm_newctx(void *provctx, size_t kbits,
     ctx = OPENSSL_zalloc(sizeof(*ctx));
     if (ctx != NULL)
         base_ctx_init(provctx, &ctx->base_ctx,
-                      ossl_prov_cipher_hw_aes_cbc_hmac_sha512_etm(), kbits, blkbits,
-                      ivbits, flags);
+                      ossl_prov_cipher_hw_aes_cbc_hmac_sha512_etm(), kbits,
+                      blkbits, ivbits, flags);
     return ctx;
 }
 
@@ -334,20 +329,29 @@ const OSSL_DISPATCH ossl_##nm##kbits##sub##_functions[] = {                    \
 #endif /* AES_CBC_HMAC_SHA_ETM_CAPABLE */
 
 /* ossl_aes128cbc_hmac_sha1_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha1_etm, 128, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha1_etm, 128, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)
 /* ossl_aes192cbc_hmac_sha1_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha1_etm, 192, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha1_etm, 192, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)
 /* ossl_aes256cbc_hmac_sha1_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha1_etm, 256, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha1_etm, 256, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)
 /* ossl_aes128cbc_hmac_sha256_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha256_etm, 128, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha256_etm, 128, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)
 /* ossl_aes192cbc_hmac_sha256_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha256_etm, 192, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha256_etm, 192, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)
 /* ossl_aes256cbc_hmac_sha256_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha256_etm, 256, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha256_etm, 256, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)
 /* ossl_aes128cbc_hmac_sha512_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha512_etm, 128, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha512_etm, 128, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)
 /* ossl_aes192cbc_hmac_sha512_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha512_etm, 192, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha512_etm, 192, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)
 /* ossl_aes256cbc_hmac_sha512_etm_functions */
-IMPLEMENT_CIPHER(aes, cbc_hmac_sha512_etm, 256, 128, 128, EVP_CIPH_FLAG_ENC_THEN_MAC)
+IMPLEMENT_CIPHER(aes, cbc_hmac_sha512_etm, 256, 128, 128,
+                 EVP_CIPH_FLAG_ENC_THEN_MAC)

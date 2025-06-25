@@ -148,8 +148,8 @@ int main(int argc, char **argv)
         goto fail;
     }
 
-    mlen = snprintf(msg, sizeof(msg),
-                    "GET / HTTP/1.0\r\nHost: %s\r\n\r\n", argv[1]);
+    mlen = snprintf(msg, sizeof(msg), "GET / HTTP/1.0\r\nHost: %s\r\n\r\n",
+                    argv[1]);
 
     ctx = create_ssl_ctx();
     if (ctx == NULL) {
@@ -157,9 +157,9 @@ int main(int argc, char **argv)
         goto fail;
     }
 
-    hints.ai_family     = AF_INET;
-    hints.ai_socktype   = SOCK_STREAM;
-    hints.ai_flags      = AI_PASSIVE;
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
     rc = getaddrinfo(argv[1], argv[2], &hints, &result);
     if (rc < 0) {
         fprintf(stderr, "cannot resolve\n");

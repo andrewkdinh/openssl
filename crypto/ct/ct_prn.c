@@ -33,8 +33,7 @@ static void timestamp_print(uint64_t timestamp, BIO *out)
 
     if (gen == NULL)
         return;
-    ASN1_GENERALIZEDTIME_adj(gen, (time_t)0,
-                             (int)(timestamp / 86400000),
+    ASN1_GENERALIZEDTIME_adj(gen, (time_t)0, (int)(timestamp / 86400000),
                              (timestamp % 86400000) / 1000);
     /*
      * Note GeneralizedTime from ASN1_GENERALIZETIME_adj is always 15
@@ -73,8 +72,8 @@ void SCT_print(const SCT *sct, BIO *out, int indent,
     const CTLOG *log = NULL;
 
     if (log_store != NULL) {
-        log = CTLOG_STORE_get0_log_by_id(log_store, sct->log_id,
-                                         sct->log_id_len);
+        log =
+            CTLOG_STORE_get0_log_by_id(log_store, sct->log_id, sct->log_id_len);
     }
 
     BIO_printf(out, "%*sSigned Certificate Timestamp:", indent, "");

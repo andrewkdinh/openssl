@@ -78,9 +78,8 @@ static uint8_t *consume_size_t(const uint8_t *buf, size_t *len, size_t *val)
  *
  * @return 1 if a key type is successfully selected, 0 on failure.
  */
-static int select_keytype_and_size(uint8_t **buf, size_t *len,
-                                   char **keytype, size_t *keylen,
-                                   int only_valid)
+static int select_keytype_and_size(uint8_t **buf, size_t *len, char **keytype,
+                                   size_t *keylen, int only_valid)
 {
     uint16_t keysize;
     uint16_t modulus = 6;
@@ -156,8 +155,8 @@ static int select_keytype_and_size(uint8_t **buf, size_t *len,
  * @note The generated key is allocated using OpenSSL's EVP_PKEY functions
  *       and should be freed appropriately using `EVP_PKEY_free()`.
  */
-static void create_ml_dsa_raw_key(uint8_t **buf, size_t *len,
-                                  void **key1, void **key2)
+static void create_ml_dsa_raw_key(uint8_t **buf, size_t *len, void **key1,
+                                  void **key2)
 {
     EVP_PKEY *pubkey;
     char *keytype = NULL;
@@ -208,9 +207,11 @@ static void create_ml_dsa_raw_key(uint8_t **buf, size_t *len,
      * which is what we want the fuzzer to do
      */
     if (pub == 1)
-        pubkey = EVP_PKEY_new_raw_public_key_ex(NULL, keytype, NULL, key, keylen);
+        pubkey =
+            EVP_PKEY_new_raw_public_key_ex(NULL, keytype, NULL, key, keylen);
     else
-        pubkey = EVP_PKEY_new_raw_private_key_ex(NULL, keytype, NULL, key, keylen);
+        pubkey =
+            EVP_PKEY_new_raw_private_key_ex(NULL, keytype, NULL, key, keylen);
 
     *key1 = pubkey;
     return;
@@ -273,8 +274,8 @@ err:
  * @note The generated key is allocated using OpenSSL's EVP_PKEY functions
  *       and should be freed using `EVP_PKEY_free()`.
  */
-static void keygen_ml_dsa_real_key(uint8_t **buf, size_t *len,
-                                   void **key1, void **key2)
+static void keygen_ml_dsa_real_key(uint8_t **buf, size_t *len, void **key1,
+                                   void **key2)
 {
     if (!keygen_ml_dsa_real_key_helper(buf, len, (EVP_PKEY **)key1)
         || !keygen_ml_dsa_real_key_helper(buf, len, (EVP_PKEY **)key2))
@@ -309,8 +310,7 @@ static void ml_dsa_sign_verify(uint8_t **buf, size_t *len, void *key1,
     const OSSL_PARAM params[] = {
         OSSL_PARAM_octet_string("context-string",
                                 (unsigned char *)"A context string", 16),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
 
     if (!consume_size_t(*buf, len, &tbslen)) {
         fprintf(stderr, "Failed to set tbslen");
@@ -319,8 +319,7 @@ static void ml_dsa_sign_verify(uint8_t **buf, size_t *len, void *key1,
     /* Keep tbslen within a reasonable value we can malloc */
     tbslen = (tbslen % 2048) + 1;
 
-    if ((tbs = OPENSSL_malloc(tbslen)) == NULL
-        || ctx == NULL || alg == NULL
+    if ((tbs = OPENSSL_malloc(tbslen)) == NULL || ctx == NULL || alg == NULL
         || !RAND_bytes_ex(NULL, tbs, tbslen, 0)) {
         fprintf(stderr, "Failed basic initialization\n");
         goto err;
@@ -386,8 +385,7 @@ static void ml_dsa_digest_sign_verify(uint8_t **buf, size_t *len, void *key1,
     const OSSL_PARAM params[] = {
         OSSL_PARAM_octet_string("context-string",
                                 (unsigned char *)"A context string", 16),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
 
     if (!consume_size_t(*buf, len, &tbslen)) {
         fprintf(stderr, "Failed to set tbslen");
@@ -396,8 +394,7 @@ static void ml_dsa_digest_sign_verify(uint8_t **buf, size_t *len, void *key1,
     /* Keep tbslen within a reasonable value we can malloc */
     tbslen = (tbslen % 2048) + 1;
 
-    if ((tbs = OPENSSL_malloc(tbslen)) == NULL
-        || ctx == NULL
+    if ((tbs = OPENSSL_malloc(tbslen)) == NULL || ctx == NULL
         || !RAND_bytes_ex(NULL, tbs, tbslen, 0)) {
         fprintf(stderr, "Failed basic initialization\n");
         goto err;
@@ -423,7 +420,8 @@ static void ml_dsa_digest_sign_verify(uint8_t **buf, size_t *len, void *key1,
 
     if ((ctx = EVP_MD_CTX_new()) == NULL
         || EVP_DigestVerifyInit_ex(ctx, NULL, NULL, NULL, "?fips=true", key,
-                                   params) <= 0
+                                   params)
+            <= 0
         || EVP_DigestVerify(ctx, sig, sig_len, tbs, tbslen) <= 0) {
         fprintf(stderr, "Failed to verify digest with EVP_DigestVerify\n");
         goto err;
@@ -500,8 +498,8 @@ err:
  * @param out1  Unused parameter (purpose unclear).
  * @param out2  Unused parameter (purpose unclear).
  */
-static void ml_dsa_compare(uint8_t **buf, size_t *len, void *key1,
-                           void *key2, void **out1, void **out2)
+static void ml_dsa_compare(uint8_t **buf, size_t *len, void *key1, void *key2,
+                           void **out1, void **out2)
 {
     EVP_PKEY *alice = (EVP_PKEY *)key1;
     EVP_PKEY *bob = (EVP_PKEY *)key2;
@@ -524,8 +522,7 @@ static void ml_dsa_compare(uint8_t **buf, size_t *len, void *key1,
  * @note This function assumes that each key is either a valid EVP_PKEY
  *       object or NULL. Passing NULL is safe and has no effect.
  */
-static void cleanup_ml_dsa_keys(void *key1, void *key2,
-                                void *key3, void *key4)
+static void cleanup_ml_dsa_keys(void *key1, void *key2, void *key3, void *key4)
 {
     EVP_PKEY_free((EVP_PKEY *)key1);
     EVP_PKEY_free((EVP_PKEY *)key2);
@@ -569,8 +566,8 @@ struct op_table_entry {
      * @param out1  Pointer to store the first output of the operation.
      * @param out2  Pointer to store the second output of the operation.
      */
-    void (*doit)(uint8_t **buf, size_t *len, void *in1, void *in2,
-                 void **out1, void **out2);
+    void (*doit)(uint8_t **buf, size_t *len, void *in1, void *in2, void **out1,
+                 void **out2);
 
     /**
      * @brief Function pointer for cleaning up after the operation.
@@ -584,44 +581,23 @@ struct op_table_entry {
 };
 
 static struct op_table_entry ops[] = {
-    {
-        "Generate ML-DSA raw key",
-        "Try generate a raw keypair using random data. Usually fails",
-        create_ml_dsa_raw_key,
-        NULL,
-        cleanup_ml_dsa_keys
-    }, {
-        "Generate ML-DSA keypair, using EVP_PKEY_keygen",
-        "Generates a real ML-DSA keypair, should always work",
-        keygen_ml_dsa_real_key,
-        NULL,
-        cleanup_ml_dsa_keys
-    }, {
-        "Do a sign/verify operation on a key",
-        "Generate key, sign random data, verify it, should work",
-        keygen_ml_dsa_real_key,
-        ml_dsa_sign_verify,
-        cleanup_ml_dsa_keys
-    }, {
-        "Do a digest sign/verify operation on a key",
-        "Generate key, digest sign random data, verify it, should work",
-        keygen_ml_dsa_real_key,
-        ml_dsa_digest_sign_verify,
-        cleanup_ml_dsa_keys
-    }, {
-        "Do an export/import of key data",
-        "Exercise EVP_PKEY_todata/fromdata",
-        keygen_ml_dsa_real_key,
-        ml_dsa_export_import,
-        cleanup_ml_dsa_keys
-    }, {
-        "Compare keys for equality",
-        "Compare key1/key1 and key1/key2 for equality",
-        keygen_ml_dsa_real_key,
-        ml_dsa_compare,
-        cleanup_ml_dsa_keys
-    }
-};
+    {"Generate ML-DSA raw key",
+     "Try generate a raw keypair using random data. Usually fails",
+     create_ml_dsa_raw_key, NULL, cleanup_ml_dsa_keys},
+    {"Generate ML-DSA keypair, using EVP_PKEY_keygen",
+     "Generates a real ML-DSA keypair, should always work",
+     keygen_ml_dsa_real_key, NULL, cleanup_ml_dsa_keys},
+    {"Do a sign/verify operation on a key",
+     "Generate key, sign random data, verify it, should work",
+     keygen_ml_dsa_real_key, ml_dsa_sign_verify, cleanup_ml_dsa_keys},
+    {"Do a digest sign/verify operation on a key",
+     "Generate key, digest sign random data, verify it, should work",
+     keygen_ml_dsa_real_key, ml_dsa_digest_sign_verify, cleanup_ml_dsa_keys},
+    {"Do an export/import of key data", "Exercise EVP_PKEY_todata/fromdata",
+     keygen_ml_dsa_real_key, ml_dsa_export_import, cleanup_ml_dsa_keys},
+    {"Compare keys for equality",
+     "Compare key1/key1 and key1/key2 for equality", keygen_ml_dsa_real_key,
+     ml_dsa_compare, cleanup_ml_dsa_keys}};
 
 int FuzzerInitialize(int *argc, char ***argv)
 {

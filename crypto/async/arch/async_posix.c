@@ -17,7 +17,7 @@
 # include <openssl/err.h>
 # include <openssl/crypto.h>
 
-#define STACKSIZE       32768
+# define STACKSIZE       32768
 
 static CRYPTO_RWLOCK *async_mem_lock;
 
@@ -95,9 +95,9 @@ void async_local_cleanup(void)
 
 int async_fibre_makecontext(async_fibre *fibre)
 {
-#ifndef USE_SWAPCONTEXT
+# ifndef USE_SWAPCONTEXT
     fibre->env_init = 0;
-#endif
+# endif
     if (getcontext(&fibre->fibre) == 0) {
         size_t num = STACKSIZE;
 

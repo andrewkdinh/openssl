@@ -62,8 +62,8 @@ static int get_peer_public_key(PEER_DATA *peer, OSSL_LIB_CTX *libctx)
                                                   pubkeydata, pubkeylen);
     params[2] = OSSL_PARAM_construct_end();
     ret = EVP_PKEY_fromdata_init(ctx) > 0
-          && (EVP_PKEY_fromdata(ctx, &peer->pub, EVP_PKEY_PUBLIC_KEY,
-                                params) > 0);
+        && (EVP_PKEY_fromdata(ctx, &peer->pub, EVP_PKEY_PUBLIC_KEY, params)
+            > 0);
     EVP_PKEY_CTX_free(ctx);
     return ret;
 }
@@ -82,10 +82,9 @@ static int create_peer(PEER_DATA *peer, OSSL_LIB_CTX *libctx)
     if (ctx == NULL)
         return 0;
 
-    if (EVP_PKEY_keygen_init(ctx) <= 0
-            || !EVP_PKEY_CTX_set_params(ctx, params)
-            || EVP_PKEY_generate(ctx, &peer->priv) <= 0
-            || !get_peer_public_key(peer, libctx)) {
+    if (EVP_PKEY_keygen_init(ctx) <= 0 || !EVP_PKEY_CTX_set_params(ctx, params)
+        || EVP_PKEY_generate(ctx, &peer->priv) <= 0
+        || !get_peer_public_key(peer, libctx)) {
         EVP_PKEY_free(peer->priv);
         peer->priv = NULL;
         goto err;
@@ -186,8 +185,7 @@ int main(void)
     OSSL_LIB_CTX *libctx = NULL;
 
     /* Each peer creates a (Ephemeral) keypair */
-    if (!create_peer(&peer1, libctx)
-            || !create_peer(&peer2, libctx)) {
+    if (!create_peer(&peer1, libctx) || !create_peer(&peer2, libctx)) {
         fprintf(stderr, "Create peer failed\n");
         goto cleanup;
     }
@@ -197,14 +195,14 @@ int main(void)
      * derive a shared secret
      */
     if (!generate_secret(&peer1, peer2.pub, libctx)
-            || !generate_secret(&peer2, peer1.pub, libctx)) {
+        || !generate_secret(&peer2, peer1.pub, libctx)) {
         fprintf(stderr, "Generate secrets failed\n");
         goto cleanup;
     }
 
     /* For illustrative purposes demonstrate that the derived secrets are equal */
     if (peer1.secretlen != peer2.secretlen
-            || CRYPTO_memcmp(peer1.secret, peer2.secret, peer1.secretlen) != 0) {
+        || CRYPTO_memcmp(peer1.secret, peer2.secret, peer1.secretlen) != 0) {
         fprintf(stderr, "Derived secrets do not match\n");
         goto cleanup;
     } else {

@@ -70,7 +70,8 @@ static void print_escaped_value(BIO *out, const char *value)
 /**
  * Print all values in the configuration section identified by section_name
  */
-static void print_section(BIO *out, const CONF *cnf, OPENSSL_CSTRING section_name)
+static void print_section(BIO *out, const CONF *cnf,
+                          OPENSSL_CSTRING section_name)
 {
     STACK_OF(CONF_VALUE) *values = NCONF_get_section(cnf, section_name);
     int idx;
@@ -94,12 +95,13 @@ typedef enum OPTION_choice {
 const OPTIONS configutl_options[] = {
     OPT_SECTION("General"),
     {"help", OPT_HELP, '-', "Display this summary"},
-    {"config", OPT_CONFIG, 's', "Config file to deal with (the default one if omitted)"},
+    {"config", OPT_CONFIG, 's',
+     "Config file to deal with (the default one if omitted)"},
     OPT_SECTION("Output"),
     {"out", OPT_OUT, '>', "Output to filename rather than stdout"},
-    {"noheader", OPT_NOHEADER, '-', "Don't print the information about original config"},
-    {NULL}
-};
+    {"noheader", OPT_NOHEADER, '-',
+     "Don't print the information about original config"},
+    {NULL}};
 
 /**
  * Parse the passed OpenSSL configuration file (or the default one/specified in the
@@ -165,7 +167,8 @@ int configutl_main(int argc, char *argv[])
         goto end;
 
     if (NCONF_load(cnf, configfile, &eline) == 0) {
-        BIO_printf(bio_err, "Error on line %ld of configuration file\n", eline + 1);
+        BIO_printf(bio_err, "Error on line %ld of configuration file\n",
+                   eline + 1);
         goto end;
     }
 
@@ -173,8 +176,10 @@ int configutl_main(int argc, char *argv[])
         goto end;
 
     if (no_header == 0)
-        BIO_printf(out, "# This configuration file was linearized and expanded from %s\n",
-                   configfile);
+        BIO_printf(
+            out,
+            "# This configuration file was linearized and expanded from %s\n",
+            configfile);
 
     default_section_idx = sk_OPENSSL_CSTRING_find(sections, "default");
     if (default_section_idx != -1)

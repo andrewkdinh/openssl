@@ -8,31 +8,31 @@
  */
 
 #ifndef OSSL_CRYPTO_DES_LOCAL_H
-# define OSSL_CRYPTO_DES_LOCAL_H
+#define OSSL_CRYPTO_DES_LOCAL_H
 
-# include <openssl/e_os2.h>
+#include <openssl/e_os2.h>
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-# include <openssl/des.h>
+#include <openssl/des.h>
 
-# ifdef OPENSSL_BUILD_SHLIBCRYPTO
-#  undef OPENSSL_EXTERN
-#  define OPENSSL_EXTERN OPENSSL_EXPORT
-# endif
+#ifdef OPENSSL_BUILD_SHLIBCRYPTO
+# undef OPENSSL_EXTERN
+# define OPENSSL_EXTERN OPENSSL_EXPORT
+#endif
 
-# define ITERATIONS 16
-# define HALF_ITERATIONS 8
+#define ITERATIONS 16
+#define HALF_ITERATIONS 8
 
-# define c2l(c,l)        (l =((DES_LONG)(*((c)++)))    , \
+#define c2l(c, l)        (l =((DES_LONG)(*((c)++)))    , \
                          l|=((DES_LONG)(*((c)++)))<< 8L, \
                          l|=((DES_LONG)(*((c)++)))<<16L, \
                          l|=((DES_LONG)(*((c)++)))<<24L)
 
 /* NOTE - c is not incremented as per c2l */
-# define c2ln(c,l1,l2,n) { \
+#define c2ln(c, l1, l2, n) { \
                         c+=n; \
                         l1=l2=0; \
                         switch (n) { \
@@ -54,13 +54,13 @@
                                 } \
                         }
 
-# define l2c(l,c)        (*((c)++)=(unsigned char)(((l)     )&0xff), \
+#define l2c(l, c)        (*((c)++)=(unsigned char)(((l)     )&0xff), \
                          *((c)++)=(unsigned char)(((l)>> 8L)&0xff), \
                          *((c)++)=(unsigned char)(((l)>>16L)&0xff), \
                          *((c)++)=(unsigned char)(((l)>>24L)&0xff))
 
 /* NOTE - c is not incremented as per l2c */
-# define l2cn(l1,l2,c,n) { \
+#define l2cn(l1, l2, c, n) { \
                         c+=n; \
                         switch (n) { \
                         case 8: *(--(c))=(unsigned char)(((l2)>>24L)&0xff); \
@@ -81,59 +81,62 @@
                                 } \
                         }
 
-# if defined(_MSC_VER)
-#  define ROTATE(a,n)     (_lrotr(a,n))
-# elif defined(__ICC)
-#  define ROTATE(a,n)     (_rotr(a,n))
-# elif defined(__GNUC__) && __GNUC__>=2 && !defined(__STRICT_ANSI__) && !defined(OPENSSL_NO_ASM) && !defined(OPENSSL_NO_INLINE_ASM) && !defined(PEDANTIC)
-#  if defined(__i386) || defined(__i386__) || defined(__x86_64) || defined(__x86_64__)
-#   define ROTATE(a,n)   ({ register unsigned int ret;   \
+#if defined(_MSC_VER)
+# define ROTATE(a, n)     (_lrotr(a,n))
+#elif defined(__ICC)
+# define ROTATE(a, n)     (_rotr(a,n))
+#elif defined(__GNUC__) && __GNUC__ >= 2 && !defined(__STRICT_ANSI__) \
+    && !defined(OPENSSL_NO_ASM) && !defined(OPENSSL_NO_INLINE_ASM) \
+    && !defined(PEDANTIC)
+# if defined(__i386) || defined(__i386__) || defined(__x86_64) \
+     || defined(__x86_64__)
+#  define ROTATE(a, n)   ({ register unsigned int ret;   \
                                 asm ("rorl %1,%0"       \
                                         : "=r"(ret)     \
                                         : "I"(n),"0"(a) \
                                         : "cc");        \
                            ret;                         \
                         })
-#  elif defined(__riscv_zbb) || defined(__riscv_zbkb)
-#   if __riscv_xlen == 64
-#    define ROTATE(x, n) ({ register unsigned int ret; \
+# elif defined(__riscv_zbb) || defined(__riscv_zbkb)
+#  if __riscv_xlen == 64
+#   define ROTATE(x, n) ({ register unsigned int ret; \
                        asm ("roriw %0, %1, %2"         \
                        : "=r"(ret)                     \
                        : "r"(x), "i"(n)); ret; })
-#   endif
-#   if __riscv_xlen == 32
-#    define ROTATE(x, n) ({ register unsigned int ret; \
+#  endif
+#  if __riscv_xlen == 32
+#   define ROTATE(x, n) ({ register unsigned int ret; \
                        asm ("rori %0, %1, %2"          \
                        : "=r"(ret)                     \
                        : "r"(x), "i"(n)); ret; })
-#   endif
 #  endif
 # endif
-# ifndef ROTATE
-#  define ROTATE(a,n)     (((a)>>(n))+((a)<<(32-(n))))
-# endif
+#endif
+#ifndef ROTATE
+# define ROTATE(a, n)     (((a)>>(n))+((a)<<(32-(n))))
+#endif
 
 /*
  * Don't worry about the LOAD_DATA() stuff, that is used by fcrypt() to add
  * it's little bit to the front
  */
 
-# ifdef DES_FCRYPT
+#ifdef DES_FCRYPT
 
-#  define LOAD_DATA_tmp(R,S,u,t,E0,E1) \
+# define LOAD_DATA_tmp(R, S, u, t, E0, E1) \
         { DES_LONG tmp; LOAD_DATA(R,S,u,t,E0,E1,tmp); }
 
-#  define LOAD_DATA(R,S,u,t,E0,E1,tmp) \
+# define LOAD_DATA(R, S, u, t, E0, E1, tmp) \
         t=R^(R>>16L); \
         u=t&E0; t&=E1; \
         tmp=(u<<16); u^=R^s[S  ]; u^=tmp; \
         tmp=(t<<16); t^=R^s[S+1]; t^=tmp
-# else
-#  define LOAD_DATA_tmp(a,b,c,d,e,f) LOAD_DATA(a,b,c,d,e,f,g)
-#  define LOAD_DATA(R,S,u,t,E0,E1,tmp) \
+#else
+# define LOAD_DATA_tmp(a, b, c, d, e, f) LOAD_DATA(a,b,c,d,e,f,g)
+# define LOAD_DATA(R, S, u, t, E0, E1, tmp) \
         u=R^s[S  ]; \
         t=R^s[S+1]
-# endif
+#endif
 
 /*
  * It recently occurred to me that 0^0^0^0^0^0^0 == 0, so there is no reason
@@ -141,7 +144,7 @@
  * since things can be xored directly into L
  */
 
-# define D_ENCRYPT(LL,R,S) { \
+#define D_ENCRYPT(LL, R, S) { \
         LOAD_DATA_tmp(R,S,u,t,E0,E1); \
         t=ROTATE(t,4); \
         LL^= \
@@ -192,11 +195,11 @@
         I first got ~42 operations without xors.  When I remembered
         how to use xors :-) I got it to its final state.
         */
-# define PERM_OP(a,b,t,n,m) ((t)=((((a)>>(n))^(b))&(m)),\
+#define PERM_OP(a, b, t, n, m) ((t)=((((a)>>(n))^(b))&(m)),\
         (b)^=(t),\
         (a)^=((t)<<(n)))
 
-# define IP(l,r) \
+#define IP(l, r) \
         { \
         register DES_LONG tt; \
         PERM_OP(r,l,tt, 4,0x0f0f0f0fL); \
@@ -206,7 +209,7 @@
         PERM_OP(r,l,tt, 1,0x55555555L); \
         }
 
-# define FP(l,r) \
+#define FP(l, r) \
         { \
         register DES_LONG tt; \
         PERM_OP(l,r,tt, 1,0x55555555L); \
@@ -218,7 +221,7 @@
 
 extern const DES_LONG DES_SPtrans[8][64];
 
-void fcrypt_body(DES_LONG *out, DES_key_schedule *ks,
-                 DES_LONG Eswap0, DES_LONG Eswap1);
+void fcrypt_body(DES_LONG *out, DES_key_schedule *ks, DES_LONG Eswap0,
+                 DES_LONG Eswap1);
 
 #endif

@@ -42,13 +42,12 @@ typedef struct {
 #define NPAD 6
 #define NVARPAD (NVAR * NPAD - NPAD + 1)
 
-static char *prefixes[NVAR] = { "", junk, gunk, "", "" };
-static char *suffixes[NVAR] = { "", "", "", sEOF, junk };
-static unsigned lengths[6] = { 0, 3, 48, 192, 768, 1536 };
-static unsigned linelengths[] = {
-    4, 8, 16, 28, 40, 64, 80, 128, 256, 512, 1023, 0
-};
-static unsigned wscnts[] = { 0, 1, 2, 4, 8, 16, 0xFFFF };
+static char *prefixes[NVAR] = {"", junk, gunk, "", ""};
+static char *suffixes[NVAR] = {"", "", "", sEOF, junk};
+static unsigned lengths[6] = {0, 3, 48, 192, 768, 1536};
+static unsigned linelengths[] = {4,  8,   16,  28,  40,   64,
+                                 80, 128, 256, 512, 1023, 0};
+static unsigned wscnts[] = {0, 1, 2, 4, 8, 16, 0xFFFF};
 
 /* Generate `len` random octets */
 static unsigned char *genbytes(unsigned len)
@@ -78,8 +77,7 @@ static int memout(BIO *mem, char c, int llen, int *pos)
 /* Encode and append one 6-bit slice, randomly prepending some whitespace */
 static int memoutws(BIO *mem, char c, unsigned wscnt, unsigned llen, int *pos)
 {
-    if (wscnt > 0
-        && (test_random() % llen) < wscnt
+    if (wscnt > 0 && (test_random() % llen) < wscnt
         && memout(mem, ' ', llen, pos) == 0)
         return 0;
     return memout(mem, c, llen, pos);
@@ -162,11 +160,13 @@ static int genb64(char *prefix, char *suffix, unsigned const char *buf,
     if (mem == NULL)
         return -1;
 
-    if ((*prefix && (BIO_write(mem, prefix, preflen) != preflen
-                     || BIO_write(mem, &newline, 1) != 1))
+    if ((*prefix
+         && (BIO_write(mem, prefix, preflen) != preflen
+             || BIO_write(mem, &newline, 1) != 1))
         || encode(buf, buflen, encoded, trunc, llen, wscnt, mem) <= 0
-        || (*suffix && (BIO_write(mem, suffix, sufflen) != sufflen
-                        || BIO_write(mem, &newline, 1) != 1))) {
+        || (*suffix
+            && (BIO_write(mem, suffix, sufflen) != sufflen
+                || BIO_write(mem, &newline, 1) != 1))) {
         BIO_free(mem);
         return -1;
     }
@@ -176,7 +176,7 @@ static int genb64(char *prefix, char *suffix, unsigned const char *buf,
     *out = bptr->data;
     outlen = bptr->length;
     bptr->data = NULL;
-    (void) BIO_set_close(mem, BIO_NOCLOSE);
+    (void)BIO_set_close(mem, BIO_NOCLOSE);
     BIO_free(mem);
     BUF_MEM_free(bptr);
 
@@ -268,7 +268,7 @@ static int test_bio_base64_run(test_case *t, int llen, int wscnt)
     if (t->retry)
         BIO_set_mem_eof_return(bio, 0);
 
-    if (n < (int) out_len)
+    if (n < (int)out_len)
         /* Perform the last read, checking its result */
         ret = BIO_read(b64, out + n, out_len - n);
     else {
@@ -292,9 +292,8 @@ static int test_bio_base64_run(test_case *t, int llen, int wscnt)
         || (t->no_nl && *t->prefix)) {
         if ((ret = ret < 0 ? 0 : -1) != 0)
             TEST_error("Final read result was non-negative");
-    } else if (ret != 0
-             || n != (int) t->bytes
-             || (n > 0 && memcmp(raw, out, n) != 0)) {
+    } else if (ret != 0 || n != (int)t->bytes
+               || (n > 0 && memcmp(raw, out, n) != 0)) {
         TEST_error("Failed to decode expected data");
         ret = -1;
     }
@@ -386,10 +385,10 @@ static int test_bio_base64_generated(int idx)
 
     t.prefix = prefixes[variant];
     t.encoded = NULL;
-    t.bytes  = lengths[lencase];
+    t.bytes = lengths[lencase];
     t.trunc = 0;
     if (padcase && padcase < 3)
-        t.bytes  += padcase;
+        t.bytes += padcase;
     else if (padcase >= 3)
         t.trunc = padcase - 2;
     t.suffix = suffixes[variant];
@@ -424,7 +423,7 @@ static int test_bio_base64_corner_case_bug(int idx)
 
     /* Expected decode length */
     t.bytes = 6;
-    t.trunc = 0;    /* ignored */
+    t.trunc = 0; /* ignored */
 
     return generic_case(&t, 0);
 }

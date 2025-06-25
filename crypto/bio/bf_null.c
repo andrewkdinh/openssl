@@ -23,18 +23,9 @@ static int nullf_gets(BIO *h, char *str, int size);
 static long nullf_ctrl(BIO *h, int cmd, long arg1, void *arg2);
 static long nullf_callback_ctrl(BIO *h, int cmd, BIO_info_cb *fp);
 static const BIO_METHOD methods_nullf = {
-    BIO_TYPE_NULL_FILTER,
-    "NULL filter",
-    bwrite_conv,
-    nullf_write,
-    bread_conv,
-    nullf_read,
-    nullf_puts,
-    nullf_gets,
-    nullf_ctrl,
-    NULL,
-    NULL,
-    nullf_callback_ctrl,
+    BIO_TYPE_NULL_FILTER, "NULL filter", bwrite_conv, nullf_write,
+    bread_conv,           nullf_read,    nullf_puts,  nullf_gets,
+    nullf_ctrl,           NULL,          NULL,        nullf_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_null(void)

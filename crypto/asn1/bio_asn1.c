@@ -71,24 +71,14 @@ static long asn1_bio_callback_ctrl(BIO *h, int cmd, BIO_info_cb *fp);
 static int asn1_bio_init(BIO_ASN1_BUF_CTX *ctx, int size);
 static int asn1_bio_flush_ex(BIO *b, BIO_ASN1_BUF_CTX *ctx,
                              asn1_ps_func *cleanup, asn1_bio_state_t next);
-static int asn1_bio_setup_ex(BIO *b, BIO_ASN1_BUF_CTX *ctx,
-                             asn1_ps_func *setup,
+static int asn1_bio_setup_ex(BIO *b, BIO_ASN1_BUF_CTX *ctx, asn1_ps_func *setup,
                              asn1_bio_state_t ex_state,
                              asn1_bio_state_t other_state);
 
 static const BIO_METHOD methods_asn1 = {
-    BIO_TYPE_ASN1,
-    "asn1",
-    bwrite_conv,
-    asn1_bio_write,
-    bread_conv,
-    asn1_bio_read,
-    asn1_bio_puts,
-    asn1_bio_gets,
-    asn1_bio_ctrl,
-    asn1_bio_new,
-    asn1_bio_free,
-    asn1_bio_callback_ctrl,
+    BIO_TYPE_ASN1, "asn1",        bwrite_conv,   asn1_bio_write,
+    bread_conv,    asn1_bio_read, asn1_bio_puts, asn1_bio_gets,
+    asn1_bio_ctrl, asn1_bio_new,  asn1_bio_free, asn1_bio_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_asn1(void)
@@ -170,16 +160,16 @@ static int asn1_bio_write(BIO *b, const char *in, int inl)
         switch (ctx->state) {
             /* Setup prefix data, call it */
         case ASN1_STATE_START:
-            if (!asn1_bio_setup_ex(b, ctx, ctx->prefix,
-                                   ASN1_STATE_PRE_COPY, ASN1_STATE_HEADER))
+            if (!asn1_bio_setup_ex(b, ctx, ctx->prefix, ASN1_STATE_PRE_COPY,
+                                   ASN1_STATE_HEADER))
                 return -1;
             break;
 
             /* Copy any pre data first */
         case ASN1_STATE_PRE_COPY:
 
-            ret = asn1_bio_flush_ex(b, ctx, ctx->prefix_free,
-                                    ASN1_STATE_HEADER);
+            ret =
+                asn1_bio_flush_ex(b, ctx, ctx->prefix_free, ASN1_STATE_HEADER);
 
             if (ret <= 0)
                 goto done;
@@ -238,17 +228,14 @@ static int asn1_bio_write(BIO *b, const char *in, int inl)
         case ASN1_STATE_DONE:
             BIO_clear_retry_flags(b);
             return 0;
-
         }
-
     }
 
- done:
+done:
     BIO_clear_retry_flags(b);
     BIO_copy_next_retry(b);
 
     return (wrlen > 0) ? wrlen : ret;
-
 }
 
 static int asn1_bio_flush_ex(BIO *b, BIO_ASN1_BUF_CTX *ctx,
@@ -276,8 +263,7 @@ static int asn1_bio_flush_ex(BIO *b, BIO_ASN1_BUF_CTX *ctx,
     return ret;
 }
 
-static int asn1_bio_setup_ex(BIO *b, BIO_ASN1_BUF_CTX *ctx,
-                             asn1_ps_func *setup,
+static int asn1_bio_setup_ex(BIO *b, BIO_ASN1_BUF_CTX *ctx, asn1_ps_func *setup,
                              asn1_bio_state_t ex_state,
                              asn1_bio_state_t other_state)
 {
@@ -372,14 +358,13 @@ static long asn1_bio_ctrl(BIO *b, int cmd, long arg1, void *arg2)
 
         /* Call post function if possible */
         if (ctx->state == ASN1_STATE_HEADER) {
-            if (!asn1_bio_setup_ex(b, ctx, ctx->suffix,
-                                   ASN1_STATE_POST_COPY, ASN1_STATE_DONE))
+            if (!asn1_bio_setup_ex(b, ctx, ctx->suffix, ASN1_STATE_POST_COPY,
+                                   ASN1_STATE_DONE))
                 return 0;
         }
 
         if (ctx->state == ASN1_STATE_POST_COPY) {
-            ret = asn1_bio_flush_ex(b, ctx, ctx->suffix_free,
-                                    ASN1_STATE_DONE);
+            ret = asn1_bio_flush_ex(b, ctx, ctx->suffix_free, ASN1_STATE_DONE);
             if (ret <= 0)
                 return ret;
         }
@@ -395,14 +380,13 @@ static long asn1_bio_ctrl(BIO *b, int cmd, long arg1, void *arg2)
         if (next == NULL)
             return 0;
         return BIO_ctrl(next, cmd, arg1, arg2);
-
     }
 
     return ret;
 }
 
-static int asn1_bio_set_ex(BIO *b, int cmd,
-                           asn1_ps_func *ex_func, asn1_ps_func *ex_free_func)
+static int asn1_bio_set_ex(BIO *b, int cmd, asn1_ps_func *ex_func,
+                           asn1_ps_func *ex_free_func)
 {
     BIO_ASN1_EX_FUNCS extmp;
     extmp.ex_func = ex_func;
@@ -410,8 +394,7 @@ static int asn1_bio_set_ex(BIO *b, int cmd,
     return BIO_ctrl(b, cmd, 0, &extmp);
 }
 
-static int asn1_bio_get_ex(BIO *b, int cmd,
-                           asn1_ps_func **ex_func,
+static int asn1_bio_get_ex(BIO *b, int cmd, asn1_ps_func **ex_func,
                            asn1_ps_func **ex_free_func)
 {
     BIO_ASN1_EX_FUNCS extmp;
@@ -424,8 +407,7 @@ static int asn1_bio_get_ex(BIO *b, int cmd,
     return ret;
 }
 
-int BIO_asn1_set_prefix(BIO *b, asn1_ps_func *prefix,
-                        asn1_ps_func *prefix_free)
+int BIO_asn1_set_prefix(BIO *b, asn1_ps_func *prefix, asn1_ps_func *prefix_free)
 {
     return asn1_bio_set_ex(b, BIO_C_SET_PREFIX, prefix, prefix_free);
 }
@@ -436,8 +418,7 @@ int BIO_asn1_get_prefix(BIO *b, asn1_ps_func **pprefix,
     return asn1_bio_get_ex(b, BIO_C_GET_PREFIX, pprefix, pprefix_free);
 }
 
-int BIO_asn1_set_suffix(BIO *b, asn1_ps_func *suffix,
-                        asn1_ps_func *suffix_free)
+int BIO_asn1_set_suffix(BIO *b, asn1_ps_func *suffix, asn1_ps_func *suffix_free)
 {
     return asn1_bio_set_ex(b, BIO_C_SET_SUFFIX, suffix, suffix_free);
 }

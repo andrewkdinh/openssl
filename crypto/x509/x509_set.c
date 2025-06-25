@@ -192,8 +192,8 @@ int X509_SIG_INFO_get(const X509_SIG_INFO *siginf, int *mdnid, int *pknid,
     return (siginf->flags & X509_SIG_INFO_VALID) != 0;
 }
 
-void X509_SIG_INFO_set(X509_SIG_INFO *siginf, int mdnid, int pknid,
-                       int secbits, uint32_t flags)
+void X509_SIG_INFO_set(X509_SIG_INFO *siginf, int mdnid, int pknid, int secbits,
+                       uint32_t flags)
 {
     siginf->mdnid = mdnid;
     siginf->pknid = pknid;
@@ -221,7 +221,7 @@ static int x509_sig_info_init(X509_SIG_INFO *siginf, const X509_ALGOR *alg,
     siginf->secbits = -1;
     siginf->flags = 0;
     if (!OBJ_find_sigid_algs(OBJ_obj2nid(alg->algorithm), &mdnid, &pknid)
-            || pknid == NID_undef) {
+        || pknid == NID_undef) {
         ERR_raise(ERR_LIB_X509, X509_R_UNKNOWN_SIGID_ALGS);
         return 0;
     }
@@ -233,8 +233,8 @@ static int x509_sig_info_init(X509_SIG_INFO *siginf, const X509_ALGOR *alg,
         /* If we have one, use a custom handler for this algorithm */
         ameth = EVP_PKEY_asn1_find(NULL, pknid);
         if (ameth != NULL && ameth->siginf_set != NULL
-                && ameth->siginf_set(siginf, alg, sig))
-           break;
+            && ameth->siginf_set(siginf, alg, sig))
+            break;
         if (pubkey != NULL) {
             int secbits;
 

@@ -74,8 +74,7 @@ static EXT_LIST ext_list[] = {
     EXT_ENTRY(certificate_authorities),
     EXT_ENTRY(padding),
     EXT_ENTRY(psk),
-    EXT_END(num_builtins)
-};
+    EXT_END(num_builtins)};
 
 static int test_extension_list(void)
 {
@@ -87,8 +86,8 @@ static int test_extension_list(void)
     for (i = 0; i < n; i++) {
         if (!TEST_size_t_eq(i, ext_list[i].idx)) {
             retval = 0;
-            TEST_error("TLSEXT_IDX_%s=%zd, found at=%zd\n",
-                       ext_list[i].name, ext_list[i].idx, i);
+            TEST_error("TLSEXT_IDX_%s=%zd, found at=%zd\n", ext_list[i].name,
+                       ext_list[i].idx, i);
         }
         type = ossl_get_extension_type(ext_list[i].idx);
         if (!TEST_uint_eq(type, ext_list[i].type)) {

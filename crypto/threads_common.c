@@ -123,7 +123,7 @@ DEFINE_SPARSE_ARRAY_OF(CTX_TABLE_ENTRY);
  *
  */
 typedef struct master_key_entry {
-    SPARSE_ARRAY_OF(CTX_TABLE_ENTRY) *ctx_table;
+    SPARSE_ARRAY_OF(CTX_TABLE_ENTRY) * ctx_table;
 } MASTER_KEY_ENTRY;
 
 /**
@@ -252,12 +252,14 @@ static void init_master_key(void)
  * @return A pointer to the stored context-specific data, or NULL if no
  *         entry is found or initialization fails.
  */
-void *CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id, OSSL_LIB_CTX *ctx)
+void *CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id,
+                                 OSSL_LIB_CTX *ctx)
 {
     MASTER_KEY_ENTRY *mkey;
     CTX_TABLE_ENTRY ctxd;
 
-    ctx = (ctx == CRYPTO_THREAD_NO_CONTEXT) ? NULL : ossl_lib_ctx_get_concrete(ctx);
+    ctx = (ctx == CRYPTO_THREAD_NO_CONTEXT) ? NULL
+                                            : ossl_lib_ctx_get_concrete(ctx);
     /*
      * Make sure the master key has been initialized
      * NOTE: We use CRYPTO_THREAD_run_once here, rather than the
@@ -330,12 +332,13 @@ void *CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id, OSSL_LIB_CTX *ct
  *
  * @return 1 on success, or 0 if allocation or initialization fails.
  */
-int CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id,
-                               OSSL_LIB_CTX *ctx, void *data)
+int CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id, OSSL_LIB_CTX *ctx,
+                               void *data)
 {
     MASTER_KEY_ENTRY *mkey;
 
-    ctx = (ctx == CRYPTO_THREAD_NO_CONTEXT) ? NULL : ossl_lib_ctx_get_concrete(ctx);
+    ctx = (ctx == CRYPTO_THREAD_NO_CONTEXT) ? NULL
+                                            : ossl_lib_ctx_get_concrete(ctx);
     /*
      * Make sure our master key is initialized
      * See notes above on the use of CRYPTO_THREAD_run_once here
@@ -355,7 +358,8 @@ int CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id,
         /*
          * we didn't find one, but that's ok, just initialize it now
          */
-        mkey = OPENSSL_zalloc(sizeof(MASTER_KEY_ENTRY) * CRYPTO_THREAD_LOCAL_KEY_MAX);
+        mkey = OPENSSL_zalloc(sizeof(MASTER_KEY_ENTRY)
+                              * CRYPTO_THREAD_LOCAL_KEY_MAX);
         if (mkey == NULL)
             return 0;
         /*
@@ -387,8 +391,8 @@ int CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id,
      *
      * Assign to the entry in the table so that we can find it later
      */
-    return ossl_sa_CTX_TABLE_ENTRY_set(mkey[id].ctx_table,
-                                       (uintptr_t)ctx, data);
+    return ossl_sa_CTX_TABLE_ENTRY_set(mkey[id].ctx_table, (uintptr_t)ctx,
+                                       data);
 }
 
 #ifdef FIPS_MODULE

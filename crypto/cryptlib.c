@@ -26,7 +26,7 @@
 #  define alloca _alloca
 # endif
 
-# if defined(_WIN32_WINNT) && _WIN32_WINNT>=0x0333
+# if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0333
 #  ifdef OPENSSL_SYS_WIN_CORE
 
 int OPENSSL_isservice(void)
@@ -43,9 +43,7 @@ int OPENSSL_isservice(void)
     static union {
         void *p;
         FARPROC f;
-    } _OPENSSL_isservice = {
-        NULL
-    };
+    } _OPENSSL_isservice = {NULL};
 
     if (_OPENSSL_isservice.p == NULL) {
         HANDLE mod = GetModuleHandle(NULL);
@@ -60,14 +58,14 @@ int OPENSSL_isservice(void)
     }
 
     if (_OPENSSL_isservice.p != (void *)-1)
-        return (*_OPENSSL_isservice.f) ();
+        return (*_OPENSSL_isservice.f)();
 
     h = GetProcessWindowStation();
     if (h == NULL)
         return -1;
 
-    if (GetUserObjectInformationW(h, UOI_NAME, NULL, 0, &len) ||
-        GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+    if (GetUserObjectInformationW(h, UOI_NAME, NULL, 0, &len)
+        || GetLastError() != ERROR_INSUFFICIENT_BUFFER)
         return -1;
 
     if (len > 512)
@@ -117,15 +115,15 @@ void OPENSSL_showfatal(const char *fmta, ...)
 # ifdef STD_ERROR_HANDLE
     HANDLE h;
 
-    if ((h = GetStdHandle(STD_ERROR_HANDLE)) != NULL &&
-        GetFileType(h) != FILE_TYPE_UNKNOWN) {
+    if ((h = GetStdHandle(STD_ERROR_HANDLE)) != NULL
+        && GetFileType(h) != FILE_TYPE_UNKNOWN) {
         /* must be console application */
         int len;
         DWORD out;
 
         va_start(ap, fmta);
         len = _vsnprintf((char *)buf, sizeof(buf), fmta, ap);
-        WriteFile(h, buf, len < 0 ? sizeof(buf) : (DWORD) len, &out, NULL);
+        WriteFile(h, buf, len < 0 ? sizeof(buf) : (DWORD)len, &out, NULL);
         va_end(ap);
         return;
     }
@@ -145,8 +143,7 @@ void OPENSSL_showfatal(const char *fmta, ...)
                 break;
             }
             if (!MultiByteToWideChar(CP_ACP, 0, fmta, len_0, fmtw, len_0))
-                for (i = 0; i < len_0; i++)
-                    fmtw[i] = (WCHAR)fmta[i];
+                for (i = 0; i < len_0; i++) fmtw[i] = (WCHAR)fmta[i];
             for (i = 0; i < len_0; i++) {
                 if (fmtw[i] == L'%')
                     do {
@@ -191,7 +188,7 @@ void OPENSSL_showfatal(const char *fmta, ...)
     buf[OSSL_NELEM(buf) - 1] = _T('\0');
     va_end(ap);
 
-# if defined(_WIN32_WINNT) && _WIN32_WINNT>=0x0333
+# if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0333
 #  ifdef OPENSSL_SYS_WIN_CORE
     /* ONECORE is always NONGUI and NT >= 0x0601 */
 #   if !defined(NDEBUG)
@@ -201,7 +198,7 @@ void OPENSSL_showfatal(const char *fmta, ...)
         * in debug builds, send output to the debugger or any other
         * tool like DebugView which can monitor the output.
         */
-        OutputDebugString(buf);
+    OutputDebugString(buf);
 #   endif
 #  else
     /* this -------------v--- guards NT-specific calls */
@@ -211,8 +208,8 @@ void OPENSSL_showfatal(const char *fmta, ...)
         if (hEventLog != NULL) {
             const TCHAR *pmsg = buf;
 
-            if (!ReportEvent(hEventLog, EVENTLOG_ERROR_TYPE, 0, 0, NULL,
-                             1, 0, &pmsg, NULL)) {
+            if (!ReportEvent(hEventLog, EVENTLOG_ERROR_TYPE, 0, 0, NULL, 1, 0,
+                             &pmsg, NULL)) {
 #   if !defined(NDEBUG)
                 /*
                  * We are in a situation where we tried to report a critical
@@ -237,13 +234,13 @@ void OPENSSL_showfatal(const char *fmta, ...)
 #else
 void OPENSSL_showfatal(const char *fmta, ...)
 {
-#ifndef OPENSSL_NO_STDIO
+# ifndef OPENSSL_NO_STDIO
     va_list ap;
 
     va_start(ap, fmta);
     vfprintf(stderr, fmta, ap);
     va_end(ap);
-#endif
+# endif
 }
 
 int OPENSSL_isservice(void)
@@ -254,8 +251,8 @@ int OPENSSL_isservice(void)
 
 void OPENSSL_die(const char *message, const char *file, int line)
 {
-    OPENSSL_showfatal("%s:%d: OpenSSL internal error: %s\n",
-                      file, line, message);
+    OPENSSL_showfatal("%s:%d: OpenSSL internal error: %s\n", file, line,
+                      message);
 #if !defined(_WIN32) || defined(OPENSSL_SYS_UEFI)
     abort();
 #else
@@ -278,5 +275,7 @@ void OPENSSL_die(const char *message, const char *file, int line)
 # define OPENSSL_VPROC_STRING_(x)    x##_CRYPTO
 # define OPENSSL_VPROC_STRING(x)     OPENSSL_VPROC_STRING_(x)
 # define OPENSSL_VPROC_FUNC          OPENSSL_VPROC_STRING(OPENSSL_VPROC)
-void OPENSSL_VPROC_FUNC(void) {}
+void OPENSSL_VPROC_FUNC(void)
+{
+}
 #endif /* __TANDEM */

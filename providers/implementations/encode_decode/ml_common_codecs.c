@@ -66,8 +66,8 @@ ossl_ml_common_pkcs8_fmt_order(const char *algorithm_name,
         for (i = 0; i < NUM_PKCS8_FORMATS; ++i) {
             /* Skip slots already selected or with a different name. */
             if (ret[i].pref > 0
-                || OPENSSL_strncasecmp(ret[i].fmt->p8_name,
-                                       fmt, (end - fmt)) != 0)
+                || OPENSSL_strncasecmp(ret[i].fmt->p8_name, fmt, (end - fmt))
+                    != 0)
                 continue;
             /* First time match */
             ret[i].pref = ++count;

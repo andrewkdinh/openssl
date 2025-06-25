@@ -101,19 +101,19 @@ static int ossl_method_construct_postcondition(OSSL_PROVIDER *provider,
 }
 
 static void ossl_method_construct_this(OSSL_PROVIDER *provider,
-                                       const OSSL_ALGORITHM *algo,
-                                       int no_store, void *cbdata)
+                                       const OSSL_ALGORITHM *algo, int no_store,
+                                       void *cbdata)
 {
     struct construct_data_st *data = cbdata;
     void *method = NULL;
 
-    if ((method = data->mcm->construct(algo, provider, data->mcm_data))
-        == NULL)
+    if ((method = data->mcm->construct(algo, provider, data->mcm_data)) == NULL)
         return;
 
-    OSSL_TRACE2(QUERY,
-                "ossl_method_construct_this: putting an algo to the store %p with no_store %d\n",
-                (void *)data->store, no_store);
+    OSSL_TRACE2(
+        QUERY,
+        "ossl_method_construct_this: putting an algo to the store %p with no_store %d\n",
+        (void *)data->store, no_store);
     /*
      * Note regarding putting the method in stores:
      *
@@ -124,8 +124,9 @@ static void ossl_method_construct_this(OSSL_PROVIDER *provider,
      * It is *expected* that the put function increments the refcnt
      * of the passed method.
      */
-    data->mcm->put(no_store ? data->store : NULL, method, provider, algo->algorithm_names,
-                   algo->property_definition, data->mcm_data);
+    data->mcm->put(no_store ? data->store : NULL, method, provider,
+                   algo->algorithm_names, algo->property_definition,
+                   data->mcm_data);
 
     /* refcnt-- because we're dropping the reference */
     data->mcm->destruct(method, data->mcm_data);
@@ -154,13 +155,11 @@ void *ossl_method_construct(OSSL_LIB_CTX *libctx, int operation_id,
     cbdata.force_store = force_store;
     cbdata.mcm = mcm;
     cbdata.mcm_data = mcm_data;
-    ossl_algorithm_do_all(libctx, operation_id, provider,
-                          ossl_method_construct_precondition,
-                          ossl_method_construct_reserve_store,
-                          ossl_method_construct_this,
-                          ossl_method_construct_unreserve_store,
-                          ossl_method_construct_postcondition,
-                          &cbdata);
+    ossl_algorithm_do_all(
+        libctx, operation_id, provider, ossl_method_construct_precondition,
+        ossl_method_construct_reserve_store, ossl_method_construct_this,
+        ossl_method_construct_unreserve_store,
+        ossl_method_construct_postcondition, &cbdata);
 
     /* If there is a temporary store, try there first */
     if (cbdata.store != NULL)

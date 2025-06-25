@@ -26,7 +26,8 @@ int EVP_SKEY_export(const EVP_SKEY *skey, int selection,
         return 0;
     }
 
-    return evp_skeymgmt_export(skey->skeymgmt, skey->keydata, selection, export_cb, export_cbarg);
+    return evp_skeymgmt_export(skey->skeymgmt, skey->keydata, selection,
+                               export_cb, export_cbarg);
 }
 
 static EVP_SKEY *evp_skey_alloc(EVP_SKEYMGMT *skeymgmt)
@@ -50,7 +51,7 @@ static EVP_SKEY *evp_skey_alloc(EVP_SKEYMGMT *skeymgmt)
     skey->skeymgmt = skeymgmt;
     return skey;
 
- err:
+err:
     CRYPTO_FREE_REF(&skey->references);
     CRYPTO_THREAD_lock_free(skey->lock);
     OPENSSL_free(skey);
@@ -70,7 +71,8 @@ static EVP_SKEY *evp_skey_alloc_fetch(OSSL_LIB_CTX *libctx,
          * if the specific key_type is unknown, attempt to use the generic
          * key management
          */
-        skeymgmt = EVP_SKEYMGMT_fetch(libctx, OSSL_SKEY_TYPE_GENERIC, propquery);
+        skeymgmt =
+            EVP_SKEYMGMT_fetch(libctx, OSSL_SKEY_TYPE_GENERIC, propquery);
         if (skeymgmt == NULL) {
             ERR_raise(ERR_LIB_EVP, ERR_R_FETCH_FAILED);
             return NULL;
@@ -84,8 +86,9 @@ static EVP_SKEY *evp_skey_alloc_fetch(OSSL_LIB_CTX *libctx,
     return skey;
 }
 
-EVP_SKEY *EVP_SKEY_import(OSSL_LIB_CTX *libctx, const char *skeymgmtname, const char *propquery,
-                          int selection, const OSSL_PARAM *params)
+EVP_SKEY *EVP_SKEY_import(OSSL_LIB_CTX *libctx, const char *skeymgmtname,
+                          const char *propquery, int selection,
+                          const OSSL_PARAM *params)
 {
     EVP_SKEY *skey = evp_skey_alloc_fetch(libctx, skeymgmtname, propquery);
 
@@ -98,7 +101,7 @@ EVP_SKEY *EVP_SKEY_import(OSSL_LIB_CTX *libctx, const char *skeymgmtname, const 
 
     return skey;
 
- err:
+err:
     EVP_SKEY_free(skey);
     return NULL;
 }
@@ -117,7 +120,7 @@ EVP_SKEY *EVP_SKEY_generate(OSSL_LIB_CTX *libctx, const char *skeymgmtname,
 
     return skey;
 
- err:
+err:
     EVP_SKEY_free(skey);
     return NULL;
 }
@@ -132,7 +135,8 @@ static int get_secret_key(const OSSL_PARAM params[], void *arg)
     const OSSL_PARAM *p = NULL;
     struct raw_key_details_st *raw_key = arg;
 
-    if ((p = OSSL_PARAM_locate_const(params, OSSL_SKEY_PARAM_RAW_BYTES)) != NULL)
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_SKEY_PARAM_RAW_BYTES))
+        != NULL)
         return OSSL_PARAM_get_octet_string_ptr(p, raw_key->key, raw_key->len);
 
     return 0;
@@ -152,13 +156,13 @@ int EVP_SKEY_get0_raw_key(const EVP_SKEY *skey, const unsigned char **key,
     raw_key.len = len;
 
     return evp_skeymgmt_export(skey->skeymgmt, skey->keydata,
-                               OSSL_SKEYMGMT_SELECT_SECRET_KEY,
-                               get_secret_key, &raw_key);
+                               OSSL_SKEYMGMT_SELECT_SECRET_KEY, get_secret_key,
+                               &raw_key);
 }
 
-EVP_SKEY *EVP_SKEY_import_raw_key(OSSL_LIB_CTX *libctx, const char *skeymgmtname,
-                                  unsigned char *key, size_t keylen,
-                                  const char *propquery)
+EVP_SKEY *EVP_SKEY_import_raw_key(OSSL_LIB_CTX *libctx,
+                                  const char *skeymgmtname, unsigned char *key,
+                                  size_t keylen, const char *propquery)
 {
     OSSL_PARAM params[2];
 
@@ -220,7 +224,6 @@ const char *EVP_SKEY_get0_skeymgmt_name(const EVP_SKEY *skey)
         return NULL;
 
     return skey->skeymgmt->type_name;
-
 }
 
 const char *EVP_SKEY_get0_provider_name(const EVP_SKEY *skey)
@@ -256,7 +259,7 @@ static int transfer_cb(const OSSL_PARAM params[], void *arg)
 EVP_SKEY *EVP_SKEY_to_provider(EVP_SKEY *skey, OSSL_LIB_CTX *libctx,
                                OSSL_PROVIDER *prov, const char *propquery)
 {
-    struct transfer_cb_ctx ctx = { 0 };
+    struct transfer_cb_ctx ctx = {0};
     EVP_SKEYMGMT *skeymgmt = NULL;
     EVP_SKEY *ret = NULL;
 
@@ -269,12 +272,12 @@ EVP_SKEY *EVP_SKEY_to_provider(EVP_SKEY *skey, OSSL_LIB_CTX *libctx,
         if (skey->skeymgmt->prov == prov)
             skeymgmt = skey->skeymgmt;
         else
-            skeymgmt = evp_skeymgmt_fetch_from_prov(prov, skey->skeymgmt->type_name,
-                                                    propquery);
+            skeymgmt = evp_skeymgmt_fetch_from_prov(
+                prov, skey->skeymgmt->type_name, propquery);
     } else {
         /* If no provider, get the default skeymgmt */
-        skeymgmt = EVP_SKEYMGMT_fetch(libctx, skey->skeymgmt->type_name,
-                                      propquery);
+        skeymgmt =
+            EVP_SKEYMGMT_fetch(libctx, skey->skeymgmt->type_name, propquery);
     }
     if (skeymgmt == NULL) {
         ERR_raise(ERR_LIB_EVP, ERR_R_FETCH_FAILED);
@@ -307,7 +310,7 @@ EVP_SKEY *EVP_SKEY_to_provider(EVP_SKEY *skey, OSSL_LIB_CTX *libctx,
 
     return ret;
 
- err:
+err:
     EVP_SKEYMGMT_free(skeymgmt);
     EVP_SKEY_free(ret);
     return NULL;

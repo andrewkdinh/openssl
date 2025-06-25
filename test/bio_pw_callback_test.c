@@ -41,15 +41,9 @@ typedef enum CallbackTest {
 } CALLBACK_TEST;
 static CALLBACK_TEST callback_test = CB_TEST_NEGATIVE;
 
-typedef enum KeyEncoding {
-    KE_PEM = 0,
-    KE_PKCS8
-} KEY_ENCODING;
+typedef enum KeyEncoding { KE_PEM = 0, KE_PKCS8 } KEY_ENCODING;
 
-typedef enum ExpectedResult {
-    ER_FAILURE = 0,
-    ER_SUCCESS
-} EXPECTED_RESULT;
+typedef enum ExpectedResult { ER_FAILURE = 0, ER_SUCCESS } EXPECTED_RESULT;
 
 typedef enum OPTION_choice {
     OPT_ERR = -1,
@@ -62,10 +56,9 @@ const OPTIONS *test_get_options(void)
 {
     static const OPTIONS test_options[] = {
         OPT_TEST_OPTIONS_DEFAULT_USAGE,
-        { "keyfile", OPT_KEY_FILE, '<',
-          "The PEM file with the encrypted key to load" },
-        { NULL }
-    };
+        {"keyfile", OPT_KEY_FILE, '<',
+         "The PEM file with the encrypted key to load"},
+        {NULL}};
     return test_options;
 }
 
@@ -302,7 +295,8 @@ static int test_pem_exceed_size(void)
 
 static int test_pkcs8_negative(void)
 {
-    return full_cycle_test(KE_PKCS8, CB_TEST_WEAK, CB_TEST_NEGATIVE, ER_FAILURE);
+    return full_cycle_test(KE_PKCS8, CB_TEST_WEAK, CB_TEST_NEGATIVE,
+                           ER_FAILURE);
 }
 
 static int test_pkcs8_zero_length(void)

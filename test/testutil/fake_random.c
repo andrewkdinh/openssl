@@ -48,7 +48,7 @@ static void fake_rand_freectx(void *vrng)
 }
 
 static int fake_rand_instantiate(void *vrng, ossl_unused unsigned int strength,
-                                 ossl_unused  int prediction_resistance,
+                                 ossl_unused int prediction_resistance,
                                  ossl_unused const unsigned char *pstr,
                                  size_t pstr_len,
                                  ossl_unused const OSSL_PARAM params[])
@@ -112,38 +112,32 @@ static int fake_rand_get_ctx_params(ossl_unused void *vrng, OSSL_PARAM params[])
     return 1;
 }
 
-static const OSSL_PARAM *fake_rand_gettable_ctx_params(ossl_unused void *vrng,
-                                                       ossl_unused void *provctx)
+static const OSSL_PARAM *
+fake_rand_gettable_ctx_params(ossl_unused void *vrng, ossl_unused void *provctx)
 {
     static const OSSL_PARAM known_gettable_ctx_params[] = {
         OSSL_PARAM_int(OSSL_RAND_PARAM_STATE, NULL),
         OSSL_PARAM_uint(OSSL_RAND_PARAM_STRENGTH, NULL),
-        OSSL_PARAM_size_t(OSSL_RAND_PARAM_MAX_REQUEST, NULL),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_size_t(OSSL_RAND_PARAM_MAX_REQUEST, NULL), OSSL_PARAM_END};
     return known_gettable_ctx_params;
 }
 
 static const OSSL_DISPATCH fake_rand_functions[] = {
-    { OSSL_FUNC_RAND_NEWCTX, (void (*)(void))fake_rand_newctx },
-    { OSSL_FUNC_RAND_FREECTX, (void (*)(void))fake_rand_freectx },
-    { OSSL_FUNC_RAND_INSTANTIATE, (void (*)(void))fake_rand_instantiate },
-    { OSSL_FUNC_RAND_UNINSTANTIATE, (void (*)(void))fake_rand_uninstantiate },
-    { OSSL_FUNC_RAND_GENERATE, (void (*)(void))fake_rand_generate },
-    { OSSL_FUNC_RAND_ENABLE_LOCKING, (void (*)(void))fake_rand_enable_locking },
-    { OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS,
-      (void(*)(void))fake_rand_gettable_ctx_params },
-    { OSSL_FUNC_RAND_GET_CTX_PARAMS, (void(*)(void))fake_rand_get_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_RAND_NEWCTX, (void (*)(void))fake_rand_newctx},
+    {OSSL_FUNC_RAND_FREECTX, (void (*)(void))fake_rand_freectx},
+    {OSSL_FUNC_RAND_INSTANTIATE, (void (*)(void))fake_rand_instantiate},
+    {OSSL_FUNC_RAND_UNINSTANTIATE, (void (*)(void))fake_rand_uninstantiate},
+    {OSSL_FUNC_RAND_GENERATE, (void (*)(void))fake_rand_generate},
+    {OSSL_FUNC_RAND_ENABLE_LOCKING, (void (*)(void))fake_rand_enable_locking},
+    {OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS,
+     (void (*)(void))fake_rand_gettable_ctx_params},
+    {OSSL_FUNC_RAND_GET_CTX_PARAMS, (void (*)(void))fake_rand_get_ctx_params},
+    OSSL_DISPATCH_END};
 
 static const OSSL_ALGORITHM fake_rand_rand[] = {
-    { "FAKE", "provider=fake", fake_rand_functions },
-    { NULL, NULL, NULL }
-};
+    {"FAKE", "provider=fake", fake_rand_functions}, {NULL, NULL, NULL}};
 
-static const OSSL_ALGORITHM *fake_rand_query(void *provctx,
-                                             int operation_id,
+static const OSSL_ALGORITHM *fake_rand_query(void *provctx, int operation_id,
                                              int *no_cache)
 {
     *no_cache = 0;
@@ -156,10 +150,9 @@ static const OSSL_ALGORITHM *fake_rand_query(void *provctx,
 
 /* Functions we provide to the core */
 static const OSSL_DISPATCH fake_rand_method[] = {
-    { OSSL_FUNC_PROVIDER_TEARDOWN, (void (*)(void))OSSL_LIB_CTX_free },
-    { OSSL_FUNC_PROVIDER_QUERY_OPERATION, (void (*)(void))fake_rand_query },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_PROVIDER_TEARDOWN, (void (*)(void))OSSL_LIB_CTX_free},
+    {OSSL_FUNC_PROVIDER_QUERY_OPERATION, (void (*)(void))fake_rand_query},
+    OSSL_DISPATCH_END};
 
 static int fake_rand_provider_init(const OSSL_CORE_HANDLE *handle,
                                    const OSSL_DISPATCH *in,
@@ -191,14 +184,14 @@ OSSL_PROVIDER *fake_rand_start(OSSL_LIB_CTX *libctx)
 
     if (!TEST_true(OSSL_PROVIDER_add_builtin(libctx, "fake-rand",
                                              fake_rand_provider_init))
-            || !TEST_true(RAND_set_DRBG_type(libctx, "fake", NULL, NULL, NULL))
-            || !TEST_ptr(p = OSSL_PROVIDER_try_load(libctx, "fake-rand", 1)))
+        || !TEST_true(RAND_set_DRBG_type(libctx, "fake", NULL, NULL, NULL))
+        || !TEST_ptr(p = OSSL_PROVIDER_try_load(libctx, "fake-rand", 1)))
         return NULL;
 
     /* Ensure that the fake rand is initialized. */
     if (!TEST_true(check_rng(RAND_get0_primary(libctx), "primary"))
-            || !TEST_true(check_rng(RAND_get0_private(libctx), "private"))
-            || !TEST_true(check_rng(RAND_get0_public(libctx), "public"))) {
+        || !TEST_true(check_rng(RAND_get0_private(libctx), "private"))
+        || !TEST_true(check_rng(RAND_get0_public(libctx), "public"))) {
         OSSL_PROVIDER_unload(p);
         return NULL;
     }
@@ -228,4 +221,3 @@ void fake_rand_set_public_private_callbacks(OSSL_LIB_CTX *libctx,
     fake_rand_set_callback(RAND_get0_private(libctx), cb);
     fake_rand_set_callback(RAND_get0_public(libctx), cb);
 }
-

@@ -84,9 +84,8 @@ static int lock_parent(CRNG_TEST *crngt)
 {
     void *parent = crngt->parent;
 
-    if (parent != NULL
-            && crngt->parent_lock != NULL
-            && !crngt->parent_lock(parent)) {
+    if (parent != NULL && crngt->parent_lock != NULL
+        && !crngt->parent_lock(parent)) {
         ERR_raise(ERR_LIB_PROV, PROV_R_PARENT_LOCKING_NOT_ENABLED);
         return 0;
     }
@@ -118,8 +117,7 @@ static int RCT_test(CRNG_TEST *crngt, uint8_t next)
         21, 11, 8, 6, 5, 5, 4, 4            /* H = 1, ..., 8 */
     };
 
-    if (ossl_likely(crngt->rct.b != 0)
-            && ossl_unlikely(next == crngt->rct.a))
+    if (ossl_likely(crngt->rct.b != 0) && ossl_unlikely(next == crngt->rct.a))
         return ossl_likely(++crngt->rct.b < rct_c[ENTROPY_H]);
     crngt->rct.a = next;
     crngt->rct.b = 1;
@@ -144,7 +142,7 @@ static int APT_test(CRNG_TEST *crngt, uint8_t next)
 
     if (ossl_likely(crngt->apt.b != 0)) {
         if (ossl_unlikely(crngt->apt.a == next)
-                && ossl_unlikely(++crngt->apt.b >= apt_c[ENTROPY_H])) {
+            && ossl_unlikely(++crngt->apt.b >= apt_c[ENTROPY_H])) {
             crngt->apt.b = 0;
             return 0;
         }
@@ -199,15 +197,19 @@ static void *crng_test_new(void *provctx, void *parent,
     /* Extract parent's functions */
     if (parent != NULL) {
         crngt->parent = parent;
-        if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_ENABLE_LOCKING)) != NULL)
+        if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_ENABLE_LOCKING))
+            != NULL)
             crngt->parent_enable_locking = OSSL_FUNC_rand_enable_locking(pfunc);
         if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_LOCK)) != NULL)
             crngt->parent_lock = OSSL_FUNC_rand_lock(pfunc);
         if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_UNLOCK)) != NULL)
             crngt->parent_unlock = OSSL_FUNC_rand_unlock(pfunc);
-        if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS)) != NULL)
-            crngt->parent_gettable_ctx_params = OSSL_FUNC_rand_gettable_ctx_params(pfunc);
-        if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_GET_CTX_PARAMS)) != NULL)
+        if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS))
+            != NULL)
+            crngt->parent_gettable_ctx_params =
+                OSSL_FUNC_rand_gettable_ctx_params(pfunc);
+        if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_GET_CTX_PARAMS))
+            != NULL)
             crngt->parent_get_ctx_params = OSSL_FUNC_rand_get_ctx_params(pfunc);
         if ((pfunc = find_call(p_dispatch, OSSL_FUNC_RAND_GET_SEED)) != NULL)
             crngt->parent_get_seed = OSSL_FUNC_rand_get_seed(pfunc);
@@ -230,8 +232,7 @@ static void crng_test_free(void *vcrngt)
 
 static int crng_test_instantiate(void *vcrngt, unsigned int strength,
                                  int prediction_resistance,
-                                 const unsigned char *pstr,
-                                 size_t pstr_len,
+                                 const unsigned char *pstr, size_t pstr_len,
                                  ossl_unused const OSSL_PARAM params[])
 {
     CRNG_TEST *crngt = (CRNG_TEST *)vcrngt;
@@ -280,21 +281,18 @@ static int crng_test_verify_zeroization(ossl_unused void *vcrngt)
 }
 
 static size_t crng_test_get_seed(void *vcrngt, unsigned char **pout,
-                                 int entropy, size_t min_len,
-                                 size_t max_len,
+                                 int entropy, size_t min_len, size_t max_len,
                                  int prediction_resistance,
-                                 const unsigned char *adin,
-                                 size_t adin_len)
+                                 const unsigned char *adin, size_t adin_len)
 {
     CRNG_TEST *crngt = (CRNG_TEST *)vcrngt;
     size_t n;
     int r = 0;
 
     /* Without a parent, we rely on the up calls */
-    if (crngt->parent == NULL
-            || crngt->parent_get_seed == NULL) {
-        n = ossl_prov_get_entropy(crngt->provctx, pout, entropy,
-                                  min_len, max_len);
+    if (crngt->parent == NULL || crngt->parent_get_seed == NULL) {
+        n = ossl_prov_get_entropy(crngt->provctx, pout, entropy, min_len,
+                                  max_len);
         if (n == 0)
             return 0;
         r = crng_test(crngt, *pout, n);
@@ -305,9 +303,8 @@ static size_t crng_test_get_seed(void *vcrngt, unsigned char **pout,
     if (!lock_parent(crngt))
         return 0;
 
-    n = crngt->parent_get_seed(crngt->parent, pout, entropy,
-                               min_len, max_len, prediction_resistance,
-                               adin, adin_len);
+    n = crngt->parent_get_seed(crngt->parent, pout, entropy, min_len, max_len,
+                               prediction_resistance, adin, adin_len);
     if (n > 0 && crng_test(crngt, *pout, n) > 0)
         r = n;
     else if (crngt->parent_clear_seed != NULL)
@@ -316,8 +313,8 @@ static size_t crng_test_get_seed(void *vcrngt, unsigned char **pout,
     return r;
 }
 
-static void crng_test_clear_seed(void *vcrngt,
-                                 unsigned char *out, size_t outlen)
+static void crng_test_clear_seed(void *vcrngt, unsigned char *out,
+                                 size_t outlen)
 {
     CRNG_TEST *crngt = (CRNG_TEST *)vcrngt;
 
@@ -397,8 +394,7 @@ static const OSSL_PARAM *crng_test_gettable_ctx_params(void *vcrngt,
         OSSL_PARAM_uint(OSSL_RAND_PARAM_STRENGTH, NULL),
         OSSL_PARAM_size_t(OSSL_RAND_PARAM_MAX_REQUEST, NULL),
         OSSL_PARAM_int(OSSL_RAND_PARAM_FIPS_APPROVED_INDICATOR, NULL),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
 
     if (crngt->parent != NULL && crngt->parent_gettable_ctx_params != NULL)
         return crngt->parent_gettable_ctx_params(crngt->parent, provctx);
@@ -406,23 +402,20 @@ static const OSSL_PARAM *crng_test_gettable_ctx_params(void *vcrngt,
 }
 
 const OSSL_DISPATCH ossl_crng_test_functions[] = {
-    { OSSL_FUNC_RAND_NEWCTX, (void(*)(void))crng_test_new },
-    { OSSL_FUNC_RAND_FREECTX, (void(*)(void))crng_test_free },
-    { OSSL_FUNC_RAND_INSTANTIATE,
-      (void(*)(void))crng_test_instantiate },
-    { OSSL_FUNC_RAND_UNINSTANTIATE,
-      (void(*)(void))crng_test_uninstantiate },
-    { OSSL_FUNC_RAND_GENERATE, (void(*)(void))crng_test_generate },
-    { OSSL_FUNC_RAND_RESEED, (void(*)(void))crng_test_reseed },
-    { OSSL_FUNC_RAND_ENABLE_LOCKING, (void(*)(void))crng_test_enable_locking },
-    { OSSL_FUNC_RAND_LOCK, (void(*)(void))crng_test_lock },
-    { OSSL_FUNC_RAND_UNLOCK, (void(*)(void))crng_test_unlock },
-    { OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS,
-      (void(*)(void))crng_test_gettable_ctx_params },
-    { OSSL_FUNC_RAND_GET_CTX_PARAMS, (void(*)(void))crng_test_get_ctx_params },
-    { OSSL_FUNC_RAND_VERIFY_ZEROIZATION,
-      (void(*)(void))crng_test_verify_zeroization },
-    { OSSL_FUNC_RAND_GET_SEED, (void(*)(void))crng_test_get_seed },
-    { OSSL_FUNC_RAND_CLEAR_SEED, (void(*)(void))crng_test_clear_seed },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_RAND_NEWCTX, (void (*)(void))crng_test_new},
+    {OSSL_FUNC_RAND_FREECTX, (void (*)(void))crng_test_free},
+    {OSSL_FUNC_RAND_INSTANTIATE, (void (*)(void))crng_test_instantiate},
+    {OSSL_FUNC_RAND_UNINSTANTIATE, (void (*)(void))crng_test_uninstantiate},
+    {OSSL_FUNC_RAND_GENERATE, (void (*)(void))crng_test_generate},
+    {OSSL_FUNC_RAND_RESEED, (void (*)(void))crng_test_reseed},
+    {OSSL_FUNC_RAND_ENABLE_LOCKING, (void (*)(void))crng_test_enable_locking},
+    {OSSL_FUNC_RAND_LOCK, (void (*)(void))crng_test_lock},
+    {OSSL_FUNC_RAND_UNLOCK, (void (*)(void))crng_test_unlock},
+    {OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS,
+     (void (*)(void))crng_test_gettable_ctx_params},
+    {OSSL_FUNC_RAND_GET_CTX_PARAMS, (void (*)(void))crng_test_get_ctx_params},
+    {OSSL_FUNC_RAND_VERIFY_ZEROIZATION,
+     (void (*)(void))crng_test_verify_zeroization},
+    {OSSL_FUNC_RAND_GET_SEED, (void (*)(void))crng_test_get_seed},
+    {OSSL_FUNC_RAND_CLEAR_SEED, (void (*)(void))crng_test_clear_seed},
+    OSSL_DISPATCH_END};

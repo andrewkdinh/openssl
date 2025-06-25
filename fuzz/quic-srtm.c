@@ -17,7 +17,8 @@
 int FuzzerInitialize(int *argc, char ***argv)
 {
     FuzzerSetRand();
-    OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS | OPENSSL_INIT_ASYNC, NULL);
+    OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS | OPENSSL_INIT_ASYNC,
+                        NULL);
     OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS, NULL);
     ERR_clear_error();
     return 1;
@@ -32,13 +33,7 @@ int FuzzerInitialize(int *argc, char ***argv)
  *     CULL   - u8(0x02) u64(opaque)
  *     LOOKUP - u8(0x03) u128(token) u64(idx)
  */
-enum {
-    CMD_ADD,
-    CMD_REMOVE,
-    CMD_CULL,
-    CMD_LOOKUP,
-    CMD_MAX
-};
+enum { CMD_ADD, CMD_REMOVE, CMD_CULL, CMD_LOOKUP, CMD_MAX };
 
 #define MAX_CMDS 10000
 
@@ -77,8 +72,8 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
                                       sizeof(arg_token.token)))
                 continue; /* just stop */
 
-            ossl_quic_srtm_add(srtm, (void *)(uintptr_t)arg_opaque,
-                               arg_seq_num, &arg_token);
+            ossl_quic_srtm_add(srtm, (void *)(uintptr_t)arg_opaque, arg_seq_num,
+                               &arg_token);
             ossl_quic_srtm_check(srtm);
             break;
 
@@ -106,8 +101,8 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
                 || !PACKET_get_net_8(&pkt, &arg_idx))
                 continue; /* just stop */
 
-            ossl_quic_srtm_lookup(srtm, &arg_token, (size_t)arg_idx,
-                                  NULL, NULL);
+            ossl_quic_srtm_lookup(srtm, &arg_token, (size_t)arg_idx, NULL,
+                                  NULL);
             ossl_quic_srtm_check(srtm);
             break;
 

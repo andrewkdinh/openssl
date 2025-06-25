@@ -19,8 +19,8 @@ typedef struct prov_des_ctx_st {
         DES_key_schedule ks;
     } dks;
     union {
-        void (*cbc) (const void *, void *, size_t,
-                     const DES_key_schedule *, unsigned char *);
+        void (*cbc)(const void *, void *, size_t, const DES_key_schedule *,
+                    unsigned char *);
     } dstream;
 
 } PROV_DES_CTX;

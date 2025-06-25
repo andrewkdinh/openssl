@@ -22,10 +22,10 @@ static int test_namemap_empty(void)
     int ok;
 
     ok = TEST_int_eq(ossl_namemap_empty(NULL), 1)
-         && TEST_ptr(nm = ossl_namemap_new(NULL))
-         && TEST_int_eq(ossl_namemap_empty(nm), 1)
-         && TEST_int_ne(ossl_namemap_add_name(nm, 0, NAME1), 0)
-         && TEST_int_eq(ossl_namemap_empty(nm), 0);
+        && TEST_ptr(nm = ossl_namemap_new(NULL))
+        && TEST_int_eq(ossl_namemap_empty(nm), 1)
+        && TEST_int_ne(ossl_namemap_add_name(nm, 0, NAME1), 0)
+        && TEST_int_eq(ossl_namemap_empty(nm), 0);
     ossl_namemap_free(nm);
     return ok;
 }
@@ -42,14 +42,10 @@ static int test_namemap(OSSL_NAMEMAP *nm)
     int check4 = ossl_namemap_name2num(nm, ALIAS1_UC);
     int false1 = ossl_namemap_name2num(nm, "cookie");
 
-    return TEST_int_ne(num1, 0)
-        && TEST_int_ne(num2, 0)
-        && TEST_int_eq(num1, num3)
-        && TEST_int_eq(num3, num4)
-        && TEST_int_eq(num1, check1)
-        && TEST_int_eq(num2, check2)
-        && TEST_int_eq(num3, check3)
-        && TEST_int_eq(num4, check4)
+    return TEST_int_ne(num1, 0) && TEST_int_ne(num2, 0)
+        && TEST_int_eq(num1, num3) && TEST_int_eq(num3, num4)
+        && TEST_int_eq(num1, check1) && TEST_int_eq(num2, check2)
+        && TEST_int_eq(num3, check3) && TEST_int_eq(num4, check4)
         && TEST_int_eq(false1, 0);
 }
 
@@ -66,8 +62,7 @@ static int test_namemap_stored(void)
 {
     OSSL_NAMEMAP *nm = ossl_namemap_stored(NULL);
 
-    return TEST_ptr(nm)
-        && test_namemap(nm);
+    return TEST_ptr(nm) && test_namemap(nm);
 }
 
 /*

@@ -24,27 +24,25 @@ NON_EMPTY_TRANSLATION_UNIT
  * See crypto/bn/asm/rsaz-avx2.pl for further details.
  */
 void rsaz_1024_norm2red_avx2(void *red, const void *norm);
-void rsaz_1024_mul_avx2(void *ret, const void *a, const void *b,
-                        const void *n, BN_ULONG k);
+void rsaz_1024_mul_avx2(void *ret, const void *a, const void *b, const void *n,
+                        BN_ULONG k);
 void rsaz_1024_sqr_avx2(void *ret, const void *a, const void *n, BN_ULONG k,
                         int cnt);
 void rsaz_1024_scatter5_avx2(void *tbl, const void *val, int i);
 void rsaz_1024_gather5_avx2(void *val, const void *tbl, int i);
 void rsaz_1024_red2norm_avx2(void *norm, const void *red);
 
-#if defined(__SUNPRO_C)
-# pragma align 64(one,two80)
-#endif
+# if defined(__SUNPRO_C)
+#  pragma align 64(one, two80)
+# endif
 
 ALIGN64 static const BN_ULONG one[40] = {
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 ALIGN64 static const BN_ULONG two80[40] = {
     0, 0, 1 << 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+    0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void RSAZ_1024_mod_exp_avx2(BN_ULONG result_norm[16],
                             const BN_ULONG base_norm[16],
@@ -89,13 +87,13 @@ void RSAZ_1024_mod_exp_avx2(BN_ULONG result_norm[16],
     /* table[2] = a_inv^2 */
     rsaz_1024_sqr_avx2(result, a_inv, m, k0, 1);
     rsaz_1024_scatter5_avx2(table_s, result, 2);
-#if 0
+# if 0
     /* this is almost 2x smaller and less than 1% slower */
     for (index = 3; index < 32; index++) {
         rsaz_1024_mul_avx2(result, result, a_inv, m, k0);
         rsaz_1024_scatter5_avx2(table_s, result, index);
     }
-#else
+# else
     /* table[4] = a_inv^4 */
     rsaz_1024_sqr_avx2(result, result, m, k0, 1);
     rsaz_1024_scatter5_avx2(table_s, result, 4);
@@ -197,7 +195,7 @@ void RSAZ_1024_mod_exp_avx2(BN_ULONG result_norm[16],
     /* table[31] */
     rsaz_1024_mul_avx2(result, result, a_inv, m, k0);
     rsaz_1024_scatter5_avx2(table_s, result, 31);
-#endif
+# endif
 
     /* load first window */
     p_str = (unsigned char *)exponent;
@@ -242,19 +240,18 @@ void RSAZ_1024_mod_exp_avx2(BN_ULONG result_norm[16],
  */
 void rsaz_512_mul(void *ret, const void *a, const void *b, const void *n,
                   BN_ULONG k);
-void rsaz_512_mul_scatter4(void *ret, const void *a, const void *n,
-                           BN_ULONG k, const void *tbl, unsigned int power);
+void rsaz_512_mul_scatter4(void *ret, const void *a, const void *n, BN_ULONG k,
+                           const void *tbl, unsigned int power);
 void rsaz_512_mul_gather4(void *ret, const void *a, const void *tbl,
                           const void *n, BN_ULONG k, unsigned int power);
 void rsaz_512_mul_by_one(void *ret, const void *a, const void *n, BN_ULONG k);
-void rsaz_512_sqr(void *ret, const void *a, const void *n, BN_ULONG k,
-                  int cnt);
+void rsaz_512_sqr(void *ret, const void *a, const void *n, BN_ULONG k, int cnt);
 void rsaz_512_scatter4(void *tbl, const BN_ULONG *val, int power);
 void rsaz_512_gather4(BN_ULONG *val, const void *tbl, int power);
 
-void RSAZ_512_mod_exp(BN_ULONG result[8],
-                      const BN_ULONG base[8], const BN_ULONG exponent[8],
-                      const BN_ULONG m[8], BN_ULONG k0, const BN_ULONG RR[8])
+void RSAZ_512_mod_exp(BN_ULONG result[8], const BN_ULONG base[8],
+                      const BN_ULONG exponent[8], const BN_ULONG m[8],
+                      BN_ULONG k0, const BN_ULONG RR[8])
 {
     unsigned char storage[16 * 8 * 8 + 64 * 2 + 64]; /* 1.2KB */
     unsigned char *table = storage + (64 - ((size_t)storage % 64));

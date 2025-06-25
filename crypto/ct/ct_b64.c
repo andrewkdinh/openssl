@@ -65,7 +65,7 @@ SCT *SCT_new_from_base64(unsigned char version, const char *logid_base64,
 {
     SCT *sct = SCT_new();
     unsigned char *dec = NULL;
-    const unsigned char* p = NULL;
+    const unsigned char *p = NULL;
     int declen;
 
     if (sct == NULL) {
@@ -118,7 +118,7 @@ SCT *SCT_new_from_base64(unsigned char version, const char *logid_base64,
 
     return sct;
 
- err:
+err:
     OPENSSL_free(dec);
     SCT_free(sct);
     return NULL;

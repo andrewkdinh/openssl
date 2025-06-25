@@ -23,15 +23,15 @@ typedef struct prov_tdes_ctx_st {
         DES_key_schedule ks[3];
     } tks;
     union {
-        void (*cbc) (const void *, void *, size_t,
-                     const DES_key_schedule *, unsigned char *);
+        void (*cbc)(const void *, void *, size_t, const DES_key_schedule *,
+                    unsigned char *);
     } tstream;
     OSSL_FIPS_IND_DECLARE
 
 } PROV_TDES_CTX;
 
-#define IMPLEMENT_tdes_cipher(type, UCTYPE, lcmode, UCMODE, flags,             \
-                              kbits, blkbits, ivbits, block)                   \
+#define IMPLEMENT_tdes_cipher(type, UCTYPE, lcmode, UCMODE, flags, kbits, \
+                              blkbits, ivbits, block)                   \
 static OSSL_FUNC_cipher_newctx_fn tdes_##type##_##lcmode##_newctx;             \
 static void *tdes_##type##_##lcmode##_newctx(void *provctx)                    \
 {                                                                              \

@@ -108,16 +108,16 @@ static void *krb5kdf_dup(void *vctx)
 
     dest = krb5kdf_new(src->provctx);
     if (dest != NULL) {
-        if (!ossl_prov_memdup(src->key, src->key_len,
-                              &dest->key, &dest->key_len)
-                || !ossl_prov_memdup(src->constant, src->constant_len,
-                                     &dest->constant , &dest->constant_len)
-                || !ossl_prov_cipher_copy(&dest->cipher, &src->cipher))
+        if (!ossl_prov_memdup(src->key, src->key_len, &dest->key,
+                              &dest->key_len)
+            || !ossl_prov_memdup(src->constant, src->constant_len,
+                                 &dest->constant, &dest->constant_len)
+            || !ossl_prov_cipher_copy(&dest->cipher, &src->cipher))
             goto err;
     }
     return dest;
 
- err:
+err:
     krb5kdf_free(dest);
     return NULL;
 }
@@ -146,9 +146,8 @@ static int krb5kdf_derive(void *vctx, unsigned char *key, size_t keylen,
         return 0;
     }
     engine = ossl_prov_cipher_engine(&ctx->cipher);
-    return KRB5KDF(cipher, engine, ctx->key, ctx->key_len,
-                   ctx->constant, ctx->constant_len,
-                   key, keylen);
+    return KRB5KDF(cipher, engine, ctx->key, ctx->key_len, ctx->constant,
+                   ctx->constant_len, key, keylen);
 }
 
 static int krb5kdf_set_ctx_params(void *vctx, const OSSL_PARAM params[])
@@ -167,8 +166,7 @@ static int krb5kdf_set_ctx_params(void *vctx, const OSSL_PARAM params[])
         if (!krb5kdf_set_membuf(&ctx->key, &ctx->key_len, p))
             return 0;
 
-    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_CONSTANT))
-        != NULL)
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_CONSTANT)) != NULL)
         if (!krb5kdf_set_membuf(&ctx->constant, &ctx->constant_len, p))
             return 0;
 
@@ -183,8 +181,7 @@ static const OSSL_PARAM *krb5kdf_settable_ctx_params(ossl_unused void *ctx,
         OSSL_PARAM_utf8_string(OSSL_KDF_PARAM_CIPHER, NULL, 0),
         OSSL_PARAM_octet_string(OSSL_KDF_PARAM_KEY, NULL, 0),
         OSSL_PARAM_octet_string(OSSL_KDF_PARAM_CONSTANT, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
     return known_settable_ctx_params;
 }
 
@@ -210,28 +207,23 @@ static const OSSL_PARAM *krb5kdf_gettable_ctx_params(ossl_unused void *ctx,
                                                      ossl_unused void *provctx)
 {
     static const OSSL_PARAM known_gettable_ctx_params[] = {
-        OSSL_PARAM_size_t(OSSL_KDF_PARAM_SIZE, NULL),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_size_t(OSSL_KDF_PARAM_SIZE, NULL), OSSL_PARAM_END};
     return known_gettable_ctx_params;
 }
 
 const OSSL_DISPATCH ossl_kdf_krb5kdf_functions[] = {
-    { OSSL_FUNC_KDF_NEWCTX, (void(*)(void))krb5kdf_new },
-    { OSSL_FUNC_KDF_DUPCTX, (void(*)(void))krb5kdf_dup },
-    { OSSL_FUNC_KDF_FREECTX, (void(*)(void))krb5kdf_free },
-    { OSSL_FUNC_KDF_RESET, (void(*)(void))krb5kdf_reset },
-    { OSSL_FUNC_KDF_DERIVE, (void(*)(void))krb5kdf_derive },
-    { OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
-      (void(*)(void))krb5kdf_settable_ctx_params },
-    { OSSL_FUNC_KDF_SET_CTX_PARAMS,
-      (void(*)(void))krb5kdf_set_ctx_params },
-    { OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
-      (void(*)(void))krb5kdf_gettable_ctx_params },
-    { OSSL_FUNC_KDF_GET_CTX_PARAMS,
-      (void(*)(void))krb5kdf_get_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_KDF_NEWCTX, (void (*)(void))krb5kdf_new},
+    {OSSL_FUNC_KDF_DUPCTX, (void (*)(void))krb5kdf_dup},
+    {OSSL_FUNC_KDF_FREECTX, (void (*)(void))krb5kdf_free},
+    {OSSL_FUNC_KDF_RESET, (void (*)(void))krb5kdf_reset},
+    {OSSL_FUNC_KDF_DERIVE, (void (*)(void))krb5kdf_derive},
+    {OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
+     (void (*)(void))krb5kdf_settable_ctx_params},
+    {OSSL_FUNC_KDF_SET_CTX_PARAMS, (void (*)(void))krb5kdf_set_ctx_params},
+    {OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
+     (void (*)(void))krb5kdf_gettable_ctx_params},
+    {OSSL_FUNC_KDF_GET_CTX_PARAMS, (void (*)(void))krb5kdf_get_ctx_params},
+    OSSL_DISPATCH_END};
 
 #ifndef OPENSSL_NO_DES
 /*
@@ -248,14 +240,13 @@ static int fixup_des3_key(unsigned char *key)
         cblock = &key[i * 8];
         memmove(cblock, &key[i * 7], 7);
         cblock[7] = 0;
-        for (j = 0; j < 7; j++)
-            cblock[7] |= (cblock[j] & 1) << (j + 1);
+        for (j = 0; j < 7; j++) cblock[7] |= (cblock[j] & 1) << (j + 1);
         DES_set_odd_parity((DES_cblock *)cblock);
     }
 
     /* fail if keys are such that triple des degrades to single des */
-    if (CRYPTO_memcmp(&key[0], &key[8], 8) == 0 ||
-        CRYPTO_memcmp(&key[8], &key[16], 8) == 0) {
+    if (CRYPTO_memcmp(&key[0], &key[8], 8) == 0
+        || CRYPTO_memcmp(&key[8], &key[16], 8) == 0) {
         return 0;
     }
 
@@ -326,9 +317,9 @@ static void n_fold(unsigned char *block, unsigned int blocksize,
         /* rbyte % constant_len gives us the unrotated byte in the
          * constant buffer, get also the previous byte then
          * appropriately shift them to get the rotated byte we need */
-        tmp = (constant[(rbyte-1) % constant_len] << (8 - rshift)
+        tmp = (constant[(rbyte - 1) % constant_len] << (8 - rshift)
                | constant[rbyte % constant_len] >> rshift)
-              & 0xff;
+            & 0xff;
         /* add with carry to any value placed by previous passes */
         tmp += carry + block[b];
         block[b] = tmp & 0xff;
@@ -344,9 +335,8 @@ static void n_fold(unsigned char *block, unsigned int blocksize,
     }
 }
 
-static int cipher_init(EVP_CIPHER_CTX *ctx,
-                       const EVP_CIPHER *cipher, ENGINE *engine,
-                       const unsigned char *key, size_t key_len)
+static int cipher_init(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+                       ENGINE *engine, const unsigned char *key, size_t key_len)
 {
     int klen, ret;
 
@@ -393,9 +383,9 @@ static int KRB5KDF(const EVP_CIPHER *cipher, ENGINE *engine,
 #ifndef OPENSSL_NO_DES
         /* special case for 3des, where the caller may be requesting
          * the random raw key, instead of the fixed up key  */
-        if (EVP_CIPHER_get_nid(cipher) == NID_des_ede3_cbc &&
-            key_len == 24 && okey_len == 21) {
-                des3_no_fixup = 1;
+        if (EVP_CIPHER_get_nid(cipher) == NID_des_ede3_cbc && key_len == 24
+            && okey_len == 21) {
+            des3_no_fixup = 1;
         } else {
 #endif
             ERR_raise(ERR_LIB_PROV, PROV_R_WRONG_OUTPUT_BUFFER_SIZE);
@@ -435,8 +425,7 @@ static int KRB5KDF(const EVP_CIPHER *cipher, ENGINE *engine,
     for (osize = 0; osize < okey_len; osize += cipherlen) {
         int olen;
 
-        ret = EVP_EncryptUpdate(ctx, cipherblock, &olen,
-                                plainblock, blocksize);
+        ret = EVP_EncryptUpdate(ctx, cipherblock, &olen, plainblock, blocksize);
         if (!ret)
             goto out;
         cipherlen = olen;
@@ -491,4 +480,3 @@ out:
     OPENSSL_cleanse(block, EVP_MAX_BLOCK_LENGTH * 2);
     return ret;
 }
-

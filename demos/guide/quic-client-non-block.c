@@ -208,7 +208,7 @@ static int handle_io_failure(SSL *ssl, int res)
          */
         if (SSL_get_verify_result(ssl) != X509_V_OK)
             printf("Verify error: %s\n",
-                X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
+                   X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
         return -1;
 
     default:
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
     BIO *bio = NULL;
     int res = EXIT_FAILURE;
     int ret;
-    unsigned char alpn[] = { 8, 'h', 't', 't', 'p', '/', '1', '.', '0' };
+    unsigned char alpn[] = {8, 'h', 't', 't', 'p', '/', '1', '.', '0'};
     const char *request_start = "GET / HTTP/1.0\r\nConnection: close\r\nHost: ";
     const char *request_end = "\r\n\r\n";
     size_t written, readbytes = 0;
@@ -411,7 +411,7 @@ int main(int argc, char *argv[])
 
     /* Success! */
     res = EXIT_SUCCESS;
- end:
+end:
     /*
      * If something bad happened then we will dump the contents of the
      * OpenSSL error stack to stderr. There might be some useful diagnostic

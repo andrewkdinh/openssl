@@ -40,18 +40,10 @@ typedef struct bio_ssl_st {
 } BIO_SSL;
 
 static const BIO_METHOD methods_sslp = {
-    BIO_TYPE_SSL,
-    "ssl",
-    ssl_write,
-    NULL,                       /* ssl_write_old, */
-    ssl_read,
-    NULL,                       /* ssl_read_old,  */
-    ssl_puts,
-    NULL,                       /* ssl_gets,      */
-    ssl_ctrl,
-    ssl_new,
-    ssl_free,
-    ssl_callback_ctrl,
+    BIO_TYPE_SSL, "ssl",   ssl_write, NULL, /* ssl_write_old, */
+    ssl_read,     NULL, /* ssl_read_old,  */
+    ssl_puts,     NULL, /* ssl_gets,      */
+    ssl_ctrl,     ssl_new, ssl_free,  ssl_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_ssl(void)
@@ -267,7 +259,7 @@ static long ssl_ctrl(BIO *b, int cmd, long num, void *ptr)
         ret = 0;
         break;
     case BIO_C_SSL_MODE:
-        if (num)                /* client mode */
+        if (num) /* client mode */
             SSL_set_connect_state(ssl);
         else
             SSL_set_accept_state(ssl);
@@ -458,7 +450,7 @@ BIO *BIO_new_buffer_ssl_connect(SSL_CTX *ctx)
     if ((ret = BIO_push(buf, ssl)) == NULL)
         goto err;
     return ret;
- err:
+err:
     BIO_free(buf);
     BIO_free(ssl);
 #endif
@@ -477,14 +469,14 @@ BIO *BIO_new_ssl_connect(SSL_CTX *ctx)
     if (ctx != NULL && IS_QUIC_CTX(ctx))
         if (!BIO_set_sock_type(con, SOCK_DGRAM))
             goto err;
-#endif
+# endif
 
     if ((ssl = BIO_new_ssl(ctx, 1)) == NULL)
         goto err;
     if ((ret = BIO_push(ssl, con)) == NULL)
         goto err;
     return ret;
- err:
+err:
     BIO_free(ssl);
     BIO_free(con);
 #endif

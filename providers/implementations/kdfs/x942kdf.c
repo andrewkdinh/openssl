@@ -65,15 +65,15 @@ static const struct {
     size_t oid_len;
     size_t keklen; /* size in bytes */
 } kek_algs[] = {
-    { "AES-128-WRAP", ossl_der_oid_id_aes128_wrap, DER_OID_SZ_id_aes128_wrap,
-      16 },
-    { "AES-192-WRAP", ossl_der_oid_id_aes192_wrap, DER_OID_SZ_id_aes192_wrap,
-      24 },
-    { "AES-256-WRAP", ossl_der_oid_id_aes256_wrap, DER_OID_SZ_id_aes256_wrap,
-      32 },
+    {"AES-128-WRAP", ossl_der_oid_id_aes128_wrap, DER_OID_SZ_id_aes128_wrap,
+     16},
+    {"AES-192-WRAP", ossl_der_oid_id_aes192_wrap, DER_OID_SZ_id_aes192_wrap,
+     24},
+    {"AES-256-WRAP", ossl_der_oid_id_aes256_wrap, DER_OID_SZ_id_aes256_wrap,
+     32},
 #ifndef FIPS_MODULE
-    { "DES3-WRAP", ossl_der_oid_id_alg_CMS3DESwrap,
-      DER_OID_SZ_id_alg_CMS3DESwrap, 24 },
+    {"DES3-WRAP", ossl_der_oid_id_alg_CMS3DESwrap,
+     DER_OID_SZ_id_alg_CMS3DESwrap, 24},
 #endif
 };
 
@@ -100,44 +100,44 @@ end:
     return ret;
 }
 
-static int DER_w_keyinfo(WPACKET *pkt,
-                         const unsigned char *der_oid, size_t der_oidlen,
-                         unsigned char **pcounter)
+static int DER_w_keyinfo(WPACKET *pkt, const unsigned char *der_oid,
+                         size_t der_oidlen, unsigned char **pcounter)
 {
     return ossl_DER_w_begin_sequence(pkt, -1)
            /* Store the initial value of 1 into the counter */
-           && ossl_DER_w_octet_string_uint32(pkt, -1, 1)
+        && ossl_DER_w_octet_string_uint32(pkt, -1, 1)
            /* Remember where we stored the counter in the buffer */
-           && (pcounter == NULL
-               || (*pcounter = WPACKET_get_curr(pkt)) != NULL)
-           && ossl_DER_w_precompiled(pkt, -1, der_oid, der_oidlen)
-           && ossl_DER_w_end_sequence(pkt, -1);
+        && (pcounter == NULL || (*pcounter = WPACKET_get_curr(pkt)) != NULL)
+        && ossl_DER_w_precompiled(pkt, -1, der_oid, der_oidlen)
+        && ossl_DER_w_end_sequence(pkt, -1);
 }
 
-static int der_encode_sharedinfo(WPACKET *pkt, unsigned char *buf, size_t buflen,
-                                 const unsigned char *der_oid, size_t der_oidlen,
-                                 const unsigned char *acvp, size_t acvplen,
-                                 const unsigned char *partyu, size_t partyulen,
-                                 const unsigned char *partyv, size_t partyvlen,
-                                 const unsigned char *supp_pub, size_t supp_publen,
-                                 const unsigned char *supp_priv, size_t supp_privlen,
-                                 uint32_t keylen_bits, unsigned char **pcounter)
+static int
+der_encode_sharedinfo(WPACKET *pkt, unsigned char *buf, size_t buflen,
+                      const unsigned char *der_oid, size_t der_oidlen,
+                      const unsigned char *acvp, size_t acvplen,
+                      const unsigned char *partyu, size_t partyulen,
+                      const unsigned char *partyv, size_t partyvlen,
+                      const unsigned char *supp_pub, size_t supp_publen,
+                      const unsigned char *supp_priv, size_t supp_privlen,
+                      uint32_t keylen_bits, unsigned char **pcounter)
 {
-    return (buf != NULL ? WPACKET_init_der(pkt, buf, buflen) :
-                          WPACKET_init_null_der(pkt))
-           && ossl_DER_w_begin_sequence(pkt, -1)
-           && (supp_priv == NULL
-               || ossl_DER_w_octet_string(pkt, 3, supp_priv, supp_privlen))
-           && (supp_pub == NULL
-               || ossl_DER_w_octet_string(pkt, 2, supp_pub, supp_publen))
-           && (keylen_bits == 0
-               || ossl_DER_w_octet_string_uint32(pkt, 2, keylen_bits))
-           && (partyv == NULL || ossl_DER_w_octet_string(pkt, 1, partyv, partyvlen))
-           && (partyu == NULL || ossl_DER_w_octet_string(pkt, 0, partyu, partyulen))
-           && (acvp == NULL || ossl_DER_w_precompiled(pkt, -1, acvp, acvplen))
-           && DER_w_keyinfo(pkt, der_oid, der_oidlen, pcounter)
-           && ossl_DER_w_end_sequence(pkt, -1)
-           && WPACKET_finish(pkt);
+    return (buf != NULL ? WPACKET_init_der(pkt, buf, buflen)
+                        : WPACKET_init_null_der(pkt))
+        && ossl_DER_w_begin_sequence(pkt, -1)
+        && (supp_priv == NULL
+            || ossl_DER_w_octet_string(pkt, 3, supp_priv, supp_privlen))
+        && (supp_pub == NULL
+            || ossl_DER_w_octet_string(pkt, 2, supp_pub, supp_publen))
+        && (keylen_bits == 0
+            || ossl_DER_w_octet_string_uint32(pkt, 2, keylen_bits))
+        && (partyv == NULL
+            || ossl_DER_w_octet_string(pkt, 1, partyv, partyvlen))
+        && (partyu == NULL
+            || ossl_DER_w_octet_string(pkt, 0, partyu, partyulen))
+        && (acvp == NULL || ossl_DER_w_precompiled(pkt, -1, acvp, acvplen))
+        && DER_w_keyinfo(pkt, der_oid, der_oidlen, pcounter)
+        && ossl_DER_w_end_sequence(pkt, -1) && WPACKET_finish(pkt);
 }
 
 /*
@@ -197,16 +197,13 @@ static int der_encode_sharedinfo(WPACKET *pkt, unsigned char *buf, size_t buflen
  * Returns: 1 if successfully encoded, or 0 otherwise.
  * Assumptions: |der|, |der_len| & |out_ctr| are not NULL.
  */
-static int
-x942_encode_otherinfo(size_t keylen,
-                      const unsigned char *cek_oid, size_t cek_oid_len,
-                      const unsigned char *acvp, size_t acvp_len,
-                      const unsigned char *partyu, size_t partyu_len,
-                      const unsigned char *partyv, size_t partyv_len,
-                      const unsigned char *supp_pub, size_t supp_pub_len,
-                      const unsigned char *supp_priv, size_t supp_priv_len,
-                      unsigned char **der, size_t *der_len,
-                      unsigned char **out_ctr)
+static int x942_encode_otherinfo(
+    size_t keylen, const unsigned char *cek_oid, size_t cek_oid_len,
+    const unsigned char *acvp, size_t acvp_len, const unsigned char *partyu,
+    size_t partyu_len, const unsigned char *partyv, size_t partyv_len,
+    const unsigned char *supp_pub, size_t supp_pub_len,
+    const unsigned char *supp_priv, size_t supp_priv_len, unsigned char **der,
+    size_t *der_len, unsigned char **out_ctr)
 {
     int ret = 0;
     unsigned char *pcounter = NULL, *der_buf = NULL;
@@ -220,9 +217,8 @@ x942_encode_otherinfo(size_t keylen,
     keylen_bits = 8 * keylen;
 
     /* Calculate the size of the buffer */
-    if (!der_encode_sharedinfo(&pkt, NULL, 0, cek_oid, cek_oid_len,
-                               acvp, acvp_len,
-                               partyu, partyu_len, partyv, partyv_len,
+    if (!der_encode_sharedinfo(&pkt, NULL, 0, cek_oid, cek_oid_len, acvp,
+                               acvp_len, partyu, partyu_len, partyv, partyv_len,
                                supp_pub, supp_pub_len, supp_priv, supp_priv_len,
                                keylen_bits, NULL)
         || !WPACKET_get_total_written(&pkt, &der_buflen))
@@ -234,10 +230,9 @@ x942_encode_otherinfo(size_t keylen,
         goto err;
     /* Encode into the buffer */
     if (!der_encode_sharedinfo(&pkt, der_buf, der_buflen, cek_oid, cek_oid_len,
-                               acvp, acvp_len,
-                               partyu, partyu_len, partyv, partyv_len,
-                               supp_pub, supp_pub_len, supp_priv, supp_priv_len,
-                               keylen_bits, &pcounter))
+                               acvp, acvp_len, partyu, partyu_len, partyv,
+                               partyv_len, supp_pub, supp_pub_len, supp_priv,
+                               supp_priv_len, keylen_bits, &pcounter))
         goto err;
     /*
      * Since we allocated the exact size required, the buffer should point to the
@@ -252,9 +247,7 @@ x942_encode_otherinfo(size_t keylen,
      * So just check the header is correct and skip over it.
      * This counter will be incremented in the kdf update loop.
      */
-    if (pcounter == NULL
-        || pcounter[0] != 0x04
-        || pcounter[1] != 0x04)
+    if (pcounter == NULL || pcounter[0] != 0x04 || pcounter[1] != 0x04)
         goto err;
     *out_ctr = (pcounter + 2);
     *der = der_buf;
@@ -265,10 +258,9 @@ err:
     return ret;
 }
 
-static int x942kdf_hash_kdm(const EVP_MD *kdf_md,
-                            const unsigned char *z, size_t z_len,
-                            const unsigned char *other, size_t other_len,
-                            unsigned char *ctr,
+static int x942kdf_hash_kdm(const EVP_MD *kdf_md, const unsigned char *z,
+                            size_t z_len, const unsigned char *other,
+                            size_t other_len, unsigned char *ctr,
                             unsigned char *derived_key, size_t derived_key_len)
 {
     int ret = 0, hlen;
@@ -277,10 +269,8 @@ static int x942kdf_hash_kdm(const EVP_MD *kdf_md,
     unsigned char *out = derived_key;
     EVP_MD_CTX *ctx = NULL, *ctx_init = NULL;
 
-    if (z_len > X942KDF_MAX_INLEN
-        || other_len > X942KDF_MAX_INLEN
-        || derived_key_len > X942KDF_MAX_INLEN
-        || derived_key_len == 0) {
+    if (z_len > X942KDF_MAX_INLEN || other_len > X942KDF_MAX_INLEN
+        || derived_key_len > X942KDF_MAX_INLEN || derived_key_len == 0) {
         ERR_raise(ERR_LIB_PROV, PROV_R_BAD_LENGTH);
         return 0;
     }
@@ -382,21 +372,19 @@ static void *x942kdf_dup(void *vctx)
 
     dest = x942kdf_new(src->provctx);
     if (dest != NULL) {
-        if (!ossl_prov_memdup(src->secret, src->secret_len,
-                              &dest->secret , &dest->secret_len)
-                || !ossl_prov_memdup(src->acvpinfo, src->acvpinfo_len,
-                                     &dest->acvpinfo , &dest->acvpinfo_len)
-                || !ossl_prov_memdup(src->partyuinfo, src->partyuinfo_len,
-                                     &dest->partyuinfo , &dest->partyuinfo_len)
-                || !ossl_prov_memdup(src->partyvinfo, src->partyvinfo_len,
-                                     &dest->partyvinfo , &dest->partyvinfo_len)
-                || !ossl_prov_memdup(src->supp_pubinfo, src->supp_pubinfo_len,
-                                     &dest->supp_pubinfo,
-                                     &dest->supp_pubinfo_len)
-                || !ossl_prov_memdup(src->supp_privinfo, src->supp_privinfo_len,
-                                     &dest->supp_privinfo,
-                                     &dest->supp_privinfo_len)
-                || !ossl_prov_digest_copy(&dest->digest, &src->digest))
+        if (!ossl_prov_memdup(src->secret, src->secret_len, &dest->secret,
+                              &dest->secret_len)
+            || !ossl_prov_memdup(src->acvpinfo, src->acvpinfo_len,
+                                 &dest->acvpinfo, &dest->acvpinfo_len)
+            || !ossl_prov_memdup(src->partyuinfo, src->partyuinfo_len,
+                                 &dest->partyuinfo, &dest->partyuinfo_len)
+            || !ossl_prov_memdup(src->partyvinfo, src->partyvinfo_len,
+                                 &dest->partyvinfo, &dest->partyvinfo_len)
+            || !ossl_prov_memdup(src->supp_pubinfo, src->supp_pubinfo_len,
+                                 &dest->supp_pubinfo, &dest->supp_pubinfo_len)
+            || !ossl_prov_memdup(src->supp_privinfo, src->supp_privinfo_len,
+                                 &dest->supp_privinfo, &dest->supp_privinfo_len)
+            || !ossl_prov_digest_copy(&dest->digest, &src->digest))
             goto err;
         dest->cek_oid = src->cek_oid;
         dest->cek_oid_len = src->cek_oid_len;
@@ -406,7 +394,7 @@ static void *x942kdf_dup(void *vctx)
     }
     return dest;
 
- err:
+err:
     x942kdf_free(dest);
     return NULL;
 }
@@ -442,8 +430,8 @@ static int fips_x942kdf_key_check_passed(KDF_X942 *ctx)
     int key_approved = ossl_kdf_check_key_size(ctx->secret_len);
 
     if (!key_approved) {
-        if (!OSSL_FIPS_IND_ON_UNAPPROVED(ctx, OSSL_FIPS_IND_SETTABLE0,
-                                         libctx, "X942KDF", "Key size",
+        if (!OSSL_FIPS_IND_ON_UNAPPROVED(ctx, OSSL_FIPS_IND_SETTABLE0, libctx,
+                                         "X942KDF", "Key size",
                                          ossl_fips_config_x942kdf_key_check)) {
             ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY_LENGTH);
             return 0;
@@ -479,10 +467,8 @@ static int x942kdf_derive(void *vctx, unsigned char *key, size_t keylen,
      * replaces should not also be defined.
      */
     if (ctx->acvpinfo != NULL
-        && (ctx->partyuinfo != NULL
-            || ctx->partyvinfo != NULL
-            || ctx->supp_pubinfo != NULL
-            || ctx->supp_privinfo != NULL)) {
+        && (ctx->partyuinfo != NULL || ctx->partyvinfo != NULL
+            || ctx->supp_pubinfo != NULL || ctx->supp_privinfo != NULL)) {
         ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_DATA);
         return 0;
     }
@@ -508,19 +494,17 @@ static int x942kdf_derive(void *vctx, unsigned char *key, size_t keylen,
         return 0;
     }
     /* generate the otherinfo der */
-    if (!x942_encode_otherinfo(ctx->use_keybits ? ctx->dkm_len : 0,
-                               ctx->cek_oid, ctx->cek_oid_len,
-                               ctx->acvpinfo, ctx->acvpinfo_len,
-                               ctx->partyuinfo, ctx->partyuinfo_len,
-                               ctx->partyvinfo, ctx->partyvinfo_len,
-                               ctx->supp_pubinfo, ctx->supp_pubinfo_len,
-                               ctx->supp_privinfo, ctx->supp_privinfo_len,
-                               &der, &der_len, &ctr)) {
+    if (!x942_encode_otherinfo(
+            ctx->use_keybits ? ctx->dkm_len : 0, ctx->cek_oid, ctx->cek_oid_len,
+            ctx->acvpinfo, ctx->acvpinfo_len, ctx->partyuinfo,
+            ctx->partyuinfo_len, ctx->partyvinfo, ctx->partyvinfo_len,
+            ctx->supp_pubinfo, ctx->supp_pubinfo_len, ctx->supp_privinfo,
+            ctx->supp_privinfo_len, &der, &der_len, &ctr)) {
         ERR_raise(ERR_LIB_PROV, PROV_R_BAD_ENCODING);
         return 0;
     }
-    ret = x942kdf_hash_kdm(md, ctx->secret, ctx->secret_len,
-                           der, der_len, ctr, key, keylen);
+    ret = x942kdf_hash_kdm(md, ctx->secret, ctx->secret_len, der, der_len, ctr,
+                           key, keylen);
     OPENSSL_free(der);
     return ret;
 }
@@ -564,8 +548,7 @@ static int x942kdf_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     }
 
     p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_X942_ACVPINFO);
-    if (p != NULL
-        && !x942kdf_set_buffer(&ctx->acvpinfo, &ctx->acvpinfo_len, p))
+    if (p != NULL && !x942kdf_set_buffer(&ctx->acvpinfo, &ctx->acvpinfo_len, p))
         return 0;
 
     p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_X942_PARTYUINFO);
@@ -633,8 +616,7 @@ static const OSSL_PARAM *x942kdf_settable_ctx_params(ossl_unused void *ctx,
         OSSL_PARAM_int(OSSL_KDF_PARAM_X942_USE_KEYBITS, NULL),
         OSSL_PARAM_utf8_string(OSSL_KDF_PARAM_CEK_ALG, NULL, 0),
         OSSL_FIPS_IND_SETTABLE_CTX_PARAM(OSSL_KDF_PARAM_FIPS_KEY_CHECK)
-        OSSL_PARAM_END
-    };
+            OSSL_PARAM_END};
     return known_settable_ctx_params;
 }
 
@@ -657,23 +639,20 @@ static const OSSL_PARAM *x942kdf_gettable_ctx_params(ossl_unused void *ctx,
 {
     static const OSSL_PARAM known_gettable_ctx_params[] = {
         OSSL_PARAM_size_t(OSSL_KDF_PARAM_SIZE, NULL),
-        OSSL_FIPS_IND_GETTABLE_CTX_PARAM()
-        OSSL_PARAM_END
-    };
+        OSSL_FIPS_IND_GETTABLE_CTX_PARAM() OSSL_PARAM_END};
     return known_gettable_ctx_params;
 }
 
 const OSSL_DISPATCH ossl_kdf_x942_kdf_functions[] = {
-    { OSSL_FUNC_KDF_NEWCTX, (void(*)(void))x942kdf_new },
-    { OSSL_FUNC_KDF_DUPCTX, (void(*)(void))x942kdf_dup },
-    { OSSL_FUNC_KDF_FREECTX, (void(*)(void))x942kdf_free },
-    { OSSL_FUNC_KDF_RESET, (void(*)(void))x942kdf_reset },
-    { OSSL_FUNC_KDF_DERIVE, (void(*)(void))x942kdf_derive },
-    { OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
-      (void(*)(void))x942kdf_settable_ctx_params },
-    { OSSL_FUNC_KDF_SET_CTX_PARAMS, (void(*)(void))x942kdf_set_ctx_params },
-    { OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
-      (void(*)(void))x942kdf_gettable_ctx_params },
-    { OSSL_FUNC_KDF_GET_CTX_PARAMS, (void(*)(void))x942kdf_get_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_KDF_NEWCTX, (void (*)(void))x942kdf_new},
+    {OSSL_FUNC_KDF_DUPCTX, (void (*)(void))x942kdf_dup},
+    {OSSL_FUNC_KDF_FREECTX, (void (*)(void))x942kdf_free},
+    {OSSL_FUNC_KDF_RESET, (void (*)(void))x942kdf_reset},
+    {OSSL_FUNC_KDF_DERIVE, (void (*)(void))x942kdf_derive},
+    {OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS,
+     (void (*)(void))x942kdf_settable_ctx_params},
+    {OSSL_FUNC_KDF_SET_CTX_PARAMS, (void (*)(void))x942kdf_set_ctx_params},
+    {OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS,
+     (void (*)(void))x942kdf_gettable_ctx_params},
+    {OSSL_FUNC_KDF_GET_CTX_PARAMS, (void (*)(void))x942kdf_get_ctx_params},
+    OSSL_DISPATCH_END};

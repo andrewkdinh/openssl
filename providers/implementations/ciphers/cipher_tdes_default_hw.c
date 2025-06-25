@@ -27,18 +27,18 @@ static int ossl_cipher_hw_tdes_ede2_initkey(PROV_CIPHER_CTX *ctx,
     DES_cblock *deskey = (DES_cblock *)key;
 
     tctx->tstream.cbc = NULL;
-# if defined(SPARC_DES_CAPABLE)
+#if defined(SPARC_DES_CAPABLE)
     if (SPARC_DES_CAPABLE) {
         if (ctx->mode == EVP_CIPH_CBC_MODE) {
             des_t4_key_expand(&deskey[0], &tctx->ks1);
             des_t4_key_expand(&deskey[1], &tctx->ks2);
             memcpy(&tctx->ks3, &tctx->ks1, sizeof(tctx->ks1));
-            tctx->tstream.cbc = ctx->enc ? des_t4_ede3_cbc_encrypt :
-                                           des_t4_ede3_cbc_decrypt;
+            tctx->tstream.cbc =
+                ctx->enc ? des_t4_ede3_cbc_encrypt : des_t4_ede3_cbc_decrypt;
             return 1;
         }
     }
-# endif
+#endif
     DES_set_key_unchecked(&deskey[0], &tctx->ks1);
     DES_set_key_unchecked(&deskey[1], &tctx->ks2);
     memcpy(&tctx->ks3, &tctx->ks1, sizeof(tctx->ks1));
@@ -74,17 +74,17 @@ static int ossl_cipher_hw_tdes_cfb(PROV_CIPHER_CTX *ctx, unsigned char *out,
 
     while (inl >= MAXCHUNK) {
 
-        DES_ede3_cfb64_encrypt(in, out, (long)MAXCHUNK,
-                               &tctx->ks1, &tctx->ks2, &tctx->ks3,
-                               (DES_cblock *)ctx->iv, &num, ctx->enc);
+        DES_ede3_cfb64_encrypt(in, out, (long)MAXCHUNK, &tctx->ks1, &tctx->ks2,
+                               &tctx->ks3, (DES_cblock *)ctx->iv, &num,
+                               ctx->enc);
         inl -= MAXCHUNK;
         in += MAXCHUNK;
         out += MAXCHUNK;
     }
     if (inl > 0) {
-        DES_ede3_cfb64_encrypt(in, out, (long)inl,
-                               &tctx->ks1, &tctx->ks2, &tctx->ks3,
-                               (DES_cblock *)ctx->iv, &num, ctx->enc);
+        DES_ede3_cfb64_encrypt(in, out, (long)inl, &tctx->ks1, &tctx->ks2,
+                               &tctx->ks3, (DES_cblock *)ctx->iv, &num,
+                               ctx->enc);
     }
     ctx->num = num;
     return 1;
@@ -100,14 +100,13 @@ static int ossl_cipher_hw_tdes_cfb1(PROV_CIPHER_CTX *ctx, unsigned char *out,
     PROV_TDES_CTX *tctx = (PROV_TDES_CTX *)ctx;
     size_t n;
     unsigned char c[1];
-    unsigned char d[1] = { 0 };
+    unsigned char d[1] = {0};
 
     if (ctx->use_bits == 0)
         inl *= 8;
     for (n = 0; n < inl; ++n) {
         c[0] = (in[n / 8] & (1 << (7 - n % 8))) ? 0x80 : 0;
-        DES_ede3_cfb_encrypt(c, d, 1, 1,
-                             &tctx->ks1, &tctx->ks2, &tctx->ks3,
+        DES_ede3_cfb_encrypt(c, d, 1, 1, &tctx->ks1, &tctx->ks2, &tctx->ks3,
                              (DES_cblock *)ctx->iv, ctx->enc);
         out[n / 8] = (out[n / 8] & ~(0x80 >> (unsigned int)(n % 8)))
             | ((d[0] & 0x80) >> (unsigned int)(n % 8));
@@ -122,27 +121,21 @@ static int ossl_cipher_hw_tdes_cfb8(PROV_CIPHER_CTX *ctx, unsigned char *out,
     PROV_TDES_CTX *tctx = (PROV_TDES_CTX *)ctx;
 
     while (inl >= MAXCHUNK) {
-        DES_ede3_cfb_encrypt(in, out, 8, (long)MAXCHUNK,
-                             &tctx->ks1, &tctx->ks2, &tctx->ks3,
-                             (DES_cblock *)ctx->iv, ctx->enc);
+        DES_ede3_cfb_encrypt(in, out, 8, (long)MAXCHUNK, &tctx->ks1, &tctx->ks2,
+                             &tctx->ks3, (DES_cblock *)ctx->iv, ctx->enc);
         inl -= MAXCHUNK;
         in += MAXCHUNK;
         out += MAXCHUNK;
     }
     if (inl > 0)
-        DES_ede3_cfb_encrypt(in, out, 8, (long)inl,
-                             &tctx->ks1, &tctx->ks2, &tctx->ks3,
-                             (DES_cblock *)ctx->iv, ctx->enc);
+        DES_ede3_cfb_encrypt(in, out, 8, (long)inl, &tctx->ks1, &tctx->ks2,
+                             &tctx->ks3, (DES_cblock *)ctx->iv, ctx->enc);
     return 1;
 }
 
-PROV_CIPHER_HW_tdes_mode(ede3, ofb)
-PROV_CIPHER_HW_tdes_mode(ede3, cfb)
-PROV_CIPHER_HW_tdes_mode(ede3, cfb1)
-PROV_CIPHER_HW_tdes_mode(ede3, cfb8)
+PROV_CIPHER_HW_tdes_mode(ede3, ofb) PROV_CIPHER_HW_tdes_mode(ede3, cfb)
+    PROV_CIPHER_HW_tdes_mode(ede3, cfb1) PROV_CIPHER_HW_tdes_mode(ede3, cfb8)
 
-PROV_CIPHER_HW_tdes_mode(ede2, ecb)
-PROV_CIPHER_HW_tdes_mode(ede2, cbc)
-PROV_CIPHER_HW_tdes_mode(ede2, ofb)
-PROV_CIPHER_HW_tdes_mode(ede2, cfb)
-
+        PROV_CIPHER_HW_tdes_mode(ede2, ecb) PROV_CIPHER_HW_tdes_mode(ede2, cbc)
+            PROV_CIPHER_HW_tdes_mode(ede2, ofb)
+                PROV_CIPHER_HW_tdes_mode(ede2, cfb)

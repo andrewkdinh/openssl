@@ -25,13 +25,13 @@ typedef struct txe_st TXE;
 
 struct txe_st {
     OSSL_LIST_MEMBER(txe, TXE);
-    size_t              data_len, alloc_len;
+    size_t data_len, alloc_len;
 
     /*
      * Destination and local addresses, as applicable. Both of these are only
      * used if the family is not AF_UNSPEC.
      */
-    BIO_ADDR            peer, local;
+    BIO_ADDR peer, local;
 
     /*
      * alloc_len allocated bytes (of which data_len bytes are valid) follow this
@@ -52,52 +52,52 @@ static ossl_inline unsigned char *txe_data(const TXE *e)
  * ===
  */
 struct ossl_qtx_st {
-    OSSL_LIB_CTX               *libctx;
-    const char                 *propq;
+    OSSL_LIB_CTX *libctx;
+    const char *propq;
 
     /* Per encryption-level state. */
-    OSSL_QRL_ENC_LEVEL_SET      el_set;
+    OSSL_QRL_ENC_LEVEL_SET el_set;
 
     /* TX BIO. */
-    BIO                        *bio;
+    BIO *bio;
 
     /* QLOG instance retrieval callback if in use, or NULL. */
-    QLOG                     *(*get_qlog_cb)(void *arg);
-    void                       *get_qlog_cb_arg;
+    QLOG *(*get_qlog_cb)(void *arg);
+    void *get_qlog_cb_arg;
 
     /* TX maximum datagram payload length. */
-    size_t                      mdpl;
+    size_t mdpl;
 
     /*
      * List of TXEs which are not currently in use. These are moved to the
      * pending list (possibly via tx_cons first) as they are filled.
      */
-    TXE_LIST                    free;
+    TXE_LIST free;
 
     /*
      * List of TXEs which are filled with completed datagrams ready to be
      * transmitted.
      */
-    TXE_LIST                    pending;
-    size_t                      pending_count; /* items in list */
-    size_t                      pending_bytes; /* sum(txe->data_len) in pending */
+    TXE_LIST pending;
+    size_t pending_count; /* items in list */
+    size_t pending_bytes; /* sum(txe->data_len) in pending */
 
     /*
      * TXE which is under construction for coalescing purposes, if any.
      * This TXE is neither on the free nor pending list. Once the datagram
      * is completed, it is moved to the pending list.
      */
-    TXE                        *cons;
-    size_t                      cons_count; /* num packets */
+    TXE *cons;
+    size_t cons_count; /* num packets */
 
     /*
      * Number of packets transmitted in this key epoch. Used to enforce AEAD
      * confidentiality limit.
      */
-    uint64_t                    epoch_pkt_count;
+    uint64_t epoch_pkt_count;
 
     /* Datagram counter. Increases monotonically per datagram (not per packet). */
-    uint64_t                    datagram_count;
+    uint64_t datagram_count;
 
     ossl_mutate_packet_cb mutatecb;
     ossl_finish_mutate_cb finishmutatecb;
@@ -121,12 +121,12 @@ OSSL_QTX *ossl_qtx_new(const OSSL_QTX_ARGS *args)
     if (qtx == NULL)
         return 0;
 
-    qtx->libctx             = args->libctx;
-    qtx->propq              = args->propq;
-    qtx->bio                = args->bio;
-    qtx->mdpl               = args->mdpl;
-    qtx->get_qlog_cb        = args->get_qlog_cb;
-    qtx->get_qlog_cb_arg    = args->get_qlog_cb_arg;
+    qtx->libctx = args->libctx;
+    qtx->propq = args->propq;
+    qtx->bio = args->bio;
+    qtx->mdpl = args->mdpl;
+    qtx->get_qlog_cb = args->get_qlog_cb;
+    qtx->get_qlog_cb_arg = args->get_qlog_cb_arg;
 
     return qtx;
 }
@@ -165,38 +165,29 @@ void ossl_qtx_free(OSSL_QTX *qtx)
 void ossl_qtx_set_mutator(OSSL_QTX *qtx, ossl_mutate_packet_cb mutatecb,
                           ossl_finish_mutate_cb finishmutatecb, void *mutatearg)
 {
-    qtx->mutatecb       = mutatecb;
+    qtx->mutatecb = mutatecb;
     qtx->finishmutatecb = finishmutatecb;
-    qtx->mutatearg      = mutatearg;
+    qtx->mutatearg = mutatearg;
 }
 
 void ossl_qtx_set_qlog_cb(OSSL_QTX *qtx, QLOG *(*get_qlog_cb)(void *arg),
                           void *get_qlog_cb_arg)
 {
-    qtx->get_qlog_cb        = get_qlog_cb;
-    qtx->get_qlog_cb_arg    = get_qlog_cb_arg;
+    qtx->get_qlog_cb = get_qlog_cb;
+    qtx->get_qlog_cb_arg = get_qlog_cb_arg;
 }
 
-int ossl_qtx_provide_secret(OSSL_QTX              *qtx,
-                            uint32_t               enc_level,
-                            uint32_t               suite_id,
-                            EVP_MD                *md,
-                            const unsigned char   *secret,
-                            size_t                 secret_len)
+int ossl_qtx_provide_secret(OSSL_QTX *qtx, uint32_t enc_level,
+                            uint32_t suite_id, EVP_MD *md,
+                            const unsigned char *secret, size_t secret_len)
 {
     if (enc_level >= QUIC_ENC_LEVEL_NUM)
         return 0;
 
-    return ossl_qrl_enc_level_set_provide_secret(&qtx->el_set,
-                                                 qtx->libctx,
-                                                 qtx->propq,
-                                                 enc_level,
-                                                 suite_id,
-                                                 md,
-                                                 secret,
-                                                 secret_len,
-                                                 0,
-                                                 /*is_tx=*/1);
+    return ossl_qrl_enc_level_set_provide_secret(
+        &qtx->el_set, qtx->libctx, qtx->propq, enc_level, suite_id, md, secret,
+        secret_len, 0,
+        /*is_tx=*/1);
 }
 
 int ossl_qtx_discard_enc_level(OSSL_QTX *qtx, uint32_t enc_level)
@@ -303,8 +294,7 @@ static TXE *qtx_resize_txe(OSSL_QTX *qtx, TXE_LIST *txl, TXE *txe, size_t n)
  * Ensure the data buffer attached to an TXE is at least n bytes in size.
  * Returns NULL on failure.
  */
-static TXE *qtx_reserve_txe(OSSL_QTX *qtx, TXE_LIST *txl,
-                            TXE *txe, size_t n)
+static TXE *qtx_reserve_txe(OSSL_QTX *qtx, TXE_LIST *txl, TXE *txe, size_t n)
 {
     if (txe->alloc_len >= n)
         return txe;
@@ -334,29 +324,26 @@ static void qtx_add_to_pending(OSSL_QTX *qtx, TXE *txe)
 
 struct iovec_cur {
     const OSSL_QTX_IOVEC *iovec;
-    size_t                num_iovec, idx, byte_off, bytes_remaining;
+    size_t num_iovec, idx, byte_off, bytes_remaining;
 };
 
-static size_t iovec_total_bytes(const OSSL_QTX_IOVEC *iovec,
-                                size_t num_iovec)
+static size_t iovec_total_bytes(const OSSL_QTX_IOVEC *iovec, size_t num_iovec)
 {
     size_t i, l = 0;
 
-    for (i = 0; i < num_iovec; ++i)
-        l += iovec[i].buf_len;
+    for (i = 0; i < num_iovec; ++i) l += iovec[i].buf_len;
 
     return l;
 }
 
-static void iovec_cur_init(struct iovec_cur *cur,
-                           const OSSL_QTX_IOVEC *iovec,
+static void iovec_cur_init(struct iovec_cur *cur, const OSSL_QTX_IOVEC *iovec,
                            size_t num_iovec)
 {
-    cur->iovec              = iovec;
-    cur->num_iovec          = num_iovec;
-    cur->idx                = 0;
-    cur->byte_off           = 0;
-    cur->bytes_remaining    = iovec_total_bytes(iovec, num_iovec);
+    cur->iovec = iovec;
+    cur->num_iovec = num_iovec;
+    cur->idx = 0;
+    cur->byte_off = 0;
+    cur->bytes_remaining = iovec_total_bytes(iovec, num_iovec);
 }
 
 /*
@@ -405,8 +392,8 @@ int ossl_qtx_calculate_ciphertext_payload_len(OSSL_QTX *qtx, uint32_t enc_level,
                                               size_t plaintext_len,
                                               size_t *ciphertext_len)
 {
-    OSSL_QRL_ENC_LEVEL *el
-        = ossl_qrl_enc_level_set_get(&qtx->el_set, enc_level, 1);
+    OSSL_QRL_ENC_LEVEL *el =
+        ossl_qrl_enc_level_set_get(&qtx->el_set, enc_level, 1);
     size_t tag_len;
 
     if (el == NULL) {
@@ -429,8 +416,8 @@ int ossl_qtx_calculate_plaintext_payload_len(OSSL_QTX *qtx, uint32_t enc_level,
                                              size_t ciphertext_len,
                                              size_t *plaintext_len)
 {
-    OSSL_QRL_ENC_LEVEL *el
-        = ossl_qrl_enc_level_set_get(&qtx->el_set, enc_level, 1);
+    OSSL_QRL_ENC_LEVEL *el =
+        ossl_qrl_enc_level_set_get(&qtx->el_set, enc_level, 1);
     size_t tag_len;
 
     if (el == NULL) {
@@ -465,11 +452,12 @@ static int qtx_write_hdr(OSSL_QTX *qtx, const QUIC_PKT_HDR *hdr, TXE *txe,
     size_t l = 0;
     unsigned char *data = txe_data(txe) + txe->data_len;
 
-    if (!WPACKET_init_static_len(&wpkt, data, txe->alloc_len - txe->data_len, 0))
+    if (!WPACKET_init_static_len(&wpkt, data, txe->alloc_len - txe->data_len,
+                                 0))
         return 0;
 
-    if (!ossl_quic_wire_encode_pkt_hdr(&wpkt, hdr->dst_conn_id.id_len,
-                                       hdr, ptrs)
+    if (!ossl_quic_wire_encode_pkt_hdr(&wpkt, hdr->dst_conn_id.id_len, hdr,
+                                       ptrs)
         || !WPACKET_get_total_written(&wpkt, &l)) {
         WPACKET_finish(&wpkt);
         return 0;
@@ -491,8 +479,8 @@ static int qtx_encrypt_into_txe(OSSL_QTX *qtx, struct iovec_cur *cur, TXE *txe,
                                 QUIC_PKT_HDR_PTRS *ptrs)
 {
     int l = 0, l2 = 0, nonce_len;
-    OSSL_QRL_ENC_LEVEL *el
-        = ossl_qrl_enc_level_set_get(&qtx->el_set, enc_level, 1);
+    OSSL_QRL_ENC_LEVEL *el =
+        ossl_qrl_enc_level_set_get(&qtx->el_set, enc_level, 1);
     unsigned char nonce[EVP_MAX_IV_LENGTH];
     size_t i;
     EVP_CIPHER_CTX *cctx = NULL;
@@ -555,8 +543,9 @@ static int qtx_encrypt_into_txe(OSSL_QTX *qtx, struct iovec_cur *cur, TXE *txe,
         if (src_len == 0)
             break;
 
-        if (EVP_CipherUpdate(cctx, txe_data(txe) + txe->data_len,
-                             &l, src, src_len) != 1) {
+        if (EVP_CipherUpdate(cctx, txe_data(txe) + txe->data_len, &l, src,
+                             src_len)
+            != 1) {
             ERR_raise(ERR_LIB_SSL, ERR_R_EVP_LIB);
             return 0;
         }
@@ -576,8 +565,9 @@ static int qtx_encrypt_into_txe(OSSL_QTX *qtx, struct iovec_cur *cur, TXE *txe,
         return 0;
     }
 
-    if (EVP_CIPHER_CTX_ctrl(cctx, EVP_CTRL_AEAD_GET_TAG,
-                            el->tag_len, txe_data(txe) + txe->data_len) != 1) {
+    if (EVP_CIPHER_CTX_ctrl(cctx, EVP_CTRL_AEAD_GET_TAG, el->tag_len,
+                            txe_data(txe) + txe->data_len)
+        != 1) {
         ERR_raise(ERR_LIB_SSL, ERR_R_EVP_LIB);
         return 0;
     }
@@ -646,17 +636,16 @@ static int qtx_write(OSSL_QTX *qtx, const OSSL_QTX_PKT *pkt, TXE *txe,
 
     /* Determine encrypted payload length. */
     if (needs_encrypt)
-        ossl_qtx_calculate_ciphertext_payload_len(qtx, enc_level,
-                                                  cur.bytes_remaining,
-                                                  &payload_len);
+        ossl_qtx_calculate_ciphertext_payload_len(
+            qtx, enc_level, cur.bytes_remaining, &payload_len);
     else
         payload_len = cur.bytes_remaining;
 
     /* Determine header length. */
-    hdr->data  = NULL;
-    hdr->len   = payload_len;
-    pred_hdr_len = ossl_quic_wire_get_encoded_pkt_hdr_len(hdr->dst_conn_id.id_len,
-                                                          hdr);
+    hdr->data = NULL;
+    hdr->len = payload_len;
+    pred_hdr_len =
+        ossl_quic_wire_get_encoded_pkt_hdr_len(hdr->dst_conn_id.id_len, hdr);
     if (pred_hdr_len == 0) {
         ret = QTX_FAIL_GENERIC;
         goto err;
@@ -671,9 +660,7 @@ static int qtx_write(OSSL_QTX *qtx, const OSSL_QTX_PKT *pkt, TXE *txe,
     }
 
     if (ossl_quic_pkt_type_has_pn(hdr->type)) {
-        if (!ossl_quic_wire_encode_pkt_hdr_pn(pkt->pn,
-                                              hdr->pn,
-                                              hdr->pn_len)) {
+        if (!ossl_quic_wire_encode_pkt_hdr_pn(pkt->pn, hdr->pn, hdr->pn_len)) {
             ret = QTX_FAIL_GENERIC;
             goto err;
         }
@@ -705,8 +692,8 @@ static int qtx_write(OSSL_QTX *qtx, const OSSL_QTX_PKT *pkt, TXE *txe,
         }
     } else {
         /* Encrypt into TXE. */
-        if (!qtx_encrypt_into_txe(qtx, &cur, txe, enc_level, pkt->pn,
-                                  hdr_start, hdr_len, &ptrs)) {
+        if (!qtx_encrypt_into_txe(qtx, &cur, txe, enc_level, pkt->pn, hdr_start,
+                                  hdr_len, &ptrs)) {
             ret = QTX_FAIL_GENERIC;
             goto err;
         }
@@ -761,17 +748,16 @@ static int qtx_mutate_write(OSSL_QTX *qtx, const OSSL_QTX_PKT *pkt, TXE *txe,
 
     /* If we are running tests then mutate_packet may be non NULL */
     if (qtx->mutatecb != NULL) {
-        if (!qtx->mutatecb(pkt->hdr, pkt->iovec, pkt->num_iovec, &hdr,
-                           &iovec, &num_iovec, qtx->mutatearg))
+        if (!qtx->mutatecb(pkt->hdr, pkt->iovec, pkt->num_iovec, &hdr, &iovec,
+                           &num_iovec, qtx->mutatearg))
             return QTX_FAIL_GENERIC;
     } else {
-        hdr         = pkt->hdr;
-        iovec       = pkt->iovec;
-        num_iovec   = pkt->num_iovec;
+        hdr = pkt->hdr;
+        iovec = pkt->iovec;
+        num_iovec = pkt->num_iovec;
     }
 
-    ret = qtx_write(qtx, pkt, txe, enc_level,
-                    hdr, iovec, num_iovec);
+    ret = qtx_write(qtx, pkt, txe, enc_level, hdr, iovec, num_iovec);
     if (ret == 1)
         ossl_qlog_event_transport_packet_sent(qtx_get_qlog(qtx), hdr, pkt->pn,
                                               iovec, num_iovec,
@@ -808,7 +794,7 @@ int ossl_qtx_write_pkt(OSSL_QTX *qtx, const OSSL_QTX_PKT *pkt)
     if (!ossl_quic_pkt_type_can_share_dgram(pkt->hdr->type))
         ossl_qtx_finish_dgram(qtx);
     else if (enc_level >= QUIC_ENC_LEVEL_NUM
-               || ossl_qrl_enc_level_set_have_el(&qtx->el_set, enc_level) != 1) {
+             || ossl_qrl_enc_level_set_have_el(&qtx->el_set, enc_level) != 1) {
         /* All other packet types are encrypted. */
         return 0;
     }
@@ -915,20 +901,18 @@ void ossl_qtx_finish_dgram(OSSL_QTX *qtx)
     else
         qtx_add_to_pending(qtx, txe);
 
-    qtx->cons       = NULL;
+    qtx->cons = NULL;
     qtx->cons_count = 0;
     ++qtx->datagram_count;
 }
 
 static void txe_to_msg(TXE *txe, BIO_MSG *msg)
 {
-    msg->data       = txe_data(txe);
-    msg->data_len   = txe->data_len;
-    msg->flags      = 0;
-    msg->peer
-        = BIO_ADDR_family(&txe->peer) != AF_UNSPEC ? &txe->peer : NULL;
-    msg->local
-        = BIO_ADDR_family(&txe->local) != AF_UNSPEC ? &txe->local : NULL;
+    msg->data = txe_data(txe);
+    msg->data_len = txe->data_len;
+    msg->flags = 0;
+    msg->peer = BIO_ADDR_family(&txe->peer) != AF_UNSPEC ? &txe->peer : NULL;
+    msg->local = BIO_ADDR_family(&txe->local) != AF_UNSPEC ? &txe->local : NULL;
 }
 
 #define MAX_MSGS_PER_SEND   32
@@ -988,18 +972,16 @@ int ossl_qtx_flush_net(OSSL_QTX *qtx)
         for (i = 0; i < wr; ++i) {
             if (qtx->msg_callback != NULL)
                 qtx->msg_callback(1, OSSL_QUIC1_VERSION, SSL3_RT_QUIC_DATAGRAM,
-                                msg[i].data, msg[i].data_len,
-                                qtx->msg_callback_ssl,
-                                qtx->msg_callback_arg);
+                                  msg[i].data, msg[i].data_len,
+                                  qtx->msg_callback_ssl, qtx->msg_callback_arg);
             qtx_pending_to_free(qtx);
         }
 
         total_written += wr;
     }
 
-    return total_written > 0
-        ? QTX_FLUSH_NET_RES_OK
-        : QTX_FLUSH_NET_RES_TRANSIENT_FAIL;
+    return total_written > 0 ? QTX_FLUSH_NET_RES_OK
+                             : QTX_FLUSH_NET_RES_TRANSIENT_FAIL;
 }
 
 int ossl_qtx_pop_net(OSSL_QTX *qtx, BIO_MSG *msg)
@@ -1055,8 +1037,7 @@ size_t ossl_qtx_get_unflushed_pkt_count(OSSL_QTX *qtx)
 
 int ossl_qtx_trigger_key_update(OSSL_QTX *qtx)
 {
-    return ossl_qrl_enc_level_set_key_update(&qtx->el_set,
-                                             QUIC_ENC_LEVEL_1RTT);
+    return ossl_qrl_enc_level_set_key_update(&qtx->el_set, QUIC_ENC_LEVEL_1RTT);
 }
 
 uint64_t ossl_qtx_get_cur_epoch_pkt_count(OSSL_QTX *qtx, uint32_t enc_level)

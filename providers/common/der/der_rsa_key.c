@@ -59,9 +59,7 @@
         DER_OID_V_id_sha1,                                              \
         DER_V_NULL
 extern const unsigned char ossl_der_aid_sha1Identifier[];
-const unsigned char ossl_der_aid_sha1Identifier[] = {
-    DER_AID_V_sha1Identifier
-};
+const unsigned char ossl_der_aid_sha1Identifier[] = {DER_AID_V_sha1Identifier};
 #define DER_AID_SZ_sha1Identifier sizeof(ossl_der_aid_sha1Identifier)
 
 #define DER_AID_V_sha224Identifier                                      \
@@ -71,8 +69,7 @@ const unsigned char ossl_der_aid_sha1Identifier[] = {
         DER_V_NULL
 extern const unsigned char ossl_der_aid_sha224Identifier[];
 const unsigned char ossl_der_aid_sha224Identifier[] = {
-    DER_AID_V_sha224Identifier
-};
+    DER_AID_V_sha224Identifier};
 #define DER_AID_SZ_sha224Identifier sizeof(ossl_der_aid_sha224Identifier)
 
 #define DER_AID_V_sha256Identifier                                      \
@@ -82,8 +79,7 @@ const unsigned char ossl_der_aid_sha224Identifier[] = {
         DER_V_NULL
 extern const unsigned char ossl_der_aid_sha256Identifier[];
 const unsigned char ossl_der_aid_sha256Identifier[] = {
-    DER_AID_V_sha256Identifier
-};
+    DER_AID_V_sha256Identifier};
 #define DER_AID_SZ_sha256Identifier sizeof(ossl_der_aid_sha256Identifier)
 
 #define DER_AID_V_sha384Identifier                                      \
@@ -93,8 +89,7 @@ const unsigned char ossl_der_aid_sha256Identifier[] = {
         DER_V_NULL
 extern const unsigned char ossl_der_aid_sha384Identifier[];
 const unsigned char ossl_der_aid_sha384Identifier[] = {
-    DER_AID_V_sha384Identifier
-};
+    DER_AID_V_sha384Identifier};
 #define DER_AID_SZ_sha384Identifier sizeof(ossl_der_aid_sha384Identifier)
 
 #define DER_AID_V_sha512Identifier                                      \
@@ -104,8 +99,7 @@ const unsigned char ossl_der_aid_sha384Identifier[] = {
         DER_V_NULL
 extern const unsigned char ossl_der_aid_sha512Identifier[];
 const unsigned char ossl_der_aid_sha512Identifier[] = {
-    DER_AID_V_sha512Identifier
-};
+    DER_AID_V_sha512Identifier};
 #define DER_AID_SZ_sha512Identifier sizeof(ossl_der_aid_sha512Identifier)
 
 #define DER_AID_V_sha512_224Identifier                                  \
@@ -115,8 +109,7 @@ const unsigned char ossl_der_aid_sha512Identifier[] = {
         DER_V_NULL
 extern const unsigned char ossl_der_aid_sha512_224Identifier[];
 const unsigned char ossl_der_aid_sha512_224Identifier[] = {
-    DER_AID_V_sha512_224Identifier
-};
+    DER_AID_V_sha512_224Identifier};
 #define DER_AID_SZ_sha512_224Identifier sizeof(ossl_der_aid_sha512_224Identifier)
 
 #define DER_AID_V_sha512_256Identifier                                  \
@@ -126,8 +119,7 @@ const unsigned char ossl_der_aid_sha512_224Identifier[] = {
         DER_V_NULL
 extern const unsigned char ossl_der_aid_sha512_256Identifier[];
 const unsigned char ossl_der_aid_sha512_256Identifier[] = {
-    DER_AID_V_sha512_256Identifier
-};
+    DER_AID_V_sha512_256Identifier};
 #define DER_AID_SZ_sha512_256Identifier sizeof(ossl_der_aid_sha512_256Identifier)
 
 /*-
@@ -161,7 +153,7 @@ const unsigned char ossl_der_aid_sha512_256Identifier[] = {
  *                      { id-mgf1, sha512Identifier }
  */
 #if 0                            /* Currently unused */
-#define DER_AID_V_mgf1SHA1Identifier                                    \
+# define DER_AID_V_mgf1SHA1Identifier                                    \
     DER_P_SEQUENCE|DER_F_CONSTRUCTED,                                   \
         DER_OID_SZ_id_mgf1 + DER_AID_SZ_sha1Identifier,                 \
         DER_OID_V_id_mgf1,                                              \
@@ -169,7 +161,7 @@ const unsigned char ossl_der_aid_sha512_256Identifier[] = {
 static const unsigned char der_aid_mgf1SHA1Identifier[] = {
     DER_AID_V_mgf1SHA1Identifier
 };
-#define DER_AID_SZ_mgf1SHA1Identifier sizeof(der_aid_mgf1SHA1Identifier)
+# define DER_AID_SZ_mgf1SHA1Identifier sizeof(der_aid_mgf1SHA1Identifier)
 #endif
 
 #define DER_AID_V_mgf1SHA224Identifier                          \
@@ -178,8 +170,7 @@ static const unsigned char der_aid_mgf1SHA1Identifier[] = {
         DER_OID_V_id_mgf1,                                      \
         DER_AID_V_sha224Identifier
 static const unsigned char der_aid_mgf1SHA224Identifier[] = {
-    DER_AID_V_mgf1SHA224Identifier
-};
+    DER_AID_V_mgf1SHA224Identifier};
 #define DER_AID_SZ_mgf1SHA224Identifier sizeof(der_aid_mgf1SHA224Identifier)
 
 #define DER_AID_V_mgf1SHA256Identifier                          \
@@ -188,8 +179,7 @@ static const unsigned char der_aid_mgf1SHA224Identifier[] = {
         DER_OID_V_id_mgf1,                                      \
         DER_AID_V_sha256Identifier
 static const unsigned char der_aid_mgf1SHA256Identifier[] = {
-    DER_AID_V_mgf1SHA256Identifier
-};
+    DER_AID_V_mgf1SHA256Identifier};
 #define DER_AID_SZ_mgf1SHA256Identifier sizeof(der_aid_mgf1SHA256Identifier)
 
 #define DER_AID_V_mgf1SHA384Identifier                          \
@@ -198,8 +188,7 @@ static const unsigned char der_aid_mgf1SHA256Identifier[] = {
         DER_OID_V_id_mgf1,                                      \
         DER_AID_V_sha384Identifier
 static const unsigned char der_aid_mgf1SHA384Identifier[] = {
-    DER_AID_V_mgf1SHA384Identifier
-};
+    DER_AID_V_mgf1SHA384Identifier};
 #define DER_AID_SZ_mgf1SHA384Identifier sizeof(der_aid_mgf1SHA384Identifier)
 
 #define DER_AID_V_mgf1SHA512Identifier                          \
@@ -208,8 +197,7 @@ static const unsigned char der_aid_mgf1SHA384Identifier[] = {
         DER_OID_V_id_mgf1,                                      \
         DER_AID_V_sha512Identifier
 static const unsigned char der_aid_mgf1SHA512Identifier[] = {
-    DER_AID_V_mgf1SHA512Identifier
-};
+    DER_AID_V_mgf1SHA512Identifier};
 #define DER_AID_SZ_mgf1SHA512Identifier sizeof(der_aid_mgf1SHA512Identifier)
 
 #define DER_AID_V_mgf1SHA512_224Identifier                      \
@@ -218,8 +206,7 @@ static const unsigned char der_aid_mgf1SHA512Identifier[] = {
         DER_OID_V_id_mgf1,                                      \
         DER_AID_V_sha512_224Identifier
 static const unsigned char der_aid_mgf1SHA512_224Identifier[] = {
-    DER_AID_V_mgf1SHA512_224Identifier
-};
+    DER_AID_V_mgf1SHA512_224Identifier};
 #define DER_AID_SZ_mgf1SHA512_224Identifier sizeof(der_aid_mgf1SHA512_224Identifier)
 
 #define DER_AID_V_mgf1SHA512_256Identifier                      \
@@ -228,10 +215,8 @@ static const unsigned char der_aid_mgf1SHA512_224Identifier[] = {
         DER_OID_V_id_mgf1,                                      \
         DER_AID_V_sha512_256Identifier
 static const unsigned char der_aid_mgf1SHA512_256Identifier[] = {
-    DER_AID_V_mgf1SHA512_256Identifier
-};
+    DER_AID_V_mgf1SHA512_256Identifier};
 #define DER_AID_SZ_mgf1SHA512_256Identifier sizeof(der_aid_mgf1SHA512_256Identifier)
-
 
 #define MGF1_SHA_CASE(bits, var)                                \
     case NID_sha##bits:                                         \
@@ -348,7 +333,8 @@ int ossl_DER_w_RSASSA_PSS_params(WPACKET *pkt, int tag,
     return ossl_DER_w_begin_sequence(pkt, tag)
         && (trailerfield == default_trailerfield
             || ossl_DER_w_uint32(pkt, 3, (uint32_t)trailerfield))
-        && (saltlen == default_saltlen || ossl_DER_w_uint32(pkt, 2, (uint32_t)saltlen))
+        && (saltlen == default_saltlen
+            || ossl_DER_w_uint32(pkt, 2, (uint32_t)saltlen))
         && DER_w_MaskGenAlgorithm(pkt, 1, pss)
         && (hashalg_nid == default_hashalg_nid
             || ossl_DER_w_precompiled(pkt, 0, hashalg, hashalg_sz))
@@ -364,8 +350,7 @@ int ossl_DER_w_RSASSA_PSS_params(WPACKET *pkt, int tag,
     var##_oid_sz = sizeof(ossl_der_oid_##name);                         \
     break;
 
-int ossl_DER_w_algorithmIdentifier_RSA_PSS(WPACKET *pkt, int tag,
-                                           int rsa_type,
+int ossl_DER_w_algorithmIdentifier_RSA_PSS(WPACKET *pkt, int tag, int rsa_type,
                                            const RSA_PSS_PARAMS_30 *pss)
 {
     int rsa_nid = NID_undef;

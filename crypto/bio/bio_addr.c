@@ -8,7 +8,7 @@
  */
 
 #ifndef _GNU_SOURCE
-# define _GNU_SOURCE
+#define _GNU_SOURCE
 #endif
 
 /*
@@ -125,9 +125,8 @@ int BIO_ADDR_make(BIO_ADDR *ap, const struct sockaddr *sa)
     return 0;
 }
 
-int BIO_ADDR_rawmake(BIO_ADDR *ap, int family,
-                     const void *where, size_t wherelen,
-                     unsigned short port)
+int BIO_ADDR_rawmake(BIO_ADDR *ap, int family, const void *where,
+                     size_t wherelen, unsigned short port)
 {
 #ifndef OPENSSL_NO_UNIX_SOCK
     if (family == AF_UNIX) {
@@ -226,8 +225,8 @@ unsigned short BIO_ADDR_rawport(const BIO_ADDR *ap)
  * The return value is 0 on failure, with the error code in the error
  * stack, and 1 on success.
  */
-static int addr_strings(const BIO_ADDR *ap, int numeric,
-                        char **hostname, char **service)
+static int addr_strings(const BIO_ADDR *ap, int numeric, char **hostname,
+                        char **service)
 {
     if (BIO_sock_init() != 1)
         return 0;
@@ -241,10 +240,10 @@ static int addr_strings(const BIO_ADDR *ap, int numeric,
         if (numeric)
             flags |= NI_NUMERICHOST | NI_NUMERICSERV;
 
-        if ((ret = getnameinfo(BIO_ADDR_sockaddr(ap),
-                               BIO_ADDR_sockaddr_size(ap),
-                               host, sizeof(host), serv, sizeof(serv),
-                               flags)) != 0) {
+        if ((ret =
+                 getnameinfo(BIO_ADDR_sockaddr(ap), BIO_ADDR_sockaddr_size(ap),
+                             host, sizeof(host), serv, sizeof(serv), flags))
+            != 0) {
 # ifdef EAI_SYSTEM
             if (ret == EAI_SYSTEM) {
                 ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(),
@@ -264,8 +263,7 @@ static int addr_strings(const BIO_ADDR *ap, int numeric,
          * didn't go the way one might expect.
          */
         if (serv[0] == '\0') {
-            BIO_snprintf(serv, sizeof(serv), "%d",
-                         ntohs(BIO_ADDR_rawport(ap)));
+            BIO_snprintf(serv, sizeof(serv), "%d", ntohs(BIO_ADDR_rawport(ap)));
         }
 
         if (hostname != NULL)
@@ -284,7 +282,7 @@ static int addr_strings(const BIO_ADDR *ap, int numeric,
     }
 
     if ((hostname != NULL && *hostname == NULL)
-            || (service != NULL && *service == NULL)) {
+        || (service != NULL && *service == NULL)) {
         if (hostname != NULL) {
             OPENSSL_free(*hostname);
             *hostname = NULL;
@@ -505,8 +503,10 @@ void BIO_ADDRINFO_free(BIO_ADDRINFO *bai)
 int BIO_parse_hostserv(const char *hostserv, char **host, char **service,
                        enum BIO_hostserv_priorities hostserv_prio)
 {
-    const char *h = NULL; size_t hl = 0;
-    const char *p = NULL; size_t pl = 0;
+    const char *h = NULL;
+    size_t hl = 0;
+    const char *p = NULL;
+    size_t pl = 0;
 
     if (*hostserv == '[') {
         if ((p = strchr(hostserv, ']')) == NULL)
@@ -557,8 +557,7 @@ int BIO_parse_hostserv(const char *hostserv, char **host, char **service,
         goto spec_err;
 
     if (h != NULL && host != NULL) {
-        if (hl == 0
-            || (hl == 1 && h[0] == '*')) {
+        if (hl == 0 || (hl == 1 && h[0] == '*')) {
             *host = NULL;
         } else {
             *host = OPENSSL_strndup(h, hl);
@@ -567,8 +566,7 @@ int BIO_parse_hostserv(const char *hostserv, char **host, char **service,
         }
     }
     if (p != NULL && service != NULL) {
-        if (pl == 0
-            || (pl == 1 && p[0] == '*')) {
+        if (pl == 0 || (pl == 1 && p[0] == '*')) {
             *service = NULL;
         } else {
             *service = OPENSSL_strndup(p, pl);
@@ -583,10 +581,10 @@ int BIO_parse_hostserv(const char *hostserv, char **host, char **service,
     }
 
     return 1;
- amb_err:
+amb_err:
     ERR_raise(ERR_LIB_BIO, BIO_R_AMBIGUOUS_HOST_OR_SERVICE);
     return 0;
- spec_err:
+spec_err:
     ERR_raise(ERR_LIB_BIO, BIO_R_MALFORMED_HOST_OR_SERVICE);
     return 0;
 }
@@ -600,9 +598,8 @@ int BIO_parse_hostserv(const char *hostserv, char **host, char **service,
  * the return value is 1 on success, or 0 on failure, which
  * only happens if a memory allocation error occurred.
  */
-static int addrinfo_wrap(int family, int socktype,
-                         const void *where, size_t wherelen,
-                         unsigned short port,
+static int addrinfo_wrap(int family, int socktype, const void *where,
+                         size_t wherelen, unsigned short port,
                          BIO_ADDRINFO **bai)
 {
     if ((*bai = OPENSSL_zalloc(sizeof(**bai))) == NULL)
@@ -646,8 +643,8 @@ DEFINE_RUN_ONCE_STATIC(do_bio_lookup_init)
 }
 
 int BIO_lookup(const char *host, const char *service,
-               enum BIO_lookup_type lookup_type,
-               int family, int socktype, BIO_ADDRINFO **res)
+               enum BIO_lookup_type lookup_type, int family, int socktype,
+               BIO_ADDRINFO **res)
 {
     return BIO_lookup_ex(host, service, lookup_type, family, socktype, 0, res);
 }
@@ -733,7 +730,7 @@ int BIO_lookup_ex(const char *host, const char *service, int lookup_type,
          * macro magic in bio_local.h
          */
 # if defined(AI_ADDRCONFIG) && defined(AI_NUMERICHOST)
-      retry:
+retry:
 # endif
         switch ((gai_ret = getaddrinfo(host, service, &hints, res))) {
 # ifdef EAI_SYSTEM
@@ -781,18 +778,15 @@ int BIO_lookup_ex(const char *host, const char *service, int lookup_type,
 #if defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_MSDOS)
         static uint32_t he_fallback_address;
         static const char *he_fallback_addresses[] = {
-            (char *)&he_fallback_address, NULL
-        };
+            (char *)&he_fallback_address, NULL};
 #else
         static in_addr_t he_fallback_address;
         static const char *he_fallback_addresses[] = {
-            (char *)&he_fallback_address, NULL
-        };
+            (char *)&he_fallback_address, NULL};
 #endif
         static const struct hostent he_fallback = {
             NULL, NULL, AF_INET, sizeof(he_fallback_address),
-            (char **)&he_fallback_addresses
-        };
+            (char **)&he_fallback_addresses};
 #if defined(OPENSSL_SYS_VMS) && defined(__DECC)
 # pragma pointer_size restore
 #endif
@@ -800,9 +794,9 @@ int BIO_lookup_ex(const char *host, const char *service, int lookup_type,
         struct servent *se;
         /* Apparently, on WIN64, s_proto and s_port have traded places... */
 #ifdef _WIN64
-        struct servent se_fallback = { NULL, NULL, NULL, 0 };
+        struct servent se_fallback = {NULL, NULL, NULL, 0};
 #else
-        struct servent se_fallback = { NULL, NULL, 0, NULL };
+        struct servent se_fallback = {NULL, NULL, 0, NULL};
 #endif
 
         if (!RUN_ONCE(&bio_lookup_init, do_bio_lookup_init)) {
@@ -813,7 +807,7 @@ int BIO_lookup_ex(const char *host, const char *service, int lookup_type,
 
         if (!CRYPTO_THREAD_write_lock(bio_lookup_lock))
             return 0;
-        
+
         he_fallback_address = INADDR_ANY;
         if (host == NULL) {
             he = &he_fallback;
@@ -849,8 +843,7 @@ int BIO_lookup_ex(const char *host, const char *service, int lookup_type,
                  */
 # if defined(OPENSSL_SYS_VXWORKS)
                 /* h_errno doesn't exist on VxWorks */
-                ERR_raise_data(ERR_LIB_SYS, 1000,
-                               "calling gethostbyname()");
+                ERR_raise_data(ERR_LIB_SYS, 1000, "calling gethostbyname()");
 # else
                 ERR_raise_data(ERR_LIB_SYS, 1000 + h_errno,
                                "calling gethostbyname()");
@@ -894,8 +887,8 @@ int BIO_lookup_ex(const char *host, const char *service, int lookup_type,
                 break;
             }
 
-            if (endp != service && *endp == '\0'
-                    && portnum > 0 && portnum < 65536) {
+            if (endp != service && *endp == '\0' && portnum > 0
+                && portnum < 65536) {
                 se_fallback.s_port = htons((unsigned short)portnum);
                 se_fallback.s_proto = proto;
                 se = &se_fallback;
@@ -934,20 +927,17 @@ int BIO_lookup_ex(const char *host, const char *service, int lookup_type,
 
             /* The easiest way to create a linked list from an
                array is to start from the back */
-            for (addrlistp = he->h_addr_list; *addrlistp != NULL;
-                 addrlistp++)
-                ;
+            for (addrlistp = he->h_addr_list; *addrlistp != NULL; addrlistp++);
 
             for (addresses = addrlistp - he->h_addr_list;
-                 addrlistp--, addresses-- > 0; ) {
-                if (!addrinfo_wrap(he->h_addrtype, socktype,
-                                   *addrlistp, he->h_length,
-                                   se->s_port, &tmp_bai))
+                 addrlistp--, addresses-- > 0;) {
+                if (!addrinfo_wrap(he->h_addrtype, socktype, *addrlistp,
+                                   he->h_length, se->s_port, &tmp_bai))
                     goto addrinfo_wrap_err;
                 tmp_bai->bai_next = *res;
                 *res = tmp_bai;
                 continue;
-             addrinfo_wrap_err:
+addrinfo_wrap_err:
                 BIO_ADDRINFO_free(*res);
                 *res = NULL;
                 ERR_raise(ERR_LIB_BIO, ERR_R_BIO_LIB);
@@ -957,7 +947,7 @@ int BIO_lookup_ex(const char *host, const char *service, int lookup_type,
 
             ret = 1;
         }
-     err:
+err:
         CRYPTO_THREAD_unlock(bio_lookup_lock);
     }
 

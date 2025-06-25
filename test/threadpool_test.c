@@ -49,7 +49,7 @@ static int test_thread_reported_flags(void)
 # define TEST_THREAD_NATIVE_FN_SET_VALUE 1
 static uint32_t test_thread_native_fn(void *data)
 {
-    uint32_t *ldata = (uint32_t*) data;
+    uint32_t *ldata = (uint32_t *)data;
     *ldata = *ldata + 1;
     return *ldata - 1;
 }
@@ -96,7 +96,7 @@ static int test_thread_native(void)
 static int test_thread_internal(void)
 {
     uint32_t retval[3];
-    uint32_t local[3] = { 0 };
+    uint32_t local[3] = {0};
     uint32_t threads_supported;
     size_t i;
     void *t[3];
@@ -266,9 +266,12 @@ static int test_thread_native_multiple_joins(void)
 {
     CRYPTO_THREAD *t, *t1, *t2;
 
-    t = ossl_crypto_thread_native_start(test_thread_native_multiple_joins_fn1, NULL, 1);
-    t1 = ossl_crypto_thread_native_start(test_thread_native_multiple_joins_fn2, t, 1);
-    t2 = ossl_crypto_thread_native_start(test_thread_native_multiple_joins_fn3, t, 1);
+    t = ossl_crypto_thread_native_start(test_thread_native_multiple_joins_fn1,
+                                        NULL, 1);
+    t1 = ossl_crypto_thread_native_start(test_thread_native_multiple_joins_fn2,
+                                         t, 1);
+    t2 = ossl_crypto_thread_native_start(test_thread_native_multiple_joins_fn3,
+                                         t, 1);
 
     if (!TEST_ptr(t) || !TEST_ptr(t1) || !TEST_ptr(t2))
         return 0;

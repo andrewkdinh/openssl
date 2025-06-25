@@ -138,10 +138,10 @@ static const unsigned char ex_coefficient[] =
 
 static int key2048_key(RSA *key)
 {
-    if (!TEST_int_eq(RSA_set0_key(key,
-                                  BN_bin2bn(n, sizeof(n) - 1, NULL),
+    if (!TEST_int_eq(RSA_set0_key(key, BN_bin2bn(n, sizeof(n) - 1, NULL),
                                   BN_bin2bn(e, sizeof(e) - 1, NULL),
-                                  BN_bin2bn(d, sizeof(d) - 1, NULL)), 1))
+                                  BN_bin2bn(d, sizeof(d) - 1, NULL)),
+                     1))
         return 0;
 
     return RSA_size(key);
@@ -152,17 +152,16 @@ static int key2048p3_v1(RSA *key)
     BIGNUM **pris = NULL, **exps = NULL, **coeffs = NULL;
     int rv = RSA_size(key);
 
-
-    if (!TEST_int_eq(RSA_set0_factors(key,
-                                      BN_bin2bn(p, sizeof(p) - 1, NULL),
-                                      BN_bin2bn(q, sizeof(q) - 1, NULL)), 1))
+    if (!TEST_int_eq(RSA_set0_factors(key, BN_bin2bn(p, sizeof(p) - 1, NULL),
+                                      BN_bin2bn(q, sizeof(q) - 1, NULL)),
+                     1))
         goto err;
 
-    if (!TEST_int_eq(RSA_set0_crt_params(key,
-                                         BN_bin2bn(dmp1, sizeof(dmp1) - 1, NULL),
-                                         BN_bin2bn(dmq1, sizeof(dmq1) - 1, NULL),
-                                         BN_bin2bn(iqmp, sizeof(iqmp) - 1,
-                                                   NULL)), 1))
+    if (!TEST_int_eq(
+            RSA_set0_crt_params(key, BN_bin2bn(dmp1, sizeof(dmp1) - 1, NULL),
+                                BN_bin2bn(dmq1, sizeof(dmq1) - 1, NULL),
+                                BN_bin2bn(iqmp, sizeof(iqmp) - 1, NULL)),
+            1))
         return 0;
 
     pris = OPENSSL_zalloc(sizeof(BIGNUM *));
@@ -177,16 +176,16 @@ static int key2048p3_v1(RSA *key)
     if (!TEST_ptr(pris[0]) || !TEST_ptr(exps[0]) || !TEST_ptr(coeffs[0]))
         goto err;
 
-    if (!TEST_true(RSA_set0_multi_prime_params(key, pris, exps,
-                                               coeffs, NUM_EXTRA_PRIMES)))
+    if (!TEST_true(RSA_set0_multi_prime_params(key, pris, exps, coeffs,
+                                               NUM_EXTRA_PRIMES)))
         goto err;
 
- ret:
+ret:
     OPENSSL_free(pris);
     OPENSSL_free(exps);
     OPENSSL_free(coeffs);
     return rv;
- err:
+err:
     if (pris != NULL)
         BN_free(pris[0]);
     if (exps != NULL)
@@ -220,25 +219,27 @@ static int key2048p3_v2(RSA *key)
         || !TEST_int_ne(sk_BIGNUM_push(exps, num), 0)
         || !TEST_ptr(num = BN_bin2bn(dmq1, sizeof(dmq1) - 1, NULL))
         || !TEST_int_ne(sk_BIGNUM_push(exps, num), 0)
-        || !TEST_ptr(num = BN_bin2bn(ex_exponent, sizeof(ex_exponent) - 1, NULL))
+        || !TEST_ptr(num =
+                         BN_bin2bn(ex_exponent, sizeof(ex_exponent) - 1, NULL))
         || !TEST_int_ne(sk_BIGNUM_push(exps, num), 0))
         goto err;
 
     if (!TEST_ptr(num = BN_bin2bn(iqmp, sizeof(iqmp) - 1, NULL))
         || !TEST_int_ne(sk_BIGNUM_push(coeffs, num), 0)
-        || !TEST_ptr(num = BN_bin2bn(ex_coefficient, sizeof(ex_coefficient) - 1, NULL))
+        || !TEST_ptr(
+            num = BN_bin2bn(ex_coefficient, sizeof(ex_coefficient) - 1, NULL))
         || !TEST_int_ne(sk_BIGNUM_push(coeffs, num), 0))
         goto err;
 
     if (!TEST_true(ossl_rsa_set0_all_params(key, primes, exps, coeffs)))
         goto err;
 
- ret:
+ret:
     sk_BIGNUM_free(primes);
     sk_BIGNUM_free(exps);
     sk_BIGNUM_free(coeffs);
     return rv;
- err:
+err:
     sk_BIGNUM_pop_free(primes, BN_free);
     sk_BIGNUM_pop_free(exps, BN_free);
     sk_BIGNUM_pop_free(coeffs, BN_free);
@@ -274,8 +275,7 @@ static int test_rsa_mp(int i)
     if (!TEST_true(RSA_check_key_ex(key, NULL)))
         goto err;
 
-    num = RSA_public_encrypt(plen, ptext_ex, ctext, key,
-                             RSA_PKCS1_PADDING);
+    num = RSA_public_encrypt(plen, ptext_ex, ctext, key, RSA_PKCS1_PADDING);
     if (!TEST_int_eq(num, clen))
         goto err;
 

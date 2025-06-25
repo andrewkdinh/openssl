@@ -133,8 +133,8 @@ static int select_alpn(SSL *ssl, const unsigned char **out,
      * what the client is requesting
      */
     if (SSL_select_next_proto((unsigned char **)out, out_len, alpn_ossltest,
-                              sizeof(alpn_ossltest), in,
-                              in_len) == OPENSSL_NPN_NEGOTIATED)
+                              sizeof(alpn_ossltest), in, in_len)
+        == OPENSSL_NPN_NEGOTIATED)
         return SSL_TLSEXT_ERR_OK;
     return SSL_TLSEXT_ERR_ALERT_FATAL;
 }
@@ -308,7 +308,8 @@ static BIO *create_socket(uint16_t port)
     /*
      * Build an INADDR_ANY BIO_ADDR
      */
-    if (!BIO_ADDR_rawmake(addr, AF_INET6, &in6addr_any, sizeof(in6addr_any), htons(port))) {
+    if (!BIO_ADDR_rawmake(addr, AF_INET6, &in6addr_any, sizeof(in6addr_any),
+                          htons(port))) {
         fprintf(stderr, "unable to bind to port %d\n", port);
         goto err;
     }
@@ -640,9 +641,8 @@ static int run_quic_server(SSL_CTX *ctx, BIO *sock)
          * are using the default stream mode, as would be specified by
          * a call to SSL_set_default_stream_mode
          */
-        if (!SSL_set_incoming_stream_policy(conn,
-                                            SSL_INCOMING_STREAM_POLICY_ACCEPT,
-                                            0)) {
+        if (!SSL_set_incoming_stream_policy(
+                conn, SSL_INCOMING_STREAM_POLICY_ACCEPT, 0)) {
             fprintf(stderr, "Failed to set incomming stream policy\n");
             goto close_conn;
         }
@@ -686,8 +686,7 @@ static int run_quic_server(SSL_CTX *ctx, BIO *sock)
          * to ensure the connection is shutdown completely.
          */
 close_conn:
-        while (SSL_shutdown(conn) != 1)
-            continue;
+        while (SSL_shutdown(conn) != 1) continue;
 
         SSL_free(conn);
     }
@@ -746,7 +745,8 @@ int main(int argc, char *argv[])
     unsigned long port;
 
     if (argc != 4) {
-        fprintf(stderr, "usage: %s <port> <server.crt> <server.key>\n", argv[0]);
+        fprintf(stderr, "usage: %s <port> <server.crt> <server.key>\n",
+                argv[0]);
         goto out;
     }
 

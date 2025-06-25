@@ -19,13 +19,13 @@
 
 static int newpass_p12(PKCS12 *p12, const char *oldpass, const char *newpass);
 static int newpass_bags(STACK_OF(PKCS12_SAFEBAG) *bags, const char *oldpass,
-                        const char *newpass,
-                        OSSL_LIB_CTX *libctx, const char *propq);
+                        const char *newpass, OSSL_LIB_CTX *libctx,
+                        const char *propq);
 static int newpass_bag(PKCS12_SAFEBAG *bag, const char *oldpass,
-                        const char *newpass,
-                        OSSL_LIB_CTX *libctx, const char *propq);
-static int alg_get(const X509_ALGOR *alg, int *pnid, int *piter,
-                   int *psaltlen, int *cipherid);
+                       const char *newpass, OSSL_LIB_CTX *libctx,
+                       const char *propq);
+static int alg_get(const X509_ALGOR *alg, int *pnid, int *piter, int *psaltlen,
+                   int *cipherid);
 
 /*
  * Change the password on a PKCS#12 structure.
@@ -61,7 +61,8 @@ static int newpass_p12(PKCS12 *p12, const char *oldpass, const char *newpass)
 {
     STACK_OF(PKCS7) *asafes = NULL, *newsafes = NULL;
     STACK_OF(PKCS12_SAFEBAG) *bags = NULL;
-    int i, bagnid, pbe_nid = 0, pbe_iter = 0, pbe_saltlen = 0, cipherid = NID_undef;
+    int i, bagnid, pbe_nid = 0, pbe_iter = 0, pbe_saltlen = 0,
+                   cipherid = NID_undef;
     PKCS7 *p7, *p7new;
     ASN1_OCTET_STRING *p12_data_tmp = NULL, *macoct = NULL;
     unsigned char mac[EVP_MAX_MD_SIZE];
@@ -81,16 +82,16 @@ static int newpass_p12(PKCS12 *p12, const char *oldpass, const char *newpass)
         } else if (bagnid == NID_pkcs7_encrypted) {
             bags = PKCS12_unpack_p7encdata(p7, oldpass, -1);
             if (p7->d.encrypted == NULL
-                    || !alg_get(p7->d.encrypted->enc_data->algorithm,
-                                &pbe_nid, &pbe_iter, &pbe_saltlen, &cipherid))
+                || !alg_get(p7->d.encrypted->enc_data->algorithm, &pbe_nid,
+                            &pbe_iter, &pbe_saltlen, &cipherid))
                 goto err;
         } else {
             continue;
         }
         if (bags == NULL)
             goto err;
-        if (!newpass_bags(bags, oldpass, newpass,
-                          p7->ctx.libctx, p7->ctx.propq))
+        if (!newpass_bags(bags, oldpass, newpass, p7->ctx.libctx,
+                          p7->ctx.propq))
             goto err;
         /* Repack bag in same form with new password */
         if (bagnid == NID_pkcs7_data)
@@ -138,8 +139,8 @@ err:
 }
 
 static int newpass_bags(STACK_OF(PKCS12_SAFEBAG) *bags, const char *oldpass,
-                        const char *newpass,
-                        OSSL_LIB_CTX *libctx, const char *propq)
+                        const char *newpass, OSSL_LIB_CTX *libctx,
+                        const char *propq)
 {
     int i;
     for (i = 0; i < sk_PKCS12_SAFEBAG_num(bags); i++) {
@@ -153,8 +154,8 @@ static int newpass_bags(STACK_OF(PKCS12_SAFEBAG) *bags, const char *oldpass,
 /* Change password of safebag: only needs handle shrouded keybags */
 
 static int newpass_bag(PKCS12_SAFEBAG *bag, const char *oldpass,
-                       const char *newpass,
-                       OSSL_LIB_CTX *libctx, const char *propq)
+                       const char *newpass, OSSL_LIB_CTX *libctx,
+                       const char *propq)
 {
     EVP_CIPHER *cipher = NULL;
     PKCS8_PRIV_KEY_INFO *p8;
@@ -165,8 +166,8 @@ static int newpass_bag(PKCS12_SAFEBAG *bag, const char *oldpass,
     if (PKCS12_SAFEBAG_get_nid(bag) != NID_pkcs8ShroudedKeyBag)
         return 1;
 
-    if ((p8 = PKCS8_decrypt_ex(bag->value.shkeybag, oldpass, -1,
-                               libctx, propq)) == NULL)
+    if ((p8 = PKCS8_decrypt_ex(bag->value.shkeybag, oldpass, -1, libctx, propq))
+        == NULL)
         return 0;
     X509_SIG_get0(bag->value.shkeybag, &shalg, NULL);
     if (!alg_get(shalg, &p8_nid, &p8_iter, &p8_saltlen, &cipherid)) {
@@ -191,8 +192,8 @@ static int newpass_bag(PKCS12_SAFEBAG *bag, const char *oldpass,
     return 1;
 }
 
-static int alg_get(const X509_ALGOR *alg, int *pnid, int *piter,
-                   int *psaltlen, int *cipherid)
+static int alg_get(const X509_ALGOR *alg, int *pnid, int *piter, int *psaltlen,
+                   int *cipherid)
 {
     int ret = 0, pbenid, aparamtype;
     int encnid, prfnid;
@@ -237,7 +238,8 @@ static int alg_get(const X509_ALGOR *alg, int *pnid, int *piter,
         *cipherid = encnid;
         break;
     default:
-        pbe = ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(PBEPARAM), alg->parameter);
+        pbe =
+            ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(PBEPARAM), alg->parameter);
         if (pbe == NULL)
             goto done;
         *pnid = OBJ_obj2nid(alg->algorithm);

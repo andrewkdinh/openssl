@@ -120,8 +120,8 @@ static int blake2_mac_init(void *vmacctx, const unsigned char *key,
     return BLAKE2_INIT_KEY(&macctx->ctx, &macctx->params, macctx->key);
 }
 
-static int blake2_mac_update(void *vmacctx,
-                             const unsigned char *data, size_t datalen)
+static int blake2_mac_update(void *vmacctx, const unsigned char *data,
+                             size_t datalen)
 {
     struct blake2_mac_data_st *macctx = vmacctx;
 
@@ -131,8 +131,7 @@ static int blake2_mac_update(void *vmacctx,
     return BLAKE2_UPDATE(&macctx->ctx, data, datalen);
 }
 
-static int blake2_mac_final(void *vmacctx,
-                            unsigned char *out, size_t *outl,
+static int blake2_mac_final(void *vmacctx, unsigned char *out, size_t *outl,
                             size_t outsize)
 {
     struct blake2_mac_data_st *macctx = vmacctx;
@@ -146,9 +145,7 @@ static int blake2_mac_final(void *vmacctx,
 
 static const OSSL_PARAM known_gettable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
-    OSSL_PARAM_size_t(OSSL_MAC_PARAM_BLOCK_SIZE, NULL),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_size_t(OSSL_MAC_PARAM_BLOCK_SIZE, NULL), OSSL_PARAM_END};
 static const OSSL_PARAM *blake2_gettable_ctx_params(ossl_unused void *ctx,
                                                     ossl_unused void *provctx)
 {
@@ -160,11 +157,11 @@ static int blake2_get_ctx_params(void *vmacctx, OSSL_PARAM params[])
     OSSL_PARAM *p;
 
     if ((p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_SIZE)) != NULL
-            && !OSSL_PARAM_set_size_t(p, blake2_mac_size(vmacctx)))
+        && !OSSL_PARAM_set_size_t(p, blake2_mac_size(vmacctx)))
         return 0;
 
     if ((p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_BLOCK_SIZE)) != NULL
-            && !OSSL_PARAM_set_size_t(p, BLAKE2_BLOCKBYTES))
+        && !OSSL_PARAM_set_size_t(p, BLAKE2_BLOCKBYTES))
         return 0;
 
     return 1;
@@ -174,11 +171,9 @@ static const OSSL_PARAM known_settable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
     OSSL_PARAM_octet_string(OSSL_MAC_PARAM_KEY, NULL, 0),
     OSSL_PARAM_octet_string(OSSL_MAC_PARAM_CUSTOM, NULL, 0),
-    OSSL_PARAM_octet_string(OSSL_MAC_PARAM_SALT, NULL, 0),
-    OSSL_PARAM_END
-};
-static const OSSL_PARAM *blake2_mac_settable_ctx_params(
-            ossl_unused void *ctx, ossl_unused void *p_ctx)
+    OSSL_PARAM_octet_string(OSSL_MAC_PARAM_SALT, NULL, 0), OSSL_PARAM_END};
+static const OSSL_PARAM *blake2_mac_settable_ctx_params(ossl_unused void *ctx,
+                                                        ossl_unused void *p_ctx)
 {
     return known_settable_ctx_params;
 }
@@ -197,8 +192,7 @@ static int blake2_mac_set_ctx_params(void *vmacctx, const OSSL_PARAM params[])
     if ((p = OSSL_PARAM_locate_const(params, OSSL_MAC_PARAM_SIZE)) != NULL) {
         size_t size;
 
-        if (!OSSL_PARAM_get_size_t(p, &size)
-            || size < 1
+        if (!OSSL_PARAM_get_size_t(p, &size) || size < 1
             || size > BLAKE2_OUTBYTES) {
             ERR_raise(ERR_LIB_PROV, PROV_R_NOT_XOF_OR_INVALID_LENGTH);
             return 0;
@@ -207,11 +201,10 @@ static int blake2_mac_set_ctx_params(void *vmacctx, const OSSL_PARAM params[])
     }
 
     if ((p = OSSL_PARAM_locate_const(params, OSSL_MAC_PARAM_KEY)) != NULL
-            && !blake2_setkey(macctx, p->data, p->data_size))
+        && !blake2_setkey(macctx, p->data, p->data_size))
         return 0;
 
-    if ((p = OSSL_PARAM_locate_const(params, OSSL_MAC_PARAM_CUSTOM))
-        != NULL) {
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_MAC_PARAM_CUSTOM)) != NULL) {
         /*
          * The OSSL_PARAM API doesn't provide direct pointer use, so we
          * must handle the OSSL_PARAM structure ourselves here
@@ -238,17 +231,16 @@ static int blake2_mac_set_ctx_params(void *vmacctx, const OSSL_PARAM params[])
 }
 
 const OSSL_DISPATCH BLAKE2_FUNCTIONS[] = {
-    { OSSL_FUNC_MAC_NEWCTX, (void (*)(void))blake2_mac_new },
-    { OSSL_FUNC_MAC_DUPCTX, (void (*)(void))blake2_mac_dup },
-    { OSSL_FUNC_MAC_FREECTX, (void (*)(void))blake2_mac_free },
-    { OSSL_FUNC_MAC_INIT, (void (*)(void))blake2_mac_init },
-    { OSSL_FUNC_MAC_UPDATE, (void (*)(void))blake2_mac_update },
-    { OSSL_FUNC_MAC_FINAL, (void (*)(void))blake2_mac_final },
-    { OSSL_FUNC_MAC_GETTABLE_CTX_PARAMS,
-      (void (*)(void))blake2_gettable_ctx_params },
-    { OSSL_FUNC_MAC_GET_CTX_PARAMS, (void (*)(void))blake2_get_ctx_params },
-    { OSSL_FUNC_MAC_SETTABLE_CTX_PARAMS,
-      (void (*)(void))blake2_mac_settable_ctx_params },
-    { OSSL_FUNC_MAC_SET_CTX_PARAMS, (void (*)(void))blake2_mac_set_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_MAC_NEWCTX, (void (*)(void))blake2_mac_new},
+    {OSSL_FUNC_MAC_DUPCTX, (void (*)(void))blake2_mac_dup},
+    {OSSL_FUNC_MAC_FREECTX, (void (*)(void))blake2_mac_free},
+    {OSSL_FUNC_MAC_INIT, (void (*)(void))blake2_mac_init},
+    {OSSL_FUNC_MAC_UPDATE, (void (*)(void))blake2_mac_update},
+    {OSSL_FUNC_MAC_FINAL, (void (*)(void))blake2_mac_final},
+    {OSSL_FUNC_MAC_GETTABLE_CTX_PARAMS,
+     (void (*)(void))blake2_gettable_ctx_params},
+    {OSSL_FUNC_MAC_GET_CTX_PARAMS, (void (*)(void))blake2_get_ctx_params},
+    {OSSL_FUNC_MAC_SETTABLE_CTX_PARAMS,
+     (void (*)(void))blake2_mac_settable_ctx_params},
+    {OSSL_FUNC_MAC_SET_CTX_PARAMS, (void (*)(void))blake2_mac_set_ctx_params},
+    OSSL_DISPATCH_END};

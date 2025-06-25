@@ -64,37 +64,36 @@ struct X509_extension_st {
 
 struct x509_crl_method_st {
     int flags;
-    int (*crl_init) (X509_CRL *crl);
-    int (*crl_free) (X509_CRL *crl);
-    int (*crl_lookup) (X509_CRL *crl, X509_REVOKED **ret,
-                       const ASN1_INTEGER *ser, const X509_NAME *issuer);
-    int (*crl_verify) (X509_CRL *crl, EVP_PKEY *pk);
+    int (*crl_init)(X509_CRL *crl);
+    int (*crl_free)(X509_CRL *crl);
+    int (*crl_lookup)(X509_CRL *crl, X509_REVOKED **ret,
+                      const ASN1_INTEGER *ser, const X509_NAME *issuer);
+    int (*crl_verify)(X509_CRL *crl, EVP_PKEY *pk);
 };
 
 struct x509_lookup_method_st {
     char *name;
-    int (*new_item) (X509_LOOKUP *ctx);
-    void (*free) (X509_LOOKUP *ctx);
-    int (*init) (X509_LOOKUP *ctx);
-    int (*shutdown) (X509_LOOKUP *ctx);
-    int (*ctrl) (X509_LOOKUP *ctx, int cmd, const char *argc, long argl,
-                 char **ret);
-    int (*get_by_subject) (X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
-                           const X509_NAME *name, X509_OBJECT *ret);
-    int (*get_by_issuer_serial) (X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
-                                 const X509_NAME *name,
-                                 const ASN1_INTEGER *serial,
-                                 X509_OBJECT *ret);
-    int (*get_by_fingerprint) (X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
-                               const unsigned char *bytes, int len,
-                               X509_OBJECT *ret);
-    int (*get_by_alias) (X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
-                         const char *str, int len, X509_OBJECT *ret);
-    int (*get_by_subject_ex) (X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
-                              const X509_NAME *name, X509_OBJECT *ret,
-                              OSSL_LIB_CTX *libctx, const char *propq);
-    int (*ctrl_ex) (X509_LOOKUP *ctx, int cmd, const char *argc, long argl,
-                    char **ret, OSSL_LIB_CTX *libctx, const char *propq);
+    int (*new_item)(X509_LOOKUP *ctx);
+    void (*free)(X509_LOOKUP *ctx);
+    int (*init)(X509_LOOKUP *ctx);
+    int (*shutdown)(X509_LOOKUP *ctx);
+    int (*ctrl)(X509_LOOKUP *ctx, int cmd, const char *argc, long argl,
+                char **ret);
+    int (*get_by_subject)(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+                          const X509_NAME *name, X509_OBJECT *ret);
+    int (*get_by_issuer_serial)(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+                                const X509_NAME *name,
+                                const ASN1_INTEGER *serial, X509_OBJECT *ret);
+    int (*get_by_fingerprint)(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+                              const unsigned char *bytes, int len,
+                              X509_OBJECT *ret);
+    int (*get_by_alias)(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+                        const char *str, int len, X509_OBJECT *ret);
+    int (*get_by_subject_ex)(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
+                             const X509_NAME *name, X509_OBJECT *ret,
+                             OSSL_LIB_CTX *libctx, const char *propq);
+    int (*ctrl_ex)(X509_LOOKUP *ctx, int cmd, const char *argc, long argl,
+                   char **ret, OSSL_LIB_CTX *libctx, const char *propq);
 };
 
 /* This is the functions plus an instance of the local variables. */
@@ -120,29 +119,28 @@ struct x509_store_st {
     X509_VERIFY_PARAM *param;
     /* Callbacks for various operations */
     /* called to verify a certificate */
-    int (*verify) (X509_STORE_CTX *ctx);
+    int (*verify)(X509_STORE_CTX *ctx);
     /* error callback */
-    int (*verify_cb) (int ok, X509_STORE_CTX *ctx);
+    int (*verify_cb)(int ok, X509_STORE_CTX *ctx);
     /* get issuers cert from ctx */
-    int (*get_issuer) (X509 **issuer, X509_STORE_CTX *ctx, X509 *x);
+    int (*get_issuer)(X509 **issuer, X509_STORE_CTX *ctx, X509 *x);
     /* check issued */
-    int (*check_issued) (X509_STORE_CTX *ctx, X509 *x, X509 *issuer);
+    int (*check_issued)(X509_STORE_CTX *ctx, X509 *x, X509 *issuer);
     /* Check revocation status of chain */
-    int (*check_revocation) (X509_STORE_CTX *ctx);
+    int (*check_revocation)(X509_STORE_CTX *ctx);
     /* retrieve CRL */
-    int (*get_crl) (X509_STORE_CTX *ctx, X509_CRL **crl, X509 *x);
+    int (*get_crl)(X509_STORE_CTX *ctx, X509_CRL **crl, X509 *x);
     /* Check CRL validity */
-    int (*check_crl) (X509_STORE_CTX *ctx, X509_CRL *crl);
+    int (*check_crl)(X509_STORE_CTX *ctx, X509_CRL *crl);
     /* Check certificate against CRL */
-    int (*cert_crl) (X509_STORE_CTX *ctx, X509_CRL *crl, X509 *x);
+    int (*cert_crl)(X509_STORE_CTX *ctx, X509_CRL *crl, X509 *x);
     /* Check policy status of the chain */
-    int (*check_policy) (X509_STORE_CTX *ctx);
-    STACK_OF(X509) *(*lookup_certs) (X509_STORE_CTX *ctx,
-                                     const X509_NAME *nm);
+    int (*check_policy)(X509_STORE_CTX *ctx);
+    STACK_OF(X509) *(*lookup_certs)(X509_STORE_CTX *ctx, const X509_NAME *nm);
     /* cannot constify 'ctx' param due to lookup_certs_sk() in x509_vfy.c */
-    STACK_OF(X509_CRL) *(*lookup_crls) (const X509_STORE_CTX *ctx,
-                                        const X509_NAME *nm);
-    int (*cleanup) (X509_STORE_CTX *ctx);
+    STACK_OF(X509_CRL) *(*lookup_crls)(const X509_STORE_CTX *ctx,
+                                       const X509_NAME *nm);
+    int (*cleanup)(X509_STORE_CTX *ctx);
     CRYPTO_EX_DATA ex_data;
     CRYPTO_REF_COUNT references;
     CRYPTO_RWLOCK *lock;
@@ -157,5 +155,6 @@ DEFINE_STACK_OF(STACK_OF_X509_NAME_ENTRY)
 
 int ossl_x509_likely_issued(X509 *issuer, X509 *subject);
 int ossl_x509_signing_allowed(const X509 *issuer, const X509 *subject);
-int ossl_x509_store_ctx_get_by_subject(const X509_STORE_CTX *ctx, X509_LOOKUP_TYPE type,
+int ossl_x509_store_ctx_get_by_subject(const X509_STORE_CTX *ctx,
+                                       X509_LOOKUP_TYPE type,
                                        const X509_NAME *name, X509_OBJECT *ret);

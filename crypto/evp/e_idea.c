@@ -47,15 +47,16 @@ static int idea_ecb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
 }
 
 BLOCK_CIPHER_func_cbc(idea, IDEA, EVP_IDEA_KEY, ks)
-BLOCK_CIPHER_func_ofb(idea, IDEA, 64, EVP_IDEA_KEY, ks)
-BLOCK_CIPHER_func_cfb(idea, IDEA, 64, EVP_IDEA_KEY, ks)
+    BLOCK_CIPHER_func_ofb(idea, IDEA, 64, EVP_IDEA_KEY, ks)
+        BLOCK_CIPHER_func_cfb(idea, IDEA, 64, EVP_IDEA_KEY, ks)
 
-BLOCK_CIPHER_defs(idea, IDEA_KEY_SCHEDULE, NID_idea, 8, 16, 8, 64,
-                  0, idea_init_key, NULL,
-                  EVP_CIPHER_set_asn1_iv, EVP_CIPHER_get_asn1_iv, NULL)
+            BLOCK_CIPHER_defs(idea, IDEA_KEY_SCHEDULE, NID_idea, 8, 16, 8, 64,
+                              0, idea_init_key, NULL, EVP_CIPHER_set_asn1_iv,
+                              EVP_CIPHER_get_asn1_iv, NULL)
 
-static int idea_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                         const unsigned char *iv, int enc)
+                static int idea_init_key(EVP_CIPHER_CTX *ctx,
+                                         const unsigned char *key,
+                                         const unsigned char *iv, int enc)
 {
     if (!enc) {
         if (EVP_CIPHER_CTX_get_mode(ctx) == EVP_CIPH_OFB_MODE)

@@ -21,7 +21,7 @@
  * =======================
  */
 struct quic_tserver_st {
-    QUIC_TSERVER_ARGS   args;
+    QUIC_TSERVER_ARGS args;
 
     /* Dummy SSL object for this QUIC connection for use by msg_callback */
     SSL *ssl;
@@ -30,12 +30,12 @@ struct quic_tserver_st {
      * The QUIC engine, port and channel providing the core QUIC connection
      * implementation.
      */
-    QUIC_ENGINE     *engine;
-    QUIC_PORT       *port;
-    QUIC_CHANNEL    *ch;
+    QUIC_ENGINE *engine;
+    QUIC_PORT *port;
+    QUIC_CHANNEL *ch;
 
     /* The mutex we give to the QUIC channel. */
-    CRYPTO_MUTEX    *mutex;
+    CRYPTO_MUTEX *mutex;
 
     /* SSL_CTX for creating the underlying TLS connection */
     SSL_CTX *ctx;
@@ -44,7 +44,7 @@ struct quic_tserver_st {
     SSL *tls;
 
     /* Are we connected to a peer? */
-    unsigned int    connected       : 1;
+    unsigned int connected:1;
 };
 
 static int alpn_select_cb(SSL *ssl, const unsigned char **out,
@@ -52,9 +52,8 @@ static int alpn_select_cb(SSL *ssl, const unsigned char **out,
                           unsigned int inlen, void *arg)
 {
     QUIC_TSERVER *srv = arg;
-    static const unsigned char alpndeflt[] = {
-        8, 'o', 's', 's', 'l', 't', 'e', 's', 't'
-    };
+    static const unsigned char alpndeflt[] = {8,   'o', 's', 's', 'l',
+                                              't', 'e', 's', 't'};
     const unsigned char *alpn;
     size_t alpnlen;
 
@@ -66,8 +65,9 @@ static int alpn_select_cb(SSL *ssl, const unsigned char **out,
         alpnlen = srv->args.alpnlen;
     }
 
-    if (SSL_select_next_proto((unsigned char **)out, outlen, alpn, alpnlen,
-                              in, inlen) != OPENSSL_NPN_NEGOTIATED)
+    if (SSL_select_next_proto((unsigned char **)out, outlen, alpn, alpnlen, in,
+                              inlen)
+        != OPENSSL_NPN_NEGOTIATED)
         return SSL_TLSEXT_ERR_ALERT_FATAL;
 
     return SSL_TLSEXT_ERR_OK;
@@ -97,17 +97,19 @@ QUIC_TSERVER *ossl_quic_tserver_new(const QUIC_TSERVER_ARGS *args,
     if (args->ctx != NULL)
         srv->ctx = args->ctx;
     else
-        srv->ctx = SSL_CTX_new_ex(srv->args.libctx, srv->args.propq,
-                                  TLS_method());
+        srv->ctx =
+            SSL_CTX_new_ex(srv->args.libctx, srv->args.propq, TLS_method());
     if (srv->ctx == NULL)
         goto err;
 
     if (certfile != NULL
-            && SSL_CTX_use_certificate_file(srv->ctx, certfile, SSL_FILETYPE_PEM) <= 0)
+        && SSL_CTX_use_certificate_file(srv->ctx, certfile, SSL_FILETYPE_PEM)
+            <= 0)
         goto err;
 
     if (keyfile != NULL
-            && SSL_CTX_use_PrivateKey_file(srv->ctx, keyfile, SSL_FILETYPE_PEM) <= 0)
+        && SSL_CTX_use_PrivateKey_file(srv->ctx, keyfile, SSL_FILETYPE_PEM)
+            <= 0)
         goto err;
 
     SSL_CTX_set_alpn_select_cb(srv->ctx, alpn_select_cb, srv);
@@ -116,9 +118,9 @@ QUIC_TSERVER *ossl_quic_tserver_new(const QUIC_TSERVER_ARGS *args,
     if (srv->tls == NULL)
         goto err;
 
-    engine_args.libctx          = srv->args.libctx;
-    engine_args.propq           = srv->args.propq;
-    engine_args.mutex           = srv->mutex;
+    engine_args.libctx = srv->args.libctx;
+    engine_args.propq = srv->args.propq;
+    engine_args.mutex = srv->mutex;
 
     if ((srv->engine = ossl_quic_engine_new(&engine_args)) == NULL)
         goto err;
@@ -126,10 +128,11 @@ QUIC_TSERVER *ossl_quic_tserver_new(const QUIC_TSERVER_ARGS *args,
     ossl_quic_engine_set_time_cb(srv->engine, srv->args.now_cb,
                                  srv->args.now_cb_arg);
 
-    port_args.channel_ctx       = srv->ctx;
-    port_args.is_multi_conn     = 1;
+    port_args.channel_ctx = srv->ctx;
+    port_args.is_multi_conn = 1;
     port_args.do_addr_validation = 1;
-    if ((srv->port = ossl_quic_engine_create_port(srv->engine, &port_args)) == NULL)
+    if ((srv->port = ossl_quic_engine_create_port(srv->engine, &port_args))
+        == NULL)
         goto err;
 
     if ((srv->ch = ossl_quic_port_create_incoming(srv->port, srv->tls)) == NULL)
@@ -186,24 +189,22 @@ void ossl_quic_tserver_free(QUIC_TSERVER *srv)
 }
 
 /* Set mutator callbacks for test framework support */
-int ossl_quic_tserver_set_plain_packet_mutator(QUIC_TSERVER *srv,
-                                               ossl_mutate_packet_cb mutatecb,
-                                               ossl_finish_mutate_cb finishmutatecb,
-                                               void *mutatearg)
+int ossl_quic_tserver_set_plain_packet_mutator(
+    QUIC_TSERVER *srv, ossl_mutate_packet_cb mutatecb,
+    ossl_finish_mutate_cb finishmutatecb, void *mutatearg)
 {
     return ossl_quic_channel_set_mutator(srv->ch, mutatecb, finishmutatecb,
                                          mutatearg);
 }
 
-int ossl_quic_tserver_set_handshake_mutator(QUIC_TSERVER *srv,
-                                            ossl_statem_mutate_handshake_cb mutate_handshake_cb,
-                                            ossl_statem_finish_mutate_handshake_cb finish_mutate_handshake_cb,
-                                            void *mutatearg)
+int ossl_quic_tserver_set_handshake_mutator(
+    QUIC_TSERVER *srv, ossl_statem_mutate_handshake_cb mutate_handshake_cb,
+    ossl_statem_finish_mutate_handshake_cb finish_mutate_handshake_cb,
+    void *mutatearg)
 {
     return ossl_statem_set_mutator(ossl_quic_channel_get0_ssl(srv->ch),
                                    mutate_handshake_cb,
-                                   finish_mutate_handshake_cb,
-                                   mutatearg);
+                                   finish_mutate_handshake_cb, mutatearg);
 }
 
 int ossl_quic_tserver_tick(QUIC_TSERVER *srv)
@@ -249,10 +250,8 @@ int ossl_quic_tserver_is_handshake_confirmed(const QUIC_TSERVER *srv)
     return ossl_quic_channel_is_handshake_confirmed(srv->ch);
 }
 
-int ossl_quic_tserver_read(QUIC_TSERVER *srv,
-                           uint64_t stream_id,
-                           unsigned char *buf,
-                           size_t buf_len,
+int ossl_quic_tserver_read(QUIC_TSERVER *srv, uint64_t stream_id,
+                           unsigned char *buf, size_t buf_len,
                            size_t *bytes_read)
 {
     int is_fin = 0;
@@ -261,9 +260,8 @@ int ossl_quic_tserver_read(QUIC_TSERVER *srv,
     qs = ossl_quic_stream_map_get_by_id(ossl_quic_channel_get_qsm(srv->ch),
                                         stream_id);
     if (qs == NULL) {
-        int is_client_init
-            = ((stream_id & QUIC_STREAM_INITIATOR_MASK)
-               == QUIC_STREAM_INITIATOR_CLIENT);
+        int is_client_init = ((stream_id & QUIC_STREAM_INITIATOR_MASK)
+                              == QUIC_STREAM_INITIATOR_CLIENT);
 
         /*
          * A client-initiated stream might spontaneously come into existence, so
@@ -282,8 +280,7 @@ int ossl_quic_tserver_read(QUIC_TSERVER *srv,
         || !ossl_quic_stream_has_recv_buffer(qs))
         return 0;
 
-    if (!ossl_quic_rstream_read(qs->rstream, buf, buf_len,
-                                bytes_read, &is_fin))
+    if (!ossl_quic_rstream_read(qs->rstream, buf, buf_len, bytes_read, &is_fin))
         return 0;
 
     if (*bytes_read > 0) {
@@ -295,7 +292,8 @@ int ossl_quic_tserver_read(QUIC_TSERVER *srv,
          */
         OSSL_RTT_INFO rtt_info;
 
-        ossl_statm_get_rtt_info(ossl_quic_channel_get_statm(srv->ch), &rtt_info);
+        ossl_statm_get_rtt_info(ossl_quic_channel_get_statm(srv->ch),
+                                &rtt_info);
 
         if (!ossl_quic_rxfc_on_retire(&qs->rxfc, *bytes_read,
                                       rtt_info.smoothed_rtt))
@@ -303,11 +301,12 @@ int ossl_quic_tserver_read(QUIC_TSERVER *srv,
     }
 
     if (is_fin)
-        ossl_quic_stream_map_notify_totally_read(ossl_quic_channel_get_qsm(srv->ch),
-                                                 qs);
+        ossl_quic_stream_map_notify_totally_read(
+            ossl_quic_channel_get_qsm(srv->ch), qs);
 
     if (*bytes_read > 0)
-        ossl_quic_stream_map_update_state(ossl_quic_channel_get_qsm(srv->ch), qs);
+        ossl_quic_stream_map_update_state(ossl_quic_channel_get_qsm(srv->ch),
+                                          qs);
 
     return 1;
 }
@@ -337,33 +336,32 @@ int ossl_quic_tserver_has_read_ended(QUIC_TSERVER *srv, uint64_t stream_id)
      * the RSTREAM, for example because ossl_quic_tserver_read() has not been
      * called since the FIN was received.
      */
-    if (!ossl_quic_rstream_peek(qs->rstream, buf, sizeof(buf),
-                                &bytes_read, &is_fin))
+    if (!ossl_quic_rstream_peek(qs->rstream, buf, sizeof(buf), &bytes_read,
+                                &is_fin))
         return 0;
 
     if (is_fin && bytes_read == 0) {
         /* If we have a FIN awaiting retirement and no data before it... */
         /* Let RSTREAM know we've consumed this FIN. */
-        if (!ossl_quic_rstream_read(qs->rstream, buf, sizeof(buf),
-                                    &bytes_read, &is_fin))
+        if (!ossl_quic_rstream_read(qs->rstream, buf, sizeof(buf), &bytes_read,
+                                    &is_fin))
             return 0;
 
         assert(is_fin && bytes_read == 0);
         assert(qs->recv_state == QUIC_RSTREAM_STATE_DATA_RECVD);
 
-        ossl_quic_stream_map_notify_totally_read(ossl_quic_channel_get_qsm(srv->ch),
-                                                 qs);
-        ossl_quic_stream_map_update_state(ossl_quic_channel_get_qsm(srv->ch), qs);
+        ossl_quic_stream_map_notify_totally_read(
+            ossl_quic_channel_get_qsm(srv->ch), qs);
+        ossl_quic_stream_map_update_state(ossl_quic_channel_get_qsm(srv->ch),
+                                          qs);
         return 1;
     }
 
     return 0;
 }
 
-int ossl_quic_tserver_write(QUIC_TSERVER *srv,
-                            uint64_t stream_id,
-                            const unsigned char *buf,
-                            size_t buf_len,
+int ossl_quic_tserver_write(QUIC_TSERVER *srv, uint64_t stream_id,
+                            const unsigned char *buf, size_t buf_len,
                             size_t *bytes_written)
 {
     QUIC_STREAM *qs;
@@ -376,8 +374,7 @@ int ossl_quic_tserver_write(QUIC_TSERVER *srv,
     if (qs == NULL || !ossl_quic_stream_has_send_buffer(qs))
         return 0;
 
-    if (!ossl_quic_sstream_append(qs->sstream,
-                                  buf, buf_len, bytes_written))
+    if (!ossl_quic_sstream_append(qs->sstream, buf, buf_len, bytes_written))
         return 0;
 
     if (*bytes_written > 0)
@@ -385,7 +382,8 @@ int ossl_quic_tserver_write(QUIC_TSERVER *srv,
          * We have appended at least one byte to the stream. Potentially mark
          * the stream as active, depending on FC.
          */
-        ossl_quic_stream_map_update_state(ossl_quic_channel_get_qsm(srv->ch), qs);
+        ossl_quic_stream_map_update_state(ossl_quic_channel_get_qsm(srv->ch),
+                                          qs);
 
     /* Try and send. */
     ossl_quic_tserver_tick(srv);
@@ -406,15 +404,15 @@ int ossl_quic_tserver_conclude(QUIC_TSERVER *srv, uint64_t stream_id)
 
     if (!ossl_quic_sstream_get_final_size(qs->sstream, NULL)) {
         ossl_quic_sstream_fin(qs->sstream);
-        ossl_quic_stream_map_update_state(ossl_quic_channel_get_qsm(srv->ch), qs);
+        ossl_quic_stream_map_update_state(ossl_quic_channel_get_qsm(srv->ch),
+                                          qs);
     }
 
     ossl_quic_tserver_tick(srv);
     return 1;
 }
 
-int ossl_quic_tserver_stream_new(QUIC_TSERVER *srv,
-                                 int is_uni,
+int ossl_quic_tserver_stream_new(QUIC_TSERVER *srv, int is_uni,
                                  uint64_t *stream_id)
 {
     QUIC_STREAM *qs;
@@ -458,7 +456,7 @@ int ossl_quic_tserver_stream_has_peer_stop_sending(QUIC_TSERVER *srv,
 
 int ossl_quic_tserver_stream_has_peer_reset_stream(QUIC_TSERVER *srv,
                                                    uint64_t stream_id,
-                                                   uint64_t  *app_error_code)
+                                                   uint64_t *app_error_code)
 {
     QUIC_STREAM *qs;
 
@@ -509,19 +507,19 @@ int ossl_quic_tserver_is_stream_totally_acked(QUIC_TSERVER *srv,
 int ossl_quic_tserver_get_net_read_desired(QUIC_TSERVER *srv)
 {
     return ossl_quic_reactor_net_read_desired(
-                ossl_quic_channel_get_reactor(srv->ch));
+        ossl_quic_channel_get_reactor(srv->ch));
 }
 
 int ossl_quic_tserver_get_net_write_desired(QUIC_TSERVER *srv)
 {
     return ossl_quic_reactor_net_write_desired(
-                ossl_quic_channel_get_reactor(srv->ch));
+        ossl_quic_channel_get_reactor(srv->ch));
 }
 
 OSSL_TIME ossl_quic_tserver_get_deadline(QUIC_TSERVER *srv)
 {
     return ossl_quic_reactor_get_tick_deadline(
-                ossl_quic_channel_get_reactor(srv->ch));
+        ossl_quic_channel_get_reactor(srv->ch));
 }
 
 int ossl_quic_tserver_shutdown(QUIC_TSERVER *srv, uint64_t app_error_code)

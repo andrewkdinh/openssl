@@ -80,8 +80,7 @@ BIGNUM *BN_mod_sqrt(BIGNUM *in, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
 
     /* now write  |p| - 1  as  2^e*q  where  q  is odd */
     e = 1;
-    while (!BN_is_bit_set(p, e))
-        e++;
+    while (!BN_is_bit_set(p, e)) e++;
     /* we'll set  q  later (if needed) */
 
     if (e == 1) {
@@ -186,7 +185,7 @@ BIGNUM *BN_mod_sqrt(BIGNUM *in, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
             if (!BN_priv_rand_ex(y, BN_num_bits(p), 0, 0, 0, ctx))
                 goto end;
             if (BN_ucmp(y, p) >= 0) {
-                if (!(p->neg ? BN_add : BN_sub) (y, y, p))
+                if (!(p->neg ? BN_add : BN_sub)(y, y, p))
                     goto end;
             }
             /* now 0 <= y < |p| */
@@ -203,8 +202,7 @@ BIGNUM *BN_mod_sqrt(BIGNUM *in, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
             ERR_raise(ERR_LIB_BN, BN_R_P_IS_NOT_PRIME);
             goto end;
         }
-    }
-    while (r == 1 && ++i < 82);
+    } while (r == 1 && ++i < 82);
 
     if (r != -1) {
         /*
@@ -339,7 +337,7 @@ BIGNUM *BN_mod_sqrt(BIGNUM *in, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
         e = i;
     }
 
- vrfy:
+vrfy:
     if (!err) {
         /*
          * verify the result -- the input might have been not a square (test
@@ -355,7 +353,7 @@ BIGNUM *BN_mod_sqrt(BIGNUM *in, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
         }
     }
 
- end:
+end:
     if (err) {
         if (ret != in)
             BN_clear_free(ret);

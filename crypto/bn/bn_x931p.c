@@ -50,10 +50,9 @@ static int bn_x931_derive_pi(BIGNUM *pi, const BIGNUM *Xpi, BN_CTX *ctx,
  * will be returned too: this is needed for testing.
  */
 
-int BN_X931_derive_prime_ex(BIGNUM *p, BIGNUM *p1, BIGNUM *p2,
-                            const BIGNUM *Xp, const BIGNUM *Xp1,
-                            const BIGNUM *Xp2, const BIGNUM *e, BN_CTX *ctx,
-                            BN_GENCB *cb)
+int BN_X931_derive_prime_ex(BIGNUM *p, BIGNUM *p1, BIGNUM *p2, const BIGNUM *Xp,
+                            const BIGNUM *Xp1, const BIGNUM *Xp2,
+                            const BIGNUM *e, BN_CTX *ctx, BN_GENCB *cb)
 {
     int ret = 0;
 
@@ -147,7 +146,7 @@ int BN_X931_derive_prime_ex(BIGNUM *p, BIGNUM *p1, BIGNUM *p2,
 
     ret = 1;
 
- err:
+err:
 
     BN_CTX_end(ctx);
 
@@ -203,7 +202,7 @@ int BN_X931_generate_Xpq(BIGNUM *Xp, BIGNUM *Xq, int nbits, BN_CTX *ctx)
 
     return 0;
 
- err:
+err:
     BN_CTX_end(ctx);
     return 0;
 }
@@ -216,10 +215,9 @@ int BN_X931_generate_Xpq(BIGNUM *Xp, BIGNUM *Xq, int nbits, BN_CTX *ctx)
  * previous function and supplied as input.
  */
 
-int BN_X931_generate_prime_ex(BIGNUM *p, BIGNUM *p1, BIGNUM *p2,
-                              BIGNUM *Xp1, BIGNUM *Xp2,
-                              const BIGNUM *Xp,
-                              const BIGNUM *e, BN_CTX *ctx, BN_GENCB *cb)
+int BN_X931_generate_prime_ex(BIGNUM *p, BIGNUM *p1, BIGNUM *p2, BIGNUM *Xp1,
+                              BIGNUM *Xp2, const BIGNUM *Xp, const BIGNUM *e,
+                              BN_CTX *ctx, BN_GENCB *cb)
 {
     int ret = 0;
 
@@ -240,9 +238,8 @@ int BN_X931_generate_prime_ex(BIGNUM *p, BIGNUM *p1, BIGNUM *p2,
 
     ret = 1;
 
- error:
+error:
     BN_CTX_end(ctx);
 
     return ret;
-
 }

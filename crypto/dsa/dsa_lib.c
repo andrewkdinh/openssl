@@ -75,7 +75,7 @@ DH *DSA_dup_DH(const DSA *r)
 
     return ret;
 
- err:
+err:
     BN_free(pub_key);
     BN_free(priv_key);
     DH_free(ret);
@@ -113,17 +113,16 @@ int DSA_set_method(DSA *dsa, const DSA_METHOD *meth)
     mtmp = dsa->meth;
     if (mtmp->finish)
         mtmp->finish(dsa);
-#ifndef OPENSSL_NO_ENGINE
+# ifndef OPENSSL_NO_ENGINE
     ENGINE_finish(dsa->engine);
     dsa->engine = NULL;
-#endif
+# endif
     dsa->meth = meth;
     if (meth->init)
         meth->init(dsa);
     return 1;
 }
 #endif /* FIPS_MODULE */
-
 
 const DSA_METHOD *DSA_get_method(DSA *d)
 {
@@ -153,7 +152,8 @@ static DSA *dsa_new_intern(ENGINE *engine, OSSL_LIB_CTX *libctx)
     ret->libctx = libctx;
     ret->meth = DSA_get_default_method();
 #if !defined(FIPS_MODULE) && !defined(OPENSSL_NO_ENGINE)
-    ret->flags = ret->meth->flags & ~DSA_FLAG_NON_FIPS_ALLOW; /* early default init */
+    ret->flags =
+        ret->meth->flags & ~DSA_FLAG_NON_FIPS_ALLOW; /* early default init */
     if (engine) {
         if (!ENGINE_init(engine)) {
             ERR_raise(ERR_LIB_DSA, ERR_R_ENGINE_LIB);
@@ -188,7 +188,7 @@ static DSA *dsa_new_intern(ENGINE *engine, OSSL_LIB_CTX *libctx)
 
     return ret;
 
- err:
+err:
     DSA_free(ret);
     return NULL;
 }
@@ -259,8 +259,8 @@ void ossl_dsa_set0_libctx(DSA *d, OSSL_LIB_CTX *libctx)
     d->libctx = libctx;
 }
 
-void DSA_get0_pqg(const DSA *d,
-                  const BIGNUM **p, const BIGNUM **q, const BIGNUM **g)
+void DSA_get0_pqg(const DSA *d, const BIGNUM **p, const BIGNUM **q,
+                  const BIGNUM **g)
 {
     ossl_ffc_params_get0_pqg(&d->params, p, q, g);
 }
@@ -270,8 +270,7 @@ int DSA_set0_pqg(DSA *d, BIGNUM *p, BIGNUM *q, BIGNUM *g)
     /* If the fields p, q and g in d are NULL, the corresponding input
      * parameters MUST be non-NULL.
      */
-    if ((d->params.p == NULL && p == NULL)
-        || (d->params.q == NULL && q == NULL)
+    if ((d->params.p == NULL && p == NULL) || (d->params.q == NULL && q == NULL)
         || (d->params.g == NULL && g == NULL))
         return 0;
 
@@ -306,8 +305,7 @@ const BIGNUM *DSA_get0_priv_key(const DSA *d)
     return d->priv_key;
 }
 
-void DSA_get0_key(const DSA *d,
-                  const BIGNUM **pub_key, const BIGNUM **priv_key)
+void DSA_get0_key(const DSA *d, const BIGNUM **pub_key, const BIGNUM **priv_key)
 {
     if (pub_key != NULL)
         *pub_key = d->pub_key;

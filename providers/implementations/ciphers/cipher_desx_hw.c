@@ -61,17 +61,13 @@ static int cipher_hw_desx_cbc(PROV_CIPHER_CTX *ctx, unsigned char *out,
         out += MAXCHUNK;
     }
     if (inl > 0)
-        DES_xcbc_encrypt(in, out, (long)inl, &tctx->ks1,
-                         (DES_cblock *)ctx->iv, &tctx->ks2, &tctx->ks3,
-                         ctx->enc);
+        DES_xcbc_encrypt(in, out, (long)inl, &tctx->ks1, (DES_cblock *)ctx->iv,
+                         &tctx->ks2, &tctx->ks3, ctx->enc);
     return 1;
 }
 
 static const PROV_CIPHER_HW desx_cbc = {
-    cipher_hw_desx_cbc_initkey,
-    cipher_hw_desx_cbc,
-    cipher_hw_desx_copyctx
-};
+    cipher_hw_desx_cbc_initkey, cipher_hw_desx_cbc, cipher_hw_desx_copyctx};
 
 const PROV_CIPHER_HW *ossl_prov_cipher_hw_tdes_desx_cbc(void)
 {

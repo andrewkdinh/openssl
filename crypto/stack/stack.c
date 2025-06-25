@@ -22,7 +22,8 @@ OSSL_SAFE_MATH_SIGNED(int, int)
  */
 static const int min_nodes = 4;
 static const int max_nodes = SIZE_MAX / sizeof(void *) < INT_MAX
-    ? (int)(SIZE_MAX / sizeof(void *)) : INT_MAX;
+    ? (int)(SIZE_MAX / sizeof(void *))
+    : INT_MAX;
 
 struct stack_st {
     int num;
@@ -75,7 +76,7 @@ OPENSSL_STACK *OPENSSL_sk_dup(const OPENSSL_STACK *sk)
     memcpy(ret->data, sk->data, sizeof(void *) * sk->num);
     return ret;
 
- err:
+err:
     OPENSSL_sk_free(ret);
     return NULL;
 }
@@ -123,7 +124,7 @@ OPENSSL_STACK *OPENSSL_sk_deep_copy(const OPENSSL_STACK *sk,
     }
     return ret;
 
- err:
+err:
     OPENSSL_sk_free(ret);
     return NULL;
 }
@@ -256,7 +257,8 @@ int OPENSSL_sk_reserve(OPENSSL_STACK *st, int n)
     return sk_reserve(st, n, 1);
 }
 
-OPENSSL_STACK *OPENSSL_sk_set_thunks(OPENSSL_STACK *st, OPENSSL_sk_freefunc_thunk f_thunk)
+OPENSSL_STACK *OPENSSL_sk_set_thunks(OPENSSL_STACK *st,
+                                     OPENSSL_sk_freefunc_thunk f_thunk)
 {
     if (st != NULL)
         st->free_thunk = f_thunk;
@@ -482,8 +484,8 @@ void *OPENSSL_sk_set(OPENSSL_STACK *st, int i, const void *data)
         return NULL;
     }
     if (i < 0 || i >= st->num) {
-        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_PASSED_INVALID_ARGUMENT,
-                       "i=%d", i);
+        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_PASSED_INVALID_ARGUMENT, "i=%d",
+                       i);
         return NULL;
     }
     st->data[i] = data;

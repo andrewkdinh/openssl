@@ -30,9 +30,9 @@
 # define PATH_MAX 4096
 #endif
 
-# if !defined(S_ISREG)
-#   define S_ISREG(m) ((m) & S_IFREG)
-# endif
+#if !defined(S_ISREG)
+# define S_ISREG(m) ((m) & S_IFREG)
+#endif
 
 static void testfile(const char *pathname)
 {
@@ -58,7 +58,8 @@ static void testfile(const char *pathname)
     fclose(f);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     int n;
 
     FuzzerInitialize(&argc, &argv);

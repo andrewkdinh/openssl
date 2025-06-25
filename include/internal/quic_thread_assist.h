@@ -8,17 +8,17 @@
  */
 
 #ifndef OSSL_QUIC_THREAD_ASSIST_H
-# define OSSL_QUIC_THREAD_ASSIST_H
+#define OSSL_QUIC_THREAD_ASSIST_H
 
-# include <openssl/ssl.h>
-# include "internal/thread.h"
-# include "internal/time.h"
+#include <openssl/ssl.h>
+#include "internal/thread.h"
+#include "internal/time.h"
 
-# if defined(OPENSSL_NO_QUIC) || defined(OPENSSL_NO_THREAD_POOL)
-#  define OPENSSL_NO_QUIC_THREAD_ASSIST
-# endif
+#if defined(OPENSSL_NO_QUIC) || defined(OPENSSL_NO_THREAD_POOL)
+# define OPENSSL_NO_QUIC_THREAD_ASSIST
+#endif
 
-# ifndef OPENSSL_NO_QUIC_THREAD_ASSIST
+#ifndef OPENSSL_NO_QUIC_THREAD_ASSIST
 
 /*
  * QUIC Thread Assisted Functionality
@@ -93,6 +93,6 @@ int ossl_quic_thread_assist_cleanup(QUIC_THREAD_ASSIST *qta);
  */
 int ossl_quic_thread_assist_notify_deadline_changed(QUIC_THREAD_ASSIST *qta);
 
-# endif
+#endif
 
 #endif

@@ -8,10 +8,10 @@
  */
 
 #ifndef OSSL_INTERNAL_RECORDMETHOD_H
-# define OSSL_INTERNAL_RECORDMETHOD_H
-# pragma once
+#define OSSL_INTERNAL_RECORDMETHOD_H
+#pragma once
 
-# include <openssl/ssl.h>
+#include <openssl/ssl.h>
 
 /*
  * We use the term "record" here to refer to a packet of data. Records are
@@ -36,18 +36,17 @@ typedef struct ossl_record_method_st OSSL_RECORD_METHOD;
  */
 typedef struct ossl_record_layer_st OSSL_RECORD_LAYER;
 
+#define OSSL_RECORD_ROLE_CLIENT 0
+#define OSSL_RECORD_ROLE_SERVER 1
 
-# define OSSL_RECORD_ROLE_CLIENT 0
-# define OSSL_RECORD_ROLE_SERVER 1
+#define OSSL_RECORD_DIRECTION_READ  0
+#define OSSL_RECORD_DIRECTION_WRITE 1
 
-# define OSSL_RECORD_DIRECTION_READ  0
-# define OSSL_RECORD_DIRECTION_WRITE 1
-
-# define OSSL_RECORD_RETURN_SUCCESS           1
-# define OSSL_RECORD_RETURN_RETRY             0
-# define OSSL_RECORD_RETURN_NON_FATAL_ERR    -1
-# define OSSL_RECORD_RETURN_FATAL            -2
-# define OSSL_RECORD_RETURN_EOF              -3
+#define OSSL_RECORD_RETURN_SUCCESS           1
+#define OSSL_RECORD_RETURN_RETRY             0
+#define OSSL_RECORD_RETURN_NON_FATAL_ERR    -1
+#define OSSL_RECORD_RETURN_FATAL            -2
+#define OSSL_RECORD_RETURN_EOF              -3
 
 /*
  * Template for creating a record. A record consists of the |type| of data it
@@ -111,36 +110,16 @@ struct ossl_record_method_st {
      * other than EVP_CIPHER. Also mactype would not be a NID, but a string. For
      * now though, this works.
      */
-    int (*new_record_layer)(OSSL_LIB_CTX *libctx,
-                            const char *propq, int vers,
-                            int role, int direction,
-                            int level,
-                            uint16_t epoch,
-                            unsigned char *secret,
-                            size_t secretlen,
-                            unsigned char *key,
-                            size_t keylen,
-                            unsigned char *iv,
-                            size_t ivlen,
-                            unsigned char *mackey,
-                            size_t mackeylen,
-                            const EVP_CIPHER *ciph,
-                            size_t taglen,
-                            int mactype,
-                            const EVP_MD *md,
-                            COMP_METHOD *comp,
-                            const EVP_MD *kdfdigest,
-                            BIO *prev,
-                            BIO *transport,
-                            BIO *next,
-                            BIO_ADDR *local,
-                            BIO_ADDR *peer,
-                            const OSSL_PARAM *settings,
-                            const OSSL_PARAM *options,
-                            const OSSL_DISPATCH *fns,
-                            void *cbarg,
-                            void *rlarg,
-                            OSSL_RECORD_LAYER **ret);
+    int (*new_record_layer)(
+        OSSL_LIB_CTX *libctx, const char *propq, int vers, int role,
+        int direction, int level, uint16_t epoch, unsigned char *secret,
+        size_t secretlen, unsigned char *key, size_t keylen, unsigned char *iv,
+        size_t ivlen, unsigned char *mackey, size_t mackeylen,
+        const EVP_CIPHER *ciph, size_t taglen, int mactype, const EVP_MD *md,
+        COMP_METHOD *comp, const EVP_MD *kdfdigest, BIO *prev, BIO *transport,
+        BIO *next, BIO_ADDR *local, BIO_ADDR *peer, const OSSL_PARAM *settings,
+        const OSSL_PARAM *options, const OSSL_DISPATCH *fns, void *cbarg,
+        void *rlarg, OSSL_RECORD_LAYER **ret);
     int (*free)(OSSL_RECORD_LAYER *rl);
 
     /* Returns 1 if we have unprocessed data buffered or 0 otherwise */
@@ -224,15 +203,17 @@ struct ossl_record_method_st {
      * multiple records in one go and buffer them.
      */
     int (*read_record)(OSSL_RECORD_LAYER *rl, void **rechandle, int *rversion,
-                      uint8_t *type, const unsigned char **data, size_t *datalen,
-                      uint16_t *epoch, unsigned char *seq_num);
+                       uint8_t *type, const unsigned char **data,
+                       size_t *datalen, uint16_t *epoch,
+                       unsigned char *seq_num);
     /*
      * Release length bytes from a buffer associated with a record previously
      * read with read_record. Once all the bytes from a record are released, the
      * whole record and its associated buffer is released. Records are
      * guaranteed to be released in the order that they are read.
      */
-    int (*release_record)(OSSL_RECORD_LAYER *rl, void *rechandle, size_t length);
+    int (*release_record)(OSSL_RECORD_LAYER *rl, void *rechandle,
+                          size_t length);
 
     /*
      * In the event that a fatal error is returned from the functions above then
@@ -320,12 +301,11 @@ struct ossl_record_method_st {
     int (*free_buffers)(OSSL_RECORD_LAYER *rl);
 };
 
-
 /* Standard built-in record methods */
 extern const OSSL_RECORD_METHOD ossl_tls_record_method;
-# ifndef OPENSSL_NO_KTLS
+#ifndef OPENSSL_NO_KTLS
 extern const OSSL_RECORD_METHOD ossl_ktls_record_method;
-# endif
+#endif
 extern const OSSL_RECORD_METHOD ossl_dtls_record_method;
 
 #endif /* !defined(OSSL_INTERNAL_RECORDMETHOD_H) */

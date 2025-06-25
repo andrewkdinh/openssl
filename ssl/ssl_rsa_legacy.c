@@ -70,9 +70,9 @@ int SSL_use_RSAPrivateKey_file(SSL *ssl, const char *file, int type)
         rsa = d2i_RSAPrivateKey_bio(in, NULL);
     } else if (type == SSL_FILETYPE_PEM) {
         j = ERR_R_PEM_LIB;
-        rsa = PEM_read_bio_RSAPrivateKey(in, NULL,
-                                         SSL_get_default_passwd_cb(ssl),
-                                         SSL_get_default_passwd_cb_userdata(ssl));
+        rsa =
+            PEM_read_bio_RSAPrivateKey(in, NULL, SSL_get_default_passwd_cb(ssl),
+                                       SSL_get_default_passwd_cb_userdata(ssl));
     } else {
         ERR_raise(ERR_LIB_SSL, SSL_R_BAD_SSL_FILETYPE);
         goto end;
@@ -83,7 +83,7 @@ int SSL_use_RSAPrivateKey_file(SSL *ssl, const char *file, int type)
     }
     ret = SSL_use_RSAPrivateKey(ssl, rsa);
     RSA_free(rsa);
- end:
+end:
     BIO_free(in);
     return ret;
 }
@@ -161,9 +161,9 @@ int SSL_CTX_use_RSAPrivateKey_file(SSL_CTX *ctx, const char *file, int type)
         rsa = d2i_RSAPrivateKey_bio(in, NULL);
     } else if (type == SSL_FILETYPE_PEM) {
         j = ERR_R_PEM_LIB;
-        rsa = PEM_read_bio_RSAPrivateKey(in, NULL,
-                                         SSL_CTX_get_default_passwd_cb(ctx),
-                                         SSL_CTX_get_default_passwd_cb_userdata(ctx));
+        rsa = PEM_read_bio_RSAPrivateKey(
+            in, NULL, SSL_CTX_get_default_passwd_cb(ctx),
+            SSL_CTX_get_default_passwd_cb_userdata(ctx));
     } else {
         ERR_raise(ERR_LIB_SSL, SSL_R_BAD_SSL_FILETYPE);
         goto end;
@@ -174,7 +174,7 @@ int SSL_CTX_use_RSAPrivateKey_file(SSL_CTX *ctx, const char *file, int type)
     }
     ret = SSL_CTX_use_RSAPrivateKey(ctx, rsa);
     RSA_free(rsa);
- end:
+end:
     BIO_free(in);
     return ret;
 }

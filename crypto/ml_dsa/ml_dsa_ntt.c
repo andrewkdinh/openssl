@@ -76,8 +76,7 @@ static const uint32_t zetas_montgomery[256] = {
     5341501, 3523897, 3866901, 269760,  2213111, 7404533, 1717735, 472078,
     7953734, 1723600, 6577327, 1910376, 6712985, 7276084, 8119771, 4546524,
     5441381, 6144432, 7959518, 6094090, 183443,  7403526, 1612842, 4834730,
-    7826001, 3919660, 8332111, 7018208, 3937738, 1400424, 7534263, 1976782
-};
+    7826001, 3919660, 8332111, 7018208, 3937738, 1400424, 7534263, 1976782};
 
 /*
  * @brief When multiplying 2 numbers mod q that are in montgomery form, the
@@ -113,8 +112,8 @@ void ossl_ml_dsa_poly_ntt_mult(const POLY *lhs, const POLY *rhs, POLY *out)
     int i;
 
     for (i = 0; i < ML_DSA_NUM_POLY_COEFFICIENTS; i++)
-        out->coeff[i] =
-            reduce_montgomery((uint64_t)lhs->coeff[i] * (uint64_t)rhs->coeff[i]);
+        out->coeff[i] = reduce_montgomery((uint64_t)lhs->coeff[i]
+                                          * (uint64_t)rhs->coeff[i]);
 }
 
 /*
@@ -141,9 +140,8 @@ void ossl_ml_dsa_poly_ntt(POLY *p)
 
             for (j = k; j < k + offset; j++) {
                 uint32_t w_even = p->coeff[j];
-                uint32_t t_odd =
-                    reduce_montgomery((uint64_t)z_step_root
-                                      * (uint64_t)p->coeff[j + offset]);
+                uint32_t t_odd = reduce_montgomery(
+                    (uint64_t)z_step_root * (uint64_t)p->coeff[j + offset]);
 
                 p->coeff[j] = reduce_once(w_even + t_odd);
                 p->coeff[j + offset] = mod_sub(w_even, t_odd);
@@ -185,14 +183,13 @@ void ossl_ml_dsa_poly_ntt_inverse(POLY *p)
                 uint32_t odd = p->coeff[j + offset];
 
                 p->coeff[j] = reduce_once(odd + even);
-                p->coeff[j + offset] =
-                    reduce_montgomery((uint64_t)step_root
-                                      * (uint64_t)(ML_DSA_Q + even - odd));
+                p->coeff[j + offset] = reduce_montgomery(
+                    (uint64_t)step_root * (uint64_t)(ML_DSA_Q + even - odd));
             }
             k += 2 * offset;
         }
     }
     for (i = 0; i < ML_DSA_NUM_POLY_COEFFICIENTS; i++)
-        p->coeff[i] = reduce_montgomery((uint64_t)p->coeff[i] *
-                                        (uint64_t)inverse_degree_montgomery);
+        p->coeff[i] = reduce_montgomery((uint64_t)p->coeff[i]
+                                        * (uint64_t)inverse_degree_montgomery);
 }

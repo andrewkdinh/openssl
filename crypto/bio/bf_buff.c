@@ -23,18 +23,9 @@ static long buffer_callback_ctrl(BIO *h, int cmd, BIO_info_cb *fp);
 #define DEFAULT_BUFFER_SIZE     4096
 
 static const BIO_METHOD methods_buffer = {
-    BIO_TYPE_BUFFER,
-    "buffer",
-    bwrite_conv,
-    buffer_write,
-    bread_conv,
-    buffer_read,
-    buffer_puts,
-    buffer_gets,
-    buffer_ctrl,
-    buffer_new,
-    buffer_free,
-    buffer_callback_ctrl,
+    BIO_TYPE_BUFFER, "buffer",    bwrite_conv, buffer_write,
+    bread_conv,      buffer_read, buffer_puts, buffer_gets,
+    buffer_ctrl,     buffer_new,  buffer_free, buffer_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_buffer(void)
@@ -98,7 +89,7 @@ static int buffer_read(BIO *b, char *out, int outl)
     num = 0;
     BIO_clear_retry_flags(b);
 
- start:
+start:
     i = ctx->ibuf_len;
     /* If there is stuff left over, grab it */
     if (i != 0) {
@@ -167,7 +158,7 @@ static int buffer_write(BIO *b, const char *in, int inl)
         return 0;
 
     BIO_clear_retry_flags(b);
- start:
+start:
     i = ctx->obuf_size - (ctx->obuf_len + ctx->obuf_off);
     /* add to buffer and return */
     if (i >= inl) {
@@ -367,8 +358,8 @@ static long buffer_ctrl(BIO *b, int cmd, long num, void *ptr)
         for (;;) {
             BIO_clear_retry_flags(b);
             if (ctx->obuf_len > 0) {
-                r = BIO_write(b->next_bio,
-                              &(ctx->obuf[ctx->obuf_off]), ctx->obuf_len);
+                r = BIO_write(b->next_bio, &(ctx->obuf[ctx->obuf_off]),
+                              ctx->obuf_len);
                 BIO_copy_next_retry(b);
                 if (r <= 0)
                     return (long)r;
@@ -385,8 +376,8 @@ static long buffer_ctrl(BIO *b, int cmd, long num, void *ptr)
         break;
     case BIO_CTRL_DUP:
         dbio = (BIO *)ptr;
-        if (BIO_set_read_buffer_size(dbio, ctx->ibuf_size) <= 0 ||
-            BIO_set_write_buffer_size(dbio, ctx->obuf_size) <= 0)
+        if (BIO_set_read_buffer_size(dbio, ctx->ibuf_size) <= 0
+            || BIO_set_write_buffer_size(dbio, ctx->obuf_size) <= 0)
             ret = 0;
         break;
     case BIO_CTRL_PEEK:

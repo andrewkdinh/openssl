@@ -13,8 +13,7 @@
 #include "prov/bio.h"
 #include "endecoder_local.h"
 
-OSSL_FUNC_keymgmt_new_fn *
-ossl_prov_get_keymgmt_new(const OSSL_DISPATCH *fns)
+OSSL_FUNC_keymgmt_new_fn *ossl_prov_get_keymgmt_new(const OSSL_DISPATCH *fns)
 {
     /* Pilfer the keymgmt dispatch table */
     for (; fns->function_id != 0; fns++)
@@ -24,8 +23,7 @@ ossl_prov_get_keymgmt_new(const OSSL_DISPATCH *fns)
     return NULL;
 }
 
-OSSL_FUNC_keymgmt_free_fn *
-ossl_prov_get_keymgmt_free(const OSSL_DISPATCH *fns)
+OSSL_FUNC_keymgmt_free_fn *ossl_prov_get_keymgmt_free(const OSSL_DISPATCH *fns)
 {
     /* Pilfer the keymgmt dispatch table */
     for (; fns->function_id != 0; fns++)
@@ -84,7 +82,7 @@ void ossl_prov_free_key(const OSSL_DISPATCH *fns, void *key)
         kmgmt_free(key);
 }
 
-int ossl_read_der(PROV_CTX *provctx, OSSL_CORE_BIO *cin,  unsigned char **data,
+int ossl_read_der(PROV_CTX *provctx, OSSL_CORE_BIO *cin, unsigned char **data,
                   long *len)
 {
     BUF_MEM *mem = NULL;

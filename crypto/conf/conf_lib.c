@@ -23,7 +23,7 @@ static CONF_METHOD *default_CONF_method = NULL;
 
 /* Init a 'CONF' structure from an old LHASH */
 
-void CONF_set_nconf(CONF *conf, LHASH_OF(CONF_VALUE) *hash)
+void CONF_set_nconf(CONF *conf, LHASH_OF(CONF_VALUE) * hash)
 {
     if (default_CONF_method == NULL)
         default_CONF_method = NCONF_default();
@@ -43,10 +43,10 @@ int CONF_set_default_method(CONF_METHOD *meth)
     return 1;
 }
 
-LHASH_OF(CONF_VALUE) *CONF_load(LHASH_OF(CONF_VALUE) *conf, const char *file,
-                                long *eline)
+LHASH_OF(CONF_VALUE)
+    * CONF_load(LHASH_OF(CONF_VALUE) * conf, const char *file, long *eline)
 {
-    LHASH_OF(CONF_VALUE) *ltmp;
+    LHASH_OF(CONF_VALUE) * ltmp;
     BIO *in = NULL;
 
 #ifdef OPENSSL_SYS_VMS
@@ -66,11 +66,11 @@ LHASH_OF(CONF_VALUE) *CONF_load(LHASH_OF(CONF_VALUE) *conf, const char *file,
 }
 
 #ifndef OPENSSL_NO_STDIO
-LHASH_OF(CONF_VALUE) *CONF_load_fp(LHASH_OF(CONF_VALUE) *conf, FILE *fp,
-                                   long *eline)
+LHASH_OF(CONF_VALUE)
+    * CONF_load_fp(LHASH_OF(CONF_VALUE) * conf, FILE *fp, long *eline)
 {
     BIO *btmp;
-    LHASH_OF(CONF_VALUE) *ltmp;
+    LHASH_OF(CONF_VALUE) * ltmp;
     if ((btmp = BIO_new_fp(fp, BIO_NOCLOSE)) == NULL) {
         ERR_raise(ERR_LIB_CONF, ERR_R_BUF_LIB);
         return NULL;
@@ -81,8 +81,8 @@ LHASH_OF(CONF_VALUE) *CONF_load_fp(LHASH_OF(CONF_VALUE) *conf, FILE *fp,
 }
 #endif
 
-LHASH_OF(CONF_VALUE) *CONF_load_bio(LHASH_OF(CONF_VALUE) *conf, BIO *bp,
-                                    long *eline)
+LHASH_OF(CONF_VALUE)
+    * CONF_load_bio(LHASH_OF(CONF_VALUE) * conf, BIO *bp, long *eline)
 {
     CONF ctmp;
     int ret;
@@ -95,7 +95,7 @@ LHASH_OF(CONF_VALUE) *CONF_load_bio(LHASH_OF(CONF_VALUE) *conf, BIO *bp,
     return NULL;
 }
 
-STACK_OF(CONF_VALUE) *CONF_get_section(LHASH_OF(CONF_VALUE) *conf,
+STACK_OF(CONF_VALUE) *CONF_get_section(LHASH_OF(CONF_VALUE) * conf,
                                        const char *section)
 {
     if (conf == NULL) {
@@ -108,7 +108,7 @@ STACK_OF(CONF_VALUE) *CONF_get_section(LHASH_OF(CONF_VALUE) *conf,
     }
 }
 
-char *CONF_get_string(LHASH_OF(CONF_VALUE) *conf, const char *group,
+char *CONF_get_string(LHASH_OF(CONF_VALUE) * conf, const char *group,
                       const char *name)
 {
     if (conf == NULL) {
@@ -121,7 +121,7 @@ char *CONF_get_string(LHASH_OF(CONF_VALUE) *conf, const char *group,
     }
 }
 
-long CONF_get_number(LHASH_OF(CONF_VALUE) *conf, const char *group,
+long CONF_get_number(LHASH_OF(CONF_VALUE) * conf, const char *group,
                      const char *name)
 {
     int status;
@@ -140,7 +140,7 @@ long CONF_get_number(LHASH_OF(CONF_VALUE) *conf, const char *group,
     return status == 0 ? 0L : result;
 }
 
-void CONF_free(LHASH_OF(CONF_VALUE) *conf)
+void CONF_free(LHASH_OF(CONF_VALUE) * conf)
 {
     CONF ctmp;
     CONF_set_nconf(&ctmp, conf);
@@ -148,7 +148,7 @@ void CONF_free(LHASH_OF(CONF_VALUE) *conf)
 }
 
 #ifndef OPENSSL_NO_STDIO
-int CONF_dump_fp(LHASH_OF(CONF_VALUE) *conf, FILE *out)
+int CONF_dump_fp(LHASH_OF(CONF_VALUE) * conf, FILE *out)
 {
     BIO *btmp;
     int ret;
@@ -163,7 +163,7 @@ int CONF_dump_fp(LHASH_OF(CONF_VALUE) *conf, FILE *out)
 }
 #endif
 
-int CONF_dump_bio(LHASH_OF(CONF_VALUE) *conf, BIO *out)
+int CONF_dump_bio(LHASH_OF(CONF_VALUE) * conf, BIO *out)
 {
     CONF ctmp;
 
@@ -313,8 +313,8 @@ char *NCONF_get_string(const CONF *conf, const char *group, const char *name)
         ERR_raise(ERR_LIB_CONF, CONF_R_NO_CONF_OR_ENVIRONMENT_VARIABLE);
         return NULL;
     }
-    ERR_raise_data(ERR_LIB_CONF, CONF_R_NO_VALUE,
-                   "group=%s name=%s", group, name);
+    ERR_raise_data(ERR_LIB_CONF, CONF_R_NO_VALUE, "group=%s name=%s", group,
+                   name);
     return NULL;
 }
 
@@ -366,8 +366,7 @@ int NCONF_get_number_e(const CONF *conf, const char *group, const char *name,
     return 1;
 }
 
-long _CONF_get_number(const CONF *conf, const char *section,
-                      const char *name)
+long _CONF_get_number(const CONF *conf, const char *section, const char *name)
 {
     int status;
     long result = 0;
@@ -419,7 +418,6 @@ OPENSSL_INIT_SETTINGS *OPENSSL_INIT_new(void)
 
     return ret;
 }
-
 
 #ifndef OPENSSL_NO_STDIO
 /*

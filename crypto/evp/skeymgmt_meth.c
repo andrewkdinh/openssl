@@ -17,14 +17,17 @@
 #include "crypto/evp.h"
 #include "evp_local.h"
 
-void *evp_skeymgmt_generate(const EVP_SKEYMGMT *skeymgmt, const OSSL_PARAM params[])
+void *evp_skeymgmt_generate(const EVP_SKEYMGMT *skeymgmt,
+                            const OSSL_PARAM params[])
 {
     void *provctx = ossl_provider_ctx(EVP_SKEYMGMT_get0_provider(skeymgmt));
 
-    return (skeymgmt->generate != NULL) ? skeymgmt->generate(provctx, params) : NULL;
+    return (skeymgmt->generate != NULL) ? skeymgmt->generate(provctx, params)
+                                        : NULL;
 }
 
-void *evp_skeymgmt_import(const EVP_SKEYMGMT *skeymgmt, int selection, const OSSL_PARAM params[])
+void *evp_skeymgmt_import(const EVP_SKEYMGMT *skeymgmt, int selection,
+                          const OSSL_PARAM params[])
 {
     void *provctx = ossl_provider_ctx(EVP_SKEYMGMT_get0_provider(skeymgmt));
 
@@ -58,8 +61,7 @@ static void *skeymgmt_new(void)
     return skeymgmt;
 }
 
-static void *skeymgmt_from_algorithm(int name_id,
-                                     const OSSL_ALGORITHM *algodef,
+static void *skeymgmt_from_algorithm(int name_id, const OSSL_ALGORITHM *algodef,
                                      OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
@@ -69,7 +71,8 @@ static void *skeymgmt_from_algorithm(int name_id,
         return NULL;
 
     skeymgmt->name_id = name_id;
-    if ((skeymgmt->type_name = ossl_algorithm_get1_first_name(algodef)) == NULL) {
+    if ((skeymgmt->type_name = ossl_algorithm_get1_first_name(algodef))
+        == NULL) {
         EVP_SKEYMGMT_free(skeymgmt);
         return NULL;
     }
@@ -99,18 +102,19 @@ static void *skeymgmt_from_algorithm(int name_id,
             break;
         case OSSL_FUNC_SKEYMGMT_IMP_SETTABLE_PARAMS:
             if (skeymgmt->imp_params == NULL)
-                skeymgmt->imp_params = OSSL_FUNC_skeymgmt_imp_settable_params(fns);
+                skeymgmt->imp_params =
+                    OSSL_FUNC_skeymgmt_imp_settable_params(fns);
             break;
         case OSSL_FUNC_SKEYMGMT_GEN_SETTABLE_PARAMS:
             if (skeymgmt->gen_params == NULL)
-                skeymgmt->gen_params = OSSL_FUNC_skeymgmt_gen_settable_params(fns);
+                skeymgmt->gen_params =
+                    OSSL_FUNC_skeymgmt_gen_settable_params(fns);
             break;
         }
     }
 
     /* Check that the provider is sensible */
-    if (skeymgmt->free == NULL
-        || skeymgmt->import == NULL
+    if (skeymgmt->free == NULL || skeymgmt->import == NULL
         || skeymgmt->export == NULL) {
         EVP_SKEYMGMT_free(skeymgmt);
         ERR_raise(ERR_LIB_EVP, EVP_R_INVALID_PROVIDER_FUNCTIONS);
@@ -131,9 +135,7 @@ EVP_SKEYMGMT *evp_skeymgmt_fetch_from_prov(OSSL_PROVIDER *prov,
                                            const char *name,
                                            const char *properties)
 {
-    return evp_generic_fetch_from_prov(prov,
-                                       OSSL_OP_SKEYMGMT,
-                                       name, properties,
+    return evp_generic_fetch_from_prov(prov, OSSL_OP_SKEYMGMT, name, properties,
                                        skeymgmt_from_algorithm,
                                        (int (*)(void *))EVP_SKEYMGMT_up_ref,
                                        (void (*)(void *))EVP_SKEYMGMT_free);
@@ -197,9 +199,8 @@ void EVP_SKEYMGMT_do_all_provided(OSSL_LIB_CTX *libctx,
                                   void (*fn)(EVP_SKEYMGMT *skeymgmt, void *arg),
                                   void *arg)
 {
-    evp_generic_do_all(libctx, OSSL_OP_KEYMGMT,
-                       (void (*)(void *, void *))fn, arg,
-                       skeymgmt_from_algorithm,
+    evp_generic_do_all(libctx, OSSL_OP_KEYMGMT, (void (*)(void *, void *))fn,
+                       arg, skeymgmt_from_algorithm,
                        (int (*)(void *))EVP_SKEYMGMT_up_ref,
                        (void (*)(void *))EVP_SKEYMGMT_free);
 }
@@ -217,7 +218,8 @@ int EVP_SKEYMGMT_names_do_all(const EVP_SKEYMGMT *skeymgmt,
     return 1;
 }
 
-const OSSL_PARAM *EVP_SKEYMGMT_get0_gen_settable_params(const EVP_SKEYMGMT *skeymgmt)
+const OSSL_PARAM *
+EVP_SKEYMGMT_get0_gen_settable_params(const EVP_SKEYMGMT *skeymgmt)
 {
     void *provctx = NULL;
 
@@ -226,10 +228,12 @@ const OSSL_PARAM *EVP_SKEYMGMT_get0_gen_settable_params(const EVP_SKEYMGMT *skey
 
     provctx = ossl_provider_ctx(EVP_SKEYMGMT_get0_provider(skeymgmt));
 
-    return (skeymgmt->gen_params != NULL) ? skeymgmt->gen_params(provctx) : NULL;
+    return (skeymgmt->gen_params != NULL) ? skeymgmt->gen_params(provctx)
+                                          : NULL;
 }
 
-const OSSL_PARAM *EVP_SKEYMGMT_get0_imp_settable_params(const EVP_SKEYMGMT *skeymgmt)
+const OSSL_PARAM *
+EVP_SKEYMGMT_get0_imp_settable_params(const EVP_SKEYMGMT *skeymgmt)
 {
     void *provctx = NULL;
 
@@ -238,5 +242,6 @@ const OSSL_PARAM *EVP_SKEYMGMT_get0_imp_settable_params(const EVP_SKEYMGMT *skey
 
     provctx = ossl_provider_ctx(EVP_SKEYMGMT_get0_provider(skeymgmt));
 
-    return (skeymgmt->imp_params != NULL) ? skeymgmt->imp_params(provctx) : NULL;
+    return (skeymgmt->imp_params != NULL) ? skeymgmt->imp_params(provctx)
+                                          : NULL;
 }

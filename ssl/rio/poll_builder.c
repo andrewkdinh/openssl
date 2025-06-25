@@ -22,11 +22,11 @@ int ossl_rio_poll_builder_init(RIO_POLL_BUILDER *rpb)
     FD_ZERO(&rpb->rfd);
     FD_ZERO(&rpb->wfd);
     FD_ZERO(&rpb->efd);
-    rpb->hwm_fd     = -1;
+    rpb->hwm_fd = -1;
 #elif RIO_POLL_METHOD == RIO_POLL_METHOD_POLL
-    rpb->pfd_heap   = NULL;
-    rpb->pfd_num    = 0;
-    rpb->pfd_alloc  = OSSL_NELEM(rpb->pfds);
+    rpb->pfd_heap = NULL;
+    rpb->pfd_num = 0;
+    rpb->pfd_alloc = OSSL_NELEM(rpb->pfds);
 #endif
     return 1;
 }
@@ -63,14 +63,14 @@ static int rpb_ensure_alloc(RIO_POLL_BUILDER *rpb, size_t alloc)
         /* Copy the contents of the stacked array. */
         memcpy(pfd_heap_new, rpb->pfds, sizeof(rpb->pfds));
     }
-    rpb->pfd_heap   = pfd_heap_new;
-    rpb->pfd_alloc  = alloc;
+    rpb->pfd_heap = pfd_heap_new;
+    rpb->pfd_alloc = alloc;
     return 1;
 }
 #endif
 
-int ossl_rio_poll_builder_add_fd(RIO_POLL_BUILDER *rpb, int fd,
-                                 int want_read, int want_write)
+int ossl_rio_poll_builder_add_fd(RIO_POLL_BUILDER *rpb, int fd, int want_read,
+                                 int want_write)
 {
 #if RIO_POLL_METHOD == RIO_POLL_METHOD_POLL
     size_t i;
@@ -118,11 +118,11 @@ int ossl_rio_poll_builder_add_fd(RIO_POLL_BUILDER *rpb, int fd,
         pfds = rpb->pfd_heap;
     }
 
-    assert((rpb->pfd_heap != NULL && rpb->pfd_heap == pfds) ||
-           (rpb->pfd_heap == NULL && rpb->pfds == pfds));
+    assert((rpb->pfd_heap != NULL && rpb->pfd_heap == pfds)
+           || (rpb->pfd_heap == NULL && rpb->pfds == pfds));
     assert(i <= rpb->pfd_num && rpb->pfd_num <= rpb->pfd_alloc);
-    pfds[i].fd      = fd;
-    pfds[i].events  = 0;
+    pfds[i].fd = fd;
+    pfds[i].events = 0;
 
     if (want_read)
         pfds[i].events |= POLLIN;
@@ -156,10 +156,11 @@ int ossl_rio_poll_builder_poll(RIO_POLL_BUILDER *rpb, OSSL_TIME deadline)
              * ossl_time_subtract saturates to zero so we don't need to check if
              * now > deadline.
              */
-            timeout = ossl_time_to_timeval(ossl_time_subtract(deadline,
-                                                              ossl_time_now()));
+            timeout = ossl_time_to_timeval(
+                ossl_time_subtract(deadline, ossl_time_now()));
 
-        rc = select(rpb->hwm_fd + 1, &rpb->rfd, &rpb->wfd, &rpb->efd, p_timeout);
+        rc =
+            select(rpb->hwm_fd + 1, &rpb->rfd, &rpb->wfd, &rpb->efd, p_timeout);
     } while (rc == -1 && get_last_socket_error_is_eintr());
 #elif RIO_POLL_METHOD == RIO_POLL_METHOD_POLL
     do {
@@ -168,8 +169,8 @@ int ossl_rio_poll_builder_poll(RIO_POLL_BUILDER *rpb, OSSL_TIME deadline)
         if (ossl_time_is_infinite(deadline))
             timeout_ms = -1;
         else
-            timeout_ms = ossl_time2ms(ossl_time_subtract(deadline,
-                                                         ossl_time_now()));
+            timeout_ms =
+                ossl_time2ms(ossl_time_subtract(deadline, ossl_time_now()));
 
         rc = poll(rpb->pfd_heap != NULL ? rpb->pfd_heap : rpb->pfds,
                   rpb->pfd_num, timeout_ms);

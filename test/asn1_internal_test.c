@@ -53,8 +53,8 @@ static int test_tbl_standard(void)
 
     TEST_info("asn1 tbl_standard: out of order");
     for (tmp = tbl_standard, i = 0; i < OSSL_NELEM(tbl_standard); i++, tmp++)
-        TEST_note("asn1 tbl_standard: Index %zu, NID %d, Name=%s",
-                  i, tmp->nid, OBJ_nid2ln(tmp->nid));
+        TEST_note("asn1 tbl_standard: Index %zu, NID %d, Name=%s", i, tmp->nid,
+                  OBJ_nid2ln(tmp->nid));
 
     return 0;
 }
@@ -91,8 +91,10 @@ static int test_standard_methods(void)
          *
          * Anything else is an error and may lead to a corrupt ASN1 method table
          */
-        if (!TEST_true(((*tmp)->pem_str == NULL && ((*tmp)->pkey_flags & ASN1_PKEY_ALIAS) != 0)
-                       || ((*tmp)->pem_str != NULL && ((*tmp)->pkey_flags & ASN1_PKEY_ALIAS) == 0))) {
+        if (!TEST_true(((*tmp)->pem_str == NULL
+                        && ((*tmp)->pkey_flags & ASN1_PKEY_ALIAS) != 0)
+                       || ((*tmp)->pem_str != NULL
+                           && ((*tmp)->pkey_flags & ASN1_PKEY_ALIAS) == 0))) {
             TEST_note("asn1 standard methods: Index %zu, pkey ID %d, Name=%s",
                       i, (*tmp)->pkey_id, OBJ_nid2sn((*tmp)->pkey_id));
             ok = 0;
@@ -107,8 +109,8 @@ static int test_standard_methods(void)
     TEST_note("asn1 standard methods: out of order");
     for (tmp = standard_methods, i = 0; i < OSSL_NELEM(standard_methods);
          i++, tmp++)
-        TEST_note("asn1 standard methods: Index %zu, pkey ID %d, Name=%s",
-                  i, (*tmp)->pkey_id, OBJ_nid2sn((*tmp)->pkey_id));
+        TEST_note("asn1 standard methods: Index %zu, pkey ID %d, Name=%s", i,
+                  (*tmp)->pkey_id, OBJ_nid2sn((*tmp)->pkey_id));
 
     return 0;
 }
@@ -128,10 +130,8 @@ static int test_empty_nonoptional_content(void)
     BIGNUM *e = NULL;
     int ok = 0;
 
-    if (!TEST_ptr(rsa = RSA_new())
-        || !TEST_ptr(n = BN_new())
-        || !TEST_ptr(e = BN_new())
-        || !TEST_true(RSA_set0_key(rsa, n, e, NULL)))
+    if (!TEST_ptr(rsa = RSA_new()) || !TEST_ptr(n = BN_new())
+        || !TEST_ptr(e = BN_new()) || !TEST_true(RSA_set0_key(rsa, n, e, NULL)))
         goto end;
 
     n = e = NULL;                /* They are now "owned" by |rsa| */
@@ -143,7 +143,7 @@ static int test_empty_nonoptional_content(void)
     if (TEST_int_le(i2d_RSAPrivateKey(rsa, NULL), 0))
         ok = 1;
 
- end:
+end:
     RSA_free(rsa);
     BN_free(n);
     BN_free(e);
@@ -240,15 +240,15 @@ static int test_obj_create(void)
         || !TEST_int_ne(OBJ_sn2nid(sn_prefix "5"), NID_undef)
         || !TEST_true(test_obj_create_once(arc "6", NULL, ln_prefix "6"))
         || !TEST_int_ne(OBJ_ln2nid(ln_prefix "6"), NID_undef)
-        || !TEST_true(test_obj_create_once(arc "7",
-                                           sn_prefix "7", ln_prefix "7"))
+        || !TEST_true(
+            test_obj_create_once(arc "7", sn_prefix "7", ln_prefix "7"))
         || !TEST_int_ne(OBJ_sn2nid(sn_prefix "7"), NID_undef)
         || !TEST_int_ne(OBJ_ln2nid(ln_prefix "7"), NID_undef))
         return 0;
 
     if (!TEST_false(test_obj_create_once(NULL, NULL, NULL))
-        || !TEST_false(test_obj_create_once(broken_arc "8",
-                                            sn_prefix "8", ln_prefix "8")))
+        || !TEST_false(
+            test_obj_create_once(broken_arc "8", sn_prefix "8", ln_prefix "8")))
         return 0;
 
     return 1;
@@ -256,8 +256,7 @@ static int test_obj_create(void)
 
 static int test_obj_nid_undef(void)
 {
-    if (!TEST_ptr(OBJ_nid2obj(NID_undef))
-        || !TEST_ptr(OBJ_nid2sn(NID_undef))
+    if (!TEST_ptr(OBJ_nid2obj(NID_undef)) || !TEST_ptr(OBJ_nid2sn(NID_undef))
         || !TEST_ptr(OBJ_nid2ln(NID_undef)))
         return 0;
 

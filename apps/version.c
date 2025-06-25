@@ -18,9 +18,20 @@
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_B, OPT_D, OPT_E, OPT_M, OPT_F, OPT_O, OPT_P, OPT_V, OPT_A, OPT_R, OPT_C
+    OPT_B,
+    OPT_D,
+    OPT_E,
+    OPT_M,
+    OPT_F,
+    OPT_O,
+    OPT_P,
+    OPT_V,
+    OPT_A,
+    OPT_R,
+    OPT_C
 #if defined(_WIN32)
-    ,OPT_W
+    ,
+    OPT_W
 #endif
 } OPTION_CHOICE;
 
@@ -43,8 +54,7 @@ const OPTIONS version_options[] = {
 #if defined(_WIN32)
     {"w", OPT_W, '-', "Show Windows install context"},
 #endif
-    {NULL}
-};
+    {NULL}};
 
 int version_main(int argc, char **argv)
 {
@@ -105,9 +115,8 @@ opthelp:
             break;
 #endif
         case OPT_A:
-            seed = options = cflags = version = date = platform
-                = dir = engdir = moddir = cpuinfo
-                = 1;
+            seed = options = cflags = version = date = platform = dir = engdir =
+                moddir = cpuinfo = 1;
             break;
         }
     }
@@ -120,8 +129,8 @@ opthelp:
         version = 1;
 
     if (version)
-        printf("%s (Library: %s)\n",
-               OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
+        printf("%s (Library: %s)\n", OPENSSL_VERSION_TEXT,
+               OpenSSL_version(OPENSSL_VERSION));
     if (date)
         printf("%s\n", OpenSSL_version(OPENSSL_BUILT_ON));
     if (platform)
@@ -150,10 +159,9 @@ opthelp:
         printf("%s\n", OpenSSL_version(OPENSSL_WINCTX));
 #endif
     ret = 0;
- end:
+end:
     return ret;
 }
-
 
 #if defined(__TANDEM) && defined(OPENSSL_VPROC)
 /*
@@ -164,5 +172,7 @@ opthelp:
 # define OPENSSL_VPROC_STRING_(x)    x##_OPENSSL
 # define OPENSSL_VPROC_STRING(x)     OPENSSL_VPROC_STRING_(x)
 # define OPENSSL_VPROC_FUNC          OPENSSL_VPROC_STRING(OPENSSL_VPROC)
-void OPENSSL_VPROC_FUNC(void) {}
+void OPENSSL_VPROC_FUNC(void)
+{
+}
 #endif

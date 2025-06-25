@@ -39,10 +39,12 @@ static OSSL_FUNC_signature_verify_init_fn sm2sig_signature_init;
 static OSSL_FUNC_signature_sign_fn sm2sig_sign;
 static OSSL_FUNC_signature_verify_fn sm2sig_verify;
 static OSSL_FUNC_signature_digest_sign_init_fn sm2sig_digest_signverify_init;
-static OSSL_FUNC_signature_digest_sign_update_fn sm2sig_digest_signverify_update;
+static OSSL_FUNC_signature_digest_sign_update_fn
+    sm2sig_digest_signverify_update;
 static OSSL_FUNC_signature_digest_sign_final_fn sm2sig_digest_sign_final;
 static OSSL_FUNC_signature_digest_verify_init_fn sm2sig_digest_signverify_init;
-static OSSL_FUNC_signature_digest_verify_update_fn sm2sig_digest_signverify_update;
+static OSSL_FUNC_signature_digest_verify_update_fn
+    sm2sig_digest_signverify_update;
 static OSSL_FUNC_signature_digest_verify_final_fn sm2sig_digest_verify_final;
 static OSSL_FUNC_signature_freectx_fn sm2sig_freectx;
 static OSSL_FUNC_signature_dupctx_fn sm2sig_dupctx;
@@ -51,9 +53,11 @@ static OSSL_FUNC_signature_gettable_ctx_params_fn sm2sig_gettable_ctx_params;
 static OSSL_FUNC_signature_set_ctx_params_fn sm2sig_set_ctx_params;
 static OSSL_FUNC_signature_settable_ctx_params_fn sm2sig_settable_ctx_params;
 static OSSL_FUNC_signature_get_ctx_md_params_fn sm2sig_get_ctx_md_params;
-static OSSL_FUNC_signature_gettable_ctx_md_params_fn sm2sig_gettable_ctx_md_params;
+static OSSL_FUNC_signature_gettable_ctx_md_params_fn
+    sm2sig_gettable_ctx_md_params;
 static OSSL_FUNC_signature_set_ctx_md_params_fn sm2sig_set_ctx_md_params;
-static OSSL_FUNC_signature_settable_ctx_md_params_fn sm2sig_settable_ctx_md_params;
+static OSSL_FUNC_signature_settable_ctx_md_params_fn
+    sm2sig_settable_ctx_md_params;
 
 /*
  * What's passed as an actual key is defined by the KEYMGMT interface.
@@ -71,13 +75,13 @@ typedef struct {
      * This flag should be set on initialization and the computation should
      * be performed only once, on first update.
      */
-    unsigned int flag_compute_z_digest : 1;
+    unsigned int flag_compute_z_digest:1;
 
     char mdname[OSSL_MAX_NAME_SIZE];
 
     /* The Algorithm Identifier of the combined signature algorithm */
     unsigned char aid_buf[OSSL_MAX_ALGORITHM_ID_SIZE];
-    size_t  aid_len;
+    size_t aid_len;
 
     /* main digest */
     EVP_MD *md;
@@ -92,8 +96,8 @@ typedef struct {
 static int sm2sig_set_mdname(PROV_SM2_CTX *psm2ctx, const char *mdname)
 {
     if (psm2ctx->md == NULL) /* We need an SM3 md to compare with */
-        psm2ctx->md = EVP_MD_fetch(psm2ctx->libctx, psm2ctx->mdname,
-                                   psm2ctx->propq);
+        psm2ctx->md =
+            EVP_MD_fetch(psm2ctx->libctx, psm2ctx->mdname, psm2ctx->propq);
     if (psm2ctx->md == NULL)
         return 0;
 
@@ -139,8 +143,7 @@ static int sm2sig_signature_init(void *vpsm2ctx, void *ec,
 {
     PROV_SM2_CTX *psm2ctx = (PROV_SM2_CTX *)vpsm2ctx;
 
-    if (!ossl_prov_is_running()
-            || psm2ctx == NULL)
+    if (!ossl_prov_is_running() || psm2ctx == NULL)
         return 0;
 
     if (ec == NULL && psm2ctx->ec == NULL) {
@@ -186,8 +189,8 @@ static int sm2sig_sign(void *vpsm2ctx, unsigned char *sig, size_t *siglen,
     return 1;
 }
 
-static int sm2sig_verify(void *vpsm2ctx, const unsigned char *sig, size_t siglen,
-                         const unsigned char *tbs, size_t tbslen)
+static int sm2sig_verify(void *vpsm2ctx, const unsigned char *sig,
+                         size_t siglen, const unsigned char *tbs, size_t tbslen)
 {
     PROV_SM2_CTX *ctx = (PROV_SM2_CTX *)vpsm2ctx;
 
@@ -251,7 +254,7 @@ static int sm2sig_digest_signverify_init(void *vpsm2ctx, const char *mdname,
 
     ret = 1;
 
- error:
+error:
     return ret;
 }
 
@@ -310,7 +313,6 @@ int sm2sig_digest_sign_final(void *vpsm2ctx, unsigned char *sig, size_t *siglen,
 
     return sm2sig_sign(vpsm2ctx, sig, siglen, sigsize, digest, (size_t)dlen);
 }
-
 
 int sm2sig_digest_verify_final(void *vpsm2ctx, const unsigned char *sig,
                                size_t siglen)
@@ -378,7 +380,7 @@ static void *sm2sig_dupctx(void *vpsm2ctx)
     if (srcctx->mdctx != NULL) {
         dstctx->mdctx = EVP_MD_CTX_new();
         if (dstctx->mdctx == NULL
-                || !EVP_MD_CTX_copy_ex(dstctx->mdctx, srcctx->mdctx))
+            || !EVP_MD_CTX_copy_ex(dstctx->mdctx, srcctx->mdctx))
             goto err;
     }
 
@@ -391,7 +393,7 @@ static void *sm2sig_dupctx(void *vpsm2ctx)
     }
 
     return dstctx;
- err:
+err:
     sm2sig_freectx(dstctx);
     return NULL;
 }
@@ -406,9 +408,9 @@ static int sm2sig_get_ctx_params(void *vpsm2ctx, OSSL_PARAM *params)
 
     p = OSSL_PARAM_locate(params, OSSL_SIGNATURE_PARAM_ALGORITHM_ID);
     if (p != NULL
-        && !OSSL_PARAM_set_octet_string(p,
-                                        psm2ctx->aid_len == 0 ? NULL : psm2ctx->aid_buf,
-                                        psm2ctx->aid_len))
+        && !OSSL_PARAM_set_octet_string(
+            p, psm2ctx->aid_len == 0 ? NULL : psm2ctx->aid_buf,
+            psm2ctx->aid_len))
         return 0;
 
     p = OSSL_PARAM_locate(params, OSSL_SIGNATURE_PARAM_DIGEST_SIZE);
@@ -416,9 +418,11 @@ static int sm2sig_get_ctx_params(void *vpsm2ctx, OSSL_PARAM *params)
         return 0;
 
     p = OSSL_PARAM_locate(params, OSSL_SIGNATURE_PARAM_DIGEST);
-    if (p != NULL && !OSSL_PARAM_set_utf8_string(p, psm2ctx->md == NULL
-                                                    ? psm2ctx->mdname
-                                                    : EVP_MD_get0_name(psm2ctx->md)))
+    if (p != NULL
+        && !OSSL_PARAM_set_utf8_string(p,
+                                       psm2ctx->md == NULL
+                                           ? psm2ctx->mdname
+                                           : EVP_MD_get0_name(psm2ctx->md)))
         return 0;
 
     return 1;
@@ -428,8 +432,7 @@ static const OSSL_PARAM known_gettable_ctx_params[] = {
     OSSL_PARAM_octet_string(OSSL_SIGNATURE_PARAM_ALGORITHM_ID, NULL, 0),
     OSSL_PARAM_size_t(OSSL_SIGNATURE_PARAM_DIGEST_SIZE, NULL),
     OSSL_PARAM_utf8_string(OSSL_SIGNATURE_PARAM_DIGEST, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 
 static const OSSL_PARAM *sm2sig_gettable_ctx_params(ossl_unused void *vpsm2ctx,
                                                     ossl_unused void *provctx)
@@ -474,8 +477,8 @@ static int sm2sig_set_ctx_params(void *vpsm2ctx, const OSSL_PARAM params[])
      * this needs to be adjusted accordingly.
      */
     p = OSSL_PARAM_locate_const(params, OSSL_SIGNATURE_PARAM_DIGEST_SIZE);
-    if (p != NULL && (!OSSL_PARAM_get_size_t(p, &mdsize)
-                      || mdsize != psm2ctx->mdsize))
+    if (p != NULL
+        && (!OSSL_PARAM_get_size_t(p, &mdsize) || mdsize != psm2ctx->mdsize))
         return 0;
 
     p = OSSL_PARAM_locate_const(params, OSSL_SIGNATURE_PARAM_DIGEST);
@@ -497,9 +500,7 @@ static int sm2sig_set_ctx_params(void *vpsm2ctx, const OSSL_PARAM params[])
 static const OSSL_PARAM known_settable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_SIGNATURE_PARAM_DIGEST_SIZE, NULL),
     OSSL_PARAM_utf8_string(OSSL_SIGNATURE_PARAM_DIGEST, NULL, 0),
-    OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_DIST_ID, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_DIST_ID, NULL, 0), OSSL_PARAM_END};
 
 static const OSSL_PARAM *sm2sig_settable_ctx_params(ossl_unused void *vpsm2ctx,
                                                     ossl_unused void *provctx)
@@ -548,38 +549,37 @@ static const OSSL_PARAM *sm2sig_settable_ctx_md_params(void *vpsm2ctx)
 }
 
 const OSSL_DISPATCH ossl_sm2_signature_functions[] = {
-    { OSSL_FUNC_SIGNATURE_NEWCTX, (void (*)(void))sm2sig_newctx },
-    { OSSL_FUNC_SIGNATURE_SIGN_INIT, (void (*)(void))sm2sig_signature_init },
-    { OSSL_FUNC_SIGNATURE_SIGN, (void (*)(void))sm2sig_sign },
-    { OSSL_FUNC_SIGNATURE_VERIFY_INIT, (void (*)(void))sm2sig_signature_init },
-    { OSSL_FUNC_SIGNATURE_VERIFY, (void (*)(void))sm2sig_verify },
-    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_INIT,
-      (void (*)(void))sm2sig_digest_signverify_init },
-    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_UPDATE,
-      (void (*)(void))sm2sig_digest_signverify_update },
-    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_FINAL,
-      (void (*)(void))sm2sig_digest_sign_final },
-    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_INIT,
-      (void (*)(void))sm2sig_digest_signverify_init },
-    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_UPDATE,
-      (void (*)(void))sm2sig_digest_signverify_update },
-    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_FINAL,
-      (void (*)(void))sm2sig_digest_verify_final },
-    { OSSL_FUNC_SIGNATURE_FREECTX, (void (*)(void))sm2sig_freectx },
-    { OSSL_FUNC_SIGNATURE_DUPCTX, (void (*)(void))sm2sig_dupctx },
-    { OSSL_FUNC_SIGNATURE_GET_CTX_PARAMS, (void (*)(void))sm2sig_get_ctx_params },
-    { OSSL_FUNC_SIGNATURE_GETTABLE_CTX_PARAMS,
-      (void (*)(void))sm2sig_gettable_ctx_params },
-    { OSSL_FUNC_SIGNATURE_SET_CTX_PARAMS, (void (*)(void))sm2sig_set_ctx_params },
-    { OSSL_FUNC_SIGNATURE_SETTABLE_CTX_PARAMS,
-      (void (*)(void))sm2sig_settable_ctx_params },
-    { OSSL_FUNC_SIGNATURE_GET_CTX_MD_PARAMS,
-      (void (*)(void))sm2sig_get_ctx_md_params },
-    { OSSL_FUNC_SIGNATURE_GETTABLE_CTX_MD_PARAMS,
-      (void (*)(void))sm2sig_gettable_ctx_md_params },
-    { OSSL_FUNC_SIGNATURE_SET_CTX_MD_PARAMS,
-      (void (*)(void))sm2sig_set_ctx_md_params },
-    { OSSL_FUNC_SIGNATURE_SETTABLE_CTX_MD_PARAMS,
-      (void (*)(void))sm2sig_settable_ctx_md_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_SIGNATURE_NEWCTX, (void (*)(void))sm2sig_newctx},
+    {OSSL_FUNC_SIGNATURE_SIGN_INIT, (void (*)(void))sm2sig_signature_init},
+    {OSSL_FUNC_SIGNATURE_SIGN, (void (*)(void))sm2sig_sign},
+    {OSSL_FUNC_SIGNATURE_VERIFY_INIT, (void (*)(void))sm2sig_signature_init},
+    {OSSL_FUNC_SIGNATURE_VERIFY, (void (*)(void))sm2sig_verify},
+    {OSSL_FUNC_SIGNATURE_DIGEST_SIGN_INIT,
+     (void (*)(void))sm2sig_digest_signverify_init},
+    {OSSL_FUNC_SIGNATURE_DIGEST_SIGN_UPDATE,
+     (void (*)(void))sm2sig_digest_signverify_update},
+    {OSSL_FUNC_SIGNATURE_DIGEST_SIGN_FINAL,
+     (void (*)(void))sm2sig_digest_sign_final},
+    {OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_INIT,
+     (void (*)(void))sm2sig_digest_signverify_init},
+    {OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_UPDATE,
+     (void (*)(void))sm2sig_digest_signverify_update},
+    {OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_FINAL,
+     (void (*)(void))sm2sig_digest_verify_final},
+    {OSSL_FUNC_SIGNATURE_FREECTX, (void (*)(void))sm2sig_freectx},
+    {OSSL_FUNC_SIGNATURE_DUPCTX, (void (*)(void))sm2sig_dupctx},
+    {OSSL_FUNC_SIGNATURE_GET_CTX_PARAMS, (void (*)(void))sm2sig_get_ctx_params},
+    {OSSL_FUNC_SIGNATURE_GETTABLE_CTX_PARAMS,
+     (void (*)(void))sm2sig_gettable_ctx_params},
+    {OSSL_FUNC_SIGNATURE_SET_CTX_PARAMS, (void (*)(void))sm2sig_set_ctx_params},
+    {OSSL_FUNC_SIGNATURE_SETTABLE_CTX_PARAMS,
+     (void (*)(void))sm2sig_settable_ctx_params},
+    {OSSL_FUNC_SIGNATURE_GET_CTX_MD_PARAMS,
+     (void (*)(void))sm2sig_get_ctx_md_params},
+    {OSSL_FUNC_SIGNATURE_GETTABLE_CTX_MD_PARAMS,
+     (void (*)(void))sm2sig_gettable_ctx_md_params},
+    {OSSL_FUNC_SIGNATURE_SET_CTX_MD_PARAMS,
+     (void (*)(void))sm2sig_set_ctx_md_params},
+    {OSSL_FUNC_SIGNATURE_SETTABLE_CTX_MD_PARAMS,
+     (void (*)(void))sm2sig_settable_ctx_md_params},
+    OSSL_DISPATCH_END};

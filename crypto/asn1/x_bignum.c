@@ -34,35 +34,21 @@ static int bn_secure_c2i(ASN1_VALUE **pval, const unsigned char *cont, int len,
 static int bn_print(BIO *out, const ASN1_VALUE **pval, const ASN1_ITEM *it,
                     int indent, const ASN1_PCTX *pctx);
 
-static ASN1_PRIMITIVE_FUNCS bignum_pf = {
-    NULL, 0,
-    bn_new,
-    bn_free,
-    0,
-    bn_c2i,
-    bn_i2c,
-    bn_print
-};
+static ASN1_PRIMITIVE_FUNCS bignum_pf = {NULL, 0,      bn_new, bn_free,
+                                         0,    bn_c2i, bn_i2c, bn_print};
 
 static ASN1_PRIMITIVE_FUNCS cbignum_pf = {
-    NULL, 0,
-    bn_secure_new,
-    bn_free,
-    0,
-    bn_secure_c2i,
-    bn_i2c,
-    bn_print
-};
+    NULL, 0, bn_secure_new, bn_free, 0, bn_secure_c2i, bn_i2c, bn_print};
 
-ASN1_ITEM_start(BIGNUM)
-        ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &bignum_pf, 0, "BIGNUM"
-ASN1_ITEM_end(BIGNUM)
+ASN1_ITEM_start(BIGNUM) ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0,
+    &bignum_pf, 0,
+    "BIGNUM" ASN1_ITEM_end(BIGNUM)
 
-ASN1_ITEM_start(CBIGNUM)
-        ASN1_ITYPE_PRIMITIVE, V_ASN1_INTEGER, NULL, 0, &cbignum_pf, BN_SENSITIVE, "CBIGNUM"
-ASN1_ITEM_end(CBIGNUM)
+        ASN1_ITEM_start(CBIGNUM) ASN1_ITYPE_PRIMITIVE,
+    V_ASN1_INTEGER, NULL, 0, &cbignum_pf, BN_SENSITIVE,
+    "CBIGNUM" ASN1_ITEM_end(CBIGNUM)
 
-static int bn_new(ASN1_VALUE **pval, const ASN1_ITEM *it)
+        static int bn_new(ASN1_VALUE **pval, const ASN1_ITEM *it)
 {
     *pval = (ASN1_VALUE *)BN_new();
     if (*pval != NULL)

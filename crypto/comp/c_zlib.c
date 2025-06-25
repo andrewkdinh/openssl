@@ -28,12 +28,13 @@ COMP_METHOD *COMP_zlib(void);
 
 static int zlib_stateful_init(COMP_CTX *ctx);
 static void zlib_stateful_finish(COMP_CTX *ctx);
-static ossl_ssize_t zlib_stateful_compress_block(COMP_CTX *ctx, unsigned char *out,
+static ossl_ssize_t zlib_stateful_compress_block(COMP_CTX *ctx,
+                                                 unsigned char *out,
                                                  size_t olen, unsigned char *in,
                                                  size_t ilen);
-static ossl_ssize_t zlib_stateful_expand_block(COMP_CTX *ctx, unsigned char *out,
-                                               size_t olen, unsigned char *in,
-                                               size_t ilen);
+static ossl_ssize_t zlib_stateful_expand_block(COMP_CTX *ctx,
+                                               unsigned char *out, size_t olen,
+                                               unsigned char *in, size_t ilen);
 
 /* memory allocations functions for zlib initialisation */
 static void *zlib_zalloc(void *opaque, unsigned int no, unsigned int size)
@@ -49,15 +50,10 @@ static void zlib_zfree(void *opaque, void *address)
     OPENSSL_free(address);
 }
 
-
 static COMP_METHOD zlib_stateful_method = {
-    NID_zlib_compression,
-    LN_zlib_compression,
-    zlib_stateful_init,
-    zlib_stateful_finish,
-    zlib_stateful_compress_block,
-    zlib_stateful_expand_block
-};
+    NID_zlib_compression,         LN_zlib_compression,
+    zlib_stateful_init,           zlib_stateful_finish,
+    zlib_stateful_compress_block, zlib_stateful_expand_block};
 
 /*
  * When OpenSSL is built on Windows, we do not want to require that
@@ -74,19 +70,19 @@ static COMP_METHOD zlib_stateful_method = {
 #  include "internal/dso.h"
 
 /* Function pointers */
-typedef int (*compress_ft) (Bytef *dest, uLongf *destLen,
-                            const Bytef *source, uLong sourceLen);
-typedef int (*uncompress_ft) (Bytef *dest, uLongf *destLen,
-                              const Bytef *source, uLong sourceLen);
-typedef int (*inflateEnd_ft) (z_streamp strm);
-typedef int (*inflate_ft) (z_streamp strm, int flush);
-typedef int (*inflateInit__ft) (z_streamp strm,
-                                const char *version, int stream_size);
-typedef int (*deflateEnd_ft) (z_streamp strm);
-typedef int (*deflate_ft) (z_streamp strm, int flush);
-typedef int (*deflateInit__ft) (z_streamp strm, int level,
-                                const char *version, int stream_size);
-typedef const char *(*zError__ft) (int err);
+typedef int (*compress_ft)(Bytef *dest, uLongf *destLen, const Bytef *source,
+                           uLong sourceLen);
+typedef int (*uncompress_ft)(Bytef *dest, uLongf *destLen, const Bytef *source,
+                             uLong sourceLen);
+typedef int (*inflateEnd_ft)(z_streamp strm);
+typedef int (*inflate_ft)(z_streamp strm, int flush);
+typedef int (*inflateInit__ft)(z_streamp strm, const char *version,
+                               int stream_size);
+typedef int (*deflateEnd_ft)(z_streamp strm);
+typedef int (*deflate_ft)(z_streamp strm, int flush);
+typedef int (*deflateInit__ft)(z_streamp strm, int level, const char *version,
+                               int stream_size);
+typedef const char *(*zError__ft)(int err);
 static compress_ft p_compress = NULL;
 static uncompress_ft p_uncompress = NULL;
 static inflateEnd_ft p_inflateEnd = NULL;
@@ -137,14 +133,14 @@ static int zlib_stateful_init(COMP_CTX *ctx)
     state->ostream.opaque = Z_NULL;
     state->ostream.next_in = Z_NULL;
     state->ostream.next_out = Z_NULL;
-    err = deflateInit_(&state->ostream, Z_DEFAULT_COMPRESSION,
-                       ZLIB_VERSION, sizeof(z_stream));
+    err = deflateInit_(&state->ostream, Z_DEFAULT_COMPRESSION, ZLIB_VERSION,
+                       sizeof(z_stream));
     if (err != Z_OK)
         goto err;
 
     ctx->data = state;
     return 1;
- err:
+err:
     OPENSSL_free(state);
     return 0;
 }
@@ -157,7 +153,8 @@ static void zlib_stateful_finish(COMP_CTX *ctx)
     OPENSSL_free(state);
 }
 
-static ossl_ssize_t zlib_stateful_compress_block(COMP_CTX *ctx, unsigned char *out,
+static ossl_ssize_t zlib_stateful_compress_block(COMP_CTX *ctx,
+                                                 unsigned char *out,
                                                  size_t olen, unsigned char *in,
                                                  size_t ilen)
 {
@@ -180,9 +177,9 @@ static ossl_ssize_t zlib_stateful_compress_block(COMP_CTX *ctx, unsigned char *o
     return (ossl_ssize_t)(olen - state->ostream.avail_out);
 }
 
-static ossl_ssize_t zlib_stateful_expand_block(COMP_CTX *ctx, unsigned char *out,
-                                               size_t olen, unsigned char *in,
-                                               size_t ilen)
+static ossl_ssize_t zlib_stateful_expand_block(COMP_CTX *ctx,
+                                               unsigned char *out, size_t olen,
+                                               unsigned char *in, size_t ilen)
 {
     int err = Z_OK;
     struct zlib_state *state = ctx->data;
@@ -214,9 +211,9 @@ static void zlib_oneshot_finish(COMP_CTX *ctx)
 {
 }
 
-static ossl_ssize_t zlib_oneshot_compress_block(COMP_CTX *ctx, unsigned char *out,
-                                                size_t olen, unsigned char *in,
-                                                size_t ilen)
+static ossl_ssize_t zlib_oneshot_compress_block(COMP_CTX *ctx,
+                                                unsigned char *out, size_t olen,
+                                                unsigned char *in, size_t ilen)
 {
     uLongf out_size;
 
@@ -259,13 +256,9 @@ static ossl_ssize_t zlib_oneshot_expand_block(COMP_CTX *ctx, unsigned char *out,
 }
 
 static COMP_METHOD zlib_oneshot_method = {
-    NID_zlib_compression,
-    LN_zlib_compression,
-    zlib_oneshot_init,
-    zlib_oneshot_finish,
-    zlib_oneshot_compress_block,
-    zlib_oneshot_expand_block
-};
+    NID_zlib_compression,        LN_zlib_compression,
+    zlib_oneshot_init,           zlib_oneshot_finish,
+    zlib_oneshot_compress_block, zlib_oneshot_expand_block};
 
 static CRYPTO_ONCE zlib_once = CRYPTO_ONCE_STATIC_INIT;
 DEFINE_RUN_ONCE_STATIC(ossl_comp_zlib_init)
@@ -284,20 +277,22 @@ DEFINE_RUN_ONCE_STATIC(ossl_comp_zlib_init)
 
     zlib_dso = DSO_load(NULL, LIBZ, NULL, 0);
     if (zlib_dso != NULL) {
-        p_compress = (compress_ft) DSO_bind_func(zlib_dso, "compress");
-        p_uncompress = (compress_ft) DSO_bind_func(zlib_dso, "uncompress");
-        p_inflateEnd = (inflateEnd_ft) DSO_bind_func(zlib_dso, "inflateEnd");
-        p_inflate = (inflate_ft) DSO_bind_func(zlib_dso, "inflate");
-        p_inflateInit_ = (inflateInit__ft) DSO_bind_func(zlib_dso, "inflateInit_");
-        p_deflateEnd = (deflateEnd_ft) DSO_bind_func(zlib_dso, "deflateEnd");
-        p_deflate = (deflate_ft) DSO_bind_func(zlib_dso, "deflate");
-        p_deflateInit_ = (deflateInit__ft) DSO_bind_func(zlib_dso, "deflateInit_");
-        p_zError = (zError__ft) DSO_bind_func(zlib_dso, "zError");
+        p_compress = (compress_ft)DSO_bind_func(zlib_dso, "compress");
+        p_uncompress = (compress_ft)DSO_bind_func(zlib_dso, "uncompress");
+        p_inflateEnd = (inflateEnd_ft)DSO_bind_func(zlib_dso, "inflateEnd");
+        p_inflate = (inflate_ft)DSO_bind_func(zlib_dso, "inflate");
+        p_inflateInit_ =
+            (inflateInit__ft)DSO_bind_func(zlib_dso, "inflateInit_");
+        p_deflateEnd = (deflateEnd_ft)DSO_bind_func(zlib_dso, "deflateEnd");
+        p_deflate = (deflate_ft)DSO_bind_func(zlib_dso, "deflate");
+        p_deflateInit_ =
+            (deflateInit__ft)DSO_bind_func(zlib_dso, "deflateInit_");
+        p_zError = (zError__ft)DSO_bind_func(zlib_dso, "zError");
 
         if (p_compress == NULL || p_uncompress == NULL || p_inflateEnd == NULL
-                || p_inflate == NULL || p_inflateInit_ == NULL
-                || p_deflateEnd == NULL || p_deflate == NULL
-                || p_deflateInit_ == NULL || p_zError == NULL) {
+            || p_inflate == NULL || p_inflateInit_ == NULL
+            || p_deflateEnd == NULL || p_deflate == NULL
+            || p_deflateInit_ == NULL || p_zError == NULL) {
             ossl_comp_zlib_cleanup();
             return 0;
         }
@@ -367,19 +362,10 @@ static long bio_zlib_ctrl(BIO *b, int cmd, long num, void *ptr);
 static long bio_zlib_callback_ctrl(BIO *b, int cmd, BIO_info_cb *fp);
 
 static const BIO_METHOD bio_meth_zlib = {
-    BIO_TYPE_COMP,
-    "zlib",
-    bwrite_conv,
-    bio_zlib_write,
-    bread_conv,
-    bio_zlib_read,
-    NULL,                      /* bio_zlib_puts, */
-    NULL,                      /* bio_zlib_gets, */
-    bio_zlib_ctrl,
-    bio_zlib_new,
-    bio_zlib_free,
-    bio_zlib_callback_ctrl
-};
+    BIO_TYPE_COMP, "zlib",        bwrite_conv,   bio_zlib_write,
+    bread_conv,    bio_zlib_read, NULL, /* bio_zlib_puts, */
+    NULL, /* bio_zlib_gets, */
+    bio_zlib_ctrl, bio_zlib_new,  bio_zlib_free, bio_zlib_callback_ctrl};
 #endif
 
 const BIO_METHOD *BIO_f_zlib(void)
@@ -705,7 +691,6 @@ static long bio_zlib_ctrl(BIO *b, int cmd, long num, void *ptr)
     default:
         ret = BIO_ctrl(next, cmd, num, ptr);
         break;
-
     }
 
     return ret;

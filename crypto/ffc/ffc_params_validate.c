@@ -62,8 +62,8 @@ int ossl_ffc_params_FIPS186_4_validate(OSSL_LIB_CTX *libctx,
     L = BN_num_bits(params->p);
     N = BN_num_bits(params->q);
     return ossl_ffc_params_FIPS186_4_gen_verify(libctx, (FFC_PARAMS *)params,
-                                                FFC_PARAM_MODE_VERIFY, type,
-                                                L, N, res, cb);
+                                                FFC_PARAM_MODE_VERIFY, type, L,
+                                                N, res, cb);
 }
 
 /* This may be used in FIPS mode to validate deprecated FIPS-186-2 Params */
@@ -82,8 +82,8 @@ int ossl_ffc_params_FIPS186_2_validate(OSSL_LIB_CTX *libctx,
     L = BN_num_bits(params->p);
     N = BN_num_bits(params->q);
     return ossl_ffc_params_FIPS186_2_gen_verify(libctx, (FFC_PARAMS *)params,
-                                                FFC_PARAM_MODE_VERIFY, type,
-                                                L, N, res, cb);
+                                                FFC_PARAM_MODE_VERIFY, type, L,
+                                                N, res, cb);
 }
 
 /*
@@ -92,8 +92,9 @@ int ossl_ffc_params_FIPS186_2_validate(OSSL_LIB_CTX *libctx,
  * extra parameters such as the digest and seed, which may not be available for
  * this test.
  */
-int ossl_ffc_params_simple_validate(OSSL_LIB_CTX *libctx, const FFC_PARAMS *params,
-                                    int paramstype, int *res)
+int ossl_ffc_params_simple_validate(OSSL_LIB_CTX *libctx,
+                                    const FFC_PARAMS *params, int paramstype,
+                                    int *res)
 {
     int ret;
     int tmpres = 0;
@@ -136,8 +137,9 @@ int ossl_ffc_params_simple_validate(OSSL_LIB_CTX *libctx, const FFC_PARAMS *para
  * Otherwise do simple check but in addition also check the primality of the
  * p and q.
  */
-int ossl_ffc_params_full_validate(OSSL_LIB_CTX *libctx, const FFC_PARAMS *params,
-                                  int paramstype, int *res)
+int ossl_ffc_params_full_validate(OSSL_LIB_CTX *libctx,
+                                  const FFC_PARAMS *params, int paramstype,
+                                  int *res)
 {
     int tmpres = 0;
 
@@ -148,16 +150,16 @@ int ossl_ffc_params_full_validate(OSSL_LIB_CTX *libctx, const FFC_PARAMS *params
         res = &tmpres;
 
 #ifdef FIPS_MODULE
-    return ossl_ffc_params_FIPS186_4_validate(libctx, params, paramstype,
-                                              res, NULL);
+    return ossl_ffc_params_FIPS186_4_validate(libctx, params, paramstype, res,
+                                              NULL);
 #else
     if (params->seed != NULL) {
         if (params->flags & FFC_PARAM_FLAG_VALIDATE_LEGACY)
-            return ossl_ffc_params_FIPS186_2_validate(libctx, params, paramstype,
-                                                      res, NULL);
+            return ossl_ffc_params_FIPS186_2_validate(libctx, params,
+                                                      paramstype, res, NULL);
         else
-            return ossl_ffc_params_FIPS186_4_validate(libctx, params, paramstype,
-                                                      res, NULL);
+            return ossl_ffc_params_FIPS186_4_validate(libctx, params,
+                                                      paramstype, res, NULL);
     } else {
         int ret = 0;
 

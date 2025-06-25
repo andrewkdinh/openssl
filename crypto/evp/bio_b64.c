@@ -44,18 +44,9 @@ typedef struct b64_struct {
 } BIO_B64_CTX;
 
 static const BIO_METHOD methods_b64 = {
-    BIO_TYPE_BASE64,
-    "base64 encoding",
-    bwrite_conv,
-    b64_write,
-    bread_conv,
-    b64_read,
-    b64_puts,
-    NULL,                       /* b64_gets, */
-    b64_ctrl,
-    b64_new,
-    b64_free,
-    b64_callback_ctrl,
+    BIO_TYPE_BASE64, "base64 encoding", bwrite_conv, b64_write,
+    bread_conv,      b64_read,          b64_puts,    NULL, /* b64_gets, */
+    b64_ctrl,        b64_new,           b64_free,    b64_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_base64(void)
@@ -234,8 +225,7 @@ static int b64_read(BIO *b, char *out, int outl)
                 ctx->start = 0;
                 if (p != ctx->tmp) {
                     i -= p - ctx->tmp;
-                    for (x = 0; x < i; x++)
-                        ctx->tmp[x] = p[x];
+                    for (x = 0; x < i; x++) ctx->tmp[x] = p[x];
                 }
                 break;
             }
@@ -255,8 +245,7 @@ static int b64_read(BIO *b, char *out, int outl)
                 } else if (p != q) {
                     /* Retain partial line at end of buffer */
                     n = q - p;
-                    for (ii = 0; ii < n; ii++)
-                        ctx->tmp[ii] = p[ii];
+                    for (ii = 0; ii < n; ii++) ctx->tmp[ii] = p[ii];
                     ctx->tmp_len = n;
                 } else {
                     /* All we have is newline terminated non-start data */
@@ -282,8 +271,7 @@ static int b64_read(BIO *b, char *out, int outl)
             continue;
         }
 
-        i = EVP_DecodeUpdate(ctx->base64, ctx->buf, &ctx->buf_len,
-                             ctx->tmp, i);
+        i = EVP_DecodeUpdate(ctx->base64, ctx->buf, &ctx->buf_len, ctx->tmp, i);
         ctx->tmp_len = 0;
         /*
          * If eof or an error was signalled, then the condition
@@ -495,13 +483,13 @@ static long b64_ctrl(BIO *b, int cmd, long num, void *ptr)
         ctx->encode = B64_NONE;
         ret = BIO_ctrl(next, cmd, num, ptr);
         break;
-    case BIO_CTRL_EOF:         /* More to read */
+    case BIO_CTRL_EOF: /* More to read */
         if (ctx->cont <= 0)
             ret = 1;
         else
             ret = BIO_ctrl(next, cmd, num, ptr);
         break;
-    case BIO_CTRL_WPENDING:    /* More to write in buffer */
+    case BIO_CTRL_WPENDING: /* More to write in buffer */
         if (!ossl_assert(ctx->buf_len >= ctx->buf_off)) {
             ERR_raise(ERR_LIB_BIO, ERR_R_INTERNAL_ERROR);
             return -1;
@@ -513,7 +501,7 @@ static long b64_ctrl(BIO *b, int cmd, long num, void *ptr)
         else if (ret <= 0)
             ret = BIO_ctrl(next, cmd, num, ptr);
         break;
-    case BIO_CTRL_PENDING:     /* More to read in buffer */
+    case BIO_CTRL_PENDING: /* More to read in buffer */
         if (!ossl_assert(ctx->buf_len >= ctx->buf_off)) {
             ERR_raise(ERR_LIB_BIO, ERR_R_INTERNAL_ERROR);
             return -1;
@@ -524,7 +512,7 @@ static long b64_ctrl(BIO *b, int cmd, long num, void *ptr)
         break;
     case BIO_CTRL_FLUSH:
         /* do a final write */
- again:
+again:
         while (ctx->buf_len != ctx->buf_off) {
             i = b64_write(b, NULL, 0);
             if (i < 0)
@@ -532,8 +520,8 @@ static long b64_ctrl(BIO *b, int cmd, long num, void *ptr)
         }
         if (BIO_get_flags(b) & BIO_FLAGS_BASE64_NO_NL) {
             if (ctx->tmp_len != 0) {
-                ctx->buf_len = EVP_EncodeBlock(ctx->buf,
-                                               ctx->tmp, ctx->tmp_len);
+                ctx->buf_len =
+                    EVP_EncodeBlock(ctx->buf, ctx->tmp, ctx->tmp_len);
                 ctx->buf_off = 0;
                 ctx->tmp_len = 0;
                 goto again;

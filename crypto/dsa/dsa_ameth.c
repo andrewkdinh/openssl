@@ -77,11 +77,10 @@ static int dsa_pub_decode(EVP_PKEY *pkey, const X509_PUBKEY *pubkey)
     EVP_PKEY_assign_DSA(pkey, dsa);
     return 1;
 
- err:
+err:
     ASN1_INTEGER_free(public_key);
     DSA_free(dsa);
     return 0;
-
 }
 
 static int dsa_pub_encode(X509_PUBKEY *pk, const EVP_PKEY *pkey)
@@ -95,9 +94,7 @@ static int dsa_pub_encode(X509_PUBKEY *pk, const EVP_PKEY *pkey)
     ASN1_OBJECT *aobj;
 
     dsa = pkey->pkey.dsa;
-    if (pkey->save_parameters
-        && dsa->params.p != NULL
-        && dsa->params.q != NULL
+    if (pkey->save_parameters && dsa->params.p != NULL && dsa->params.q != NULL
         && dsa->params.g != NULL) {
         str = ASN1_STRING_new();
         if (str == NULL) {
@@ -135,7 +132,7 @@ static int dsa_pub_encode(X509_PUBKEY *pk, const EVP_PKEY *pkey)
     if (X509_PUBKEY_set0_param(pk, aobj, ptype, str, penc, penclen))
         return 1;
 
- err:
+err:
     OPENSSL_free(penc);
     ASN1_STRING_free(str);
 
@@ -167,7 +164,7 @@ static int dsa_priv_encode(PKCS8_PRIV_KEY_INFO *p8, const EVP_PKEY *pkey)
     unsigned char *dp = NULL;
     int dplen;
 
-    if (pkey->pkey.dsa  == NULL|| pkey->pkey.dsa->priv_key == NULL) {
+    if (pkey->pkey.dsa == NULL || pkey->pkey.dsa->priv_key == NULL) {
         ERR_raise(ERR_LIB_DSA, DSA_R_MISSING_PARAMETERS);
         goto err;
     }
@@ -203,14 +200,14 @@ static int dsa_priv_encode(PKCS8_PRIV_KEY_INFO *p8, const EVP_PKEY *pkey)
         goto err;
     }
 
-    if (!PKCS8_pkey_set0(p8, OBJ_nid2obj(NID_dsa), 0,
-                         V_ASN1_SEQUENCE, params, dp, dplen)) {
+    if (!PKCS8_pkey_set0(p8, OBJ_nid2obj(NID_dsa), 0, V_ASN1_SEQUENCE, params,
+                         dp, dplen)) {
         OPENSSL_clear_free(dp, dplen);
         goto err;
     }
     return 1;
 
- err:
+err:
     ASN1_STRING_free(params);
     return 0;
 }
@@ -234,9 +231,7 @@ static int dsa_missing_parameters(const EVP_PKEY *pkey)
 {
     DSA *dsa;
     dsa = pkey->pkey.dsa;
-    return dsa == NULL
-        || dsa->params.p == NULL
-        || dsa->params.q == NULL
+    return dsa == NULL || dsa->params.p == NULL || dsa->params.q == NULL
         || dsa->params.g == NULL;
 }
 
@@ -313,12 +308,12 @@ static int do_dsa_print(BIO *bp, const DSA *x, int off, int ptype)
     if (!ossl_ffc_params_print(bp, &x->params, off))
         goto err;
     ret = 1;
- err:
+err:
     return ret;
 }
 
-static int dsa_param_decode(EVP_PKEY *pkey,
-                            const unsigned char **pder, int derlen)
+static int dsa_param_decode(EVP_PKEY *pkey, const unsigned char **pder,
+                            int derlen)
 {
     DSA *dsa;
 
@@ -353,8 +348,8 @@ static int dsa_priv_print(BIO *bp, const EVP_PKEY *pkey, int indent,
     return do_dsa_print(bp, pkey->pkey.dsa, indent, 2);
 }
 
-static int old_dsa_priv_decode(EVP_PKEY *pkey,
-                               const unsigned char **pder, int derlen)
+static int old_dsa_priv_decode(EVP_PKEY *pkey, const unsigned char **pder,
+                               int derlen)
 {
     DSA *dsa;
 
@@ -400,7 +395,7 @@ static int dsa_sig_print(BIO *bp, const X509_ALGOR *sigalg,
         if (!ASN1_bn_print(bp, "s:   ", s, NULL, indent))
             goto err;
         rv = 1;
- err:
+err:
         DSA_SIG_free(dsa_sig);
         return rv;
     }
@@ -452,14 +447,12 @@ static int dsa_pkey_export_to(const EVP_PKEY *from, void *to_keydata,
         goto err;
     selection |= OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS;
     if (pub_key != NULL) {
-        if (!OSSL_PARAM_BLD_push_BN(tmpl, OSSL_PKEY_PARAM_PUB_KEY,
-                                    pub_key))
+        if (!OSSL_PARAM_BLD_push_BN(tmpl, OSSL_PKEY_PARAM_PUB_KEY, pub_key))
             goto err;
         selection |= OSSL_KEYMGMT_SELECT_PUBLIC_KEY;
     }
     if (priv_key != NULL) {
-        if (!OSSL_PARAM_BLD_push_BN(tmpl, OSSL_PKEY_PARAM_PRIV_KEY,
-                                    priv_key))
+        if (!OSSL_PARAM_BLD_push_BN(tmpl, OSSL_PKEY_PARAM_PRIV_KEY, priv_key))
             goto err;
         selection |= OSSL_KEYMGMT_SELECT_PRIVATE_KEY;
     }
@@ -471,7 +464,7 @@ static int dsa_pkey_export_to(const EVP_PKEY *from, void *to_keydata,
     rv = importer(to_keydata, selection, params);
 
     OSSL_PARAM_free(params);
- err:
+err:
     OSSL_PARAM_BLD_free(tmpl);
     return rv;
 }
@@ -519,25 +512,15 @@ static int dsa_pkey_copy(EVP_PKEY *to, EVP_PKEY *from)
 const EVP_PKEY_ASN1_METHOD ossl_dsa_asn1_meths[4] = {
 
     /* This aliases NID_dsa with NID_dsa_2 */
-    {
-     EVP_PKEY_DSA1,
-     EVP_PKEY_DSA,
-     ASN1_PKEY_ALIAS},
+    {EVP_PKEY_DSA1, EVP_PKEY_DSA, ASN1_PKEY_ALIAS},
 
     /* This aliases NID_dsaWithSHA with NID_dsaWithSHA_2 */
-    {
-     EVP_PKEY_DSA4,
-     EVP_PKEY_DSA2,
-     ASN1_PKEY_ALIAS},
+    {EVP_PKEY_DSA4, EVP_PKEY_DSA2, ASN1_PKEY_ALIAS},
 
     /* This aliases NID_dsaWithSHA with NID_dsaWithSHA1 */
-    {
-     EVP_PKEY_DSA3,
-     EVP_PKEY_DSA2,
-     ASN1_PKEY_ALIAS},
+    {EVP_PKEY_DSA3, EVP_PKEY_DSA2, ASN1_PKEY_ALIAS},
 
-    {
-     EVP_PKEY_DSA,
+    {EVP_PKEY_DSA,
      EVP_PKEY_DSA,
      0,
 
@@ -570,13 +553,18 @@ const EVP_PKEY_ASN1_METHOD ossl_dsa_asn1_meths[4] = {
      old_dsa_priv_decode,
      old_dsa_priv_encode,
 
-     NULL, NULL, NULL,
-     NULL, NULL, NULL,
-     NULL, NULL, NULL, NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
 
      dsa_pkey_dirty_cnt,
      dsa_pkey_export_to,
      dsa_pkey_import_from,
-     dsa_pkey_copy
-    }
-};
+     dsa_pkey_copy}};

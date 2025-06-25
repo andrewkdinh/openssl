@@ -96,13 +96,12 @@ static int dh_to_text(BIO *out, const void *key, int selection)
     if (pub_key != NULL
         && !ossl_bio_print_labeled_bignum(out, "public-key:", pub_key))
         return 0;
-    if (params != NULL
-        && !ossl_bio_print_ffc_params(out, params))
+    if (params != NULL && !ossl_bio_print_ffc_params(out, params))
         return 0;
     length = DH_get_length(dh);
     if (length > 0
-        && BIO_printf(out, "recommended-private-length: %ld bits\n",
-                      length) <= 0)
+        && BIO_printf(out, "recommended-private-length: %ld bits\n", length)
+            <= 0)
         return 0;
 
     return 1;
@@ -168,8 +167,7 @@ static int dsa_to_text(BIO *out, const void *key, int selection)
     if (pub_key != NULL
         && !ossl_bio_print_labeled_bignum(out, "pub: ", pub_key))
         return 0;
-    if (params != NULL
-        && !ossl_bio_print_ffc_params(out, params))
+    if (params != NULL && !ossl_bio_print_ffc_params(out, params))
         return 0;
 
     return 1;
@@ -188,8 +186,7 @@ static int ec_param_explicit_curve_to_text(BIO *out, const EC_GROUP *group,
     p = BN_CTX_get(ctx);
     a = BN_CTX_get(ctx);
     b = BN_CTX_get(ctx);
-    if (b == NULL
-        || !EC_GROUP_get_curve(group, p, a, b, ctx))
+    if (b == NULL || !EC_GROUP_get_curve(group, p, a, b, ctx))
         return 0;
 
     if (EC_GROUP_get_field_type(group) == NID_X9_62_characteristic_two_field) {
@@ -224,8 +221,8 @@ static int ec_param_explicit_gen_to_text(BIO *out, const EC_GROUP *group,
 
     switch (form) {
     case POINT_CONVERSION_COMPRESSED:
-       glabel = "Generator (compressed):";
-       break;
+        glabel = "Generator (compressed):";
+        break;
     case POINT_CONVERSION_UNCOMPRESSED:
         glabel = "Generator (uncompressed):";
         break;
@@ -362,13 +359,13 @@ static int ec_to_text(BIO *out, const void *key, int selection)
 
     if (type_label != NULL
         && BIO_printf(out, "%s: (%d bit)\n", type_label,
-                      EC_GROUP_order_bits(group)) <= 0)
+                      EC_GROUP_order_bits(group))
+            <= 0)
         goto err;
     if (priv != NULL
         && !ossl_bio_print_labeled_buf(out, "priv:", priv, priv_len))
         goto err;
-    if (pub != NULL
-        && !ossl_bio_print_labeled_buf(out, "pub:", pub, pub_len))
+    if (pub != NULL && !ossl_bio_print_labeled_buf(out, "pub:", pub, pub_len))
         goto err;
     if ((selection & OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS) != 0)
         ret = ec_param_to_text(out, group, ossl_ec_key_get_libctx(ec));
@@ -415,7 +412,8 @@ static int ecx_to_text(BIO *out, const void *key, int selection)
 
         if (BIO_printf(out, "%s Private-Key:\n", type_label) <= 0)
             return 0;
-        if (!ossl_bio_print_labeled_buf(out, "priv:", ecx->privkey, ecx->keylen))
+        if (!ossl_bio_print_labeled_buf(out, "priv:", ecx->privkey,
+                                        ecx->keylen))
             return 0;
     } else if ((selection & OSSL_KEYMGMT_SELECT_PUBLIC_KEY) != 0) {
         /* ecx->pubkey is an array, not a pointer... */
@@ -464,7 +462,8 @@ static int rsa_to_text(BIO *out, const void *key, int selection)
     STACK_OF(BIGNUM_const) *exps = NULL;
     STACK_OF(BIGNUM_const) *coeffs = NULL;
     int primes;
-    const RSA_PSS_PARAMS_30 *pss_params = ossl_rsa_get0_pss_params_30((RSA *)rsa);
+    const RSA_PSS_PARAMS_30 *pss_params =
+        ossl_rsa_get0_pss_params_30((RSA *)rsa);
     int ret = 0;
 
     if (out == NULL || rsa == NULL) {
@@ -496,12 +495,13 @@ static int rsa_to_text(BIO *out, const void *key, int selection)
     primes = sk_BIGNUM_const_num(factors);
 
     if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0) {
-        if (BIO_printf(out, "%s: (%d bit, %d primes)\n",
-                       type_label, BN_num_bits(rsa_n), primes) <= 0)
+        if (BIO_printf(out, "%s: (%d bit, %d primes)\n", type_label,
+                       BN_num_bits(rsa_n), primes)
+            <= 0)
             goto err;
     } else {
-        if (BIO_printf(out, "%s: (%d bit)\n",
-                       type_label, BN_num_bits(rsa_n)) <= 0)
+        if (BIO_printf(out, "%s: (%d bit)\n", type_label, BN_num_bits(rsa_n))
+            <= 0)
             goto err;
     }
 
@@ -514,26 +514,26 @@ static int rsa_to_text(BIO *out, const void *key, int selection)
 
         if (!ossl_bio_print_labeled_bignum(out, "privateExponent:", rsa_d))
             goto err;
-        if (!ossl_bio_print_labeled_bignum(out, "prime1:",
-                                           sk_BIGNUM_const_value(factors, 0)))
+        if (!ossl_bio_print_labeled_bignum(
+                out, "prime1:", sk_BIGNUM_const_value(factors, 0)))
             goto err;
-        if (!ossl_bio_print_labeled_bignum(out, "prime2:",
-                                           sk_BIGNUM_const_value(factors, 1)))
+        if (!ossl_bio_print_labeled_bignum(
+                out, "prime2:", sk_BIGNUM_const_value(factors, 1)))
             goto err;
-        if (!ossl_bio_print_labeled_bignum(out, "exponent1:",
-                                           sk_BIGNUM_const_value(exps, 0)))
+        if (!ossl_bio_print_labeled_bignum(
+                out, "exponent1:", sk_BIGNUM_const_value(exps, 0)))
             goto err;
-        if (!ossl_bio_print_labeled_bignum(out, "exponent2:",
-                                           sk_BIGNUM_const_value(exps, 1)))
+        if (!ossl_bio_print_labeled_bignum(
+                out, "exponent2:", sk_BIGNUM_const_value(exps, 1)))
             goto err;
-        if (!ossl_bio_print_labeled_bignum(out, "coefficient:",
-                                           sk_BIGNUM_const_value(coeffs, 0)))
+        if (!ossl_bio_print_labeled_bignum(
+                out, "coefficient:", sk_BIGNUM_const_value(coeffs, 0)))
             goto err;
         for (i = 2; i < sk_BIGNUM_const_num(factors); i++) {
             if (BIO_printf(out, "prime%d:", i + 1) <= 0)
                 goto err;
-            if (!ossl_bio_print_labeled_bignum(out, NULL,
-                                               sk_BIGNUM_const_value(factors, i)))
+            if (!ossl_bio_print_labeled_bignum(
+                    out, NULL, sk_BIGNUM_const_value(factors, i)))
                 goto err;
             if (BIO_printf(out, "exponent%d:", i + 1) <= 0)
                 goto err;
@@ -542,8 +542,8 @@ static int rsa_to_text(BIO *out, const void *key, int selection)
                 goto err;
             if (BIO_printf(out, "coefficient%d:", i + 1) <= 0)
                 goto err;
-            if (!ossl_bio_print_labeled_bignum(out, NULL,
-                                               sk_BIGNUM_const_value(coeffs, i - 1)))
+            if (!ossl_bio_print_labeled_bignum(
+                    out, NULL, sk_BIGNUM_const_value(coeffs, i - 1)))
                 goto err;
         }
     }
@@ -574,23 +574,25 @@ static int rsa_to_text(BIO *out, const void *key, int selection)
                     goto err;
                 if (BIO_printf(out, "  Hash Algorithm: %s%s\n",
                                ossl_rsa_oaeppss_nid2name(hashalg_nid),
-                               (hashalg_nid == NID_sha1
-                                ? " (default)" : "")) <= 0)
+                               (hashalg_nid == NID_sha1 ? " (default)" : ""))
+                    <= 0)
                     goto err;
                 if (BIO_printf(out, "  Mask Algorithm: %s with %s%s\n",
                                ossl_rsa_mgf_nid2name(maskgenalg_nid),
                                ossl_rsa_oaeppss_nid2name(maskgenhashalg_nid),
                                (maskgenalg_nid == NID_mgf1
-                                && maskgenhashalg_nid == NID_sha1
-                                ? " (default)" : "")) <= 0)
+                                        && maskgenhashalg_nid == NID_sha1
+                                    ? " (default)"
+                                    : ""))
+                    <= 0)
                     goto err;
-                if (BIO_printf(out, "  Minimum Salt Length: %d%s\n",
-                               saltlen,
-                               (saltlen == 20 ? " (default)" : "")) <= 0)
+                if (BIO_printf(out, "  Minimum Salt Length: %d%s\n", saltlen,
+                               (saltlen == 20 ? " (default)" : ""))
+                    <= 0)
                     goto err;
-                if (BIO_printf(out, "  Trailer Field: 0x%x%s\n",
-                               trailerfield,
-                               (trailerfield == 1 ? " (default)" : "")) <= 0)
+                if (BIO_printf(out, "  Trailer Field: 0x%x%s\n", trailerfield,
+                               (trailerfield == 1 ? " (default)" : ""))
+                    <= 0)
                     goto err;
             }
             break;
@@ -598,7 +600,7 @@ static int rsa_to_text(BIO *out, const void *key, int selection)
     }
 
     ret = 1;
- err:
+err:
     sk_BIGNUM_const_free(factors);
     sk_BIGNUM_const_free(exps);
     sk_BIGNUM_const_free(coeffs);
@@ -624,11 +626,10 @@ static void key2text_freectx(ossl_unused void *vctx)
 {
 }
 
-static int key2text_encode(void *vctx, const void *key, int selection,
-                           OSSL_CORE_BIO *cout,
-                           int (*key2text)(BIO *out, const void *key,
-                                           int selection),
-                           OSSL_PASSPHRASE_CALLBACK *cb, void *cbarg)
+static int
+key2text_encode(void *vctx, const void *key, int selection, OSSL_CORE_BIO *cout,
+                int (*key2text)(BIO *out, const void *key, int selection),
+                OSSL_PASSPHRASE_CALLBACK *cb, void *cbarg)
 {
     BIO *out = ossl_bio_new_from_core_bio(vctx, cout);
     int ret;

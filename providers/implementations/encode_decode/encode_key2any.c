@@ -63,12 +63,10 @@ typedef struct key2any_ctx_st {
 typedef int check_key_type_fn(const void *key, int nid);
 typedef int key_to_paramstring_fn(const void *key, int nid, int save,
                                   void **str, int *strtype);
-typedef int key_to_der_fn(BIO *out, const void *key,
-                          int key_nid, const char *pemname,
-                          key_to_paramstring_fn *p2s,
+typedef int key_to_der_fn(BIO *out, const void *key, int key_nid,
+                          const char *pemname, key_to_paramstring_fn *p2s,
                           OSSL_i2d_of_void_ctx *k2d, KEY2ANY_CTX *ctx);
 typedef int write_bio_of_void_fn(BIO *bp, const void *x);
-
 
 /* Free the blob allocated during key_to_paramstring_fn */
 static void free_asn1_data(int type, void *data)
@@ -96,8 +94,8 @@ static PKCS8_PRIV_KEY_INFO *key_to_p8info(const void *key, int key_nid,
 
     if ((p8info = PKCS8_PRIV_KEY_INFO_new()) == NULL
         || (derlen = k2d(key, &der, (void *)ctx)) <= 0
-        || !PKCS8_pkey_set0(p8info, OBJ_nid2obj(key_nid), 0,
-                            params_type, params, der, derlen)) {
+        || !PKCS8_pkey_set0(p8info, OBJ_nid2obj(key_nid), 0, params_type,
+                            params, der, derlen)) {
         ERR_raise(ERR_LIB_PROV, ERR_R_ASN1_LIB);
         PKCS8_PRIV_KEY_INFO_free(p8info);
         OPENSSL_free(der);
@@ -107,8 +105,7 @@ static PKCS8_PRIV_KEY_INFO *key_to_p8info(const void *key, int key_nid,
     return p8info;
 }
 
-static X509_SIG *p8info_to_encp8(PKCS8_PRIV_KEY_INFO *p8info,
-                                 KEY2ANY_CTX *ctx)
+static X509_SIG *p8info_to_encp8(PKCS8_PRIV_KEY_INFO *p8info, KEY2ANY_CTX *ctx)
 {
     X509_SIG *p8 = NULL;
     char kstr[PEM_BUFSIZE];
@@ -124,14 +121,14 @@ static X509_SIG *p8info_to_encp8(PKCS8_PRIV_KEY_INFO *p8info,
         return NULL;
     }
     /* First argument == -1 means "standard" */
-    p8 = PKCS8_encrypt_ex(-1, ctx->cipher, kstr, klen, NULL, 0, 0, p8info, libctx, NULL);
+    p8 = PKCS8_encrypt_ex(-1, ctx->cipher, kstr, klen, NULL, 0, 0, p8info,
+                          libctx, NULL);
     OPENSSL_cleanse(kstr, klen);
     return p8;
 }
 
-static X509_SIG *key_to_encp8(const void *key, int key_nid,
-                              void *params, int params_type,
-                              OSSL_i2d_of_void_ctx *k2d,
+static X509_SIG *key_to_encp8(const void *key, int key_nid, void *params,
+                              int params_type, OSSL_i2d_of_void_ctx *k2d,
                               KEY2ANY_CTX *ctx)
 {
     PKCS8_PRIV_KEY_INFO *p8info =
@@ -147,9 +144,8 @@ static X509_SIG *key_to_encp8(const void *key, int key_nid,
     return p8;
 }
 
-static X509_PUBKEY *key_to_pubkey(const void *key, int key_nid,
-                                  void *params, int params_type,
-                                  OSSL_i2d_of_void_ctx *k2d,
+static X509_PUBKEY *key_to_pubkey(const void *key, int key_nid, void *params,
+                                  int params_type, OSSL_i2d_of_void_ctx *k2d,
                                   KEY2ANY_CTX *ctx)
 {
     /* der, derlen store the key DER output and its length */
@@ -158,11 +154,10 @@ static X509_PUBKEY *key_to_pubkey(const void *key, int key_nid,
     /* The final X509_PUBKEY */
     X509_PUBKEY *xpk = NULL;
 
-
     if ((xpk = X509_PUBKEY_new()) == NULL
         || (derlen = k2d(key, &der, (void *)ctx)) <= 0
-        || !X509_PUBKEY_set0_param(xpk, OBJ_nid2obj(key_nid),
-                                   params_type, params, der, derlen)) {
+        || !X509_PUBKEY_set0_param(xpk, OBJ_nid2obj(key_nid), params_type,
+                                   params, der, derlen)) {
         ERR_raise(ERR_LIB_PROV, ERR_R_X509_LIB);
         X509_PUBKEY_free(xpk);
         OPENSSL_free(der);
@@ -191,12 +186,10 @@ static X509_PUBKEY *key_to_pubkey(const void *key, int key_nid,
  * key data itself.
  */
 
-static int key_to_epki_der_priv_bio(BIO *out, const void *key,
-                                    int key_nid,
+static int key_to_epki_der_priv_bio(BIO *out, const void *key, int key_nid,
                                     ossl_unused const char *pemname,
                                     key_to_paramstring_fn *p2s,
-                                    OSSL_i2d_of_void_ctx *k2d,
-                                    KEY2ANY_CTX *ctx)
+                                    OSSL_i2d_of_void_ctx *k2d, KEY2ANY_CTX *ctx)
 {
     int ret = 0;
     void *str = NULL;
@@ -206,8 +199,7 @@ static int key_to_epki_der_priv_bio(BIO *out, const void *key,
     if (!ctx->cipher_intent)
         return 0;
 
-    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters,
-                            &str, &strtype))
+    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters, &str, &strtype))
         return 0;
 
     p8 = key_to_encp8(key, key_nid, str, strtype, k2d, ctx);
@@ -219,12 +211,10 @@ static int key_to_epki_der_priv_bio(BIO *out, const void *key,
     return ret;
 }
 
-static int key_to_epki_pem_priv_bio(BIO *out, const void *key,
-                                    int key_nid,
+static int key_to_epki_pem_priv_bio(BIO *out, const void *key, int key_nid,
                                     ossl_unused const char *pemname,
                                     key_to_paramstring_fn *p2s,
-                                    OSSL_i2d_of_void_ctx *k2d,
-                                    KEY2ANY_CTX *ctx)
+                                    OSSL_i2d_of_void_ctx *k2d, KEY2ANY_CTX *ctx)
 {
     int ret = 0;
     void *str = NULL;
@@ -234,8 +224,7 @@ static int key_to_epki_pem_priv_bio(BIO *out, const void *key,
     if (!ctx->cipher_intent)
         return 0;
 
-    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters,
-                            &str, &strtype))
+    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters, &str, &strtype))
         return 0;
 
     p8 = key_to_encp8(key, key_nid, str, strtype, k2d, ctx);
@@ -247,12 +236,10 @@ static int key_to_epki_pem_priv_bio(BIO *out, const void *key,
     return ret;
 }
 
-static int key_to_pki_der_priv_bio(BIO *out, const void *key,
-                                   int key_nid,
+static int key_to_pki_der_priv_bio(BIO *out, const void *key, int key_nid,
                                    ossl_unused const char *pemname,
                                    key_to_paramstring_fn *p2s,
-                                   OSSL_i2d_of_void_ctx *k2d,
-                                   KEY2ANY_CTX *ctx)
+                                   OSSL_i2d_of_void_ctx *k2d, KEY2ANY_CTX *ctx)
 {
     int ret = 0;
     void *str = NULL;
@@ -260,11 +247,10 @@ static int key_to_pki_der_priv_bio(BIO *out, const void *key,
     PKCS8_PRIV_KEY_INFO *p8info;
 
     if (ctx->cipher_intent)
-        return key_to_epki_der_priv_bio(out, key, key_nid, pemname,
-                                        p2s, k2d, ctx);
+        return key_to_epki_der_priv_bio(out, key, key_nid, pemname, p2s, k2d,
+                                        ctx);
 
-    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters,
-                            &str, &strtype))
+    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters, &str, &strtype))
         return 0;
 
     p8info = key_to_p8info(key, key_nid, str, strtype, k2d, ctx);
@@ -279,12 +265,10 @@ static int key_to_pki_der_priv_bio(BIO *out, const void *key,
     return ret;
 }
 
-static int key_to_pki_pem_priv_bio(BIO *out, const void *key,
-                                   int key_nid,
+static int key_to_pki_pem_priv_bio(BIO *out, const void *key, int key_nid,
                                    ossl_unused const char *pemname,
                                    key_to_paramstring_fn *p2s,
-                                   OSSL_i2d_of_void_ctx *k2d,
-                                   KEY2ANY_CTX *ctx)
+                                   OSSL_i2d_of_void_ctx *k2d, KEY2ANY_CTX *ctx)
 {
     int ret = 0;
     void *str = NULL;
@@ -292,11 +276,10 @@ static int key_to_pki_pem_priv_bio(BIO *out, const void *key,
     PKCS8_PRIV_KEY_INFO *p8info;
 
     if (ctx->cipher_intent)
-        return key_to_epki_pem_priv_bio(out, key, key_nid, pemname,
-                                        p2s, k2d, ctx);
+        return key_to_epki_pem_priv_bio(out, key, key_nid, pemname, p2s, k2d,
+                                        ctx);
 
-    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters,
-                            &str, &strtype))
+    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters, &str, &strtype))
         return 0;
 
     p8info = key_to_p8info(key, key_nid, str, strtype, k2d, ctx);
@@ -311,20 +294,17 @@ static int key_to_pki_pem_priv_bio(BIO *out, const void *key,
     return ret;
 }
 
-static int key_to_spki_der_pub_bio(BIO *out, const void *key,
-                                   int key_nid,
+static int key_to_spki_der_pub_bio(BIO *out, const void *key, int key_nid,
                                    ossl_unused const char *pemname,
                                    key_to_paramstring_fn *p2s,
-                                   OSSL_i2d_of_void_ctx *k2d,
-                                   KEY2ANY_CTX *ctx)
+                                   OSSL_i2d_of_void_ctx *k2d, KEY2ANY_CTX *ctx)
 {
     int ret = 0;
     void *str = NULL;
     int strtype = V_ASN1_UNDEF;
     X509_PUBKEY *xpk = NULL;
 
-    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters,
-                            &str, &strtype))
+    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters, &str, &strtype))
         return 0;
 
     xpk = key_to_pubkey(key, key_nid, str, strtype, k2d, ctx);
@@ -337,20 +317,17 @@ static int key_to_spki_der_pub_bio(BIO *out, const void *key,
     return ret;
 }
 
-static int key_to_spki_pem_pub_bio(BIO *out, const void *key,
-                                   int key_nid,
+static int key_to_spki_pem_pub_bio(BIO *out, const void *key, int key_nid,
                                    ossl_unused const char *pemname,
                                    key_to_paramstring_fn *p2s,
-                                   OSSL_i2d_of_void_ctx *k2d,
-                                   KEY2ANY_CTX *ctx)
+                                   OSSL_i2d_of_void_ctx *k2d, KEY2ANY_CTX *ctx)
 {
     int ret = 0;
     void *str = NULL;
     int strtype = V_ASN1_UNDEF;
     X509_PUBKEY *xpk = NULL;
 
-    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters,
-                            &str, &strtype))
+    if (p2s != NULL && !p2s(key, key_nid, ctx->save_parameters, &str, &strtype))
         return 0;
 
     xpk = key_to_pubkey(key, key_nid, str, strtype, k2d, ctx);
@@ -377,8 +354,7 @@ static int key_to_spki_pem_pub_bio(BIO *out, const void *key,
  * Note that these functions completely ignore p2s, and rather rely entirely
  * on k2d to do the complete work.
  */
-static int key_to_type_specific_der_bio(BIO *out, const void *key,
-                                        int key_nid,
+static int key_to_type_specific_der_bio(BIO *out, const void *key, int key_nid,
                                         ossl_unused const char *pemname,
                                         key_to_paramstring_fn *p2s,
                                         OSSL_i2d_of_void_ctx *k2d,
@@ -409,7 +385,8 @@ static int key_to_type_specific_pem_bio_cb(BIO *out, const void *key,
                                            pem_password_cb *cb, void *cbarg)
 {
     return PEM_ASN1_write_bio_ctx(k2d, (void *)ctx, pemname, out, key,
-                                  ctx->cipher, NULL, 0, cb, cbarg) > 0;
+                                  ctx->cipher, NULL, 0, cb, cbarg)
+        > 0;
 }
 
 static int key_to_type_specific_pem_priv_bio(BIO *out, const void *key,
@@ -418,9 +395,9 @@ static int key_to_type_specific_pem_priv_bio(BIO *out, const void *key,
                                              OSSL_i2d_of_void_ctx *k2d,
                                              KEY2ANY_CTX *ctx)
 {
-    return key_to_type_specific_pem_bio_cb(out, key, key_nid, pemname,
-                                           p2s, k2d, ctx,
-                                           ossl_pw_pem_password, &ctx->pwdata);
+    return key_to_type_specific_pem_bio_cb(out, key, key_nid, pemname, p2s, k2d,
+                                           ctx, ossl_pw_pem_password,
+                                           &ctx->pwdata);
 }
 
 static int key_to_type_specific_pem_pub_bio(BIO *out, const void *key,
@@ -429,8 +406,8 @@ static int key_to_type_specific_pem_pub_bio(BIO *out, const void *key,
                                             OSSL_i2d_of_void_ctx *k2d,
                                             KEY2ANY_CTX *ctx)
 {
-    return key_to_type_specific_pem_bio_cb(out, key, key_nid, pemname,
-                                           p2s, k2d, ctx, NULL, NULL);
+    return key_to_type_specific_pem_bio_cb(out, key, key_nid, pemname, p2s, k2d,
+                                           ctx, NULL, NULL);
 }
 
 #ifndef OPENSSL_NO_KEYPARAMS
@@ -440,8 +417,8 @@ static int key_to_type_specific_pem_param_bio(BIO *out, const void *key,
                                               OSSL_i2d_of_void_ctx *k2d,
                                               KEY2ANY_CTX *ctx)
 {
-    return key_to_type_specific_pem_bio_cb(out, key, key_nid, pemname,
-                                           p2s, k2d, ctx, NULL, NULL);
+    return key_to_type_specific_pem_bio_cb(out, key, key_nid, pemname, p2s, k2d,
+                                           ctx, NULL, NULL);
 }
 #endif
 
@@ -458,8 +435,8 @@ static int key_to_type_specific_pem_param_bio(BIO *out, const void *key,
 /* ---------------------------------------------------------------------- */
 
 #ifndef OPENSSL_NO_DH
-static int prepare_dh_params(const void *dh, int nid, int save,
-                             void **pstr, int *pstrtype)
+static int prepare_dh_params(const void *dh, int nid, int save, void **pstr,
+                             int *pstrtype)
 {
     ASN1_STRING *params = ASN1_STRING_new();
 
@@ -531,9 +508,8 @@ static int dh_pki_priv_to_der(const void *dh, unsigned char **pder,
 
 # define dh_epki_priv_to_der dh_pki_priv_to_der
 
-static int
-dh_type_specific_params_to_der(const void *dh, unsigned char **pder,
-                               ossl_unused void *ctx)
+static int dh_type_specific_params_to_der(const void *dh, unsigned char **pder,
+                                          ossl_unused void *ctx)
 {
     if (DH_test_flags(dh, DH_FLAG_TYPE_DHX))
         return i2d_DHxparams(dh, pder);
@@ -549,8 +525,7 @@ dh_type_specific_params_to_der(const void *dh, unsigned char **pder,
 
 static int dh_check_key_type(const void *dh, int expected_type)
 {
-    int type =
-        DH_test_flags(dh, DH_FLAG_TYPE_DHX) ? EVP_PKEY_DHX : EVP_PKEY_DH;
+    int type = DH_test_flags(dh, DH_FLAG_TYPE_DHX) ? EVP_PKEY_DHX : EVP_PKEY_DH;
 
     return type == expected_type;
 }
@@ -564,8 +539,8 @@ static int dh_check_key_type(const void *dh, int expected_type)
 /* ---------------------------------------------------------------------- */
 
 #ifndef OPENSSL_NO_DSA
-static int encode_dsa_params(const void *dsa, int nid,
-                             void **pstr, int *pstrtype)
+static int encode_dsa_params(const void *dsa, int nid, void **pstr,
+                             int *pstrtype)
 {
     ASN1_STRING *params = ASN1_STRING_new();
 
@@ -587,8 +562,8 @@ static int encode_dsa_params(const void *dsa, int nid,
     return 1;
 }
 
-static int prepare_dsa_params(const void *dsa, int nid, int save,
-                              void **pstr, int *pstrtype)
+static int prepare_dsa_params(const void *dsa, int nid, int save, void **pstr,
+                              int *pstrtype)
 {
     const BIGNUM *p = DSA_get0_p(dsa);
     const BIGNUM *q = DSA_get0_q(dsa);
@@ -646,9 +621,8 @@ static int dsa_pki_priv_to_der(const void *dsa, unsigned char **pder,
     return ret;
 }
 
-k2d_NOCTX(dsa_prv, i2d_DSAPrivateKey)
-k2d_NOCTX(dsa_pub, i2d_DSAPublicKey)
-k2d_NOCTX(dsa_param, i2d_DSAparams)
+k2d_NOCTX(dsa_prv, i2d_DSAPrivateKey) k2d_NOCTX(dsa_pub, i2d_DSAPublicKey)
+    k2d_NOCTX(dsa_param, i2d_DSAparams)
 
 # define dsa_epki_priv_to_der dsa_pki_priv_to_der
 
@@ -664,8 +638,8 @@ k2d_NOCTX(dsa_param, i2d_DSAparams)
 /* ---------------------------------------------------------------------- */
 
 #ifndef OPENSSL_NO_EC
-static int prepare_ec_explicit_params(const void *eckey,
-                                      void **pstr, int *pstrtype)
+        static int prepare_ec_explicit_params(const void *eckey, void **pstr,
+                                              int *pstrtype)
 {
     ASN1_STRING *params = ASN1_STRING_new();
 
@@ -690,8 +664,8 @@ static int prepare_ec_explicit_params(const void *eckey,
  * This implements EcpkParameters, where the CHOICE is based on whether there
  * is a curve name (curve nid) to be found or not.  See RFC 3279 for details.
  */
-static int prepare_ec_params(const void *eckey, int nid, int save,
-                             void **pstr, int *pstrtype)
+static int prepare_ec_params(const void *eckey, int nid, int save, void **pstr,
+                             int *pstrtype)
 {
     int curve_nid;
     const EC_GROUP *group = EC_KEY_get0_group(eckey);
@@ -755,8 +729,7 @@ static int ec_pki_priv_to_der(const void *veckey, unsigned char **pder,
     return ret; /* return the length of the der encoded data */
 }
 
-k2d_NOCTX(ec_param, i2d_ECParameters)
-k2d_NOCTX(ec_prv, i2d_ECPrivateKey)
+k2d_NOCTX(ec_param, i2d_ECParameters) k2d_NOCTX(ec_prv, i2d_ECPrivateKey)
 
 # define ec_epki_priv_to_der ec_pki_priv_to_der
 
@@ -787,8 +760,8 @@ k2d_NOCTX(ec_prv, i2d_ECPrivateKey)
 #ifndef OPENSSL_NO_ECX
 # define prepare_ecx_params NULL
 
-static int ecx_spki_pub_to_der(const void *vecxkey, unsigned char **pder,
-                               ossl_unused void *ctx)
+    static int ecx_spki_pub_to_der(const void *vecxkey, unsigned char **pder,
+                                   ossl_unused void *ctx)
 {
     const ECX_KEY *ecxkey = vecxkey;
     unsigned char *keyblob;
@@ -917,8 +890,8 @@ static int ml_kem_pki_priv_to_der(const void *vkey, unsigned char **pder,
  * functionality doesn't allow that.
  */
 
-static int prepare_rsa_params(const void *rsa, int nid, int save,
-                              void **pstr, int *pstrtype)
+static int prepare_rsa_params(const void *rsa, int nid, int save, void **pstr,
+                              int *pstrtype)
 {
     const RSA_PSS_PARAMS_30 *pss = ossl_rsa_get0_pss_params_30((RSA *)rsa);
 
@@ -979,7 +952,7 @@ static int prepare_rsa_params(const void *rsa, int nid, int save,
             *pstr = astr;
 
             return 1;
-         err:
+err:
             OPENSSL_free(str);
             return 0;
         }
@@ -989,8 +962,7 @@ static int prepare_rsa_params(const void *rsa, int nid, int save,
     return 0;
 }
 
-k2d_NOCTX(rsa_prv, i2d_RSAPrivateKey)
-k2d_NOCTX(rsa_pub, i2d_RSAPublicKey)
+k2d_NOCTX(rsa_prv, i2d_RSAPrivateKey) k2d_NOCTX(rsa_pub, i2d_RSAPublicKey)
 
 /*
  * RSA is extremely simple, as PKCS#1 is used for the PKCS#8 |privateKey|
@@ -1003,7 +975,7 @@ k2d_NOCTX(rsa_pub, i2d_RSAPublicKey)
 #define rsa_type_specific_pub_to_der    rsa_pub_k2d
 #define rsa_type_specific_params_to_der NULL
 
-static int rsa_check_key_type(const void *rsa, int expected_type)
+    static int rsa_check_key_type(const void *rsa, int expected_type)
 {
     switch (RSA_test_flags(rsa, RSA_FLAG_TYPE_MASK)) {
     case RSA_FLAG_TYPE_RSA:
@@ -1059,7 +1031,8 @@ static int slh_dsa_pki_priv_to_der(const void *vkey, unsigned char **pder,
     len = ossl_slh_dsa_key_get_priv_len(key);
 
     if (pder != NULL
-            && ((*pder = OPENSSL_memdup(ossl_slh_dsa_key_get_priv(key), len)) == NULL))
+        && ((*pder = OPENSSL_memdup(ossl_slh_dsa_key_get_priv(key), len))
+            == NULL))
         return 0;
 
     return len;
@@ -1168,8 +1141,8 @@ static int key2any_set_ctx_params(void *vctx, const OSSL_PARAM params[])
         ctx->cipher = NULL;
         ctx->cipher_intent = ciphername != NULL;
         if (ciphername != NULL
-            && ((ctx->cipher =
-                 EVP_CIPHER_fetch(libctx, ciphername, props)) == NULL))
+            && ((ctx->cipher = EVP_CIPHER_fetch(libctx, ciphername, props))
+                == NULL))
             return 0;
     }
 
@@ -1186,11 +1159,9 @@ static int key2any_check_selection(int selection, int selection_mask)
      * The selections are kinda sorta "levels", i.e. each selection given
      * here is assumed to include those following.
      */
-    int checks[] = {
-        OSSL_KEYMGMT_SELECT_PRIVATE_KEY,
-        OSSL_KEYMGMT_SELECT_PUBLIC_KEY,
-        OSSL_KEYMGMT_SELECT_ALL_PARAMETERS
-    };
+    int checks[] = {OSSL_KEYMGMT_SELECT_PRIVATE_KEY,
+                    OSSL_KEYMGMT_SELECT_PUBLIC_KEY,
+                    OSSL_KEYMGMT_SELECT_ALL_PARAMETERS};
     size_t i;
 
     /* The decoder implementations made here support guessing */
@@ -1215,8 +1186,7 @@ static int key2any_check_selection(int selection, int selection_mask)
 
 static int key2any_encode(KEY2ANY_CTX *ctx, OSSL_CORE_BIO *cout,
                           const void *key, int type, const char *pemname,
-                          check_key_type_fn *checker,
-                          key_to_der_fn *writer,
+                          check_key_type_fn *checker, key_to_der_fn *writer,
                           OSSL_PASSPHRASE_CALLBACK *pwcb, void *pwcbarg,
                           key_to_paramstring_fn *key2paramstring,
                           OSSL_i2d_of_void_ctx *key2der)
@@ -1225,8 +1195,7 @@ static int key2any_encode(KEY2ANY_CTX *ctx, OSSL_CORE_BIO *cout,
 
     if (key == NULL) {
         ERR_raise(ERR_LIB_PROV, ERR_R_PASSED_NULL_PARAMETER);
-    } else if (writer != NULL
-               && (checker == NULL || checker(key, type))) {
+    } else if (writer != NULL && (checker == NULL || checker(key, type))) {
         BIO *out = ossl_bio_new_from_core_bio(ctx->provctx, cout);
 
         if (out != NULL

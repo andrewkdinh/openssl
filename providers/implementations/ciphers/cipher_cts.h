@@ -10,7 +10,7 @@
 #include "crypto/evp.h"
 
 /* NOTE: The underlying block cipher is CBC so we reuse most of the code */
-#define IMPLEMENT_cts_cipher(alg, UCALG, lcmode, UCMODE, flags, kbits,         \
+#define IMPLEMENT_cts_cipher(alg, UCALG, lcmode, UCMODE, flags, kbits, \
                              blkbits, ivbits, typ)                             \
 static OSSL_FUNC_cipher_get_params_fn alg##_##kbits##_##lcmode##_get_params;   \
 static int alg##_cts_##kbits##_##lcmode##_get_params(OSSL_PARAM params[])      \

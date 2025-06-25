@@ -31,23 +31,22 @@ int ossl_dsa_generate_ffc_parameters(DSA *dsa, int type, int pbits, int qbits,
 #ifndef FIPS_MODULE
     if (type == DSA_PARAMGEN_TYPE_FIPS_186_2)
         ret = ossl_ffc_params_FIPS186_2_generate(dsa->libctx, &dsa->params,
-                                                 FFC_PARAM_TYPE_DSA,
-                                                 pbits, qbits, &res, cb);
+                                                 FFC_PARAM_TYPE_DSA, pbits,
+                                                 qbits, &res, cb);
     else
 #endif
         ret = ossl_ffc_params_FIPS186_4_generate(dsa->libctx, &dsa->params,
-                                                 FFC_PARAM_TYPE_DSA,
-                                                 pbits, qbits, &res, cb);
+                                                 FFC_PARAM_TYPE_DSA, pbits,
+                                                 qbits, &res, cb);
     if (ret > 0)
         dsa->dirty_cnt++;
     return ret;
 }
 
 #ifndef FIPS_MODULE
-int DSA_generate_parameters_ex(DSA *dsa, int bits,
-                               const unsigned char *seed_in, int seed_len,
-                               int *counter_ret, unsigned long *h_ret,
-                               BN_GENCB *cb)
+int DSA_generate_parameters_ex(DSA *dsa, int bits, const unsigned char *seed_in,
+                               int seed_len, int *counter_ret,
+                               unsigned long *h_ret, BN_GENCB *cb)
 {
     if (dsa->meth->dsa_paramgen)
         return dsa->meth->dsa_paramgen(dsa, bits, seed_in, seed_len,

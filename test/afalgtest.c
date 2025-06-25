@@ -53,7 +53,7 @@ static int test_afalg_aes_cbc(int keysize_idx)
         "\xa0\x76\x85\xfd\xc1\x65\x71\x9d\xc7\xe9\x13\x6e\xae\x55\x49\xb4"
         "\x13";
 
-#ifdef OSSL_SANITIZE_MEMORY
+# ifdef OSSL_SANITIZE_MEMORY
     /*
      * Initialise the encryption & decryption buffers to pacify the memory
      * sanitiser.  The sanitiser doesn't know that this memory is modified
@@ -61,30 +61,30 @@ static int test_afalg_aes_cbc(int keysize_idx)
      */
     OPENSSL_cleanse(ebuf, sizeof(ebuf));
     OPENSSL_cleanse(dbuf, sizeof(dbuf));
-#endif
+# endif
 
     switch (keysize_idx) {
-        case 0:
-            cipher = EVP_aes_128_cbc();
-            enc_result = &encresult_128[0];
-            break;
-        case 1:
-            cipher = EVP_aes_192_cbc();
-            enc_result = &encresult_192[0];
-            break;
-        case 2:
-            cipher = EVP_aes_256_cbc();
-            enc_result = &encresult_256[0];
-            break;
-        default:
-            cipher = NULL;
+    case 0:
+        cipher = EVP_aes_128_cbc();
+        enc_result = &encresult_128[0];
+        break;
+    case 1:
+        cipher = EVP_aes_192_cbc();
+        enc_result = &encresult_192[0];
+        break;
+    case 2:
+        cipher = EVP_aes_256_cbc();
+        enc_result = &encresult_256[0];
+        break;
+    default:
+        cipher = NULL;
     }
     if (!TEST_ptr(ctx = EVP_CIPHER_CTX_new()))
-            return 0;
+        return 0;
 
     if (!TEST_true(EVP_CipherInit_ex(ctx, cipher, e, key, iv, 1))
-            || !TEST_true(EVP_CipherUpdate(ctx, ebuf, &encl, in, BUFFER_SIZE))
-            || !TEST_true(EVP_CipherFinal_ex(ctx, ebuf + encl, &encf)))
+        || !TEST_true(EVP_CipherUpdate(ctx, ebuf, &encl, in, BUFFER_SIZE))
+        || !TEST_true(EVP_CipherFinal_ex(ctx, ebuf + encl, &encf)))
         goto end;
     encl += encf;
 
@@ -92,19 +92,19 @@ static int test_afalg_aes_cbc(int keysize_idx)
         goto end;
 
     if (!TEST_true(EVP_CIPHER_CTX_reset(ctx))
-            || !TEST_true(EVP_CipherInit_ex(ctx, cipher, e, key, iv, 0))
-            || !TEST_true(EVP_CipherUpdate(ctx, dbuf, &decl, ebuf, encl))
-            || !TEST_true(EVP_CipherFinal_ex(ctx, dbuf + decl, &decf)))
+        || !TEST_true(EVP_CipherInit_ex(ctx, cipher, e, key, iv, 0))
+        || !TEST_true(EVP_CipherUpdate(ctx, dbuf, &decl, ebuf, encl))
+        || !TEST_true(EVP_CipherFinal_ex(ctx, dbuf + decl, &decf)))
         goto end;
     decl += decf;
 
     if (!TEST_int_eq(decl, BUFFER_SIZE)
-            || !TEST_mem_eq(dbuf, BUFFER_SIZE, in, BUFFER_SIZE))
+        || !TEST_mem_eq(dbuf, BUFFER_SIZE, in, BUFFER_SIZE))
         goto end;
 
     ret = 1;
 
- end:
+end:
     EVP_CIPHER_CTX_free(ctx);
     return ret;
 }

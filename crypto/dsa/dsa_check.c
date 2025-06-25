@@ -69,7 +69,7 @@ int ossl_dsa_check_pub_key(const DSA *dsa, const BIGNUM *pub_key, int *ret)
         return 0;
 
     return ossl_ffc_validate_public_key(&dsa->params, pub_key, ret)
-           && *ret == 0;
+        && *ret == 0;
 }
 
 /*
@@ -77,13 +77,14 @@ int ossl_dsa_check_pub_key(const DSA *dsa, const BIGNUM *pub_key, int *ret)
  * To only be used with ephemeral FFC public keys generated using the approved
  * safe-prime groups.
  */
-int ossl_dsa_check_pub_key_partial(const DSA *dsa, const BIGNUM *pub_key, int *ret)
+int ossl_dsa_check_pub_key_partial(const DSA *dsa, const BIGNUM *pub_key,
+                                   int *ret)
 {
     if (!dsa_precheck_params(dsa, ret))
         return 0;
 
     return ossl_ffc_validate_public_key_partial(&dsa->params, pub_key, ret)
-           && *ret == 0;
+        && *ret == 0;
 }
 
 int ossl_dsa_check_priv_key(const DSA *dsa, const BIGNUM *priv_key, int *ret)
@@ -109,9 +110,7 @@ int ossl_dsa_check_pairwise(const DSA *dsa)
     if (!dsa_precheck_params(dsa, &ret))
         return 0;
 
-    if (dsa->params.g == NULL
-        || dsa->priv_key == NULL
-        || dsa->pub_key == NULL)
+    if (dsa->params.g == NULL || dsa->priv_key == NULL || dsa->pub_key == NULL)
         return 0;
 
     ctx = BN_CTX_new_ex(dsa->libctx);

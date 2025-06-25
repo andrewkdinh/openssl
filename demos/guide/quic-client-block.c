@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     BIO *bio = NULL;
     int res = EXIT_FAILURE;
     int ret;
-    unsigned char alpn[] = { 8, 'h', 't', 't', 'p', '/', '1', '.', '0' };
+    unsigned char alpn[] = {8, 'h', 't', 't', 'p', '/', '1', '.', '0'};
     const char *request_start = "GET / HTTP/1.0\r\nConnection: close\r\nHost: ";
     const char *request_end = "\r\n\r\n";
     size_t written, readbytes;
@@ -182,7 +182,8 @@ int main(int argc, char *argv[])
      * Create the underlying transport socket/BIO and associate it with the
      * connection.
      */
-    bio = create_socket_bio(hostname, port, ipv6 ? AF_INET6 : AF_INET, &peer_addr);
+    bio = create_socket_bio(hostname, port, ipv6 ? AF_INET6 : AF_INET,
+                            &peer_addr);
     if (bio == NULL) {
         printf("Failed to crete the BIO\n");
         goto end;
@@ -230,7 +231,7 @@ int main(int argc, char *argv[])
          */
         if (SSL_get_verify_result(ssl) != X509_V_OK)
             printf("Verify error: %s\n",
-                X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
+                   X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
         goto end;
     }
 
@@ -303,7 +304,7 @@ int main(int argc, char *argv[])
 
     default:
         /* Some other unexpected error occurred */
-        printf ("Failed reading remaining data\n");
+        printf("Failed reading remaining data\n");
         break;
     }
 
@@ -321,7 +322,7 @@ int main(int argc, char *argv[])
 
     /* Success! */
     res = EXIT_SUCCESS;
- end:
+end:
     /*
      * If something bad happened then we will dump the contents of the
      * OpenSSL error stack to stderr. There might be some useful diagnostic

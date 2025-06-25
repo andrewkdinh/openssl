@@ -86,10 +86,9 @@ ASN1_BIT_STRING *ossl_cmp_calc_protection(const OSSL_CMP_CTX *ctx,
             goto end;
         }
 
-        if (!OSSL_CRMF_pbm_new(ctx->libctx, ctx->propq,
-                               pbm, prot_part_der, prot_part_der_len,
-                               ctx->secretValue->data, ctx->secretValue->length,
-                               &protection, &sig_len))
+        if (!OSSL_CRMF_pbm_new(ctx->libctx, ctx->propq, pbm, prot_part_der,
+                               prot_part_der_len, ctx->secretValue->data,
+                               ctx->secretValue->length, &protection, &sig_len))
             goto end;
 
         if ((prot = ASN1_BIT_STRING_new()) == NULL)
@@ -100,7 +99,7 @@ ASN1_BIT_STRING *ossl_cmp_calc_protection(const OSSL_CMP_CTX *ctx,
             ASN1_BIT_STRING_free(prot);
             prot = NULL;
         }
-    end:
+end:
         OSSL_CRMF_PBMPARAMETER_free(pbm);
         OPENSSL_free(protection);
         OPENSSL_free(prot_part_der);
@@ -140,7 +139,8 @@ void ossl_cmp_set_own_chain(OSSL_CMP_CTX *ctx)
         ctx->chain = X509_build_chain(ctx->cert, ctx->untrusted, NULL, 0,
                                       ctx->libctx, ctx->propq);
         if (ctx->chain != NULL) {
-            ossl_cmp_debug(ctx, "success building chain for own CMP signer cert");
+            ossl_cmp_debug(ctx,
+                           "success building chain for own CMP signer cert");
         } else {
             /* dump errors to avoid confusion when printing further ones */
             OSSL_CMP_CTX_print_errors(ctx);
@@ -156,8 +156,8 @@ int ossl_cmp_msg_add_extraCerts(OSSL_CMP_CTX *ctx, OSSL_CMP_MSG *msg)
         return 0;
 
     /* Add first ctx->cert and its chain if using signature-based protection */
-    if (!ctx->unprotectedSend && ctx->secretValue == NULL
-            && ctx->cert != NULL && ctx->pkey != NULL) {
+    if (!ctx->unprotectedSend && ctx->secretValue == NULL && ctx->cert != NULL
+        && ctx->pkey != NULL) {
         int prepend = X509_ADD_FLAG_UP_REF | X509_ADD_FLAG_NO_DUP
             | X509_ADD_FLAG_PREPEND | X509_ADD_FLAG_NO_SS;
 
@@ -211,9 +211,9 @@ static X509_ALGOR *pbmac_algor(const OSSL_CMP_CTX *ctx)
         goto err;
     if (!ASN1_STRING_set(pbm_str, pbm_der, pbm_der_len))
         goto err;
-    alg = ossl_X509_ALGOR_from_nid(NID_id_PasswordBasedMAC,
-                                   V_ASN1_SEQUENCE, pbm_str);
- err:
+    alg = ossl_X509_ALGOR_from_nid(NID_id_PasswordBasedMAC, V_ASN1_SEQUENCE,
+                                   pbm_str);
+err:
     if (alg == NULL)
         ASN1_STRING_free(pbm_str);
     OPENSSL_free(pbm_der);
@@ -279,13 +279,12 @@ int ossl_cmp_msg_protect(OSSL_CMP_CTX *ctx, OSSL_CMP_MSG *msg)
          * from ctx->untrusted, and then ctx->extraCertsOut
          */
     } else {
-        ERR_raise(ERR_LIB_CMP,
-                  CMP_R_MISSING_KEY_INPUT_FOR_CREATING_PROTECTION);
+        ERR_raise(ERR_LIB_CMP, CMP_R_MISSING_KEY_INPUT_FOR_CREATING_PROTECTION);
         goto err;
     }
     if (!ctx->unprotectedSend
         /* protect according to msg->header->protectionAlg partly set above */
-            && ((msg->protection = ossl_cmp_calc_protection(ctx, msg)) == NULL))
+        && ((msg->protection = ossl_cmp_calc_protection(ctx, msg)) == NULL))
         goto err;
 
     /*
@@ -307,7 +306,7 @@ int ossl_cmp_msg_protect(OSSL_CMP_CTX *ctx, OSSL_CMP_MSG *msg)
         return 1;
     ERR_raise(ERR_LIB_CMP, CMP_R_MISSING_SENDER_IDENTIFICATION);
 
- err:
+err:
     ERR_raise(ERR_LIB_CMP, CMP_R_ERROR_PROTECTING_MESSAGE);
     return 0;
 }

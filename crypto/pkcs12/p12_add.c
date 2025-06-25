@@ -40,7 +40,7 @@ PKCS12_SAFEBAG *PKCS12_item_pack_safebag(void *obj, const ASN1_ITEM *it,
     safebag->type = OBJ_nid2obj(nid2);
     return safebag;
 
- err:
+err:
     PKCS12_BAGS_free(bag);
     return NULL;
 }
@@ -66,7 +66,7 @@ PKCS7 *PKCS12_pack_p7data(STACK_OF(PKCS12_SAFEBAG) *sk)
     }
     return p7;
 
- err:
+err:
     PKCS7_free(p7);
     return NULL;
 }
@@ -111,13 +111,15 @@ PKCS7 *PKCS12_pack_p7encdata_ex(int pbe_nid, const char *pass, int passlen,
     }
 
     ERR_set_mark();
-    pbe_ciph = pbe_ciph_fetch = EVP_CIPHER_fetch(ctx, OBJ_nid2sn(pbe_nid), propq);
+    pbe_ciph = pbe_ciph_fetch =
+        EVP_CIPHER_fetch(ctx, OBJ_nid2sn(pbe_nid), propq);
     if (pbe_ciph == NULL)
         pbe_ciph = EVP_get_cipherbynid(pbe_nid);
     ERR_pop_to_mark();
 
     if (pbe_ciph != NULL) {
-        pbe = PKCS5_pbe2_set_iv_ex(pbe_ciph, iter, salt, saltlen, NULL, -1, ctx);
+        pbe =
+            PKCS5_pbe2_set_iv_ex(pbe_ciph, iter, salt, saltlen, NULL, -1, ctx);
     } else {
         pbe = PKCS5_pbe_set_ex(pbe_nid, iter, salt, saltlen, ctx);
     }
@@ -130,8 +132,8 @@ PKCS7 *PKCS12_pack_p7encdata_ex(int pbe_nid, const char *pass, int passlen,
     p7->d.encrypted->enc_data->algorithm = pbe;
     ASN1_OCTET_STRING_free(p7->d.encrypted->enc_data->enc_data);
     if (!(p7->d.encrypted->enc_data->enc_data =
-          PKCS12_item_i2d_encrypt_ex(pbe, ASN1_ITEM_rptr(PKCS12_SAFEBAGS), pass,
-                                     passlen, bags, 1, ctx, propq))) {
+              PKCS12_item_i2d_encrypt_ex(pbe, ASN1_ITEM_rptr(PKCS12_SAFEBAGS),
+                                         pass, passlen, bags, 1, ctx, propq))) {
         ERR_raise(ERR_LIB_PKCS12, PKCS12_R_ENCRYPT_ERROR);
         goto err;
     }
@@ -139,7 +141,7 @@ PKCS7 *PKCS12_pack_p7encdata_ex(int pbe_nid, const char *pass, int passlen,
     EVP_CIPHER_free(pbe_ciph_fetch);
     return p7;
 
- err:
+err:
     PKCS7_free(p7);
     EVP_CIPHER_free(pbe_ciph_fetch);
     return NULL;
@@ -149,8 +151,8 @@ PKCS7 *PKCS12_pack_p7encdata(int pbe_nid, const char *pass, int passlen,
                              unsigned char *salt, int saltlen, int iter,
                              STACK_OF(PKCS12_SAFEBAG) *bags)
 {
-    return PKCS12_pack_p7encdata_ex(pbe_nid, pass, passlen, salt, saltlen,
-                                    iter, bags, NULL, NULL);
+    return PKCS12_pack_p7encdata_ex(pbe_nid, pass, passlen, salt, saltlen, iter,
+                                    bags, NULL, NULL);
 }
 
 STACK_OF(PKCS12_SAFEBAG) *PKCS12_unpack_p7encdata(PKCS7 *p7, const char *pass,
@@ -164,16 +166,16 @@ STACK_OF(PKCS12_SAFEBAG) *PKCS12_unpack_p7encdata(PKCS7 *p7, const char *pass,
         return NULL;
     }
 
-    return PKCS12_item_decrypt_d2i_ex(p7->d.encrypted->enc_data->algorithm,
-                                   ASN1_ITEM_rptr(PKCS12_SAFEBAGS),
-                                   pass, passlen,
-                                   p7->d.encrypted->enc_data->enc_data, 1,
-                                   p7->ctx.libctx, p7->ctx.propq);
+    return PKCS12_item_decrypt_d2i_ex(
+        p7->d.encrypted->enc_data->algorithm, ASN1_ITEM_rptr(PKCS12_SAFEBAGS),
+        pass, passlen, p7->d.encrypted->enc_data->enc_data, 1, p7->ctx.libctx,
+        p7->ctx.propq);
 }
 
 PKCS8_PRIV_KEY_INFO *PKCS12_decrypt_skey_ex(const PKCS12_SAFEBAG *bag,
                                             const char *pass, int passlen,
-                                            OSSL_LIB_CTX *ctx, const char *propq)
+                                            OSSL_LIB_CTX *ctx,
+                                            const char *propq)
 {
     return PKCS8_decrypt_ex(bag->value.shkeybag, pass, passlen, ctx, propq);
 }
@@ -210,10 +212,9 @@ STACK_OF(PKCS7) *PKCS12_unpack_authsafes(const PKCS12 *p12)
     }
 
     p7ctx = &p12->authsafes->ctx;
-    p7s = ASN1_item_unpack_ex(p12->authsafes->d.data,
-                              ASN1_ITEM_rptr(PKCS12_AUTHSAFES),
-                              ossl_pkcs7_ctx_get0_libctx(p7ctx),
-                              ossl_pkcs7_ctx_get0_propq(p7ctx));
+    p7s = ASN1_item_unpack_ex(
+        p12->authsafes->d.data, ASN1_ITEM_rptr(PKCS12_AUTHSAFES),
+        ossl_pkcs7_ctx_get0_libctx(p7ctx), ossl_pkcs7_ctx_get0_propq(p7ctx));
     if (p7s != NULL) {
         for (i = 0; i < sk_PKCS7_num(p7s); i++) {
             p7 = sk_PKCS7_value(p7s, i);

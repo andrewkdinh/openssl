@@ -20,11 +20,34 @@
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_INFORM, OPT_IN, OPT_OUTFORM, OPT_OUT, OPT_KEYFORM, OPT_KEY,
-    OPT_ISSUER, OPT_LASTUPDATE, OPT_NEXTUPDATE, OPT_FINGERPRINT,
-    OPT_CRLNUMBER, OPT_BADSIG, OPT_GENDELTA, OPT_CAPATH, OPT_CAFILE, OPT_CASTORE,
-    OPT_NOCAPATH, OPT_NOCAFILE, OPT_NOCASTORE, OPT_VERIFY, OPT_DATEOPT, OPT_TEXT, OPT_HASH,
-    OPT_HASH_OLD, OPT_NOOUT, OPT_NAMEOPT, OPT_MD, OPT_PROV_ENUM
+    OPT_INFORM,
+    OPT_IN,
+    OPT_OUTFORM,
+    OPT_OUT,
+    OPT_KEYFORM,
+    OPT_KEY,
+    OPT_ISSUER,
+    OPT_LASTUPDATE,
+    OPT_NEXTUPDATE,
+    OPT_FINGERPRINT,
+    OPT_CRLNUMBER,
+    OPT_BADSIG,
+    OPT_GENDELTA,
+    OPT_CAPATH,
+    OPT_CAFILE,
+    OPT_CASTORE,
+    OPT_NOCAPATH,
+    OPT_NOCAFILE,
+    OPT_NOCASTORE,
+    OPT_VERIFY,
+    OPT_DATEOPT,
+    OPT_TEXT,
+    OPT_HASH,
+    OPT_HASH_OLD,
+    OPT_NOOUT,
+    OPT_NAMEOPT,
+    OPT_MD,
+    OPT_PROV_ENUM
 } OPTION_CHOICE;
 
 const OPTIONS crl_options[] = {
@@ -36,18 +59,21 @@ const OPTIONS crl_options[] = {
     {"in", OPT_IN, '<', "Input file - default stdin"},
     {"inform", OPT_INFORM, 'F', "CRL input format (DER or PEM); has no effect"},
     {"key", OPT_KEY, '<', "CRL signing Private key to use"},
-    {"keyform", OPT_KEYFORM, 'F', "Private key file format (DER/PEM/P12); has no effect"},
+    {"keyform", OPT_KEYFORM, 'F',
+     "Private key file format (DER/PEM/P12); has no effect"},
 
     OPT_SECTION("Output"),
     {"out", OPT_OUT, '>', "output file - default stdout"},
     {"outform", OPT_OUTFORM, 'F', "Output format - default PEM"},
-    {"dateopt", OPT_DATEOPT, 's', "Datetime format used for printing. (rfc_822/iso_8601). Default is rfc_822."},
+    {"dateopt", OPT_DATEOPT, 's',
+     "Datetime format used for printing. (rfc_822/iso_8601). Default is rfc_822."},
     {"text", OPT_TEXT, '-', "Print out a text format version"},
     {"hash", OPT_HASH, '-', "Print hash value"},
 #ifndef OPENSSL_NO_MD5
     {"hash_old", OPT_HASH_OLD, '-', "Print old-style (MD5) hash value"},
 #endif
-    {"nameopt", OPT_NAMEOPT, 's', "Certificate subject/issuer name printing options"},
+    {"nameopt", OPT_NAMEOPT, 's',
+     "Certificate subject/issuer name printing options"},
     {"", OPT_MD, '-', "Any supported digest"},
 
     OPT_SECTION("CRL"),
@@ -57,8 +83,10 @@ const OPTIONS crl_options[] = {
     {"noout", OPT_NOOUT, '-', "No CRL output"},
     {"fingerprint", OPT_FINGERPRINT, '-', "Print the crl fingerprint"},
     {"crlnumber", OPT_CRLNUMBER, '-', "Print CRL number"},
-    {"badsig", OPT_BADSIG, '-', "Corrupt last byte of loaded CRL signature (for test)" },
-    {"gendelta", OPT_GENDELTA, '<', "Other CRL to compare/diff to the Input one"},
+    {"badsig", OPT_BADSIG, '-',
+     "Corrupt last byte of loaded CRL signature (for test)"},
+    {"gendelta", OPT_GENDELTA, '<',
+     "Other CRL to compare/diff to the Input one"},
 
     OPT_SECTION("Certificate"),
     {"CApath", OPT_CAPATH, '/', "Verify CRL using certificates in dir"},
@@ -71,8 +99,7 @@ const OPTIONS crl_options[] = {
     {"no-CAstore", OPT_NOCASTORE, '-',
      "Do not load certificates from the default certificates store"},
     OPT_PROV_OPTIONS,
-    {NULL}
-};
+    {NULL}};
 
 int crl_main(int argc, char **argv)
 {
@@ -89,7 +116,8 @@ int crl_main(int argc, char **argv)
     const char *CAfile = NULL, *CApath = NULL, *CAstore = NULL, *prog;
     OPTION_CHOICE o;
     int hash = 0, issuer = 0, lastupdate = 0, nextupdate = 0, noout = 0;
-    int informat = FORMAT_UNDEF, outformat = FORMAT_PEM, keyformat = FORMAT_UNDEF;
+    int informat = FORMAT_UNDEF, outformat = FORMAT_PEM,
+        keyformat = FORMAT_UNDEF;
     int ret = 1, num = 0, badsig = 0, fingerprint = 0, crlnumber = 0;
     int text = 0, do_ver = 0, noCAfile = 0, noCApath = 0, noCAstore = 0;
     unsigned long dateopt = ASN1_DTFLGS_RFC822;
@@ -104,7 +132,7 @@ int crl_main(int argc, char **argv)
         switch (o) {
         case OPT_EOF:
         case OPT_ERR:
- opthelp:
+opthelp:
             BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);
             goto end;
         case OPT_HELP:
@@ -148,13 +176,13 @@ int crl_main(int argc, char **argv)
             do_ver = 1;
             break;
         case OPT_NOCAPATH:
-            noCApath =  1;
+            noCApath = 1;
             break;
         case OPT_NOCAFILE:
-            noCAfile =  1;
+            noCAfile = 1;
             break;
         case OPT_NOCASTORE:
-            noCAstore =  1;
+            noCAstore = 1;
             break;
         case OPT_HASH_OLD:
 #ifndef OPENSSL_NO_MD5
@@ -220,8 +248,9 @@ int crl_main(int argc, char **argv)
         goto end;
 
     if (do_ver) {
-        if ((store = setup_verify(CAfile, noCAfile, CApath, noCApath,
-                                  CAstore, noCAstore)) == NULL)
+        if ((store = setup_verify(CAfile, noCAfile, CApath, noCApath, CAstore,
+                                  noCAstore))
+            == NULL)
             goto end;
         lookup = X509_STORE_add_lookup(store, X509_LOOKUP_file());
         if (lookup == NULL)
@@ -250,7 +279,7 @@ int crl_main(int argc, char **argv)
             goto end;
         if (i == 0) {
             BIO_printf(bio_err, "verify failure\n");
-	    goto end;
+            goto end;
         } else
             BIO_printf(bio_err, "verify OK\n");
     }
@@ -332,13 +361,15 @@ int crl_main(int argc, char **argv)
 #endif
             if (lastupdate == i) {
                 BIO_printf(bio_out, "lastUpdate=");
-                ASN1_TIME_print_ex(bio_out, X509_CRL_get0_lastUpdate(x), dateopt);
+                ASN1_TIME_print_ex(bio_out, X509_CRL_get0_lastUpdate(x),
+                                   dateopt);
                 BIO_printf(bio_out, "\n");
             }
             if (nextupdate == i) {
                 BIO_printf(bio_out, "nextUpdate=");
                 if (X509_CRL_get0_nextUpdate(x))
-                    ASN1_TIME_print_ex(bio_out, X509_CRL_get0_nextUpdate(x), dateopt);
+                    ASN1_TIME_print_ex(bio_out, X509_CRL_get0_nextUpdate(x),
+                                       dateopt);
                 else
                     BIO_printf(bio_out, "NONE");
                 BIO_printf(bio_out, "\n");
@@ -352,11 +383,11 @@ int crl_main(int argc, char **argv)
                     BIO_printf(bio_err, "out of memory\n");
                     goto end;
                 }
-                BIO_printf(bio_out, "%s Fingerprint=",
-                           EVP_MD_get0_name(digest));
+                BIO_printf(bio_out,
+                           "%s Fingerprint=", EVP_MD_get0_name(digest));
                 for (j = 0; j < (int)n; j++) {
-                    BIO_printf(bio_out, "%02X%c", md[j], (j + 1 == (int)n)
-                               ? '\n' : ':');
+                    BIO_printf(bio_out, "%02X%c", md[j],
+                               (j + 1 == (int)n) ? '\n' : ':');
                 }
             }
         }
@@ -383,7 +414,7 @@ int crl_main(int argc, char **argv)
     }
     ret = 0;
 
- end:
+end:
     if (ret != 0)
         ERR_print_errors(bio_err);
     BIO_free_all(out);

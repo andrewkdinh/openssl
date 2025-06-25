@@ -33,9 +33,8 @@ int ASN1_buf_print(BIO *bp, const unsigned char *buf, size_t buflen, int indent)
          * Use colon separators for each octet for compatibility as
          * this function is used to print out key components.
          */
-        if (BIO_printf(bp, "%02x%s", buf[i],
-                       (i == buflen - 1) ? "" : ":") <= 0)
-                return 0;
+        if (BIO_printf(bp, "%02x%s", buf[i], (i == buflen - 1) ? "" : ":") <= 0)
+            return 0;
     }
     if (BIO_write(bp, "\n", 1) <= 0)
         return 0;
@@ -64,7 +63,8 @@ int ASN1_bn_print(BIO *bp, const char *number, const BIGNUM *num,
     if (BN_num_bytes(num) <= BN_BYTES) {
         if (BIO_printf(bp, "%s %s%lu (%s0x%lx)\n", number, neg,
                        (unsigned long)bn_get_words(num)[0], neg,
-                       (unsigned long)bn_get_words(num)[0]) <= 0)
+                       (unsigned long)bn_get_words(num)[0])
+            <= 0)
             return 0;
         return 1;
     }
@@ -74,8 +74,8 @@ int ASN1_bn_print(BIO *bp, const char *number, const BIGNUM *num,
     if (buf == NULL)
         goto err;
     buf[0] = 0;
-    if (BIO_printf(bp, "%s%s\n", number,
-                   (neg[0] == '-') ? " (Negative)" : "") <= 0)
+    if (BIO_printf(bp, "%s%s\n", number, (neg[0] == '-') ? " (Negative)" : "")
+        <= 0)
         goto err;
     n = BN_bn2bin(num, buf + 1);
 
@@ -87,7 +87,7 @@ int ASN1_bn_print(BIO *bp, const char *number, const BIGNUM *num,
     if (ASN1_buf_print(bp, tmp, n, indent + 4) == 0)
         goto err;
     rv = 1;
-    err:
+err:
     OPENSSL_clear_free(buf, buflen);
     return rv;
 }

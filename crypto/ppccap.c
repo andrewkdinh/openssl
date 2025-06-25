@@ -101,19 +101,19 @@ size_t OPENSSL_instrument_bus2(unsigned int *out, size_t cnt, size_t max)
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 # include <sys/param.h>
-# if (defined(__FreeBSD__) && __FreeBSD_version >= 1200000) || \
-    (defined(__OpenBSD__) && OpenBSD >= 202409)
+# if (defined(__FreeBSD__) && __FreeBSD_version >= 1200000) \
+     || (defined(__OpenBSD__) && OpenBSD >= 202409)
 #  include <sys/auxv.h>
 #  define OSSL_IMPLEMENT_GETAUXVAL
 
 static unsigned long getauxval(unsigned long key)
 {
-  unsigned long val = 0ul;
+    unsigned long val = 0ul;
 
-  if (elf_aux_info((int)key, &val, sizeof(val)) != 0)
-    return 0ul;
+    if (elf_aux_info((int)key, &val, sizeof(val)) != 0)
+        return 0ul;
 
-  return val;
+    return val;
 }
 # endif
 #endif
@@ -174,24 +174,24 @@ void OPENSSL_cpuid_setup(void)
      */
     if (sizeof(size_t) == 4) {
         /* In 32-bit case PPC_FPU64 is always fastest [if option] */
-        if (__power_set(0xffffffffU<<13))       /* POWER5 and later */
+        if (__power_set(0xffffffffU << 13))       /* POWER5 and later */
             OPENSSL_ppccap_P |= PPC_FPU64;
     } else {
         /* In 64-bit case PPC_FPU64 is fastest only on POWER6 */
-        if (__power_set(0x1U<<14))              /* POWER6 */
+        if (__power_set(0x1U << 14))              /* POWER6 */
             OPENSSL_ppccap_P |= PPC_FPU64;
     }
 
-    if (__power_set(0xffffffffU<<14))           /* POWER6 and later */
+    if (__power_set(0xffffffffU << 14))           /* POWER6 and later */
         OPENSSL_ppccap_P |= PPC_ALTIVEC;
 
-    if (__power_set(0xffffffffU<<16))           /* POWER8 and later */
+    if (__power_set(0xffffffffU << 16))           /* POWER8 and later */
         OPENSSL_ppccap_P |= PPC_CRYPTO207;
 
-    if (__power_set(0xffffffffU<<17))           /* POWER9 and later */
+    if (__power_set(0xffffffffU << 17))           /* POWER9 and later */
         OPENSSL_ppccap_P |= PPC_MADD300;
 
-    if (__power_set(0xffffffffU<<18))           /* POWER10 and later */
+    if (__power_set(0xffffffffU << 18))           /* POWER10 and later */
         OPENSSL_ppccap_P |= PPC_BRD31;
 
     return;

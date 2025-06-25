@@ -18,7 +18,8 @@
 int FuzzerInitialize(int *argc, char ***argv)
 {
     FuzzerSetRand();
-    OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS | OPENSSL_INIT_ASYNC, NULL);
+    OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS | OPENSSL_INIT_ASYNC,
+                        NULL);
     OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS, NULL);
     ERR_clear_error();
     return 1;
@@ -63,8 +64,7 @@ static int get_cid(PACKET *pkt, QUIC_CONN_ID *cid)
 {
     unsigned int cidl;
 
-    if (!PACKET_get_1(pkt, &cidl)
-        || cidl > QUIC_MAX_CONN_ID_LEN
+    if (!PACKET_get_1(pkt, &cidl) || cidl > QUIC_MAX_CONN_ID_LEN
         || !PACKET_copy_bytes(pkt, cid->id, cidl))
         return 0;
 

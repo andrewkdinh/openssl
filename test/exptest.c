@@ -52,10 +52,8 @@ static int test_mod_exp_zero(void)
     int ret = 0, failed = 0;
     BN_MONT_CTX *mont = NULL;
 
-    if (!TEST_ptr(m = BN_new())
-        || !TEST_ptr(a = BN_new())
-        || !TEST_ptr(p = BN_new())
-        || !TEST_ptr(r = BN_new()))
+    if (!TEST_ptr(m = BN_new()) || !TEST_ptr(a = BN_new())
+        || !TEST_ptr(p = BN_new()) || !TEST_ptr(r = BN_new()))
         goto err;
 
     BN_one(m);
@@ -137,7 +135,7 @@ static int test_mod_exp_zero(void)
     }
 
     ret = !failed;
- err:
+err:
     BN_free(r);
     BN_free(a);
     BN_free(p);
@@ -164,46 +162,42 @@ static int test_mod_exp(int round)
     if (!TEST_ptr(ctx = BN_CTX_new()))
         goto err;
 
-    if (!TEST_ptr(r_mont = BN_new())
-        || !TEST_ptr(r_mont_const = BN_new())
-        || !TEST_ptr(r_recp = BN_new())
-        || !TEST_ptr(r_simple = BN_new())
-        || !TEST_ptr(a = BN_new())
-        || !TEST_ptr(b = BN_new())
+    if (!TEST_ptr(r_mont = BN_new()) || !TEST_ptr(r_mont_const = BN_new())
+        || !TEST_ptr(r_recp = BN_new()) || !TEST_ptr(r_simple = BN_new())
+        || !TEST_ptr(a = BN_new()) || !TEST_ptr(b = BN_new())
         || !TEST_ptr(m = BN_new()))
         goto err;
 
     if (!TEST_int_gt(RAND_bytes(&c, 1), 0))
         goto err;
     c = (c % BN_BITS) - BN_BITS2;
-    if (!TEST_true(BN_rand(a, NUM_BITS + c, BN_RAND_TOP_ONE,
-                           BN_RAND_BOTTOM_ANY)))
+    if (!TEST_true(
+            BN_rand(a, NUM_BITS + c, BN_RAND_TOP_ONE, BN_RAND_BOTTOM_ANY)))
         goto err;
 
     if (!TEST_int_gt(RAND_bytes(&c, 1), 0))
         goto err;
     c = (c % BN_BITS) - BN_BITS2;
-    if (!TEST_true(BN_rand(b, NUM_BITS + c, BN_RAND_TOP_ONE,
-                           BN_RAND_BOTTOM_ANY)))
+    if (!TEST_true(
+            BN_rand(b, NUM_BITS + c, BN_RAND_TOP_ONE, BN_RAND_BOTTOM_ANY)))
         goto err;
 
     if (!TEST_int_gt(RAND_bytes(&c, 1), 0))
         goto err;
     c = (c % BN_BITS) - BN_BITS2;
-    if (!TEST_true(BN_rand(m, NUM_BITS + c, BN_RAND_TOP_ONE,
-                           BN_RAND_BOTTOM_ODD)))
+    if (!TEST_true(
+            BN_rand(m, NUM_BITS + c, BN_RAND_TOP_ONE, BN_RAND_BOTTOM_ODD)))
         goto err;
 
-    if (!TEST_true(BN_mod(a, a, m, ctx))
-        || !TEST_true(BN_mod(b, b, m, ctx))
+    if (!TEST_true(BN_mod(a, a, m, ctx)) || !TEST_true(BN_mod(b, b, m, ctx))
         || !TEST_true(BN_mod_exp_mont(r_mont, a, b, m, ctx, NULL))
         || !TEST_true(BN_mod_exp_recp(r_recp, a, b, m, ctx))
         || !TEST_true(BN_mod_exp_simple(r_simple, a, b, m, ctx))
-        || !TEST_true(BN_mod_exp_mont_consttime(r_mont_const, a, b, m, ctx, NULL)))
+        || !TEST_true(
+            BN_mod_exp_mont_consttime(r_mont_const, a, b, m, ctx, NULL)))
         goto err;
 
-    if (!TEST_BN_eq(r_simple, r_mont)
-        || !TEST_BN_eq(r_simple, r_recp)
+    if (!TEST_BN_eq(r_simple, r_mont) || !TEST_BN_eq(r_simple, r_recp)
         || !TEST_BN_eq(r_simple, r_mont_const)) {
         if (BN_cmp(r_simple, r_mont) != 0)
             TEST_info("simple and mont results differ");
@@ -223,7 +217,7 @@ static int test_mod_exp(int round)
     }
 
     ret = 1;
- err:
+err:
     BN_free(r_mont);
     BN_free(r_mont_const);
     BN_free(r_recp);
@@ -264,14 +258,10 @@ static int test_mod_exp_x2(int idx)
 
     if (!TEST_ptr(r_mont_const_x2_1 = BN_new())
         || !TEST_ptr(r_mont_const_x2_2 = BN_new())
-        || !TEST_ptr(r_simple1 = BN_new())
-        || !TEST_ptr(r_simple2 = BN_new())
-        || !TEST_ptr(a1 = BN_new())
-        || !TEST_ptr(b1 = BN_new())
-        || !TEST_ptr(m1 = BN_new())
-        || !TEST_ptr(a2 = BN_new())
-        || !TEST_ptr(b2 = BN_new())
-        || !TEST_ptr(m2 = BN_new()))
+        || !TEST_ptr(r_simple1 = BN_new()) || !TEST_ptr(r_simple2 = BN_new())
+        || !TEST_ptr(a1 = BN_new()) || !TEST_ptr(b1 = BN_new())
+        || !TEST_ptr(m1 = BN_new()) || !TEST_ptr(a2 = BN_new())
+        || !TEST_ptr(b2 = BN_new()) || !TEST_ptr(m2 = BN_new()))
         goto err;
 
     BN_rand(a1, factor_size, BN_RAND_TOP_ONE, BN_RAND_BOTTOM_ANY);
@@ -287,9 +277,9 @@ static int test_mod_exp_x2(int idx)
         || !TEST_true(BN_mod(b2, b2, m2, ctx))
         || !TEST_true(BN_mod_exp_simple(r_simple1, a1, b1, m1, ctx))
         || !TEST_true(BN_mod_exp_simple(r_simple2, a2, b2, m2, ctx))
-        || !TEST_true(BN_mod_exp_mont_consttime_x2(r_mont_const_x2_1, a1, b1, m1, NULL,
-                                                   r_mont_const_x2_2, a2, b2, m2, NULL,
-                                                   ctx)))
+        || !TEST_true(BN_mod_exp_mont_consttime_x2(r_mont_const_x2_1, a1, b1,
+                                                   m1, NULL, r_mont_const_x2_2,
+                                                   a2, b2, m2, NULL, ctx)))
         goto err;
 
     if (!TEST_BN_eq(r_simple1, r_mont_const_x2_1)
@@ -313,7 +303,7 @@ static int test_mod_exp_x2(int idx)
     }
 
     ret = 1;
- err:
+err:
     BN_free(r_mont_const_x2_1);
     BN_free(r_mont_const_x2_2);
     BN_free(r_simple1);

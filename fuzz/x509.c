@@ -19,7 +19,9 @@ int FuzzerInitialize(int *argc, char ***argv)
 {
     FuzzerSetRand();
     OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS
-       | OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS, NULL);
+                            | OPENSSL_INIT_ADD_ALL_CIPHERS
+                            | OPENSSL_INIT_ADD_ALL_DIGESTS,
+                        NULL);
     ERR_clear_error();
     CRYPTO_free_ex_index(0, -1);
     return 1;
@@ -102,8 +104,7 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
 
     if (crl != NULL) {
         crls = sk_X509_CRL_new_null();
-        if (crls == NULL
-            || !sk_X509_CRL_push(crls, crl))
+        if (crls == NULL || !sk_X509_CRL_push(crls, crl))
             goto err;
 
         X509_STORE_CTX_set0_crls(ctx, crls);
@@ -119,8 +120,7 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
         ASN1_GENERALIZEDTIME *revtime, *thisupd, *nextupd;
 
         certs = sk_X509_new_null();
-        if (certs == NULL
-            || !sk_X509_push(certs, x509_1)
+        if (certs == NULL || !sk_X509_push(certs, x509_1)
             || !sk_X509_push(certs, x509_2))
             goto err;
 

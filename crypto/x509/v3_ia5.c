@@ -22,8 +22,7 @@ const X509V3_EXT_METHOD ossl_v3_ns_ia5_list[8] = {
     EXT_IA5STRING(NID_netscape_ca_policy_url),
     EXT_IA5STRING(NID_netscape_ssl_server_name),
     EXT_IA5STRING(NID_netscape_comment),
-    EXT_END
-};
+    EXT_END};
 
 char *i2s_ASN1_IA5STRING(X509V3_EXT_METHOD *method, ASN1_IA5STRING *ia5)
 {
@@ -38,8 +37,8 @@ char *i2s_ASN1_IA5STRING(X509V3_EXT_METHOD *method, ASN1_IA5STRING *ia5)
     return tmp;
 }
 
-ASN1_IA5STRING *s2i_ASN1_IA5STRING(X509V3_EXT_METHOD *method,
-                                   X509V3_CTX *ctx, const char *str)
+ASN1_IA5STRING *s2i_ASN1_IA5STRING(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
+                                   const char *str)
 {
     ASN1_IA5STRING *ia5;
     if (str == NULL) {

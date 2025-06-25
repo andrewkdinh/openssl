@@ -31,25 +31,25 @@
  * OpenSSL ASN.1 template translation of RFC 3779 3.2.3.
  */
 
-ASN1_SEQUENCE(ASRange) = {
-  ASN1_SIMPLE(ASRange, min, ASN1_INTEGER),
-  ASN1_SIMPLE(ASRange, max, ASN1_INTEGER)
-} ASN1_SEQUENCE_END(ASRange)
+ASN1_SEQUENCE(ASRange)
+    = {ASN1_SIMPLE(ASRange, min, ASN1_INTEGER),
+       ASN1_SIMPLE(ASRange, max, ASN1_INTEGER)}
+ASN1_SEQUENCE_END(ASRange)
 
-ASN1_CHOICE(ASIdOrRange) = {
-  ASN1_SIMPLE(ASIdOrRange, u.id,    ASN1_INTEGER),
-  ASN1_SIMPLE(ASIdOrRange, u.range, ASRange)
-} ASN1_CHOICE_END(ASIdOrRange)
+ASN1_CHOICE(ASIdOrRange)
+    = {ASN1_SIMPLE(ASIdOrRange, u.id, ASN1_INTEGER),
+       ASN1_SIMPLE(ASIdOrRange, u.range, ASRange)}
+ASN1_CHOICE_END(ASIdOrRange)
 
-ASN1_CHOICE(ASIdentifierChoice) = {
-  ASN1_SIMPLE(ASIdentifierChoice,      u.inherit,       ASN1_NULL),
-  ASN1_SEQUENCE_OF(ASIdentifierChoice, u.asIdsOrRanges, ASIdOrRange)
-} ASN1_CHOICE_END(ASIdentifierChoice)
+ASN1_CHOICE(ASIdentifierChoice)
+    = {ASN1_SIMPLE(ASIdentifierChoice, u.inherit, ASN1_NULL),
+       ASN1_SEQUENCE_OF(ASIdentifierChoice, u.asIdsOrRanges, ASIdOrRange)}
+ASN1_CHOICE_END(ASIdentifierChoice)
 
-ASN1_SEQUENCE(ASIdentifiers) = {
-  ASN1_EXP_OPT(ASIdentifiers, asnum, ASIdentifierChoice, 0),
-  ASN1_EXP_OPT(ASIdentifiers, rdi,   ASIdentifierChoice, 1)
-} ASN1_SEQUENCE_END(ASIdentifiers)
+ASN1_SEQUENCE(ASIdentifiers)
+    = {ASN1_EXP_OPT(ASIdentifiers, asnum, ASIdentifierChoice, 0),
+       ASN1_EXP_OPT(ASIdentifiers, rdi, ASIdentifierChoice, 1)}
+ASN1_SEQUENCE_END(ASIdentifiers)
 
 IMPLEMENT_ASN1_FUNCTIONS(ASRange)
 IMPLEMENT_ASN1_FUNCTIONS(ASIdOrRange)
@@ -59,8 +59,7 @@ IMPLEMENT_ASN1_FUNCTIONS(ASIdentifiers)
 /*
  * i2r method for an ASIdentifierChoice.
  */
-static int i2r_ASIdentifierChoice(BIO *out,
-                                  ASIdentifierChoice *choice,
+static int i2r_ASIdentifierChoice(BIO *out, ASIdentifierChoice *choice,
                                   int indent, const char *msg)
 {
     int i;
@@ -74,8 +73,7 @@ static int i2r_ASIdentifierChoice(BIO *out,
         break;
     case ASIdentifierChoice_asIdsOrRanges:
         for (i = 0; i < sk_ASIdOrRange_num(choice->u.asIdsOrRanges); i++) {
-            ASIdOrRange *aor =
-                sk_ASIdOrRange_value(choice->u.asIdsOrRanges, i);
+            ASIdOrRange *aor = sk_ASIdOrRange_value(choice->u.asIdsOrRanges, i);
             switch (aor->type) {
             case ASIdOrRange_id:
                 if ((s = i2s_ASN1_INTEGER(NULL, aor->u.id)) == NULL)
@@ -107,14 +105,14 @@ static int i2r_ASIdentifierChoice(BIO *out,
 /*
  * i2r method for an ASIdentifier extension.
  */
-static int i2r_ASIdentifiers(const X509V3_EXT_METHOD *method,
-                             void *ext, BIO *out, int indent)
+static int i2r_ASIdentifiers(const X509V3_EXT_METHOD *method, void *ext,
+                             BIO *out, int indent)
 {
     ASIdentifiers *asid = ext;
     return (i2r_ASIdentifierChoice(out, asid->asnum, indent,
-                                   "Autonomous System Numbers") &&
-            i2r_ASIdentifierChoice(out, asid->rdi, indent,
-                                   "Routing Domain Identifiers"));
+                                   "Autonomous System Numbers")
+            && i2r_ASIdentifierChoice(out, asid->rdi, indent,
+                                      "Routing Domain Identifiers"));
 }
 
 /*
@@ -125,21 +123,20 @@ static int ASIdOrRange_cmp(const ASIdOrRange *const *a_,
 {
     const ASIdOrRange *a = *a_, *b = *b_;
 
-    assert((a->type == ASIdOrRange_id && a->u.id != NULL) ||
-           (a->type == ASIdOrRange_range && a->u.range != NULL &&
-            a->u.range->min != NULL && a->u.range->max != NULL));
+    assert((a->type == ASIdOrRange_id && a->u.id != NULL)
+           || (a->type == ASIdOrRange_range && a->u.range != NULL
+               && a->u.range->min != NULL && a->u.range->max != NULL));
 
-    assert((b->type == ASIdOrRange_id && b->u.id != NULL) ||
-           (b->type == ASIdOrRange_range && b->u.range != NULL &&
-            b->u.range->min != NULL && b->u.range->max != NULL));
+    assert((b->type == ASIdOrRange_id && b->u.id != NULL)
+           || (b->type == ASIdOrRange_range && b->u.range != NULL
+               && b->u.range->min != NULL && b->u.range->max != NULL));
 
     if (a->type == ASIdOrRange_id && b->type == ASIdOrRange_id)
         return ASN1_INTEGER_cmp(a->u.id, b->u.id);
 
     if (a->type == ASIdOrRange_range && b->type == ASIdOrRange_range) {
         int r = ASN1_INTEGER_cmp(a->u.range->min, b->u.range->min);
-        return r != 0 ? r : ASN1_INTEGER_cmp(a->u.range->max,
-                                             b->u.range->max);
+        return r != 0 ? r : ASN1_INTEGER_cmp(a->u.range->max, b->u.range->max);
     }
 
     if (a->type == ASIdOrRange_id)
@@ -182,8 +179,8 @@ int X509v3_asid_add_inherit(ASIdentifiers *asid, int which)
 /*
  * Add an ID or range to an ASIdentifierChoice.
  */
-int X509v3_asid_add_id_or_range(ASIdentifiers *asid,
-                                int which, ASN1_INTEGER *min, ASN1_INTEGER *max)
+int X509v3_asid_add_id_or_range(ASIdentifiers *asid, int which,
+                                ASN1_INTEGER *min, ASN1_INTEGER *max)
 {
     ASIdentifierChoice **choice;
     ASIdOrRange *aor;
@@ -233,7 +230,7 @@ int X509v3_asid_add_id_or_range(ASIdentifiers *asid,
         goto err;
     return 1;
 
- err:
+err:
     ASIdOrRange_free(aor);
     return 0;
 }
@@ -241,8 +238,8 @@ int X509v3_asid_add_id_or_range(ASIdentifiers *asid,
 /*
  * Extract min and max values from an ASIdOrRange.
  */
-static int extract_min_max(ASIdOrRange *aor,
-                           ASN1_INTEGER **min, ASN1_INTEGER **max)
+static int extract_min_max(ASIdOrRange *aor, ASN1_INTEGER **min,
+                           ASN1_INTEGER **max)
 {
     if (!ossl_assert(aor != NULL))
         return 0;
@@ -279,8 +276,8 @@ static int ASIdentifierChoice_is_canonical(ASIdentifierChoice *choice)
     /*
      * If not a list, or if empty list, it's broken.
      */
-    if (choice->type != ASIdentifierChoice_asIdsOrRanges ||
-        sk_ASIdOrRange_num(choice->u.asIdsOrRanges) == 0)
+    if (choice->type != ASIdentifierChoice_asIdsOrRanges
+        || sk_ASIdOrRange_num(choice->u.asIdsOrRanges) == 0)
         return 0;
 
     /*
@@ -289,33 +286,31 @@ static int ASIdentifierChoice_is_canonical(ASIdentifierChoice *choice)
     for (i = 0; i < sk_ASIdOrRange_num(choice->u.asIdsOrRanges) - 1; i++) {
         ASIdOrRange *a = sk_ASIdOrRange_value(choice->u.asIdsOrRanges, i);
         ASIdOrRange *b = sk_ASIdOrRange_value(choice->u.asIdsOrRanges, i + 1);
-        ASN1_INTEGER *a_min = NULL, *a_max = NULL, *b_min = NULL, *b_max =
-            NULL;
+        ASN1_INTEGER *a_min = NULL, *a_max = NULL, *b_min = NULL, *b_max = NULL;
 
         if (!extract_min_max(a, &a_min, &a_max)
-                || !extract_min_max(b, &b_min, &b_max))
+            || !extract_min_max(b, &b_min, &b_max))
             goto done;
 
         /*
          * Punt misordered list, overlapping start, or inverted range.
          */
-        if (ASN1_INTEGER_cmp(a_min, b_min) >= 0 ||
-            ASN1_INTEGER_cmp(a_min, a_max) > 0 ||
-            ASN1_INTEGER_cmp(b_min, b_max) > 0)
+        if (ASN1_INTEGER_cmp(a_min, b_min) >= 0
+            || ASN1_INTEGER_cmp(a_min, a_max) > 0
+            || ASN1_INTEGER_cmp(b_min, b_max) > 0)
             goto done;
 
         /*
          * Calculate a_max + 1 to check for adjacency.
          */
-        if ((bn == NULL && (bn = BN_new()) == NULL) ||
-            ASN1_INTEGER_to_BN(a_max, bn) == NULL ||
-            !BN_add_word(bn, 1)) {
+        if ((bn == NULL && (bn = BN_new()) == NULL)
+            || ASN1_INTEGER_to_BN(a_max, bn) == NULL || !BN_add_word(bn, 1)) {
             ERR_raise(ERR_LIB_X509V3, ERR_R_BN_LIB);
             goto done;
         }
 
-        if ((a_max_plus_one =
-                BN_to_ASN1_INTEGER(bn, orig = a_max_plus_one)) == NULL) {
+        if ((a_max_plus_one = BN_to_ASN1_INTEGER(bn, orig = a_max_plus_one))
+            == NULL) {
             a_max_plus_one = orig;
             ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
             goto done;
@@ -337,14 +332,14 @@ static int ASIdentifierChoice_is_canonical(ASIdentifierChoice *choice)
         ASN1_INTEGER *a_min, *a_max;
         if (a != NULL && a->type == ASIdOrRange_range) {
             if (!extract_min_max(a, &a_min, &a_max)
-                    || ASN1_INTEGER_cmp(a_min, a_max) > 0)
+                || ASN1_INTEGER_cmp(a_min, a_max) > 0)
                 goto done;
         }
     }
 
     ret = 1;
 
- done:
+done:
     ASN1_INTEGER_free(a_max_plus_one);
     BN_free(bn);
     return ret;
@@ -355,9 +350,9 @@ static int ASIdentifierChoice_is_canonical(ASIdentifierChoice *choice)
  */
 int X509v3_asid_is_canonical(ASIdentifiers *asid)
 {
-    return (asid == NULL ||
-            (ASIdentifierChoice_is_canonical(asid->asnum) &&
-             ASIdentifierChoice_is_canonical(asid->rdi)));
+    return (asid == NULL
+            || (ASIdentifierChoice_is_canonical(asid->asnum)
+                && ASIdentifierChoice_is_canonical(asid->rdi)));
 }
 
 /*
@@ -379,8 +374,8 @@ static int ASIdentifierChoice_canonize(ASIdentifierChoice *choice)
     /*
      * If not a list, or if empty list, it's broken.
      */
-    if (choice->type != ASIdentifierChoice_asIdsOrRanges ||
-        sk_ASIdOrRange_num(choice->u.asIdsOrRanges) == 0) {
+    if (choice->type != ASIdentifierChoice_asIdsOrRanges
+        || sk_ASIdOrRange_num(choice->u.asIdsOrRanges) == 0) {
         ERR_raise(ERR_LIB_X509V3, X509V3_R_EXTENSION_VALUE_ERROR);
         return 0;
     }
@@ -397,11 +392,10 @@ static int ASIdentifierChoice_canonize(ASIdentifierChoice *choice)
     for (i = 0; i < sk_ASIdOrRange_num(choice->u.asIdsOrRanges) - 1; i++) {
         ASIdOrRange *a = sk_ASIdOrRange_value(choice->u.asIdsOrRanges, i);
         ASIdOrRange *b = sk_ASIdOrRange_value(choice->u.asIdsOrRanges, i + 1);
-        ASN1_INTEGER *a_min = NULL, *a_max = NULL, *b_min = NULL, *b_max =
-            NULL;
+        ASN1_INTEGER *a_min = NULL, *a_max = NULL, *b_min = NULL, *b_max = NULL;
 
         if (!extract_min_max(a, &a_min, &a_max)
-                || !extract_min_max(b, &b_min, &b_max))
+            || !extract_min_max(b, &b_min, &b_max))
             goto done;
 
         /*
@@ -413,8 +407,8 @@ static int ASIdentifierChoice_canonize(ASIdentifierChoice *choice)
         /*
          * Punt inverted ranges.
          */
-        if (ASN1_INTEGER_cmp(a_min, a_max) > 0 ||
-            ASN1_INTEGER_cmp(b_min, b_max) > 0)
+        if (ASN1_INTEGER_cmp(a_min, a_max) > 0
+            || ASN1_INTEGER_cmp(b_min, b_max) > 0)
             goto done;
 
         /*
@@ -428,15 +422,14 @@ static int ASIdentifierChoice_canonize(ASIdentifierChoice *choice)
         /*
          * Calculate a_max + 1 to check for adjacency.
          */
-        if ((bn == NULL && (bn = BN_new()) == NULL) ||
-            ASN1_INTEGER_to_BN(a_max, bn) == NULL ||
-            !BN_add_word(bn, 1)) {
+        if ((bn == NULL && (bn = BN_new()) == NULL)
+            || ASN1_INTEGER_to_BN(a_max, bn) == NULL || !BN_add_word(bn, 1)) {
             ERR_raise(ERR_LIB_X509V3, ERR_R_BN_LIB);
             goto done;
         }
 
-        if ((a_max_plus_one =
-                 BN_to_ASN1_INTEGER(bn, orig = a_max_plus_one)) == NULL) {
+        if ((a_max_plus_one = BN_to_ASN1_INTEGER(bn, orig = a_max_plus_one))
+            == NULL) {
             a_max_plus_one = orig;
             ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
             goto done;
@@ -485,7 +478,7 @@ static int ASIdentifierChoice_canonize(ASIdentifierChoice *choice)
         ASN1_INTEGER *a_min, *a_max;
         if (a != NULL && a->type == ASIdOrRange_range) {
             if (!extract_min_max(a, &a_min, &a_max)
-                    || ASN1_INTEGER_cmp(a_min, a_max) > 0)
+                || ASN1_INTEGER_cmp(a_min, a_max) > 0)
                 goto done;
         }
     }
@@ -496,7 +489,7 @@ static int ASIdentifierChoice_canonize(ASIdentifierChoice *choice)
 
     ret = 1;
 
- done:
+done:
     ASN1_INTEGER_free(a_max_plus_one);
     BN_free(bn);
     return ret;
@@ -507,9 +500,9 @@ static int ASIdentifierChoice_canonize(ASIdentifierChoice *choice)
  */
 int X509v3_asid_canonize(ASIdentifiers *asid)
 {
-    return (asid == NULL ||
-            (ASIdentifierChoice_canonize(asid->asnum) &&
-             ASIdentifierChoice_canonize(asid->rdi)));
+    return (asid == NULL
+            || (ASIdentifierChoice_canonize(asid->asnum)
+                && ASIdentifierChoice_canonize(asid->rdi)));
 }
 
 /*
@@ -624,7 +617,7 @@ static void *v2i_ASIdentifiers(const struct v3_ext_method *method,
         goto err;
     return asid;
 
- err:
+err:
     ASIdentifiers_free(asid);
     ASN1_INTEGER_free(min);
     ASN1_INTEGER_free(max);
@@ -638,7 +631,10 @@ const X509V3_EXT_METHOD ossl_v3_asid = {
     NID_sbgp_autonomousSysNum,  /* nid */
     0,                          /* flags */
     ASN1_ITEM_ref(ASIdentifiers), /* template */
-    0, 0, 0, 0,                 /* old functions, ignored */
+    0,
+    0,
+    0,
+    0,                 /* old functions, ignored */
     0,                          /* i2s */
     0,                          /* s2i */
     0,                          /* i2v */
@@ -653,11 +649,11 @@ const X509V3_EXT_METHOD ossl_v3_asid = {
  */
 int X509v3_asid_inherits(ASIdentifiers *asid)
 {
-    return (asid != NULL &&
-            ((asid->asnum != NULL &&
-              asid->asnum->type == ASIdentifierChoice_inherit) ||
-             (asid->rdi != NULL &&
-              asid->rdi->type == ASIdentifierChoice_inherit)));
+    return (asid != NULL
+            && ((asid->asnum != NULL
+                 && asid->asnum->type == ASIdentifierChoice_inherit)
+                || (asid->rdi != NULL
+                    && asid->rdi->type == ASIdentifierChoice_inherit)));
 }
 
 /*
@@ -711,22 +707,21 @@ int X509v3_asid_subset(ASIdentifiers *a, ASIdentifiers *b)
         return 0;
 
     subset = a->asnum == NULL
-             || (b->asnum != NULL
-                 && asid_contains(b->asnum->u.asIdsOrRanges,
-                                  a->asnum->u.asIdsOrRanges));
+        || (b->asnum != NULL
+            && asid_contains(b->asnum->u.asIdsOrRanges,
+                             a->asnum->u.asIdsOrRanges));
     if (!subset)
         return 0;
 
     return a->rdi == NULL
-           || (b->rdi != NULL
-               && asid_contains(b->rdi->u.asIdsOrRanges,
-                                a->rdi->u.asIdsOrRanges));
+        || (b->rdi != NULL
+            && asid_contains(b->rdi->u.asIdsOrRanges, a->rdi->u.asIdsOrRanges));
 }
 
 /*
  * Validation error handling via callback.
  */
-#define validation_err(_err_)           \
+# define validation_err(_err_)           \
   do {                                  \
     if (ctx != NULL) {                  \
       ctx->error = _err_;               \
@@ -752,13 +747,12 @@ static int asid_validate_path_internal(X509_STORE_CTX *ctx,
     X509 *x;
 
     if (!ossl_assert(chain != NULL && sk_X509_num(chain) > 0)
-            || !ossl_assert(ctx != NULL || ext != NULL)
-            || !ossl_assert(ctx == NULL || ctx->verify_cb != NULL)) {
+        || !ossl_assert(ctx != NULL || ext != NULL)
+        || !ossl_assert(ctx == NULL || ctx->verify_cb != NULL)) {
         if (ctx != NULL)
             ctx->error = X509_V_ERR_UNSPECIFIED;
         return 0;
     }
-
 
     /*
      * Figure out where to start.  If we don't have an extension to
@@ -820,9 +814,9 @@ static int asid_validate_path_internal(X509_STORE_CTX *ctx,
             child_as = NULL;
             inherit_as = 0;
         }
-        if (x->rfc3779_asid->asnum != NULL &&
-            x->rfc3779_asid->asnum->type ==
-            ASIdentifierChoice_asIdsOrRanges) {
+        if (x->rfc3779_asid->asnum != NULL
+            && x->rfc3779_asid->asnum->type
+                == ASIdentifierChoice_asIdsOrRanges) {
             if (inherit_as
                 || asid_contains(x->rfc3779_asid->asnum->u.asIdsOrRanges,
                                  child_as)) {
@@ -837,11 +831,11 @@ static int asid_validate_path_internal(X509_STORE_CTX *ctx,
             child_rdi = NULL;
             inherit_rdi = 0;
         }
-        if (x->rfc3779_asid->rdi != NULL &&
-            x->rfc3779_asid->rdi->type == ASIdentifierChoice_asIdsOrRanges) {
-            if (inherit_rdi ||
-                asid_contains(x->rfc3779_asid->rdi->u.asIdsOrRanges,
-                              child_rdi)) {
+        if (x->rfc3779_asid->rdi != NULL
+            && x->rfc3779_asid->rdi->type == ASIdentifierChoice_asIdsOrRanges) {
+            if (inherit_rdi
+                || asid_contains(x->rfc3779_asid->rdi->u.asIdsOrRanges,
+                                 child_rdi)) {
                 child_rdi = x->rfc3779_asid->rdi->u.asIdsOrRanges;
                 inherit_rdi = 0;
             } else {
@@ -859,28 +853,27 @@ static int asid_validate_path_internal(X509_STORE_CTX *ctx,
         return 0;
     }
     if (x->rfc3779_asid != NULL) {
-        if (x->rfc3779_asid->asnum != NULL &&
-            x->rfc3779_asid->asnum->type == ASIdentifierChoice_inherit)
+        if (x->rfc3779_asid->asnum != NULL
+            && x->rfc3779_asid->asnum->type == ASIdentifierChoice_inherit)
             validation_err(X509_V_ERR_UNNESTED_RESOURCE);
-        if (x->rfc3779_asid->rdi != NULL &&
-            x->rfc3779_asid->rdi->type == ASIdentifierChoice_inherit)
+        if (x->rfc3779_asid->rdi != NULL
+            && x->rfc3779_asid->rdi->type == ASIdentifierChoice_inherit)
             validation_err(X509_V_ERR_UNNESTED_RESOURCE);
     }
 
- done:
+done:
     return ret;
 }
 
-#undef validation_err
+# undef validation_err
 
 /*
  * RFC 3779 3.3 path validation -- called from X509_verify_cert().
  */
 int X509v3_asid_validate_path(X509_STORE_CTX *ctx)
 {
-    if (ctx->chain == NULL
-            || sk_X509_num(ctx->chain) == 0
-            || ctx->verify_cb == NULL) {
+    if (ctx->chain == NULL || sk_X509_num(ctx->chain) == 0
+        || ctx->verify_cb == NULL) {
         ctx->error = X509_V_ERR_UNSPECIFIED;
         return 0;
     }
@@ -891,8 +884,8 @@ int X509v3_asid_validate_path(X509_STORE_CTX *ctx)
  * RFC 3779 3.3 path validation of an extension.
  * Test whether chain covers extension.
  */
-int X509v3_asid_validate_resource_set(STACK_OF(X509) *chain,
-                                      ASIdentifiers *ext, int allow_inheritance)
+int X509v3_asid_validate_resource_set(STACK_OF(X509) *chain, ASIdentifiers *ext,
+                                      int allow_inheritance)
 {
     if (ext == NULL)
         return 1;

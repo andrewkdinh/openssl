@@ -52,10 +52,9 @@ static OSSL_FUNC_BIO_vsnprintf_fn *c_BIO_vsnprintf;
 
 /* Tell the core what params we provide and what type they are */
 static const OSSL_PARAM p_param_types[] = {
-    { "greeting", OSSL_PARAM_UTF8_STRING, NULL, 0, 0 },
-    { "digest-check", OSSL_PARAM_UNSIGNED_INTEGER, NULL, 0, 0},
-    { NULL, 0, NULL, 0, 0 }
-};
+    {"greeting", OSSL_PARAM_UTF8_STRING, NULL, 0, 0},
+    {"digest-check", OSSL_PARAM_UNSIGNED_INTEGER, NULL, 0, 0},
+    {NULL, 0, NULL, 0, 0}};
 
 /* This is a trick to ensure we define the provider functions correctly */
 static OSSL_FUNC_provider_gettable_params_fn p_gettable_params;
@@ -105,17 +104,16 @@ static int p_get_params(void *provctx, OSSL_PARAM params[])
             static char *greeting;
             static OSSL_PARAM counter_request[] = {
                 /* Known libcrypto provided parameters */
-                { "openssl-version", OSSL_PARAM_UTF8_PTR,
-                  &opensslv, sizeof(&opensslv), 0 },
-                { "provider-name", OSSL_PARAM_UTF8_PTR,
-                  &provname, sizeof(&provname), 0},
+                {"openssl-version", OSSL_PARAM_UTF8_PTR, &opensslv,
+                 sizeof(&opensslv), 0},
+                {"provider-name", OSSL_PARAM_UTF8_PTR, &provname,
+                 sizeof(&provname), 0},
 
                 /* This might be present, if there's such a configuration */
-                { "greeting", OSSL_PARAM_UTF8_PTR,
-                  &greeting, sizeof(&greeting), 0 },
+                {"greeting", OSSL_PARAM_UTF8_PTR, &greeting, sizeof(&greeting),
+                 0},
 
-                { NULL, 0, NULL, 0, 0 }
-            };
+                {NULL, 0, NULL, 0, 0}};
             char buf[256];
             size_t buf_l;
 
@@ -128,7 +126,8 @@ static int p_get_params(void *provctx, OSSL_PARAM params[])
                     const char *versionp = *(void **)counter_request[0].data;
                     const char *namep = *(void **)counter_request[1].data;
 
-                    local_snprintf(buf, sizeof(buf), "Hello OpenSSL %.20s, greetings from %s!",
+                    local_snprintf(buf, sizeof(buf),
+                                   "Hello OpenSSL %.20s, greetings from %s!",
                                    versionp, namep);
                 }
             } else {
@@ -161,7 +160,7 @@ static int p_get_params(void *provctx, OSSL_PARAM params[])
             */
             deflt = OSSL_PROVIDER_load(ctx->libctx, "default");
             if (deflt == NULL
-                    || !OSSL_PROVIDER_available(ctx->libctx, "default")) {
+                || !OSSL_PROVIDER_available(ctx->libctx, "default")) {
                 /* We set error "3" for a failure to load the default provider */
                 p_set_error(ERR_LIB_PROV, 3, ctx->thisfile, OPENSSL_LINE,
                             ctx->thisfunc, NULL);
@@ -174,17 +173,15 @@ static int p_get_params(void *provctx, OSSL_PARAM params[])
              * from the parent libctx. We should also have "this" provider
              * available.
              */
-            if (ok
-                    && OSSL_PROVIDER_available(ctx->libctx, "default")
-                    && OSSL_PROVIDER_available(ctx->libctx, "base")
-                    && OSSL_PROVIDER_available(ctx->libctx, "legacy")
-                    && OSSL_PROVIDER_available(ctx->libctx, "p_test")
-                    && md4 != NULL
-                    && mdctx != NULL) {
+            if (ok && OSSL_PROVIDER_available(ctx->libctx, "default")
+                && OSSL_PROVIDER_available(ctx->libctx, "base")
+                && OSSL_PROVIDER_available(ctx->libctx, "legacy")
+                && OSSL_PROVIDER_available(ctx->libctx, "p_test") && md4 != NULL
+                && mdctx != NULL) {
                 if (EVP_DigestInit_ex(mdctx, md4, NULL)
-                        && EVP_DigestUpdate(mdctx, (const unsigned char *)msg,
-                                            strlen(msg))
-                        && EVP_DigestFinal(mdctx, out, NULL))
+                    && EVP_DigestUpdate(mdctx, (const unsigned char *)msg,
+                                        strlen(msg))
+                    && EVP_DigestFinal(mdctx, out, NULL))
                     digestsuccess = 1;
             }
             EVP_MD_CTX_free(mdctx);
@@ -224,14 +221,12 @@ static const OSSL_ITEM *p_get_reason_strings(void *_)
         {1, "dummy reason string"},
         {2, "Can't create child library context"},
         {3, "Can't load default provider"},
-        {0, NULL}
-    };
+        {0, NULL}};
 
     return reason_strings;
 }
 
-static const OSSL_ALGORITHM *p_query(OSSL_PROVIDER *prov,
-                                     int operation_id,
+static const OSSL_ALGORITHM *p_query(OSSL_PROVIDER *prov, int operation_id,
                                      int *no_cache)
 {
     *no_cache = 1;
@@ -239,19 +234,16 @@ static const OSSL_ALGORITHM *p_query(OSSL_PROVIDER *prov,
 }
 
 static const OSSL_DISPATCH p_test_table[] = {
-    { OSSL_FUNC_PROVIDER_GETTABLE_PARAMS, (void (*)(void))p_gettable_params },
-    { OSSL_FUNC_PROVIDER_GET_PARAMS, (void (*)(void))p_get_params },
-    { OSSL_FUNC_PROVIDER_GET_REASON_STRINGS,
-        (void (*)(void))p_get_reason_strings},
-    { OSSL_FUNC_PROVIDER_TEARDOWN, (void (*)(void))p_teardown },
-    { OSSL_FUNC_PROVIDER_QUERY_OPERATION, (void (*)(void))p_query },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_PROVIDER_GETTABLE_PARAMS, (void (*)(void))p_gettable_params},
+    {OSSL_FUNC_PROVIDER_GET_PARAMS, (void (*)(void))p_get_params},
+    {OSSL_FUNC_PROVIDER_GET_REASON_STRINGS,
+     (void (*)(void))p_get_reason_strings},
+    {OSSL_FUNC_PROVIDER_TEARDOWN, (void (*)(void))p_teardown},
+    {OSSL_FUNC_PROVIDER_QUERY_OPERATION, (void (*)(void))p_query},
+    OSSL_DISPATCH_END};
 
-int OSSL_provider_init(const OSSL_CORE_HANDLE *handle,
-                       const OSSL_DISPATCH *oin,
-                       const OSSL_DISPATCH **out,
-                       void **provctx)
+int OSSL_provider_init(const OSSL_CORE_HANDLE *handle, const OSSL_DISPATCH *oin,
+                       const OSSL_DISPATCH **out, void **provctx)
 {
     P_TEST_CTX *ctx;
     const OSSL_DISPATCH *in = oin;
@@ -326,7 +318,8 @@ int OSSL_provider_init(const OSSL_CORE_HANDLE *handle,
      * Set a spurious error to check error handling works correctly. This will
      * be ignored
      */
-    p_set_error(ERR_LIB_PROV, 1, ctx->thisfile, OPENSSL_LINE, ctx->thisfunc, NULL);
+    p_set_error(ERR_LIB_PROV, 1, ctx->thisfile, OPENSSL_LINE, ctx->thisfunc,
+                NULL);
 
     *provctx = (void *)ctx;
     *out = p_test_table;

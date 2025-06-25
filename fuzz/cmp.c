@@ -32,8 +32,8 @@ static OSSL_CMP_MSG *transfer_cb(OSSL_CMP_CTX *ctx, const OSSL_CMP_MSG *req)
 {
     if (num_responses++ > 2)
         return NULL; /* prevent loops due to repeated pollRep */
-    return OSSL_CMP_MSG_dup((OSSL_CMP_MSG *)
-                            OSSL_CMP_CTX_get_transfer_cb_arg(ctx));
+    return OSSL_CMP_MSG_dup(
+        (OSSL_CMP_MSG *)OSSL_CMP_CTX_get_transfer_cb_arg(ctx));
 }
 
 static int print_noop(const char *func, const char *file, int line,
@@ -59,9 +59,9 @@ static void cmp_client_process_response(OSSL_CMP_CTX *ctx, OSSL_CMP_MSG *msg)
     ctx->oldCert = X509_new(); /* satisfy crm_new() and ossl_cmp_rr_new() */
     if (!OSSL_CMP_CTX_set1_secretValue(ctx, (unsigned char *)"",
                                        0) /* prevent too unspecific error */
-            || ctx->oldCert == NULL
-            || name == NULL || !X509_set_issuer_name(ctx->oldCert, name)
-            || serial == NULL || !X509_set_serialNumber(ctx->oldCert, serial))
+        || ctx->oldCert == NULL || name == NULL
+        || !X509_set_issuer_name(ctx->oldCert, name) || serial == NULL
+        || !X509_set_serialNumber(ctx->oldCert, serial))
         goto err;
 
     (void)OSSL_CMP_CTX_set_transfer_cb(ctx, transfer_cb);
@@ -94,19 +94,16 @@ static void cmp_client_process_response(OSSL_CMP_CTX *ctx, OSSL_CMP_MSG *msg)
         (void)ossl_cmp_msg_check_update(ctx, msg, allow_unprotected, 0);
         break;
     }
- err:
+err:
     X509_NAME_free(name);
     ASN1_INTEGER_free(serial);
 }
 
-static OSSL_CMP_PKISI *process_cert_request(OSSL_CMP_SRV_CTX *srv_ctx,
-                                            const OSSL_CMP_MSG *cert_req,
-                                            int certReqId,
-                                            const OSSL_CRMF_MSG *crm,
-                                            const X509_REQ *p10cr,
-                                            X509 **certOut,
-                                            STACK_OF(X509) **chainOut,
-                                            STACK_OF(X509) **caPubs)
+static OSSL_CMP_PKISI *
+process_cert_request(OSSL_CMP_SRV_CTX *srv_ctx, const OSSL_CMP_MSG *cert_req,
+                     int certReqId, const OSSL_CRMF_MSG *crm,
+                     const X509_REQ *p10cr, X509 **certOut,
+                     STACK_OF(X509) **chainOut, STACK_OF(X509) **caPubs)
 {
     ERR_raise(ERR_LIB_CMP, CMP_R_ERROR_PROCESSING_MESSAGE);
     return NULL;
@@ -121,8 +118,7 @@ static OSSL_CMP_PKISI *process_rr(OSSL_CMP_SRV_CTX *srv_ctx,
     return NULL;
 }
 
-static int process_genm(OSSL_CMP_SRV_CTX *srv_ctx,
-                        const OSSL_CMP_MSG *genm,
+static int process_genm(OSSL_CMP_SRV_CTX *srv_ctx, const OSSL_CMP_MSG *genm,
                         const STACK_OF(OSSL_CMP_ITAV) *in,
                         STACK_OF(OSSL_CMP_ITAV) **out)
 {
@@ -184,8 +180,8 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
         OSSL_CMP_CTX *client_ctx = OSSL_CMP_CTX_new(NULL, NULL);
 
         i2d_OSSL_CMP_MSG_bio(out, msg);
-        ASN1_item_print(out, (ASN1_VALUE *)msg, 4,
-                        ASN1_ITEM_rptr(OSSL_CMP_MSG), NULL);
+        ASN1_item_print(out, (ASN1_VALUE *)msg, 4, ASN1_ITEM_rptr(OSSL_CMP_MSG),
+                        NULL);
         BIO_free(out);
 
         if (client_ctx != NULL)

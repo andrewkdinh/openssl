@@ -50,7 +50,7 @@ static void clear_comments(CONF *conf, char *p);
 static int str_copy(CONF *conf, char *section, char **to, char *from);
 static char *scan_quote(CONF *conf, char *p);
 static char *scan_dquote(CONF *conf, char *p);
-#define scan_esc(conf,p)        (((IS_EOF((conf),(p)[1]))?((p)+1):((p)+2)))
+#define scan_esc(conf, p)        (((IS_EOF((conf),(p)[1]))?((p)+1):((p)+2)))
 #ifndef OPENSSL_NO_POSIX_IO
 static BIO *process_include(char *include, OPENSSL_DIR_CTX **dirctx,
                             char **dirpath);
@@ -71,17 +71,9 @@ static int def_is_number(const CONF *conf, char c);
 static int def_to_int(const CONF *conf, char c);
 
 static CONF_METHOD default_method = {
-    "OpenSSL default",
-    def_create,
-    def_init_default,
-    def_destroy,
-    def_destroy_data,
-    def_load_bio,
-    def_dump,
-    def_is_number,
-    def_to_int,
-    def_load
-};
+    "OpenSSL default", def_create,   def_init_default, def_destroy,
+    def_destroy_data,  def_load_bio, def_dump,         def_is_number,
+    def_to_int,        def_load};
 
 CONF_METHOD *NCONF_default(void)
 {
@@ -90,17 +82,8 @@ CONF_METHOD *NCONF_default(void)
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 static CONF_METHOD WIN32_method = {
-    "WIN32",
-    def_create,
-    def_init_WIN32,
-    def_destroy,
-    def_destroy_data,
-    def_load_bio,
-    def_dump,
-    def_is_number,
-    def_to_int,
-    def_load
-};
+    "WIN32",      def_create, def_init_WIN32, def_destroy, def_destroy_data,
+    def_load_bio, def_dump,   def_is_number,  def_to_int,  def_load};
 
 CONF_METHOD *NCONF_WIN32(void)
 {
@@ -188,7 +171,6 @@ static int def_load(CONF *conf, const char *name, long *line)
     return ret;
 }
 
-
 /* Parse a boolean value and fill in *flag. Return 0 on error. */
 static int parsebool(const char *pval, int *flag)
 {
@@ -259,7 +241,7 @@ static int def_load_bio(CONF *conf, BIO *in, long *line)
         }
         p = &(buff->data[bufnum]);
         *p = '\0';
- read_retry:
+read_retry:
         if (in != NULL && BIO_gets(in, p, CONFBUFSIZE - 1) < 0)
             goto err;
         p[CONFBUFSIZE - 1] = '\0';
@@ -317,10 +299,10 @@ static int def_load_bio(CONF *conf, BIO *in, long *line)
          * we removed some trailing stuff so there is a new line on the end.
          */
         if (ii && i == ii)
-            again = 1;          /* long line */
+            again = 1; /* long line */
         else {
             p[i] = '\0';
-            eline++;            /* another input line */
+            eline++; /* another input line */
         }
 
         /* we now have a line with trailing \r\n removed */
@@ -349,14 +331,14 @@ static int def_load_bio(CONF *conf, BIO *in, long *line)
         clear_comments(conf, buf);
         s = eat_ws(conf, buf);
         if (IS_EOF(conf, *s))
-            continue;           /* blank line */
+            continue; /* blank line */
         if (*s == '[') {
             char *ss;
 
             s++;
             start = eat_ws(conf, s);
             ss = start;
- again:
+again:
             end = eat_alpha_numeric(conf, ss);
             p = eat_ws(conf, end);
             if (*p != ']') {
@@ -435,10 +417,11 @@ static int def_load_bio(CONF *conf, BIO *in, long *line)
                  */
                 continue;
             } else if (CHECK_AND_SKIP_PREFIX(pname, ".include")
-                && (p != pname || *p == '=')) {
+                       && (p != pname || *p == '=')) {
                 char *include = NULL;
                 BIO *next;
-                const char *include_dir = ossl_safe_getenv("OPENSSL_CONF_INCLUDE");
+                const char *include_dir =
+                    ossl_safe_getenv("OPENSSL_CONF_INCLUDE");
                 char *include_path = NULL;
 
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
@@ -485,7 +468,7 @@ static int def_load_bio(CONF *conf, BIO *in, long *line)
                 }
 
                 if (conf->flag_abspath
-                        && !ossl_is_absolute_path(include_path)) {
+                    && !ossl_is_absolute_path(include_path)) {
                     ERR_raise(ERR_LIB_CONF, CONF_R_RELATIVE_PATH);
                     OPENSSL_free(include_path);
                     goto err;
@@ -541,8 +524,7 @@ static int def_load_bio(CONF *conf, BIO *in, long *line)
                 goto err;
 
             if (strcmp(psection, section) != 0) {
-                if ((tv = _CONF_get_section(conf, psection))
-                    == NULL)
+                if ((tv = _CONF_get_section(conf, psection)) == NULL)
                     tv = _CONF_new_section(conf, psection);
                 if (tv == NULL) {
                     ERR_raise(ERR_LIB_CONF,
@@ -567,7 +549,7 @@ static int def_load_bio(CONF *conf, BIO *in, long *line)
     sk_BIO_free(biosk);
     return 1;
 
- err:
+err:
     BUF_MEM_free(buff);
     OPENSSL_free(section);
     /*
@@ -698,8 +680,7 @@ static int str_copy(CONF *conf, char *section, char **pto, char *from)
         } else if (IS_EOF(conf, *from))
             break;
         else if (*from == '$'
-                 && (!conf->flag_dollarid
-                     || from[1] == '{'
+                 && (!conf->flag_dollarid || from[1] == '{'
                      || from[1] == '(')) {
             size_t newsize;
 
@@ -768,8 +749,7 @@ static int str_copy(CONF *conf, char *section, char **pto, char *from)
                 ERR_raise(ERR_LIB_CONF, ERR_R_BUF_LIB);
                 goto err;
             }
-            while (*p)
-                buf->data[to++] = *(p++);
+            while (*p) buf->data[to++] = *(p++);
 
             /*
              * Since we change the pointer 'from', we also have to change the
@@ -792,7 +772,7 @@ static int str_copy(CONF *conf, char *section, char **pto, char *from)
     *pto = buf->data;
     OPENSSL_free(buf);
     return 1;
- err:
+err:
     BUF_MEM_free(buf);
     return 0;
 }
@@ -846,7 +826,6 @@ static BIO *get_next_file(const char *path, OPENSSL_DIR_CTX **dirctx)
 
         namelen = strlen(filename);
 
-
         if ((namelen > 5
              && OPENSSL_strcasecmp(filename + namelen - 5, ".conf") == 0)
             || (namelen > 4
@@ -859,18 +838,17 @@ static BIO *get_next_file(const char *path, OPENSSL_DIR_CTX **dirctx)
             newpath = OPENSSL_zalloc(newlen);
             if (newpath == NULL)
                 break;
-#ifdef OPENSSL_SYS_VMS
+# ifdef OPENSSL_SYS_VMS
             /*
              * If the given path isn't clear VMS syntax,
              * we treat it as on Unix.
              */
-            if (path[pathlen - 1] == ']'
-                || path[pathlen - 1] == '>'
+            if (path[pathlen - 1] == ']' || path[pathlen - 1] == '>'
                 || path[pathlen - 1] == ':') {
                 /* Clear VMS directory syntax, just copy as is */
                 OPENSSL_strlcpy(newpath, path, newlen);
             }
-#endif
+# endif
             if (newpath[0] == '\0') {
                 OPENSSL_strlcpy(newpath, path, newlen);
                 OPENSSL_strlcat(newpath, "/", newlen);
@@ -892,7 +870,7 @@ static BIO *get_next_file(const char *path, OPENSSL_DIR_CTX **dirctx)
 
 static int is_keytype(const CONF *conf, char c, unsigned short type)
 {
-    const unsigned short *keytypes = (const unsigned short *) conf->meth_data;
+    const unsigned short *keytypes = (const unsigned short *)conf->meth_data;
     unsigned char key = (unsigned char)c;
 
 #ifdef CHARSET_EBCDIC
@@ -916,8 +894,7 @@ static int is_keytype(const CONF *conf, char c, unsigned short type)
 
 static char *eat_ws(CONF *conf, char *p)
 {
-    while (IS_WS(conf, *p) && (!IS_EOF(conf, *p)))
-        p++;
+    while (IS_WS(conf, *p) && (!IS_EOF(conf, *p))) p++;
     return p;
 }
 
@@ -925,11 +902,9 @@ static void trim_ws(CONF *conf, char *start)
 {
     char *p = start;
 
-    while (!IS_EOF(conf, *p))
-        p++;
+    while (!IS_EOF(conf, *p)) p++;
     p--;
-    while ((p >= start) && IS_WS(conf, *p))
-        p--;
+    while ((p >= start) && IS_WS(conf, *p)) p--;
     p++;
     *p = '\0';
 }

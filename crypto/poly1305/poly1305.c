@@ -21,10 +21,9 @@ size_t Poly1305_ctx_size(void)
 /* pick 32-bit unsigned integer in little endian order */
 static unsigned int U8TOU32(const unsigned char *p)
 {
-    return (((unsigned int)(p[0] & 0xff)) |
-            ((unsigned int)(p[1] & 0xff) << 8) |
-            ((unsigned int)(p[2] & 0xff) << 16) |
-            ((unsigned int)(p[3] & 0xff) << 24));
+    return (((unsigned int)(p[0] & 0xff)) | ((unsigned int)(p[1] & 0xff) << 8)
+            | ((unsigned int)(p[2] & 0xff) << 16)
+            | ((unsigned int)(p[3] & 0xff) << 24));
 }
 
 /*
@@ -84,13 +83,13 @@ typedef unsigned int u32;
  *      level Poly1305_* from this very module, so that quirks are
  *      handled locally.
  */
-static void
-poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit);
+static void poly1305_blocks(void *ctx, const unsigned char *inp, size_t len,
+                            u32 padbit);
 
 /*
  * Type-agnostic "rip-off" from constant_time.h
  */
-# define CONSTANT_TIME_CARRY(a,b) ( \
+# define CONSTANT_TIME_CARRY(a, b) ( \
          (a ^ ((a ^ b) | ((a - b) ^ b))) >> (sizeof(a) * 8 - 1) \
          )
 
@@ -107,14 +106,10 @@ typedef struct {
 /* pick 32-bit unsigned integer in little endian order */
 static u64 U8TOU64(const unsigned char *p)
 {
-    return (((u64)(p[0] & 0xff)) |
-            ((u64)(p[1] & 0xff) << 8) |
-            ((u64)(p[2] & 0xff) << 16) |
-            ((u64)(p[3] & 0xff) << 24) |
-            ((u64)(p[4] & 0xff) << 32) |
-            ((u64)(p[5] & 0xff) << 40) |
-            ((u64)(p[6] & 0xff) << 48) |
-            ((u64)(p[7] & 0xff) << 56));
+    return (((u64)(p[0] & 0xff)) | ((u64)(p[1] & 0xff) << 8)
+            | ((u64)(p[2] & 0xff) << 16) | ((u64)(p[3] & 0xff) << 24)
+            | ((u64)(p[4] & 0xff) << 32) | ((u64)(p[5] & 0xff) << 40)
+            | ((u64)(p[6] & 0xff) << 48) | ((u64)(p[7] & 0xff) << 56));
 }
 
 /* store a 32-bit unsigned integer in little endian */
@@ -132,7 +127,7 @@ static void U64TO8(unsigned char *p, u64 v)
 
 static void poly1305_init(void *ctx, const unsigned char key[16])
 {
-    poly1305_internal *st = (poly1305_internal *) ctx;
+    poly1305_internal *st = (poly1305_internal *)ctx;
 
     /* h = 0 */
     st->h[0] = 0;
@@ -144,8 +139,8 @@ static void poly1305_init(void *ctx, const unsigned char key[16])
     st->r[1] = U8TOU64(&key[8]) & 0x0ffffffc0ffffffc;
 }
 
-static void
-poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit)
+static void poly1305_blocks(void *ctx, const unsigned char *inp, size_t len,
+                            u32 padbit)
 {
     poly1305_internal *st = (poly1305_internal *)ctx;
     u64 r0, r1;
@@ -173,11 +168,8 @@ poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit)
         h2 += (u64)(d1 >> 64) + padbit;
 
         /* h *= r "%" p, where "%" stands for "partial remainder" */
-        d0 = ((u128)h0 * r0) +
-             ((u128)h1 * s1);
-        d1 = ((u128)h0 * r1) +
-             ((u128)h1 * r0) +
-             (h2 * s1);
+        d0 = ((u128)h0 * r0) + ((u128)h1 * s1);
+        d1 = ((u128)h0 * r1) + ((u128)h1 * r0) + (h2 * s1);
         h2 = (h2 * r0);
 
         /* last reduction step: */
@@ -189,8 +181,8 @@ poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit)
         c = (h2 >> 2) + (h2 & ~3UL);
         h2 &= 3;
         h0 += c;
-        h1 += (c = CONSTANT_TIME_CARRY(h0,c));
-        h2 += CONSTANT_TIME_CARRY(h1,c);
+        h1 += (c = CONSTANT_TIME_CARRY(h0, c));
+        h2 += CONSTANT_TIME_CARRY(h1, c);
         /*
          * Occasional overflows to 3rd bit of h2 are taken care of
          * "naturally". If after this point we end up at the top of
@@ -210,10 +202,9 @@ poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit)
     st->h[2] = h2;
 }
 
-static void poly1305_emit(void *ctx, unsigned char mac[16],
-                          const u32 nonce[4])
+static void poly1305_emit(void *ctx, unsigned char mac[16], const u32 nonce[4])
 {
-    poly1305_internal *st = (poly1305_internal *) ctx;
+    poly1305_internal *st = (poly1305_internal *)ctx;
     u64 h0, h1, h2;
     u64 g0, g1, g2;
     u128 t;
@@ -237,8 +228,8 @@ static void poly1305_emit(void *ctx, unsigned char mac[16],
     h1 = (h1 & mask) | g1;
 
     /* mac = (h + nonce) % (2^128) */
-    h0 = (u64)(t = (u128)h0 + nonce[0] + ((u64)nonce[1]<<32));
-    h1 = (u64)(t = (u128)h1 + nonce[2] + ((u64)nonce[3]<<32) + (t >> 64));
+    h0 = (u64)(t = (u128)h0 + nonce[0] + ((u64)nonce[1] << 32));
+    h1 = (u64)(t = (u128)h1 + nonce[2] + ((u64)nonce[3] << 32) + (t >> 64));
 
     U64TO8(mac + 0, h0);
     U64TO8(mac + 8, h1);
@@ -270,7 +261,7 @@ static void U32TO8(unsigned char *p, unsigned int v)
 
 static void poly1305_init(void *ctx, const unsigned char key[16])
 {
-    poly1305_internal *st = (poly1305_internal *) ctx;
+    poly1305_internal *st = (poly1305_internal *)ctx;
 
     /* h = 0 */
     st->h[0] = 0;
@@ -286,8 +277,8 @@ static void poly1305_init(void *ctx, const unsigned char key[16])
     st->r[3] = U8TOU32(&key[12]) & 0x0ffffffc;
 }
 
-static void
-poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit)
+static void poly1305_blocks(void *ctx, const unsigned char *inp, size_t len,
+                            u32 padbit)
 {
     poly1305_internal *st = (poly1305_internal *)ctx;
     u32 r0, r1, r2, r3;
@@ -319,25 +310,13 @@ poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit)
         h4 += (u32)(d3 >> 32) + padbit;
 
         /* h *= r "%" p, where "%" stands for "partial remainder" */
-        d0 = ((u64)h0 * r0) +
-             ((u64)h1 * s3) +
-             ((u64)h2 * s2) +
-             ((u64)h3 * s1);
-        d1 = ((u64)h0 * r1) +
-             ((u64)h1 * r0) +
-             ((u64)h2 * s3) +
-             ((u64)h3 * s2) +
-             (h4 * s1);
-        d2 = ((u64)h0 * r2) +
-             ((u64)h1 * r1) +
-             ((u64)h2 * r0) +
-             ((u64)h3 * s3) +
-             (h4 * s2);
-        d3 = ((u64)h0 * r3) +
-             ((u64)h1 * r2) +
-             ((u64)h2 * r1) +
-             ((u64)h3 * r0) +
-             (h4 * s3);
+        d0 = ((u64)h0 * r0) + ((u64)h1 * s3) + ((u64)h2 * s2) + ((u64)h3 * s1);
+        d1 = ((u64)h0 * r1) + ((u64)h1 * r0) + ((u64)h2 * s3) + ((u64)h3 * s2)
+            + (h4 * s1);
+        d2 = ((u64)h0 * r2) + ((u64)h1 * r1) + ((u64)h2 * r0) + ((u64)h3 * s3)
+            + (h4 * s2);
+        d3 = ((u64)h0 * r3) + ((u64)h1 * r2) + ((u64)h2 * r1) + ((u64)h3 * r0)
+            + (h4 * s3);
         h4 = (h4 * r0);
 
         /* last reduction step: */
@@ -351,10 +330,10 @@ poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit)
         c = (h4 >> 2) + (h4 & ~3U);
         h4 &= 3;
         h0 += c;
-        h1 += (c = CONSTANT_TIME_CARRY(h0,c));
-        h2 += (c = CONSTANT_TIME_CARRY(h1,c));
-        h3 += (c = CONSTANT_TIME_CARRY(h2,c));
-        h4 += CONSTANT_TIME_CARRY(h3,c);
+        h1 += (c = CONSTANT_TIME_CARRY(h0, c));
+        h2 += (c = CONSTANT_TIME_CARRY(h1, c));
+        h3 += (c = CONSTANT_TIME_CARRY(h2, c));
+        h4 += CONSTANT_TIME_CARRY(h3, c);
         /*
          * Occasional overflows to 3rd bit of h4 are taken care of
          * "naturally". If after this point we end up at the top of
@@ -376,10 +355,9 @@ poly1305_blocks(void *ctx, const unsigned char *inp, size_t len, u32 padbit)
     st->h[4] = h4;
 }
 
-static void poly1305_emit(void *ctx, unsigned char mac[16],
-                          const u32 nonce[4])
+static void poly1305_emit(void *ctx, unsigned char mac[16], const u32 nonce[4])
 {
-    poly1305_internal *st = (poly1305_internal *) ctx;
+    poly1305_internal *st = (poly1305_internal *)ctx;
     u32 h0, h1, h2, h3, h4;
     u32 g0, g1, g2, g3, g4;
     u64 t;
@@ -453,7 +431,6 @@ void Poly1305_Init(POLY1305 *ctx, const unsigned char key[32])
 #endif
 
     ctx->num = 0;
-
 }
 
 #ifdef POLY1305_ASM
@@ -517,8 +494,7 @@ void Poly1305_Final(POLY1305 *ctx, unsigned char mac[16])
 
     if ((num = ctx->num)) {
         ctx->data[num++] = 1;   /* pad bit */
-        while (num < POLY1305_BLOCK_SIZE)
-            ctx->data[num++] = 0;
+        while (num < POLY1305_BLOCK_SIZE) ctx->data[num++] = 0;
         poly1305_blocks(ctx->opaque, ctx->data, POLY1305_BLOCK_SIZE, 0);
     }
 

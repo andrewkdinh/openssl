@@ -59,8 +59,7 @@ static void ml_kem_freectx(void *vctx)
     OPENSSL_free(ctx);
 }
 
-static int ml_kem_init(void *vctx, int op, void *key,
-                       const OSSL_PARAM params[])
+static int ml_kem_init(void *vctx, int op, void *key, const OSSL_PARAM params[])
 {
     PROV_ML_KEM_CTX *ctx = vctx;
 
@@ -118,8 +117,7 @@ static int ml_kem_set_ctx_params(void *vctx, const OSSL_PARAM params[])
         size_t len = ML_KEM_RANDOM_BYTES;
 
         ctx->entropy = ctx->entropy_buf;
-        if (OSSL_PARAM_get_octet_string(p, (void **)&ctx->entropy,
-                                        len, &len)
+        if (OSSL_PARAM_get_octet_string(p, (void **)&ctx->entropy, len, &len)
             && len == ML_KEM_RANDOM_BYTES)
             return 1;
 
@@ -136,9 +134,7 @@ static const OSSL_PARAM *ml_kem_settable_ctx_params(ossl_unused void *vctx,
                                                     ossl_unused void *provctx)
 {
     static const OSSL_PARAM params[] = {
-        OSSL_PARAM_octet_string(OSSL_KEM_PARAM_IKME, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_octet_string(OSSL_KEM_PARAM_IKME, NULL, 0), OSSL_PARAM_END};
 
     return params;
 }
@@ -206,7 +202,7 @@ static int ml_kem_encapsulate(void *vctx, unsigned char *ctext, size_t *clen,
     else
         ret = ossl_ml_kem_encap_rand(ctext, encap_clen, shsec, encap_slen, key);
 
- end:
+end:
     /*
      * One shot entropy, each encapsulate call must either provide a new
      * "ikmE", or else will use a random value.  If a caller sets an explicit
@@ -256,13 +252,12 @@ static int ml_kem_decapsulate(void *vctx, uint8_t *shsec, size_t *slen,
 }
 
 const OSSL_DISPATCH ossl_ml_kem_asym_kem_functions[] = {
-    { OSSL_FUNC_KEM_NEWCTX, (OSSL_FUNC) ml_kem_newctx },
-    { OSSL_FUNC_KEM_ENCAPSULATE_INIT, (OSSL_FUNC) ml_kem_encapsulate_init },
-    { OSSL_FUNC_KEM_ENCAPSULATE, (OSSL_FUNC) ml_kem_encapsulate },
-    { OSSL_FUNC_KEM_DECAPSULATE_INIT, (OSSL_FUNC) ml_kem_decapsulate_init },
-    { OSSL_FUNC_KEM_DECAPSULATE, (OSSL_FUNC) ml_kem_decapsulate },
-    { OSSL_FUNC_KEM_FREECTX, (OSSL_FUNC) ml_kem_freectx },
-    { OSSL_FUNC_KEM_SET_CTX_PARAMS, (OSSL_FUNC) ml_kem_set_ctx_params },
-    { OSSL_FUNC_KEM_SETTABLE_CTX_PARAMS, (OSSL_FUNC) ml_kem_settable_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_KEM_NEWCTX, (OSSL_FUNC)ml_kem_newctx},
+    {OSSL_FUNC_KEM_ENCAPSULATE_INIT, (OSSL_FUNC)ml_kem_encapsulate_init},
+    {OSSL_FUNC_KEM_ENCAPSULATE, (OSSL_FUNC)ml_kem_encapsulate},
+    {OSSL_FUNC_KEM_DECAPSULATE_INIT, (OSSL_FUNC)ml_kem_decapsulate_init},
+    {OSSL_FUNC_KEM_DECAPSULATE, (OSSL_FUNC)ml_kem_decapsulate},
+    {OSSL_FUNC_KEM_FREECTX, (OSSL_FUNC)ml_kem_freectx},
+    {OSSL_FUNC_KEM_SET_CTX_PARAMS, (OSSL_FUNC)ml_kem_set_ctx_params},
+    {OSSL_FUNC_KEM_SETTABLE_CTX_PARAMS, (OSSL_FUNC)ml_kem_settable_ctx_params},
+    OSSL_DISPATCH_END};

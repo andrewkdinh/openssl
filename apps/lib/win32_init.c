@@ -24,8 +24,7 @@ static void cleanup(void)
 
     SetConsoleOutputCP(saved_cp);
 
-    for (i = 0; i < newargc; i++)
-        free(newargv[i]);
+    for (i = 0; i < newargc; i++) free(newargv[i]);
 
     free(newargv);
 }
@@ -40,8 +39,7 @@ static int validate_argv(int argc)
     if (argc >= size) {
         char **ptr;
 
-        while (argc >= size)
-            size += 64;
+        while (argc >= size) size += 64;
 
         ptr = realloc(newargv, size * sizeof(newargv[0]));
         if (ptr == NULL)
@@ -91,8 +89,8 @@ static int process_glob(WCHAR *wstr, int wlen)
         return 0;   /* not a valid glob, just pass... */
 
     if (slash)
-        udlen = WideCharToMultiByte(CP_UTF8, 0, wstr, slash,
-                                    NULL, 0, NULL, NULL);
+        udlen =
+            WideCharToMultiByte(CP_UTF8, 0, wstr, slash, NULL, 0, NULL, NULL);
     else
         udlen = 0;
 
@@ -104,8 +102,8 @@ static int process_glob(WCHAR *wstr, int wlen)
          * skip over . and ..
          */
         if (data.cFileName[0] == L'.') {
-            if ((data.cFileName[1] == L'\0') ||
-                (data.cFileName[1] == L'.' && data.cFileName[2] == L'\0'))
+            if ((data.cFileName[1] == L'\0')
+                || (data.cFileName[1] == L'.' && data.cFileName[2] == L'\0'))
                 continue;
         }
 
@@ -116,19 +114,19 @@ static int process_glob(WCHAR *wstr, int wlen)
          * -1 below means "scan for trailing '\0' *and* count it",
          * so that |uflen| covers even trailing '\0'.
          */
-        uflen = WideCharToMultiByte(CP_UTF8, 0, data.cFileName, -1,
-                                    NULL, 0, NULL, NULL);
+        uflen = WideCharToMultiByte(CP_UTF8, 0, data.cFileName, -1, NULL, 0,
+                                    NULL, NULL);
 
         arg = malloc(udlen + uflen);
         if (arg == NULL)
             break;
 
         if (udlen)
-            WideCharToMultiByte(CP_UTF8, 0, wstr, slash,
-                                arg, udlen, NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, 0, wstr, slash, arg, udlen, NULL,
+                                NULL);
 
-        WideCharToMultiByte(CP_UTF8, 0, data.cFileName, -1,
-                            arg + udlen, uflen, NULL, NULL);
+        WideCharToMultiByte(CP_UTF8, 0, data.cFileName, -1, arg + udlen, uflen,
+                            NULL, NULL);
 
         newargv[newargc++] = arg;
     } while (FindNextFileW(h, &data));
@@ -154,7 +152,8 @@ void win32_utf8argv(int *argc, char **argv[])
         return;
 
     wcmdline = GetCommandLineW();
-    if (wcmdline == NULL) return;
+    if (wcmdline == NULL)
+        return;
 
     /*
      * make a copy of the command line, since we might have to modify it...
@@ -177,8 +176,7 @@ void win32_utf8argv(int *argc, char **argv[])
          * the number of characters will never expand.
          */
         warg = wend = p;
-        while (*p != L'\0'
-               && (in_quote || (*p != L' ' && *p != L'\t'))) {
+        while (*p != L'\0' && (in_quote || (*p != L' ' && *p != L'\t'))) {
             switch (*p) {
             case L'\\':
                 /*
@@ -207,14 +205,12 @@ void win32_utf8argv(int *argc, char **argv[])
                     const WCHAR *q = p;
                     int i;
 
-                    while (*p == L'\\')
-                        p++;
+                    while (*p == L'\\') p++;
 
                     if (*p == L'"') {
                         int i;
 
-                        for (i = (p - q) / 2; i > 0; i--)
-                            *wend++ = L'\\';
+                        for (i = (p - q) / 2; i > 0; i--) *wend++ = L'\\';
 
                         /*
                          * if odd amount of backslashes before the quote,
@@ -223,8 +219,7 @@ void win32_utf8argv(int *argc, char **argv[])
                         if ((p - q) % 2 == 1)
                             *wend++ = *p++;
                     } else {
-                        for (i = p - q; i > 0; i--)
-                            *wend++ = L'\\';
+                        for (i = p - q; i > 0; i--) *wend++ = L'\\';
                     }
                 }
                 break;
@@ -258,8 +253,8 @@ void win32_utf8argv(int *argc, char **argv[])
 
             ulen = 0;
             if (wlen > 0) {
-                ulen = WideCharToMultiByte(CP_UTF8, 0, warg, wlen,
-                                           NULL, 0, NULL, NULL);
+                ulen = WideCharToMultiByte(CP_UTF8, 0, warg, wlen, NULL, 0,
+                                           NULL, NULL);
                 if (ulen <= 0)
                     continue;
             }
@@ -271,8 +266,8 @@ void win32_utf8argv(int *argc, char **argv[])
             }
 
             if (wlen > 0)
-                WideCharToMultiByte(CP_UTF8, 0, warg, wlen,
-                                    arg, ulen, NULL, NULL);
+                WideCharToMultiByte(CP_UTF8, 0, warg, wlen, arg, ulen, NULL,
+                                    NULL);
             arg[ulen] = '\0';
 
             newargv[newargc++] = arg;
@@ -290,8 +285,7 @@ void win32_utf8argv(int *argc, char **argv[])
     } else if (newargv != NULL) {
         int i;
 
-        for (i = 0; i < newargc; i++)
-            free(newargv[i]);
+        for (i = 0; i < newargc; i++) free(newargv[i]);
 
         free(newargv);
 
@@ -303,5 +297,7 @@ void win32_utf8argv(int *argc, char **argv[])
 }
 #else
 void win32_utf8argv(int *argc, char **argv[])
-{   return;   }
+{
+    return;
+}
 #endif

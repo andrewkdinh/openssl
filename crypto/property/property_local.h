@@ -14,23 +14,25 @@
 typedef int OSSL_PROPERTY_IDX;
 
 typedef enum {
-    OSSL_PROPERTY_OPER_EQ, OSSL_PROPERTY_OPER_NE, OSSL_PROPERTY_OVERRIDE
+    OSSL_PROPERTY_OPER_EQ,
+    OSSL_PROPERTY_OPER_NE,
+    OSSL_PROPERTY_OVERRIDE
 } OSSL_PROPERTY_OPER;
 
 struct ossl_property_definition_st {
     OSSL_PROPERTY_IDX name_idx;
     OSSL_PROPERTY_TYPE type;
     OSSL_PROPERTY_OPER oper;
-    unsigned int optional : 1;
+    unsigned int optional:1;
     union {
-        int64_t             int_val;     /* Signed integer */
-        OSSL_PROPERTY_IDX   str_val;     /* String */
+        int64_t int_val;     /* Signed integer */
+        OSSL_PROPERTY_IDX str_val;     /* String */
     } v;
 };
 
 struct ossl_property_list_st {
     int num_properties;
-    unsigned int has_optional : 1;
+    unsigned int has_optional:1;
     OSSL_PROPERTY_DEFINITION properties[1];
 };
 

@@ -25,7 +25,8 @@ void ASN1_item_ex_free(ASN1_VALUE **pval, const ASN1_ITEM *it)
     ossl_asn1_item_embed_free(pval, it, 0);
 }
 
-void ossl_asn1_item_embed_free(ASN1_VALUE **pval, const ASN1_ITEM *it, int embed)
+void ossl_asn1_item_embed_free(ASN1_VALUE **pval, const ASN1_ITEM *it,
+                               int embed)
 {
     const ASN1_TEMPLATE *tt = NULL, *seqtt;
     const ASN1_EXTERN_FUNCS *ef;

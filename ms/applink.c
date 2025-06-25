@@ -93,27 +93,25 @@ static int app_fsetmod(FILE *fp, char mod)
     return _setmode(_fileno(fp), mod == 'b' ? _O_BINARY : _O_TEXT);
 }
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 extern "C" {
-#endif
+# endif
 
-__declspec(dllexport)
-void **
+__declspec(dllexport) void **
 # if defined(__BORLANDC__)
 /*
  * __stdcall appears to be the only way to get the name
  * decoration right with Borland C. Otherwise it works
  * purely incidentally, as we pass no parameters.
  */
-__stdcall
+    __stdcall
 # else
-__cdecl
+    __cdecl
 # endif
-OPENSSL_Applink(void)
+    OPENSSL_Applink(void)
 {
     static int once = 1;
-    static void *OPENSSL_ApplinkTable[APPLINK_MAX + 1] =
-        { (void *)APPLINK_MAX };
+    static void *OPENSSL_ApplinkTable[APPLINK_MAX + 1] = {(void *)APPLINK_MAX};
 
     if (once) {
         OPENSSL_ApplinkTable[APPLINK_STDIN] = app_stdin;
@@ -147,7 +145,7 @@ OPENSSL_Applink(void)
     return OPENSSL_ApplinkTable;
 }
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 }
-#endif
+# endif
 #endif

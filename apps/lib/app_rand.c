@@ -44,8 +44,7 @@ static int loadfiles(char *name)
 
     for (;;) {
         last = 0;
-        for (p = name; *p != '\0' && *p != LIST_SEPARATOR_CHAR; p++)
-            continue;
+        for (p = name; *p != '\0' && *p != LIST_SEPARATOR_CHAR; p++) continue;
         if (*p == '\0')
             last = 1;
         *p = '\0';
@@ -89,10 +88,9 @@ int app_RAND_write(void)
         ret = 0;
     }
     OPENSSL_free(save_rand_file);
-    save_rand_file =  NULL;
+    save_rand_file = NULL;
     return ret;
 }
-
 
 /*
  * See comments in opt_verify for explanation of this.
@@ -107,7 +105,7 @@ int opt_rand(int opt)
         break;
     case OPT_R_RAND:
         if (randfiles == NULL
-                && (randfiles = sk_OPENSSL_STRING_new_null()) == NULL)
+            && (randfiles = sk_OPENSSL_STRING_new_null()) == NULL)
             return 0;
         if (!sk_OPENSSL_STRING_push(randfiles, opt_arg()))
             return 0;

@@ -32,18 +32,16 @@ X509_POLICY_LEVEL *X509_policy_tree_get0_level(const X509_POLICY_TREE *tree,
     return tree->levels + i;
 }
 
-STACK_OF(X509_POLICY_NODE) *X509_policy_tree_get0_policies(const
-                                                           X509_POLICY_TREE
-                                                           *tree)
+STACK_OF(X509_POLICY_NODE) *
+X509_policy_tree_get0_policies(const X509_POLICY_TREE *tree)
 {
     if (!tree)
         return NULL;
     return tree->auth_policies;
 }
 
-STACK_OF(X509_POLICY_NODE) *X509_policy_tree_get0_user_policies(const
-                                                                X509_POLICY_TREE
-                                                                *tree)
+STACK_OF(X509_POLICY_NODE) *
+X509_policy_tree_get0_user_policies(const X509_POLICY_TREE *tree)
 {
     if (!tree)
         return NULL;
@@ -69,7 +67,8 @@ int X509_policy_level_node_count(X509_POLICY_LEVEL *level)
     return n;
 }
 
-X509_POLICY_NODE *X509_policy_level_get0_node(const X509_POLICY_LEVEL *level, int i)
+X509_POLICY_NODE *X509_policy_level_get0_node(const X509_POLICY_LEVEL *level,
+                                              int i)
 {
     if (!level)
         return NULL;
@@ -90,17 +89,16 @@ const ASN1_OBJECT *X509_policy_node_get0_policy(const X509_POLICY_NODE *node)
     return node->data->valid_policy;
 }
 
-STACK_OF(POLICYQUALINFO) *X509_policy_node_get0_qualifiers(const
-                                                           X509_POLICY_NODE
-                                                           *node)
+STACK_OF(POLICYQUALINFO) *
+X509_policy_node_get0_qualifiers(const X509_POLICY_NODE *node)
 {
     if (!node)
         return NULL;
     return node->data->qualifier_set;
 }
 
-const X509_POLICY_NODE *X509_policy_node_get0_parent(const X509_POLICY_NODE
-                                                     *node)
+const X509_POLICY_NODE *
+X509_policy_node_get0_parent(const X509_POLICY_NODE *node)
 {
     if (!node)
         return NULL;

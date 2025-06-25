@@ -36,8 +36,10 @@ static OSSL_FUNC_signature_freectx_fn mac_freectx;
 static OSSL_FUNC_signature_dupctx_fn mac_dupctx;
 static OSSL_FUNC_signature_set_ctx_params_fn mac_set_ctx_params;
 static OSSL_FUNC_signature_settable_ctx_params_fn mac_hmac_settable_ctx_params;
-static OSSL_FUNC_signature_settable_ctx_params_fn mac_siphash_settable_ctx_params;
-static OSSL_FUNC_signature_settable_ctx_params_fn mac_poly1305_settable_ctx_params;
+static OSSL_FUNC_signature_settable_ctx_params_fn
+    mac_siphash_settable_ctx_params;
+static OSSL_FUNC_signature_settable_ctx_params_fn
+    mac_poly1305_settable_ctx_params;
 static OSSL_FUNC_signature_settable_ctx_params_fn mac_cmac_settable_ctx_params;
 
 typedef struct {
@@ -75,7 +77,7 @@ static void *mac_newctx(void *provctx, const char *propq, const char *macname)
 
     return pmacctx;
 
- err:
+err:
     OPENSSL_free(pmacctx->propq);
     OPENSSL_free(pmacctx);
     EVP_MAC_free(mac);
@@ -99,8 +101,7 @@ static int mac_digest_sign_init(void *vpmacctx, const char *mdname, void *vkey,
     PROV_MAC_CTX *pmacctx = (PROV_MAC_CTX *)vpmacctx;
     const char *ciphername = NULL, *engine = NULL;
 
-    if (!ossl_prov_is_running()
-        || pmacctx == NULL)
+    if (!ossl_prov_is_running() || pmacctx == NULL)
         return 0;
 
     if (pmacctx->key == NULL && vkey == NULL) {
@@ -122,12 +123,9 @@ static int mac_digest_sign_init(void *vpmacctx, const char *mdname, void *vkey,
         engine = (char *)ENGINE_get_id(pmacctx->key->cipher.engine);
 #endif
 
-    if (!ossl_prov_set_macctx(pmacctx->macctx, NULL,
-                              (char *)ciphername,
-                              (char *)mdname,
-                              (char *)engine,
-                              pmacctx->key->properties,
-                              NULL, 0))
+    if (!ossl_prov_set_macctx(pmacctx->macctx, NULL, (char *)ciphername,
+                              (char *)mdname, (char *)engine,
+                              pmacctx->key->properties, NULL, 0))
         return 0;
 
     if (!EVP_MAC_init(pmacctx->macctx, pmacctx->key->priv_key,
@@ -186,7 +184,8 @@ static void *mac_dupctx(void *vpmacctx)
     dstctx->key = NULL;
     dstctx->macctx = NULL;
 
-    if (srcctx->propq != NULL && (dstctx->propq = OPENSSL_strdup(srcctx->propq)) == NULL)
+    if (srcctx->propq != NULL
+        && (dstctx->propq = OPENSSL_strdup(srcctx->propq)) == NULL)
         goto err;
 
     if (srcctx->key != NULL && !ossl_mac_key_up_ref(srcctx->key))
@@ -200,7 +199,7 @@ static void *mac_dupctx(void *vpmacctx)
     }
 
     return dstctx;
- err:
+err:
     mac_freectx(dstctx);
     return NULL;
 }
@@ -216,8 +215,7 @@ static const OSSL_PARAM *mac_settable_ctx_params(ossl_unused void *ctx,
                                                  void *provctx,
                                                  const char *macname)
 {
-    EVP_MAC *mac = EVP_MAC_fetch(PROV_LIBCTX_OF(provctx), macname,
-                                 NULL);
+    EVP_MAC *mac = EVP_MAC_fetch(PROV_LIBCTX_OF(provctx), macname, NULL);
     const OSSL_PARAM *params;
 
     if (mac == NULL)

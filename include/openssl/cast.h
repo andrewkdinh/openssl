@@ -8,18 +8,18 @@
  */
 
 #ifndef OPENSSL_CAST_H
-# define OPENSSL_CAST_H
-# pragma once
+#define OPENSSL_CAST_H
+#pragma once
 
-# include <openssl/macros.h>
-# ifndef OPENSSL_NO_DEPRECATED_3_0
-#  define HEADER_CAST_H
-# endif
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+# define HEADER_CAST_H
+#endif
 
-# include <openssl/opensslconf.h>
+#include <openssl/opensslconf.h>
 
-# ifndef OPENSSL_NO_CAST
-# ifdef  __cplusplus
+#ifndef OPENSSL_NO_CAST
+# ifdef __cplusplus
 extern "C" {
 # endif
 
@@ -50,9 +50,8 @@ void CAST_encrypt(CAST_LONG *data, const CAST_KEY *key);
 OSSL_DEPRECATEDIN_3_0
 void CAST_decrypt(CAST_LONG *data, const CAST_KEY *key);
 OSSL_DEPRECATEDIN_3_0
-void CAST_cbc_encrypt(const unsigned char *in, unsigned char *out,
-                      long length, const CAST_KEY *ks, unsigned char *iv,
-                      int enc);
+void CAST_cbc_encrypt(const unsigned char *in, unsigned char *out, long length,
+                      const CAST_KEY *ks, unsigned char *iv, int enc);
 OSSL_DEPRECATEDIN_3_0
 void CAST_cfb64_encrypt(const unsigned char *in, unsigned char *out,
                         long length, const CAST_KEY *schedule,
@@ -63,9 +62,9 @@ void CAST_ofb64_encrypt(const unsigned char *in, unsigned char *out,
                         unsigned char *ivec, int *num);
 # endif
 
-# ifdef  __cplusplus
+# ifdef __cplusplus
 }
 # endif
-# endif
+#endif
 
 #endif

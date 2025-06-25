@@ -31,18 +31,17 @@ struct self_test_arg {
 
 static OSSL_LIB_CTX *libctx = NULL;
 static char *provider_name = NULL;
-static struct self_test_arg self_test_args = { 0 };
+static struct self_test_arg self_test_args = {0};
 
 const OPTIONS *test_get_options(void)
 {
     static const OPTIONS test_options[] = {
         OPT_TEST_OPTIONS_DEFAULT_USAGE,
-        { "provider_name", OPT_PROVIDER_NAME, 's',
-          "The name of the provider to load" },
-        { "config", OPT_CONFIG_FILE, '<',
-          "The configuration file to use for the libctx" },
-        { NULL }
-    };
+        {"provider_name", OPT_PROVIDER_NAME, 's',
+         "The name of the provider to load"},
+        {"config", OPT_CONFIG_FILE, '<',
+         "The configuration file to use for the libctx"},
+        {NULL}};
     return test_options;
 }
 
@@ -113,18 +112,22 @@ static int get_provider_params(const OSSL_PROVIDER *prov)
     const OSSL_PARAM *gettable, *p;
 
     if (!TEST_ptr(gettable = OSSL_PROVIDER_gettable_params(prov))
-        || !TEST_ptr(p = OSSL_PARAM_locate_const(gettable, OSSL_PROV_PARAM_NAME))
-        || !TEST_ptr(p = OSSL_PARAM_locate_const(gettable, OSSL_PROV_PARAM_VERSION))
-        || !TEST_ptr(p = OSSL_PARAM_locate_const(gettable, OSSL_PROV_PARAM_STATUS))
-        || !TEST_ptr(p = OSSL_PARAM_locate_const(gettable, OSSL_PROV_PARAM_BUILDINFO)))
+        || !TEST_ptr(
+            p = OSSL_PARAM_locate_const(gettable, OSSL_PROV_PARAM_NAME))
+        || !TEST_ptr(
+            p = OSSL_PARAM_locate_const(gettable, OSSL_PROV_PARAM_VERSION))
+        || !TEST_ptr(
+            p = OSSL_PARAM_locate_const(gettable, OSSL_PROV_PARAM_STATUS))
+        || !TEST_ptr(
+            p = OSSL_PARAM_locate_const(gettable, OSSL_PROV_PARAM_BUILDINFO)))
         goto end;
 
     params[0] = OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_NAME, &name, 0);
-    params[1] = OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_VERSION,
-                                              &version, 0);
+    params[1] =
+        OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_VERSION, &version, 0);
     params[2] = OSSL_PARAM_construct_int(OSSL_PROV_PARAM_STATUS, &status);
-    params[3] = OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_BUILDINFO,
-                                              &buildinfo, 0);
+    params[3] =
+        OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_BUILDINFO, &buildinfo, 0);
     params[4] = OSSL_PARAM_construct_end();
     OSSL_PARAM_set_all_unmodified(params);
     if (!TEST_true(OSSL_PROVIDER_get_params(prov, params)))
@@ -185,7 +188,8 @@ static int test_provider_status(void)
 
     /* Setup a callback that corrupts the self tests and causes status failures */
     self_test_args.count = 0;
-    OSSL_SELF_TEST_set_callback(libctx, self_test_on_demand_fail, &self_test_args);
+    OSSL_SELF_TEST_set_callback(libctx, self_test_on_demand_fail,
+                                &self_test_args);
     if (!TEST_false(OSSL_PROVIDER_self_test(prov)))
         goto err;
     if (!TEST_true(OSSL_PROVIDER_get_params(prov, params))
@@ -227,7 +231,7 @@ int setup_tests(void)
             provider_name = opt_arg();
             break;
         case OPT_TEST_CASES:
-           break;
+            break;
         default:
         case OPT_ERR:
             return 0;

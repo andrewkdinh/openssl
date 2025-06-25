@@ -76,9 +76,8 @@ int ASN1_STRING_set_default_mask_asc(const char *p)
  * a corresponding OID. For example certificates and certificate requests.
  */
 
-ASN1_STRING *ASN1_STRING_set_by_NID(ASN1_STRING **out,
-                                    const unsigned char *in, int inlen,
-                                    int inform, int nid)
+ASN1_STRING *ASN1_STRING_set_by_NID(ASN1_STRING **out, const unsigned char *in,
+                                    int inlen, int inform, int nid)
 {
     ASN1_STRING_TABLE *tbl;
     ASN1_STRING *str = NULL;
@@ -92,8 +91,8 @@ ASN1_STRING *ASN1_STRING_set_by_NID(ASN1_STRING **out,
         mask = tbl->mask;
         if (!(tbl->flags & STABLE_NO_MASK))
             mask &= global_mask;
-        ret = ASN1_mbstring_ncopy(out, in, inlen, inform, mask,
-                                  tbl->minsize, tbl->maxsize);
+        ret = ASN1_mbstring_ncopy(out, in, inlen, inform, mask, tbl->minsize,
+                                  tbl->maxsize);
     } else {
         ret = ASN1_mbstring_copy(out, in, inlen, inform,
                                  DIRSTRING_TYPE & global_mask);
@@ -189,9 +188,8 @@ static ASN1_STRING_TABLE *stable_get(int nid)
     return rv;
 }
 
-int ASN1_STRING_TABLE_add(int nid,
-                          long minsize, long maxsize, unsigned long mask,
-                          unsigned long flags)
+int ASN1_STRING_TABLE_add(int nid, long minsize, long maxsize,
+                          unsigned long mask, unsigned long flags)
 {
     ASN1_STRING_TABLE *tmp;
 

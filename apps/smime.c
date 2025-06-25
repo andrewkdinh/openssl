@@ -34,18 +34,53 @@ static int smime_cb(int ok, X509_STORE_CTX *ctx);
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_ENCRYPT, OPT_DECRYPT, OPT_SIGN, OPT_RESIGN, OPT_VERIFY,
-    OPT_PK7OUT, OPT_TEXT, OPT_NOINTERN, OPT_NOVERIFY, OPT_NOCHAIN,
-    OPT_NOCERTS, OPT_NOATTR, OPT_NODETACH, OPT_NOSMIMECAP,
-    OPT_BINARY, OPT_NOSIGS, OPT_STREAM, OPT_INDEF, OPT_NOINDEF,
-    OPT_CRLFEOL, OPT_ENGINE, OPT_PASSIN,
-    OPT_TO, OPT_FROM, OPT_SUBJECT, OPT_SIGNER, OPT_RECIP, OPT_MD,
-    OPT_CIPHER, OPT_INKEY, OPT_KEYFORM, OPT_CERTFILE, OPT_CAFILE,
-    OPT_CAPATH, OPT_CASTORE, OPT_NOCAFILE, OPT_NOCAPATH, OPT_NOCASTORE,
-    OPT_R_ENUM, OPT_PROV_ENUM, OPT_CONFIG,
+    OPT_ENCRYPT,
+    OPT_DECRYPT,
+    OPT_SIGN,
+    OPT_RESIGN,
+    OPT_VERIFY,
+    OPT_PK7OUT,
+    OPT_TEXT,
+    OPT_NOINTERN,
+    OPT_NOVERIFY,
+    OPT_NOCHAIN,
+    OPT_NOCERTS,
+    OPT_NOATTR,
+    OPT_NODETACH,
+    OPT_NOSMIMECAP,
+    OPT_BINARY,
+    OPT_NOSIGS,
+    OPT_STREAM,
+    OPT_INDEF,
+    OPT_NOINDEF,
+    OPT_CRLFEOL,
+    OPT_ENGINE,
+    OPT_PASSIN,
+    OPT_TO,
+    OPT_FROM,
+    OPT_SUBJECT,
+    OPT_SIGNER,
+    OPT_RECIP,
+    OPT_MD,
+    OPT_CIPHER,
+    OPT_INKEY,
+    OPT_KEYFORM,
+    OPT_CERTFILE,
+    OPT_CAFILE,
+    OPT_CAPATH,
+    OPT_CASTORE,
+    OPT_NOCAFILE,
+    OPT_NOCAPATH,
+    OPT_NOCASTORE,
+    OPT_R_ENUM,
+    OPT_PROV_ENUM,
+    OPT_CONFIG,
     OPT_V_ENUM,
-    OPT_IN, OPT_INFORM, OPT_OUT,
-    OPT_OUTFORM, OPT_CONTENT
+    OPT_IN,
+    OPT_INFORM,
+    OPT_OUT,
+    OPT_OUTFORM,
+    OPT_CONTENT
 } OPTION_CHOICE;
 
 const OPTIONS smime_options[] = {
@@ -56,16 +91,15 @@ const OPTIONS smime_options[] = {
     {"in", OPT_IN, '<', "Input file"},
     {"inform", OPT_INFORM, 'c', "Input format SMIME (default), PEM or DER"},
     {"out", OPT_OUT, '>', "Output file"},
-    {"outform", OPT_OUTFORM, 'c',
-     "Output format SMIME (default), PEM or DER"},
-    {"inkey", OPT_INKEY, 's',
-     "Input private key (if not signer or recipient)"},
-    {"keyform", OPT_KEYFORM, 'f', "Input private key format (ENGINE, other values ignored)"},
+    {"outform", OPT_OUTFORM, 'c', "Output format SMIME (default), PEM or DER"},
+    {"inkey", OPT_INKEY, 's', "Input private key (if not signer or recipient)"},
+    {"keyform", OPT_KEYFORM, 'f',
+     "Input private key format (ENGINE, other values ignored)"},
 #ifndef OPENSSL_NO_ENGINE
     {"engine", OPT_ENGINE, 's', "Use engine, possibly a hardware device"},
 #endif
-    {"stream", OPT_STREAM, '-', "Enable CMS streaming" },
-    {"indef", OPT_INDEF, '-', "Same as -stream" },
+    {"stream", OPT_STREAM, '-', "Enable CMS streaming"},
+    {"indef", OPT_INDEF, '-', "Same as -stream"},
     {"noindef", OPT_NOINDEF, '-', "Disable CMS streaming"},
     OPT_CONFIG_OPTION,
 
@@ -120,8 +154,9 @@ const OPTIONS smime_options[] = {
     {"no-CAstore", OPT_NOCASTORE, '-',
      "Do not load certificates from the default certificates store"},
     {"nochain", OPT_NOCHAIN, '-',
-     "set PKCS7_NOCHAIN so certificates contained in the message are not used as untrusted CAs" },
-    {"crlfeol", OPT_CRLFEOL, '-', "Use CRLF as EOL termination instead of LF only"},
+     "set PKCS7_NOCHAIN so certificates contained in the message are not used as untrusted CAs"},
+    {"crlfeol", OPT_CRLFEOL, '-',
+     "Use CRLF as EOL termination instead of LF only"},
 
     OPT_R_OPTIONS,
     OPT_V_OPTIONS,
@@ -129,8 +164,7 @@ const OPTIONS smime_options[] = {
 
     OPT_PARAMETERS(),
     {"cert", 0, 0, "Recipient certs, used when encrypting"},
-    {NULL}
-};
+    {NULL}};
 
 static const char *operation_name(int operation)
 {
@@ -179,8 +213,8 @@ int smime_main(int argc, char **argv)
     OPTION_CHOICE o;
     int noCApath = 0, noCAfile = 0, noCAstore = 0;
     int flags = PKCS7_DETACHED, operation = 0, ret = 0, indef = 0;
-    int informat = FORMAT_SMIME, outformat = FORMAT_SMIME, keyform =
-        FORMAT_UNDEF;
+    int informat = FORMAT_SMIME, outformat = FORMAT_SMIME,
+        keyform = FORMAT_UNDEF;
     int vpmtouched = 0, rv = 0;
     ENGINE *e = NULL;
     const char *mime_eol = "\n";
@@ -195,7 +229,7 @@ int smime_main(int argc, char **argv)
         switch (o) {
         case OPT_EOF:
         case OPT_ERR:
- opthelp:
+opthelp:
             BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);
             goto end;
         case OPT_HELP:
@@ -341,8 +375,8 @@ int smime_main(int argc, char **argv)
             /* If previous -inkey argument add signer to list */
             if (keyfile != NULL) {
                 if (signerfile == NULL) {
-                    BIO_printf(bio_err,
-                               "%s: Must have -signer before -inkey\n", prog);
+                    BIO_printf(bio_err, "%s: Must have -signer before -inkey\n",
+                               prog);
                     goto opthelp;
                 }
                 if (sksigners == NULL
@@ -407,14 +441,13 @@ int smime_main(int argc, char **argv)
             goto opthelp;
     }
     if (!opt_cipher_any(ciphername, &cipher))
-            goto opthelp;
+        goto opthelp;
     if (!(operation & SMIME_SIGNERS) && (skkeys != NULL || sksigners != NULL)) {
         BIO_puts(bio_err, "Multiple signers or keys not allowed\n");
         goto opthelp;
     }
     if (!operation) {
-        BIO_puts(bio_err,
-                "No operation (-encrypt|-sign|...) specified\n");
+        BIO_puts(bio_err, "No operation (-encrypt|-sign|...) specified\n");
         goto opthelp;
     }
 
@@ -445,8 +478,7 @@ int smime_main(int argc, char **argv)
         keyfile = NULL;
     } else if (operation == SMIME_DECRYPT) {
         if (recipfile == NULL && keyfile == NULL) {
-            BIO_printf(bio_err,
-                       "No recipient certificate or key specified\n");
+            BIO_printf(bio_err, "No recipient certificate or key specified\n");
             goto opthelp;
         }
     } else if (operation == SMIME_ENCRYPT) {
@@ -483,8 +515,7 @@ int smime_main(int argc, char **argv)
         if (encerts == NULL)
             goto end;
         while (*argv != NULL) {
-            cert = load_cert(*argv, FORMAT_UNDEF,
-                             "recipient certificate file");
+            cert = load_cert(*argv, FORMAT_UNDEF, "recipient certificate file");
             if (cert == NULL)
                 goto end;
             if (!sk_X509_push(encerts, cert))
@@ -503,7 +534,8 @@ int smime_main(int argc, char **argv)
 
     if (recipfile != NULL && (operation == SMIME_DECRYPT)) {
         if ((recip = load_cert(recipfile, FORMAT_UNDEF,
-                               "recipient certificate file")) == NULL) {
+                               "recipient certificate file"))
+            == NULL) {
             ERR_print_errors(bio_err);
             goto end;
         }
@@ -566,8 +598,9 @@ int smime_main(int argc, char **argv)
         goto end;
 
     if (operation == SMIME_VERIFY) {
-        if ((store = setup_verify(CAfile, noCAfile, CApath, noCApath,
-                                  CAstore, noCAstore)) == NULL)
+        if ((store = setup_verify(CAfile, noCAfile, CApath, noCApath, CAstore,
+                                  noCAstore))
+            == NULL)
             goto end;
         X509_STORE_set_verify_cb(store, smime_cb);
         if (vpmtouched)
@@ -579,7 +612,8 @@ int smime_main(int argc, char **argv)
     if (operation == SMIME_ENCRYPT) {
         if (indef)
             flags |= PKCS7_STREAM;
-        p7 = PKCS7_encrypt_ex(encerts, in, cipher, flags, libctx, app_get0_propq());
+        p7 = PKCS7_encrypt_ex(encerts, in, cipher, flags, libctx,
+                              app_get0_propq());
     } else if (operation & SMIME_SIGNERS) {
         int i;
         /*
@@ -594,7 +628,8 @@ int smime_main(int argc, char **argv)
                 flags |= PKCS7_STREAM;
             }
             flags |= PKCS7_PARTIAL;
-            p7 = PKCS7_sign_ex(NULL, NULL, other, in, flags, libctx, app_get0_propq());
+            p7 = PKCS7_sign_ex(NULL, NULL, other, in, flags, libctx,
+                               app_get0_propq());
             if (p7 == NULL)
                 goto end;
             if (flags & PKCS7_NOCERTS) {
@@ -685,7 +720,7 @@ int smime_main(int argc, char **argv)
         }
     }
     ret = 0;
- end:
+end:
     if (ret)
         ERR_print_errors(bio_err);
     OSSL_STACK_OF_X509_free(encerts);

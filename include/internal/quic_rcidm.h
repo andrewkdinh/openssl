@@ -8,15 +8,15 @@
 */
 
 #ifndef OSSL_INTERNAL_QUIC_RCIDM_H
-# define OSSL_INTERNAL_QUIC_RCIDM_H
-# pragma once
+#define OSSL_INTERNAL_QUIC_RCIDM_H
+#pragma once
 
-# include "internal/e_os.h"
-# include "internal/time.h"
-# include "internal/quic_types.h"
-# include "internal/quic_wire.h"
+#include "internal/e_os.h"
+#include "internal/time.h"
+#include "internal/quic_types.h"
+#include "internal/quic_wire.h"
 
-# ifndef OPENSSL_NO_QUIC
+#ifndef OPENSSL_NO_QUIC
 
 /*
  * QUIC Remote Connection ID Manager
@@ -164,8 +164,7 @@ int ossl_quic_rcidm_get_preferred_tx_dcid(QUIC_RCIDM *rcidm,
  * changed since the last call to this function with clear set. If clear is set,
  * clears the changed flag. Returns the old value of the changed flag.
  */
-int ossl_quic_rcidm_get_preferred_tx_dcid_changed(QUIC_RCIDM *rcidm,
-                                                  int clear);
+int ossl_quic_rcidm_get_preferred_tx_dcid_changed(QUIC_RCIDM *rcidm, int clear);
 
 /*
  * Returns the number of active numbered RCIDs we have. Note that this includes
@@ -180,6 +179,6 @@ size_t ossl_quic_rcidm_get_num_active(const QUIC_RCIDM *rcidm);
  */
 size_t ossl_quic_rcidm_get_num_retiring(const QUIC_RCIDM *rcidm);
 
-# endif
+#endif
 
 #endif

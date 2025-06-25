@@ -52,7 +52,7 @@ static void aes_siv_freectx(void *vctx)
 
     if (ctx != NULL) {
         ctx->hw->cleanup(ctx);
-        OPENSSL_clear_free(ctx,  sizeof(*ctx));
+        OPENSSL_clear_free(ctx, sizeof(*ctx));
     }
 }
 
@@ -155,8 +155,7 @@ static int aes_siv_get_ctx_params(void *vctx, OSSL_PARAM params[])
 
     p = OSSL_PARAM_locate(params, OSSL_CIPHER_PARAM_AEAD_TAG);
     if (p != NULL && p->data_type == OSSL_PARAM_OCTET_STRING) {
-        if (!ctx->enc
-            || p->data_size != ctx->taglen
+        if (!ctx->enc || p->data_size != ctx->taglen
             || !OSSL_PARAM_set_octet_string(p, &sctx->tag.byte, ctx->taglen)) {
             ERR_raise(ERR_LIB_PROV, PROV_R_FAILED_TO_SET_PARAMETER);
             return 0;
@@ -179,8 +178,7 @@ static const OSSL_PARAM aes_siv_known_gettable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_AEAD_TAGLEN, NULL),
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 static const OSSL_PARAM *aes_siv_gettable_ctx_params(ossl_unused void *cctx,
                                                      ossl_unused void *provctx)
 {
@@ -233,8 +231,7 @@ static const OSSL_PARAM aes_siv_known_settable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
     OSSL_PARAM_uint(OSSL_CIPHER_PARAM_SPEED, NULL),
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 static const OSSL_PARAM *aes_siv_settable_ctx_params(ossl_unused void *cctx,
                                                      ossl_unused void *provctx)
 {
@@ -292,5 +289,5 @@ const OSSL_DISPATCH ossl_##alg##kbits##lc##_functions[] = {                    \
 };
 
 IMPLEMENT_cipher(aes, siv, SIV, SIV_FLAGS, 128, 8, 0)
-IMPLEMENT_cipher(aes, siv, SIV, SIV_FLAGS, 192, 8, 0)
-IMPLEMENT_cipher(aes, siv, SIV, SIV_FLAGS, 256, 8, 0)
+    IMPLEMENT_cipher(aes, siv, SIV, SIV_FLAGS, 192, 8, 0)
+        IMPLEMENT_cipher(aes, siv, SIV, SIV_FLAGS, 256, 8, 0)

@@ -42,34 +42,39 @@ struct OSSL_IETF_ATTR_SYNTAX_st {
     STACK_OF(OSSL_IETF_ATTR_SYNTAX_VALUE) *values;
 };
 
-ASN1_CHOICE(OSSL_IETF_ATTR_SYNTAX_VALUE) = {
-    ASN1_SIMPLE(OSSL_IETF_ATTR_SYNTAX_VALUE, u.octets, ASN1_OCTET_STRING),
-    ASN1_SIMPLE(OSSL_IETF_ATTR_SYNTAX_VALUE, u.oid, ASN1_OBJECT),
-    ASN1_SIMPLE(OSSL_IETF_ATTR_SYNTAX_VALUE, u.string, ASN1_UTF8STRING),
-} ASN1_CHOICE_END(OSSL_IETF_ATTR_SYNTAX_VALUE)
+ASN1_CHOICE(OSSL_IETF_ATTR_SYNTAX_VALUE)
+    = {
+        ASN1_SIMPLE(OSSL_IETF_ATTR_SYNTAX_VALUE, u.octets, ASN1_OCTET_STRING),
+        ASN1_SIMPLE(OSSL_IETF_ATTR_SYNTAX_VALUE, u.oid, ASN1_OBJECT),
+        ASN1_SIMPLE(OSSL_IETF_ATTR_SYNTAX_VALUE, u.string, ASN1_UTF8STRING),
+    }
+ASN1_CHOICE_END(OSSL_IETF_ATTR_SYNTAX_VALUE)
 
-ASN1_SEQUENCE(OSSL_IETF_ATTR_SYNTAX) = {
-    ASN1_IMP_SEQUENCE_OF_OPT(OSSL_IETF_ATTR_SYNTAX, policyAuthority, GENERAL_NAME, 0),
-    ASN1_SEQUENCE_OF(OSSL_IETF_ATTR_SYNTAX, values, OSSL_IETF_ATTR_SYNTAX_VALUE),
-} ASN1_SEQUENCE_END(OSSL_IETF_ATTR_SYNTAX)
+ASN1_SEQUENCE(OSSL_IETF_ATTR_SYNTAX)
+    = {
+        ASN1_IMP_SEQUENCE_OF_OPT(OSSL_IETF_ATTR_SYNTAX, policyAuthority,
+                                 GENERAL_NAME, 0),
+        ASN1_SEQUENCE_OF(OSSL_IETF_ATTR_SYNTAX, values,
+                         OSSL_IETF_ATTR_SYNTAX_VALUE),
+    }
+ASN1_SEQUENCE_END(OSSL_IETF_ATTR_SYNTAX)
 
 IMPLEMENT_ASN1_ALLOC_FUNCTIONS(OSSL_IETF_ATTR_SYNTAX)
 IMPLEMENT_ASN1_ALLOC_FUNCTIONS(OSSL_IETF_ATTR_SYNTAX_VALUE)
 
-OSSL_IETF_ATTR_SYNTAX *d2i_OSSL_IETF_ATTR_SYNTAX (OSSL_IETF_ATTR_SYNTAX **a,
-                                                  const unsigned char **in,
-                                                  long len)
+OSSL_IETF_ATTR_SYNTAX *d2i_OSSL_IETF_ATTR_SYNTAX(OSSL_IETF_ATTR_SYNTAX **a,
+                                                 const unsigned char **in,
+                                                 long len)
 {
     OSSL_IETF_ATTR_SYNTAX *ias;
     int i;
 
-    ias = (OSSL_IETF_ATTR_SYNTAX *) ASN1_item_d2i((ASN1_VALUE **)a, in, len,
-                                                  OSSL_IETF_ATTR_SYNTAX_it());
+    ias = (OSSL_IETF_ATTR_SYNTAX *)ASN1_item_d2i((ASN1_VALUE **)a, in, len,
+                                                 OSSL_IETF_ATTR_SYNTAX_it());
     if (ias == NULL)
         return ias;
 
-    for (i = 0; i < sk_OSSL_IETF_ATTR_SYNTAX_VALUE_num(ias->values); i++)
-    {
+    for (i = 0; i < sk_OSSL_IETF_ATTR_SYNTAX_VALUE_num(ias->values); i++) {
         OSSL_IETF_ATTR_SYNTAX_VALUE *val;
 
         val = sk_OSSL_IETF_ATTR_SYNTAX_VALUE_value(ias->values, i);
@@ -89,10 +94,11 @@ invalid_types:
     return NULL;
 }
 
-int i2d_OSSL_IETF_ATTR_SYNTAX (const OSSL_IETF_ATTR_SYNTAX *a,
-                               unsigned char **out)
+int i2d_OSSL_IETF_ATTR_SYNTAX(const OSSL_IETF_ATTR_SYNTAX *a,
+                              unsigned char **out)
 {
-    return ASN1_item_i2d((const ASN1_VALUE *)a, out, OSSL_IETF_ATTR_SYNTAX_it());
+    return ASN1_item_i2d((const ASN1_VALUE *)a, out,
+                         OSSL_IETF_ATTR_SYNTAX_it());
 }
 
 int OSSL_IETF_ATTR_SYNTAX_get_value_num(const OSSL_IETF_ATTR_SYNTAX *a)
@@ -116,8 +122,8 @@ void OSSL_IETF_ATTR_SYNTAX_set0_policyAuthority(OSSL_IETF_ATTR_SYNTAX *a,
     a->policyAuthority = names;
 }
 
-void *OSSL_IETF_ATTR_SYNTAX_get0_value(const OSSL_IETF_ATTR_SYNTAX *a,
-                                       int ind, int *type)
+void *OSSL_IETF_ATTR_SYNTAX_get0_value(const OSSL_IETF_ATTR_SYNTAX *a, int ind,
+                                       int *type)
 {
     OSSL_IETF_ATTR_SYNTAX_VALUE *val;
 
@@ -200,8 +206,9 @@ int OSSL_IETF_ATTR_SYNTAX_print(BIO *bp, OSSL_IETF_ATTR_SYNTAX *a, int indent)
             if (BIO_printf(bp, "%*s", indent, "") <= 0)
                 goto err;
 
-            if (GENERAL_NAME_print(bp, sk_GENERAL_NAME_value(a->policyAuthority,
-                                                             i)) <= 0)
+            if (GENERAL_NAME_print(bp,
+                                   sk_GENERAL_NAME_value(a->policyAuthority, i))
+                <= 0)
                 goto err;
 
             if (BIO_printf(bp, "\n") <= 0)
@@ -223,7 +230,7 @@ int OSSL_IETF_ATTR_SYNTAX_print(BIO *bp, OSSL_IETF_ATTR_SYNTAX *a, int indent)
         switch (ietf_type) {
         case OSSL_IETFAS_OID:
             OBJ_obj2txt(oidstr, sizeof(oidstr), attr_value, 0);
-            BIO_printf(bp, "%.*s", (int) sizeof(oidstr), oidstr);
+            BIO_printf(bp, "%.*s", (int)sizeof(oidstr), oidstr);
             break;
         case OSSL_IETFAS_OCTETS:
         case OSSL_IETFAS_STRING:

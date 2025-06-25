@@ -46,15 +46,14 @@ static BIGNUM *walk_curve(const EC_GROUP *group, EC_POINT *point,
     ossl_intmax_t i;
 
     if (!TEST_ptr(scalar = BN_new())
-            || !TEST_true(EC_POINT_get_affine_coordinates(group, point, scalar,
-                                                          NULL, NULL)))
+        || !TEST_true(
+            EC_POINT_get_affine_coordinates(group, point, scalar, NULL, NULL)))
         goto err;
 
     for (i = 0; i < num; i++) {
         if (!TEST_true(EC_POINT_mul(group, point, NULL, point, scalar, NULL))
-                || !TEST_true(EC_POINT_get_affine_coordinates(group, point,
-                                                              scalar,
-                                                              NULL, NULL)))
+            || !TEST_true(EC_POINT_get_affine_coordinates(group, point, scalar,
+                                                          NULL, NULL)))
             goto err;
     }
     return scalar;
@@ -76,9 +75,9 @@ static int test_curve(void)
      * would be straightforward.
      */
     if (!TEST_ptr(group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1))
-            || !TEST_ptr(point = EC_POINT_dup(EC_GROUP_get0_generator(group),
-                                              group))
-            || !TEST_ptr(result = walk_curve(group, point, num_repeats)))
+        || !TEST_ptr(point =
+                         EC_POINT_dup(EC_GROUP_get0_generator(group), group))
+        || !TEST_ptr(result = walk_curve(group, point, num_repeats)))
         goto err;
 
     if (print_mode) {
@@ -87,8 +86,8 @@ static int test_curve(void)
         ret = 1;
     } else {
         if (!TEST_true(BN_hex2bn(&expected_result, kP256DefaultResult))
-                || !TEST_ptr(expected_result)
-                || !TEST_BN_eq(result, expected_result))
+            || !TEST_ptr(expected_result)
+            || !TEST_BN_eq(result, expected_result))
             goto err;
         ret = 1;
     }
@@ -113,9 +112,8 @@ const OPTIONS *test_get_options(void)
 {
     static const OPTIONS test_options[] = {
         OPT_TEST_OPTIONS_DEFAULT_USAGE,
-        { "num", OPT_NUM_REPEATS, 'M', "Number of repeats" },
-        { NULL }
-    };
+        {"num", OPT_NUM_REPEATS, 'M', "Number of repeats"},
+        {NULL}};
     return test_options;
 }
 
@@ -136,13 +134,12 @@ int setup_tests(void)
     while ((o = opt_next()) != OPT_EOF) {
         switch (o) {
         case OPT_NUM_REPEATS:
-            if (!opt_intmax(opt_arg(), &num_repeats)
-                    || num_repeats < 0)
+            if (!opt_intmax(opt_arg(), &num_repeats) || num_repeats < 0)
                 return 0;
             print_mode = 1;
             break;
         case OPT_TEST_CASES:
-           break;
+            break;
         default:
         case OPT_ERR:
             return 0;

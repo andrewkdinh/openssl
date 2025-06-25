@@ -44,7 +44,7 @@ static int nm##_final(EVP_MD_CTX *ctx, unsigned char *md)                      \
 static int nm##_init(EVP_MD_CTX *ctx)                                          \
 {                                                                              \
     return fn##_init(EVP_MD_CTX_get0_md_data(ctx), tag, ctx->digest->md_size * 8); \
-}                                                                              \
+}
 
 #define sha512_224_Init    sha512_224_init
 #define sha512_256_Init    sha512_256_init
@@ -86,8 +86,6 @@ static int shake_ctrl(EVP_MD_CTX *evp_ctx, int cmd, int p1, void *p2)
         return 0;
     }
 }
-
-
 
 static const EVP_MD sha1_md = {
     NID_sha1,

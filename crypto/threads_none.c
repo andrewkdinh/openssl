@@ -130,7 +130,8 @@ int CRYPTO_THREAD_unlock(CRYPTO_RWLOCK *lock)
     return 1;
 }
 
-void CRYPTO_THREAD_lock_free(CRYPTO_RWLOCK *lock) {
+void CRYPTO_THREAD_lock_free(CRYPTO_RWLOCK *lock)
+{
     if (lock == NULL)
         return;
 
@@ -158,13 +159,15 @@ struct thread_local_storage_entry {
     uint8_t used;
 };
 
-static struct thread_local_storage_entry thread_local_storage[OPENSSL_CRYPTO_THREAD_LOCAL_KEY_MAX];
+static struct thread_local_storage_entry
+    thread_local_storage[OPENSSL_CRYPTO_THREAD_LOCAL_KEY_MAX];
 
 int CRYPTO_THREAD_init_local(CRYPTO_THREAD_LOCAL *key, void (*cleanup)(void *))
 {
     int entry_idx = 0;
 
-    for (entry_idx = 0; entry_idx < OPENSSL_CRYPTO_THREAD_LOCAL_KEY_MAX; entry_idx++) {
+    for (entry_idx = 0; entry_idx < OPENSSL_CRYPTO_THREAD_LOCAL_KEY_MAX;
+         entry_idx++) {
         if (!thread_local_storage[entry_idx].used)
             break;
     }
@@ -221,7 +224,7 @@ int CRYPTO_THREAD_compare_id(CRYPTO_THREAD_ID a, CRYPTO_THREAD_ID b)
 int CRYPTO_atomic_add(int *val, int amount, int *ret, CRYPTO_RWLOCK *lock)
 {
     *val += amount;
-    *ret  = *val;
+    *ret = *val;
 
     return 1;
 }
@@ -230,7 +233,7 @@ int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
                         CRYPTO_RWLOCK *lock)
 {
     *val += op;
-    *ret  = *val;
+    *ret = *val;
 
     return 1;
 }
@@ -239,7 +242,7 @@ int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
                       CRYPTO_RWLOCK *lock)
 {
     *val &= op;
-    *ret  = *val;
+    *ret = *val;
 
     return 1;
 }
@@ -248,14 +251,14 @@ int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
                      CRYPTO_RWLOCK *lock)
 {
     *val |= op;
-    *ret  = *val;
+    *ret = *val;
 
     return 1;
 }
 
 int CRYPTO_atomic_load(uint64_t *val, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
-    *ret  = *val;
+    *ret = *val;
 
     return 1;
 }

@@ -53,8 +53,8 @@ int RSA_generate_multi_prime_key(RSA *rsa, int bits, int primes,
 #ifndef FIPS_MODULE
     /* multi-prime is only supported with the builtin key generation */
     if (rsa->meth->rsa_multi_prime_keygen != NULL) {
-        return rsa->meth->rsa_multi_prime_keygen(rsa, bits, primes,
-                                                 e_value, cb);
+        return rsa->meth->rsa_multi_prime_keygen(rsa, bits, primes, e_value,
+                                                 cb);
     } else if (rsa->meth->rsa_keygen != NULL) {
         /*
          * However, if rsa->meth implements only rsa_keygen, then we
@@ -79,11 +79,9 @@ DEFINE_STACK_OF(BIGNUM)
  * on their respective exps and coeffs stacks
  */
 #ifndef FIPS_MODULE
-int ossl_rsa_multiprime_derive(RSA *rsa, int bits, int primes,
-                               BIGNUM *e_value,
+int ossl_rsa_multiprime_derive(RSA *rsa, int bits, int primes, BIGNUM *e_value,
                                STACK_OF(BIGNUM) *factors,
-                               STACK_OF(BIGNUM) *exps,
-                               STACK_OF(BIGNUM) *coeffs)
+                               STACK_OF(BIGNUM) *exps, STACK_OF(BIGNUM) *coeffs)
 {
     STACK_OF(BIGNUM) *pplist = NULL, *pdlist = NULL;
     BIGNUM *factor = NULL, *newpp = NULL, *newpd = NULL;
@@ -225,7 +223,8 @@ int ossl_rsa_multiprime_derive(RSA *rsa, int bits, int primes,
         goto err;
 
     if (BN_mod_inverse(iqmp, sk_BIGNUM_value(factors, 1),
-                       sk_BIGNUM_value(factors, 0), ctx) == NULL)
+                       sk_BIGNUM_value(factors, 0), ctx)
+        == NULL)
         goto err;
     if (!sk_BIGNUM_insert(coeffs, iqmp, sk_BIGNUM_num(coeffs)))
         goto err;
@@ -236,8 +235,8 @@ int ossl_rsa_multiprime_derive(RSA *rsa, int bits, int primes,
         newcoeff = BN_new();
         if (newcoeff == NULL)
             goto err;
-        if (BN_mod_inverse(newcoeff, newpp, sk_BIGNUM_value(factors, i),
-                           ctx) == NULL)
+        if (BN_mod_inverse(newcoeff, newpp, sk_BIGNUM_value(factors, i), ctx)
+            == NULL)
             goto err;
         if (!sk_BIGNUM_insert(coeffs, newcoeff, sk_BIGNUM_num(coeffs)))
             goto err;
@@ -245,7 +244,7 @@ int ossl_rsa_multiprime_derive(RSA *rsa, int bits, int primes,
     }
 
     ret = 1;
- err:
+err:
     BN_free(newcoeff);
     BN_free(newexp);
     BN_free(dval);
@@ -321,8 +320,7 @@ static int rsa_multiprime_keygen(RSA *rsa, int bits, int primes,
     quo = bits / primes;
     rmd = bits % primes;
 
-    for (i = 0; i < primes; i++)
-        bitsr[i] = (i < rmd) ? quo + 1 : quo;
+    for (i = 0; i < primes; i++) bitsr[i] = (i < rmd) ? quo + 1 : quo;
 
     rsa->dirty_cnt++;
 
@@ -382,9 +380,9 @@ static int rsa_multiprime_keygen(RSA *rsa, int bits, int primes,
         BN_set_flags(prime, BN_FLG_CONSTTIME);
 
         for (;;) {
- redo:
-            if (!BN_generate_prime_ex2(prime, bitsr[i] + adj, 0, NULL, NULL,
-                                       cb, ctx))
+redo:
+            if (!BN_generate_prime_ex2(prime, bitsr[i] + adj, 0, NULL, NULL, cb,
+                                       ctx))
                 goto err;
             /*
              * prime should not be equal to p, q, r_3...
@@ -401,8 +399,8 @@ static int rsa_multiprime_keygen(RSA *rsa, int bits, int primes,
                     else if (j == 1)
                         prev_prime = rsa->q;
                     else
-                        prev_prime = sk_RSA_PRIME_INFO_value(prime_infos,
-                                                             j - 2)->r;
+                        prev_prime =
+                            sk_RSA_PRIME_INFO_value(prime_infos, j - 2)->r;
 
                     if (!BN_cmp(prime, prev_prime)) {
                         goto redo;
@@ -551,15 +549,14 @@ static int rsa_multiprime_keygen(RSA *rsa, int bits, int primes,
             goto err;
     }
 
-
     BN_set_flags(r0, BN_FLG_CONSTTIME);
     if (BN_mod_inverse(rsa->d, rsa->e, r0, ctx) == NULL) {
-        goto err;               /* d */
+        goto err; /* d */
     }
 
     /* derive any missing exponents and coefficients */
-    if (!ossl_rsa_multiprime_derive(rsa, bits, primes, e_value,
-                                    factors, exps, coeffs))
+    if (!ossl_rsa_multiprime_derive(rsa, bits, primes, e_value, factors, exps,
+                                    coeffs))
         goto err;
 
     /*
@@ -592,7 +589,7 @@ static int rsa_multiprime_keygen(RSA *rsa, int bits, int primes,
             goto err;
     }
     ok = 1;
- err:
+err:
     sk_BIGNUM_free(factors);
     sk_BIGNUM_free(exps);
     sk_BIGNUM_free(coeffs);
@@ -619,9 +616,8 @@ static int rsa_keygen(OSSL_LIB_CTX *libctx, RSA *rsa, int bits, int primes,
      * Only multi-prime keys or insecure keys with a small key length or a
      * public exponent <= 2^16 will use the older rsa_multiprime_keygen().
      */
-    if (primes == 2
-            && bits >= 2048
-            && (e_value == NULL || BN_num_bits(e_value) > 16))
+    if (primes == 2 && bits >= 2048
+        && (e_value == NULL || BN_num_bits(e_value) > 16))
         ok = ossl_rsa_sp800_56b_generate_key(rsa, bits, e_value, cb);
     else
         ok = rsa_multiprime_keygen(rsa, bits, primes, e_value, cb);
@@ -713,17 +709,17 @@ static int rsa_keygen_pairwise_test(RSA *rsa, OSSL_CALLBACK *cb, void *cbarg)
     /* SP 800-56Br2 Section 6.4.1.1 requires that plaintext is greater than 1 */
     plaintxt[plaintxt_len - 1] = 2;
 
-    ciphertxt_len = RSA_public_encrypt(plaintxt_len, plaintxt, ciphertxt, rsa,
-                                       padding);
+    ciphertxt_len =
+        RSA_public_encrypt(plaintxt_len, plaintxt, ciphertxt, rsa, padding);
     if (ciphertxt_len <= 0)
         goto err;
 
     OSSL_SELF_TEST_oncorrupt_byte(st, ciphertxt);
 
-    decoded_len = RSA_private_decrypt(ciphertxt_len, ciphertxt, decoded, rsa,
-                                      padding);
+    decoded_len =
+        RSA_private_decrypt(ciphertxt_len, ciphertxt, decoded, rsa, padding);
     if (decoded_len != plaintxt_len
-        || memcmp(decoded, plaintxt,  decoded_len) != 0)
+        || memcmp(decoded, plaintxt, decoded_len) != 0)
         goto err;
 
     ret = 1;

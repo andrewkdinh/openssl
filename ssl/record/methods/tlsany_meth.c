@@ -18,10 +18,8 @@ static int tls_any_set_crypto_state(OSSL_RECORD_LAYER *rl, int level,
                                     unsigned char *key, size_t keylen,
                                     unsigned char *iv, size_t ivlen,
                                     unsigned char *mackey, size_t mackeylen,
-                                    const EVP_CIPHER *ciph,
-                                    size_t taglen,
-                                    int mactype,
-                                    const EVP_MD *md,
+                                    const EVP_CIPHER *ciph, size_t taglen,
+                                    int mactype, const EVP_MD *md,
                                     COMP_METHOD *comp)
 {
     if (level != OSSL_RECORD_PROTECTION_LEVEL_NONE) {
@@ -64,14 +62,14 @@ static int tls_validate_record_header(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec)
                      * we have.
                      */
                     p = rl->packet;
-                    if (HAS_PREFIX((char *)p, "GET ") ||
-                        HAS_PREFIX((char *)p, "POST ") ||
-                        HAS_PREFIX((char *)p, "HEAD ") ||
-                        HAS_PREFIX((char *)p, "PATCH") ||
-                        HAS_PREFIX((char *)p, "OPTIO") ||
-                        HAS_PREFIX((char *)p, "DELET") ||
-                        HAS_PREFIX((char *)p, "TRACE") ||
-                        HAS_PREFIX((char *)p, "PUT ")) {
+                    if (HAS_PREFIX((char *)p, "GET ")
+                        || HAS_PREFIX((char *)p, "POST ")
+                        || HAS_PREFIX((char *)p, "HEAD ")
+                        || HAS_PREFIX((char *)p, "PATCH")
+                        || HAS_PREFIX((char *)p, "OPTIO")
+                        || HAS_PREFIX((char *)p, "DELET")
+                        || HAS_PREFIX((char *)p, "TRACE")
+                        || HAS_PREFIX((char *)p, "PUT ")) {
                         RLAYERfatal(rl, SSL_AD_NO_ALERT, SSL_R_HTTP_REQUEST);
                         return 0;
                     } else if (HAS_PREFIX((char *)p, "CONNE")) {
@@ -141,8 +139,7 @@ static int tls_any_set_protocol_version(OSSL_RECORD_LAYER *rl, int vers)
 }
 
 static int tls_any_prepare_for_encryption(OSSL_RECORD_LAYER *rl,
-                                          size_t mac_size,
-                                          WPACKET *thispkt,
+                                          size_t mac_size, WPACKET *thispkt,
                                           TLS_RL_RECORD *thiswr)
 {
     /* No encryption, so nothing to do */
@@ -167,8 +164,7 @@ const struct record_functions_st tls_any_funcs = {
     NULL,
     tls_any_prepare_for_encryption,
     tls_post_encryption_processing_default,
-    NULL
-};
+    NULL};
 
 static int dtls_any_set_protocol_version(OSSL_RECORD_LAYER *rl, int vers)
 {
@@ -197,5 +193,4 @@ const struct record_functions_st dtls_any_funcs = {
     NULL,
     tls_prepare_for_encryption_default,
     dtls_post_encryption_processing,
-    NULL
-};
+    NULL};

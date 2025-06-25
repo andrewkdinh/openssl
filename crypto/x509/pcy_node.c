@@ -37,7 +37,6 @@ X509_POLICY_NODE *ossl_policy_tree_find_sk(STACK_OF(X509_POLICY_NODE) *nodes,
 
     idx = sk_X509_POLICY_NODE_find(nodes, &l);
     return sk_X509_POLICY_NODE_value(nodes, idx);
-
 }
 
 X509_POLICY_NODE *ossl_policy_level_find_node(const X509_POLICY_LEVEL *level,
@@ -112,15 +111,15 @@ X509_POLICY_NODE *ossl_policy_level_add_node(X509_POLICY_LEVEL *level,
 
     return node;
 
- extra_data_error:
+extra_data_error:
     if (level != NULL) {
         if (level->anyPolicy == node)
             level->anyPolicy = NULL;
         else
-            (void) sk_X509_POLICY_NODE_pop(level->nodes);
+            (void)sk_X509_POLICY_NODE_pop(level->nodes);
     }
 
- node_error:
+node_error:
     ossl_policy_node_free(node);
     return NULL;
 }
@@ -155,5 +154,4 @@ int ossl_policy_node_match(const X509_POLICY_LEVEL *lvl,
             return 1;
     }
     return 0;
-
 }

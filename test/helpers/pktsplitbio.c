@@ -89,8 +89,9 @@ static int pkt_split_dgram_recvmmsg(BIO *bio, BIO_MSG *msg, size_t stride,
             return 0;
 
         /* Decode the packet header */
-        if (ossl_quic_wire_decode_pkt_hdr(&pkt, bdata->short_conn_id_len,
-                                          0, 0, &hdr, NULL, NULL) != 1)
+        if (ossl_quic_wire_decode_pkt_hdr(&pkt, bdata->short_conn_id_len, 0, 0,
+                                          &hdr, NULL, NULL)
+            != 1)
             return 0;
         remain = PACKET_remaining(&pkt);
         if (remain > 0) {
@@ -120,8 +121,9 @@ static BIO_METHOD *method_pkt_split_dgram = NULL;
 const BIO_METHOD *bio_f_pkt_split_dgram_filter(void)
 {
     if (method_pkt_split_dgram == NULL) {
-        method_pkt_split_dgram = BIO_meth_new(BIO_TYPE_PKT_SPLIT_DGRAM_FILTER,
-                                              "Packet splitting datagram filter");
+        method_pkt_split_dgram =
+            BIO_meth_new(BIO_TYPE_PKT_SPLIT_DGRAM_FILTER,
+                         "Packet splitting datagram filter");
         if (method_pkt_split_dgram == NULL
             || !BIO_meth_set_ctrl(method_pkt_split_dgram, pkt_split_dgram_ctrl)
             || !BIO_meth_set_sendmmsg(method_pkt_split_dgram,

@@ -67,7 +67,7 @@ int ossl_param_build_set_octet_string(OSSL_PARAM_BLD *bld, OSSL_PARAM *p,
 }
 
 int ossl_param_build_set_bn_pad(OSSL_PARAM_BLD *bld, OSSL_PARAM *p,
-                                const char *key, const BIGNUM *bn,  size_t sz)
+                                const char *key, const BIGNUM *bn, size_t sz)
 {
     if (bld != NULL)
         return OSSL_PARAM_BLD_push_BN_pad(bld, key, bn, sz);
@@ -83,8 +83,8 @@ int ossl_param_build_set_bn_pad(OSSL_PARAM_BLD *bld, OSSL_PARAM *p,
     return 1;
 }
 
-int ossl_param_build_set_bn(OSSL_PARAM_BLD *bld, OSSL_PARAM *p,
-                            const char *key, const BIGNUM *bn)
+int ossl_param_build_set_bn(OSSL_PARAM_BLD *bld, OSSL_PARAM *p, const char *key,
+                            const BIGNUM *bn)
 {
     if (bld != NULL)
         return OSSL_PARAM_BLD_push_BN(bld, key, bn);

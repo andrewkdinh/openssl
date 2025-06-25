@@ -113,10 +113,11 @@ int ossl_cms_check_signing_certs(const CMS_SignerInfo *si,
     return ret;
 }
 
-CMS_ReceiptRequest *CMS_ReceiptRequest_create0_ex(
-    unsigned char *id, int idlen, int allorfirst,
-    STACK_OF(GENERAL_NAMES) *receiptList, STACK_OF(GENERAL_NAMES) *receiptsTo,
-    OSSL_LIB_CTX *libctx)
+CMS_ReceiptRequest *
+CMS_ReceiptRequest_create0_ex(unsigned char *id, int idlen, int allorfirst,
+                              STACK_OF(GENERAL_NAMES) *receiptList,
+                              STACK_OF(GENERAL_NAMES) *receiptsTo,
+                              OSSL_LIB_CTX *libctx)
 {
     CMS_ReceiptRequest *rr;
 
@@ -132,8 +133,8 @@ CMS_ReceiptRequest *CMS_ReceiptRequest_create0_ex(
             ERR_raise(ERR_LIB_CMS, ERR_R_ASN1_LIB);
             goto err;
         }
-        if (RAND_bytes_ex(libctx, rr->signedContentIdentifier->data, 32,
-                          0) <= 0)
+        if (RAND_bytes_ex(libctx, rr->signedContentIdentifier->data, 32, 0)
+            <= 0)
             goto err;
     }
 
@@ -150,15 +151,15 @@ CMS_ReceiptRequest *CMS_ReceiptRequest_create0_ex(
 
     return rr;
 
- err:
+err:
     CMS_ReceiptRequest_free(rr);
     return NULL;
-
 }
 
-CMS_ReceiptRequest *CMS_ReceiptRequest_create0(
-    unsigned char *id, int idlen, int allorfirst,
-    STACK_OF(GENERAL_NAMES) *receiptList, STACK_OF(GENERAL_NAMES) *receiptsTo)
+CMS_ReceiptRequest *
+CMS_ReceiptRequest_create0(unsigned char *id, int idlen, int allorfirst,
+                           STACK_OF(GENERAL_NAMES) *receiptList,
+                           STACK_OF(GENERAL_NAMES) *receiptsTo)
 {
     return CMS_ReceiptRequest_create0_ex(id, idlen, allorfirst, receiptList,
                                          receiptsTo, NULL);
@@ -183,15 +184,13 @@ int CMS_add1_ReceiptRequest(CMS_SignerInfo *si, CMS_ReceiptRequest *rr)
 
     r = 1;
 
- err:
+err:
     OPENSSL_free(rrder);
 
     return r;
-
 }
 
-void CMS_ReceiptRequest_get0_values(CMS_ReceiptRequest *rr,
-                                    ASN1_STRING **pcid,
+void CMS_ReceiptRequest_get0_values(CMS_ReceiptRequest *rr, ASN1_STRING **pcid,
                                     int *pallorfirst,
                                     STACK_OF(GENERAL_NAMES) **plist,
                                     STACK_OF(GENERAL_NAMES) **prto)
@@ -215,8 +214,8 @@ void CMS_ReceiptRequest_get0_values(CMS_ReceiptRequest *rr,
 
 /* Digest a SignerInfo structure for msgSigDigest attribute processing */
 
-static int cms_msgSigDigest(CMS_SignerInfo *si,
-                            unsigned char *dig, unsigned int *diglen)
+static int cms_msgSigDigest(CMS_SignerInfo *si, unsigned char *dig,
+                            unsigned int *diglen)
 {
     const EVP_MD *md = EVP_get_digestbyobj(si->digestAlgorithm->algorithm);
 
@@ -311,10 +310,8 @@ int ossl_cms_Receipt_verify(CMS_ContentInfo *cms, CMS_ContentInfo *req_cms)
 
     /* Get msgSigDigest value and compare */
 
-    msig = CMS_signed_get0_data_by_OBJ(si,
-                                       OBJ_nid2obj
-                                       (NID_id_smime_aa_msgSigDigest), -3,
-                                       V_ASN1_OCTET_STRING);
+    msig = CMS_signed_get0_data_by_OBJ(
+        si, OBJ_nid2obj(NID_id_smime_aa_msgSigDigest), -3, V_ASN1_OCTET_STRING);
 
     if (!msig) {
         ERR_raise(ERR_LIB_CMS, CMS_R_NO_MSGSIGDIGEST);
@@ -338,9 +335,8 @@ int ossl_cms_Receipt_verify(CMS_ContentInfo *cms, CMS_ContentInfo *req_cms)
 
     /* Compare content types */
 
-    octype = CMS_signed_get0_data_by_OBJ(osi,
-                                         OBJ_nid2obj(NID_pkcs9_contentType),
-                                         -3, V_ASN1_OBJECT);
+    octype = CMS_signed_get0_data_by_OBJ(
+        osi, OBJ_nid2obj(NID_pkcs9_contentType), -3, V_ASN1_OBJECT);
     if (!octype) {
         ERR_raise(ERR_LIB_CMS, CMS_R_NO_CONTENT_TYPE);
         goto err;
@@ -368,11 +364,10 @@ int ossl_cms_Receipt_verify(CMS_ContentInfo *cms, CMS_ContentInfo *req_cms)
 
     r = 1;
 
- err:
+err:
     CMS_ReceiptRequest_free(rr);
     M_ASN1_free_of(rct, CMS_Receipt);
     return r;
-
 }
 
 /*
@@ -398,8 +393,7 @@ ASN1_OCTET_STRING *ossl_cms_encode_Receipt(CMS_SignerInfo *si)
 
     /* Get original content type */
 
-    ctype = CMS_signed_get0_data_by_OBJ(si,
-                                        OBJ_nid2obj(NID_pkcs9_contentType),
+    ctype = CMS_signed_get0_data_by_OBJ(si, OBJ_nid2obj(NID_pkcs9_contentType),
                                         -3, V_ASN1_OBJECT);
     if (!ctype) {
         ERR_raise(ERR_LIB_CMS, CMS_R_NO_CONTENT_TYPE);
@@ -413,7 +407,7 @@ ASN1_OCTET_STRING *ossl_cms_encode_Receipt(CMS_SignerInfo *si)
 
     os = ASN1_item_pack(&rct, ASN1_ITEM_rptr(CMS_Receipt), NULL);
 
- err:
+err:
     CMS_ReceiptRequest_free(rr);
     return os;
 }

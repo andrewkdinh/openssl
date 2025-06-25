@@ -34,8 +34,8 @@ static int try_provided_check(EVP_PKEY_CTX *ctx, int selection, int checktype)
         return -1;
 
     keymgmt = ctx->keymgmt;
-    keydata = evp_pkey_export_to_provider(ctx->pkey, ctx->libctx,
-                                          &keymgmt, ctx->propquery);
+    keydata = evp_pkey_export_to_provider(ctx->pkey, ctx->libctx, &keymgmt,
+                                          ctx->propquery);
     if (keydata == NULL) {
         ERR_raise(ERR_LIB_EVP, EVP_R_INITIALIZATION_ERROR);
         return 0;
@@ -54,8 +54,9 @@ static int evp_pkey_public_check_combined(EVP_PKEY_CTX *ctx, int checktype)
         return 0;
     }
 
-    if ((ok = try_provided_check(ctx, OSSL_KEYMGMT_SELECT_PUBLIC_KEY,
-                                 checktype)) != -1)
+    if ((ok =
+             try_provided_check(ctx, OSSL_KEYMGMT_SELECT_PUBLIC_KEY, checktype))
+        != -1)
         return ok;
 
     if (pkey->type == EVP_PKEY_NONE)
@@ -73,19 +74,21 @@ static int evp_pkey_public_check_combined(EVP_PKEY_CTX *ctx, int checktype)
 
     return pkey->ameth->pkey_public_check(pkey);
 #endif
- not_supported:
+not_supported:
     ERR_raise(ERR_LIB_EVP, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
     return -2;
 }
 
 int EVP_PKEY_public_check(EVP_PKEY_CTX *ctx)
 {
-    return evp_pkey_public_check_combined(ctx, OSSL_KEYMGMT_VALIDATE_FULL_CHECK);
+    return evp_pkey_public_check_combined(ctx,
+                                          OSSL_KEYMGMT_VALIDATE_FULL_CHECK);
 }
 
 int EVP_PKEY_public_check_quick(EVP_PKEY_CTX *ctx)
 {
-    return evp_pkey_public_check_combined(ctx, OSSL_KEYMGMT_VALIDATE_QUICK_CHECK);
+    return evp_pkey_public_check_combined(ctx,
+                                          OSSL_KEYMGMT_VALIDATE_QUICK_CHECK);
 }
 
 static int evp_pkey_param_check_combined(EVP_PKEY_CTX *ctx, int checktype)
@@ -98,9 +101,9 @@ static int evp_pkey_param_check_combined(EVP_PKEY_CTX *ctx, int checktype)
         return 0;
     }
 
-    if ((ok = try_provided_check(ctx,
-                                 OSSL_KEYMGMT_SELECT_ALL_PARAMETERS,
-                                 checktype)) != -1)
+    if ((ok = try_provided_check(ctx, OSSL_KEYMGMT_SELECT_ALL_PARAMETERS,
+                                 checktype))
+        != -1)
         return ok;
 
     if (pkey->type == EVP_PKEY_NONE)
@@ -118,7 +121,7 @@ static int evp_pkey_param_check_combined(EVP_PKEY_CTX *ctx, int checktype)
 
     return pkey->ameth->pkey_param_check(pkey);
 #endif
- not_supported:
+not_supported:
     ERR_raise(ERR_LIB_EVP, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
     return -2;
 }
@@ -130,7 +133,8 @@ int EVP_PKEY_param_check(EVP_PKEY_CTX *ctx)
 
 int EVP_PKEY_param_check_quick(EVP_PKEY_CTX *ctx)
 {
-    return evp_pkey_param_check_combined(ctx, OSSL_KEYMGMT_VALIDATE_QUICK_CHECK);
+    return evp_pkey_param_check_combined(ctx,
+                                         OSSL_KEYMGMT_VALIDATE_QUICK_CHECK);
 }
 
 int EVP_PKEY_private_check(EVP_PKEY_CTX *ctx)
@@ -144,7 +148,8 @@ int EVP_PKEY_private_check(EVP_PKEY_CTX *ctx)
     }
 
     if ((ok = try_provided_check(ctx, OSSL_KEYMGMT_SELECT_PRIVATE_KEY,
-                                 OSSL_KEYMGMT_VALIDATE_FULL_CHECK)) != -1)
+                                 OSSL_KEYMGMT_VALIDATE_FULL_CHECK))
+        != -1)
         return ok;
 
     /* not supported for legacy keys */
@@ -168,7 +173,8 @@ int EVP_PKEY_pairwise_check(EVP_PKEY_CTX *ctx)
     }
 
     if ((ok = try_provided_check(ctx, OSSL_KEYMGMT_SELECT_KEYPAIR,
-                                 OSSL_KEYMGMT_VALIDATE_FULL_CHECK)) != -1)
+                                 OSSL_KEYMGMT_VALIDATE_FULL_CHECK))
+        != -1)
         return ok;
 
     if (pkey->type == EVP_PKEY_NONE)
@@ -186,8 +192,7 @@ int EVP_PKEY_pairwise_check(EVP_PKEY_CTX *ctx)
 
     return pkey->ameth->pkey_check(pkey);
 #endif
- not_supported:
+not_supported:
     ERR_raise(ERR_LIB_EVP, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
     return -2;
 }
-

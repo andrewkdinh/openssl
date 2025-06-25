@@ -63,13 +63,13 @@ static int s390x_mod_exp_hw(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
          */
         OPENSSL_s390xcex_nodev = 1;
     }
- dealloc:
+dealloc:
     OPENSSL_clear_free(buffer, 4 * size);
     return res;
 }
 
-int s390x_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
-                  const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *m_ctx)
+int s390x_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m,
+                  BN_CTX *ctx, BN_MONT_CTX *m_ctx)
 {
     if (s390x_mod_exp_hw(r, a, p, m) == 1)
         return 1;
@@ -140,14 +140,14 @@ int s390x_crt(BIGNUM *r, const BIGNUM *i, const BIGNUM *p, const BIGNUM *q,
          */
         OPENSSL_s390xcex_nodev = 1;
     }
- dealloc:
+dealloc:
     OPENSSL_clear_free(buffer, 9 * size + 24);
     return res;
 }
 
 #else
-int s390x_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
-                  const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *m_ctx)
+int s390x_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m,
+                  BN_CTX *ctx, BN_MONT_CTX *m_ctx)
 {
     return BN_mod_exp_mont(r, a, p, m, ctx, m_ctx);
 }

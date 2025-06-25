@@ -159,8 +159,7 @@ int BN_usub(BIGNUM *r, const BIGNUM *a, const BIGNUM *b)
         borrow &= (t1 == 0);
     }
 
-    while (max && *--rp == 0)
-        max--;
+    while (max && *--rp == 0) max--;
 
     r->top = max;
     r->neg = 0;
@@ -168,4 +167,3 @@ int BN_usub(BIGNUM *r, const BIGNUM *a, const BIGNUM *b)
 
     return 1;
 }
-

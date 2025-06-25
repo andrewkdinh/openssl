@@ -72,8 +72,8 @@ static int include_legacy(void)
     return app_get0_propq() == NULL;
 }
 
-static void legacy_cipher_fn(const EVP_CIPHER *c,
-                             const char *from, const char *to, void *arg)
+static void legacy_cipher_fn(const EVP_CIPHER *c, const char *from,
+                             const char *to, void *arg)
 {
     if (select_name != NULL
         && (c == NULL
@@ -92,8 +92,7 @@ static void legacy_cipher_fn(const EVP_CIPHER *c,
 #endif
 
 DEFINE_STACK_OF(EVP_CIPHER)
-static int cipher_cmp(const EVP_CIPHER * const *a,
-                      const EVP_CIPHER * const *b)
+static int cipher_cmp(const EVP_CIPHER *const *a, const EVP_CIPHER *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_CIPHER_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_CIPHER_get0_provider(*b)));
@@ -103,10 +102,10 @@ static void collect_ciphers(EVP_CIPHER *cipher, void *stack)
 {
     STACK_OF(EVP_CIPHER) *cipher_stack = stack;
 
-    if (is_cipher_fetchable(cipher)
-            && EVP_CIPHER_up_ref(cipher)
-            && sk_EVP_CIPHER_push(cipher_stack, cipher) <= 0)
-        EVP_CIPHER_free(cipher); /* up-ref successful but push to stack failed */
+    if (is_cipher_fetchable(cipher) && EVP_CIPHER_up_ref(cipher)
+        && sk_EVP_CIPHER_push(cipher_stack, cipher) <= 0)
+        EVP_CIPHER_free(
+            cipher); /* up-ref successful but push to stack failed */
 }
 
 static void list_ciphers(const char *prefix)
@@ -162,8 +161,8 @@ static void list_ciphers(const char *prefix)
 }
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
-static void legacy_md_fn(const EVP_MD *m,
-                       const char *from, const char *to, void *arg)
+static void legacy_md_fn(const EVP_MD *m, const char *from, const char *to,
+                         void *arg)
 {
     if (m != NULL) {
         BIO_printf(arg, "  %s\n", EVP_MD_get0_name(m));
@@ -178,7 +177,7 @@ static void legacy_md_fn(const EVP_MD *m,
 #endif
 
 DEFINE_STACK_OF(EVP_MD)
-static int md_cmp(const EVP_MD * const *a, const EVP_MD * const *b)
+static int md_cmp(const EVP_MD *const *a, const EVP_MD *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_MD_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_MD_get0_provider(*b)));
@@ -188,9 +187,8 @@ static void collect_digests(EVP_MD *digest, void *stack)
 {
     STACK_OF(EVP_MD) *digest_stack = stack;
 
-    if (is_digest_fetchable(digest)
-            && EVP_MD_up_ref(digest)
-            && sk_EVP_MD_push(digest_stack, digest) <= 0)
+    if (is_digest_fetchable(digest) && EVP_MD_up_ref(digest)
+        && sk_EVP_MD_push(digest_stack, digest) <= 0)
         EVP_MD_free(digest); /* up-ref successful but push to stack failed */
 }
 
@@ -234,11 +232,11 @@ static void list_digests(const char *prefix)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("retrievable algorithm parameters",
-                                EVP_MD_gettable_params(m), 4);
+                                  EVP_MD_gettable_params(m), 4);
                 print_param_types("retrievable operation parameters",
-                                EVP_MD_gettable_ctx_params(m), 4);
+                                  EVP_MD_gettable_ctx_params(m), 4);
                 print_param_types("settable operation parameters",
-                                EVP_MD_settable_ctx_params(m), 4);
+                                  EVP_MD_settable_ctx_params(m), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -247,7 +245,7 @@ static void list_digests(const char *prefix)
 }
 
 DEFINE_STACK_OF(EVP_MAC)
-static int mac_cmp(const EVP_MAC * const *a, const EVP_MAC * const *b)
+static int mac_cmp(const EVP_MAC *const *a, const EVP_MAC *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_MAC_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_MAC_get0_provider(*b)));
@@ -257,8 +255,7 @@ static void collect_macs(EVP_MAC *mac, void *stack)
 {
     STACK_OF(EVP_MAC) *mac_stack = stack;
 
-    if (is_mac_fetchable(mac)
-            && sk_EVP_MAC_push(mac_stack, mac) > 0)
+    if (is_mac_fetchable(mac) && sk_EVP_MAC_push(mac_stack, mac) > 0)
         EVP_MAC_up_ref(mac);
 }
 
@@ -295,11 +292,11 @@ static void list_macs(void)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("retrievable algorithm parameters",
-                                EVP_MAC_gettable_params(m), 4);
+                                  EVP_MAC_gettable_params(m), 4);
                 print_param_types("retrievable operation parameters",
-                                EVP_MAC_gettable_ctx_params(m), 4);
+                                  EVP_MAC_gettable_ctx_params(m), 4);
                 print_param_types("settable operation parameters",
-                                EVP_MAC_settable_ctx_params(m), 4);
+                                  EVP_MAC_settable_ctx_params(m), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -311,7 +308,7 @@ static void list_macs(void)
  * KDFs and PRFs
  */
 DEFINE_STACK_OF(EVP_KDF)
-static int kdf_cmp(const EVP_KDF * const *a, const EVP_KDF * const *b)
+static int kdf_cmp(const EVP_KDF *const *a, const EVP_KDF *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_KDF_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_KDF_get0_provider(*b)));
@@ -321,9 +318,8 @@ static void collect_kdfs(EVP_KDF *kdf, void *stack)
 {
     STACK_OF(EVP_KDF) *kdf_stack = stack;
 
-    if (is_kdf_fetchable(kdf)
-            && EVP_KDF_up_ref(kdf)
-            && sk_EVP_KDF_push(kdf_stack, kdf) <= 0)
+    if (is_kdf_fetchable(kdf) && EVP_KDF_up_ref(kdf)
+        && sk_EVP_KDF_push(kdf_stack, kdf) <= 0)
         EVP_KDF_free(kdf); /* up-ref successful but push to stack failed */
 }
 
@@ -360,11 +356,11 @@ static void list_kdfs(void)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("retrievable algorithm parameters",
-                                EVP_KDF_gettable_params(k), 4);
+                                  EVP_KDF_gettable_params(k), 4);
                 print_param_types("retrievable operation parameters",
-                                EVP_KDF_gettable_ctx_params(k), 4);
+                                  EVP_KDF_gettable_ctx_params(k), 4);
                 print_param_types("settable operation parameters",
-                                EVP_KDF_settable_ctx_params(k), 4);
+                                  EVP_KDF_settable_ctx_params(k), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -377,9 +373,10 @@ static void list_kdfs(void)
  */
 DEFINE_STACK_OF(EVP_RAND)
 
-static int rand_cmp(const EVP_RAND * const *a, const EVP_RAND * const *b)
+static int rand_cmp(const EVP_RAND *const *a, const EVP_RAND *const *b)
 {
-    int ret = OPENSSL_strcasecmp(EVP_RAND_get0_name(*a), EVP_RAND_get0_name(*b));
+    int ret =
+        OPENSSL_strcasecmp(EVP_RAND_get0_name(*a), EVP_RAND_get0_name(*b));
 
     if (ret == 0)
         ret = strcmp(OSSL_PROVIDER_get0_name(EVP_RAND_get0_provider(*a)),
@@ -392,9 +389,8 @@ static void collect_rands(EVP_RAND *rand, void *stack)
 {
     STACK_OF(EVP_RAND) *rand_stack = stack;
 
-    if (is_rand_fetchable(rand)
-            && EVP_RAND_up_ref(rand)
-            && sk_EVP_RAND_push(rand_stack, rand) <= 0)
+    if (is_rand_fetchable(rand) && EVP_RAND_up_ref(rand)
+        && sk_EVP_RAND_push(rand_stack, rand) <= 0)
         EVP_RAND_free(rand); /* up-ref successful but push to stack failed */
 }
 
@@ -442,7 +438,7 @@ static void display_random(const char *name, EVP_RAND_CTX *drbg)
     uint64_t u;
     const char *p;
     const OSSL_PARAM *gettables;
-    OSSL_PARAM params[2] = { OSSL_PARAM_END, OSSL_PARAM_END };
+    OSSL_PARAM params[2] = {OSSL_PARAM_END, OSSL_PARAM_END};
     unsigned char buf[1000];
 
     BIO_printf(bio_out, "%s:\n", name);
@@ -473,17 +469,17 @@ static void display_random(const char *name, EVP_RAND_CTX *drbg)
         if (gettables != NULL)
             for (; gettables->key != NULL; gettables++) {
                 /* State has been dealt with already, so ignore */
-                if (OPENSSL_strcasecmp(gettables->key, OSSL_RAND_PARAM_STATE) == 0)
+                if (OPENSSL_strcasecmp(gettables->key, OSSL_RAND_PARAM_STATE)
+                    == 0)
                     continue;
                 /* Outside of verbose mode, we skip non-string values */
                 if (gettables->data_type != OSSL_PARAM_UTF8_STRING
-                        && gettables->data_type != OSSL_PARAM_UTF8_PTR
-                        && !verbose)
+                    && gettables->data_type != OSSL_PARAM_UTF8_PTR && !verbose)
                     continue;
                 params->key = gettables->key;
                 params->data_type = gettables->data_type;
                 if (gettables->data_type == OSSL_PARAM_UNSIGNED_INTEGER
-                        || gettables->data_type == OSSL_PARAM_INTEGER) {
+                    || gettables->data_type == OSSL_PARAM_INTEGER) {
                     params->data = &u;
                     params->data_size = sizeof(u);
                 } else {
@@ -508,8 +504,8 @@ static void list_random_instances(void)
  * Encoders
  */
 DEFINE_STACK_OF(OSSL_ENCODER)
-static int encoder_cmp(const OSSL_ENCODER * const *a,
-                       const OSSL_ENCODER * const *b)
+static int encoder_cmp(const OSSL_ENCODER *const *a,
+                       const OSSL_ENCODER *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(OSSL_ENCODER_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(OSSL_ENCODER_get0_provider(*b)));
@@ -519,10 +515,10 @@ static void collect_encoders(OSSL_ENCODER *encoder, void *stack)
 {
     STACK_OF(OSSL_ENCODER) *encoder_stack = stack;
 
-    if (is_encoder_fetchable(encoder)
-            && OSSL_ENCODER_up_ref(encoder)
-            && sk_OSSL_ENCODER_push(encoder_stack, encoder) <= 0)
-        OSSL_ENCODER_free(encoder); /* up-ref successful but push to stack failed */
+    if (is_encoder_fetchable(encoder) && OSSL_ENCODER_up_ref(encoder)
+        && sk_OSSL_ENCODER_push(encoder_stack, encoder) <= 0)
+        OSSL_ENCODER_free(
+            encoder); /* up-ref successful but push to stack failed */
 }
 
 static void list_encoders(void)
@@ -536,8 +532,7 @@ static void list_encoders(void)
         return;
     }
     BIO_printf(bio_out, "Provided ENCODERs:\n");
-    OSSL_ENCODER_do_all_provided(app_get0_libctx(), collect_encoders,
-                                 encoders);
+    OSSL_ENCODER_do_all_provided(app_get0_libctx(), collect_encoders, encoders);
     sk_OSSL_ENCODER_sort(encoders);
 
     for (i = 0; i < sk_OSSL_ENCODER_num(encoders); i++) {
@@ -548,13 +543,14 @@ static void list_encoders(void)
             continue;
 
         names = sk_OPENSSL_CSTRING_new(name_cmp);
-        if (names != NULL && OSSL_ENCODER_names_do_all(k, collect_names, names)) {
+        if (names != NULL
+            && OSSL_ENCODER_names_do_all(k, collect_names, names)) {
             BIO_printf(bio_out, "  ");
             print_names(bio_out, names);
 
             BIO_printf(bio_out, " @ %s (%s)\n",
-                    OSSL_PROVIDER_get0_name(OSSL_ENCODER_get0_provider(k)),
-                    OSSL_ENCODER_get0_properties(k));
+                       OSSL_PROVIDER_get0_name(OSSL_ENCODER_get0_provider(k)),
+                       OSSL_ENCODER_get0_properties(k));
 
             if (verbose) {
                 const char *desc = OSSL_ENCODER_get0_description(k);
@@ -562,7 +558,7 @@ static void list_encoders(void)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("settable operation parameters",
-                                OSSL_ENCODER_settable_ctx_params(k), 4);
+                                  OSSL_ENCODER_settable_ctx_params(k), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -574,8 +570,8 @@ static void list_encoders(void)
  * Decoders
  */
 DEFINE_STACK_OF(OSSL_DECODER)
-static int decoder_cmp(const OSSL_DECODER * const *a,
-                       const OSSL_DECODER * const *b)
+static int decoder_cmp(const OSSL_DECODER *const *a,
+                       const OSSL_DECODER *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(OSSL_DECODER_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(OSSL_DECODER_get0_provider(*b)));
@@ -585,10 +581,10 @@ static void collect_decoders(OSSL_DECODER *decoder, void *stack)
 {
     STACK_OF(OSSL_DECODER) *decoder_stack = stack;
 
-    if (is_decoder_fetchable(decoder)
-            && OSSL_DECODER_up_ref(decoder)
-            && sk_OSSL_DECODER_push(decoder_stack, decoder) <= 0)
-        OSSL_DECODER_free(decoder); /* up-ref successful but push to stack failed */
+    if (is_decoder_fetchable(decoder) && OSSL_DECODER_up_ref(decoder)
+        && sk_OSSL_DECODER_push(decoder_stack, decoder) <= 0)
+        OSSL_DECODER_free(
+            decoder); /* up-ref successful but push to stack failed */
 }
 
 static void list_decoders(void)
@@ -602,8 +598,7 @@ static void list_decoders(void)
         return;
     }
     BIO_printf(bio_out, "Provided DECODERs:\n");
-    OSSL_DECODER_do_all_provided(app_get0_libctx(), collect_decoders,
-                                 decoders);
+    OSSL_DECODER_do_all_provided(app_get0_libctx(), collect_decoders, decoders);
     sk_OSSL_DECODER_sort(decoders);
 
     for (i = 0; i < sk_OSSL_DECODER_num(decoders); i++) {
@@ -614,7 +609,8 @@ static void list_decoders(void)
             continue;
 
         names = sk_OPENSSL_CSTRING_new(name_cmp);
-        if (names != NULL && OSSL_DECODER_names_do_all(k, collect_names, names)) {
+        if (names != NULL
+            && OSSL_DECODER_names_do_all(k, collect_names, names)) {
             BIO_printf(bio_out, "  ");
             print_names(bio_out, names);
 
@@ -628,7 +624,7 @@ static void list_decoders(void)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("settable operation parameters",
-                                OSSL_DECODER_settable_ctx_params(k), 4);
+                                  OSSL_DECODER_settable_ctx_params(k), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -637,8 +633,8 @@ static void list_decoders(void)
 }
 
 DEFINE_STACK_OF(EVP_KEYMGMT)
-static int keymanager_cmp(const EVP_KEYMGMT * const *a,
-                          const EVP_KEYMGMT * const *b)
+static int keymanager_cmp(const EVP_KEYMGMT *const *a,
+                          const EVP_KEYMGMT *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_KEYMGMT_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_KEYMGMT_get0_provider(*b)));
@@ -648,9 +644,8 @@ static void collect_keymanagers(EVP_KEYMGMT *km, void *stack)
 {
     STACK_OF(EVP_KEYMGMT) *km_stack = stack;
 
-    if (is_keymgmt_fetchable(km)
-            && EVP_KEYMGMT_up_ref(km)
-            && sk_EVP_KEYMGMT_push(km_stack, km) <= 0)
+    if (is_keymgmt_fetchable(km) && EVP_KEYMGMT_up_ref(km)
+        && sk_EVP_KEYMGMT_push(km_stack, km) <= 0)
         EVP_KEYMGMT_free(km); /* up-ref successful but push to stack failed */
 }
 
@@ -671,7 +666,8 @@ static void list_keymanagers(void)
             continue;
 
         names = sk_OPENSSL_CSTRING_new(name_cmp);
-        if (names != NULL && EVP_KEYMGMT_names_do_all(k, collect_names, names)) {
+        if (names != NULL
+            && EVP_KEYMGMT_names_do_all(k, collect_names, names)) {
             const char *desc = EVP_KEYMGMT_get0_description(k);
 
             BIO_printf(bio_out, "  Name: ");
@@ -684,15 +680,15 @@ static void list_keymanagers(void)
             BIO_printf(bio_out, "    IDs: ");
             print_names(bio_out, names);
             BIO_printf(bio_out, " @ %s\n",
-                    OSSL_PROVIDER_get0_name(EVP_KEYMGMT_get0_provider(k)));
+                       OSSL_PROVIDER_get0_name(EVP_KEYMGMT_get0_provider(k)));
 
             if (verbose) {
                 print_param_types("settable key generation parameters",
-                                EVP_KEYMGMT_gen_settable_params(k), 4);
+                                  EVP_KEYMGMT_gen_settable_params(k), 4);
                 print_param_types("settable operation parameters",
-                                EVP_KEYMGMT_settable_params(k), 4);
+                                  EVP_KEYMGMT_settable_params(k), 4);
                 print_param_types("retrievable operation parameters",
-                                EVP_KEYMGMT_gettable_params(k), 4);
+                                  EVP_KEYMGMT_gettable_params(k), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -701,8 +697,8 @@ static void list_keymanagers(void)
 }
 
 DEFINE_STACK_OF(EVP_SKEYMGMT)
-static int skeymanager_cmp(const EVP_SKEYMGMT * const *a,
-                           const EVP_SKEYMGMT * const *b)
+static int skeymanager_cmp(const EVP_SKEYMGMT *const *a,
+                           const EVP_SKEYMGMT *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_SKEYMGMT_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_SKEYMGMT_get0_provider(*b)));
@@ -712,8 +708,7 @@ static void collect_skeymanagers(EVP_SKEYMGMT *km, void *stack)
 {
     STACK_OF(EVP_SKEYMGMT) *km_stack = stack;
 
-    if (is_skeymgmt_fetchable(km)
-            && sk_EVP_SKEYMGMT_push(km_stack, km) > 0)
+    if (is_skeymgmt_fetchable(km) && sk_EVP_SKEYMGMT_push(km_stack, km) > 0)
         EVP_SKEYMGMT_up_ref(km);
 }
 
@@ -734,7 +729,8 @@ static void list_skeymanagers(void)
             continue;
 
         names = sk_OPENSSL_CSTRING_new(name_cmp);
-        if (names != NULL && EVP_SKEYMGMT_names_do_all(k, collect_names, names)) {
+        if (names != NULL
+            && EVP_SKEYMGMT_names_do_all(k, collect_names, names)) {
             const char *desc = EVP_SKEYMGMT_get0_description(k);
 
             BIO_printf(bio_out, "  Name: ");
@@ -748,7 +744,6 @@ static void list_skeymanagers(void)
             print_names(bio_out, names);
             BIO_printf(bio_out, " @ %s\n",
                        OSSL_PROVIDER_get0_name(EVP_SKEYMGMT_get0_provider(k)));
-
         }
         sk_OPENSSL_CSTRING_free(names);
     }
@@ -756,8 +751,8 @@ static void list_skeymanagers(void)
 }
 
 DEFINE_STACK_OF(EVP_SIGNATURE)
-static int signature_cmp(const EVP_SIGNATURE * const *a,
-                         const EVP_SIGNATURE * const *b)
+static int signature_cmp(const EVP_SIGNATURE *const *a,
+                         const EVP_SIGNATURE *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_SIGNATURE_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_SIGNATURE_get0_provider(*b)));
@@ -767,10 +762,10 @@ static void collect_signatures(EVP_SIGNATURE *sig, void *stack)
 {
     STACK_OF(EVP_SIGNATURE) *sig_stack = stack;
 
-    if (is_signature_fetchable(sig)
-            && EVP_SIGNATURE_up_ref(sig)
-            && sk_EVP_SIGNATURE_push(sig_stack, sig) <= 0)
-        EVP_SIGNATURE_free(sig); /* up-ref successful but push to stack failed */
+    if (is_signature_fetchable(sig) && EVP_SIGNATURE_up_ref(sig)
+        && sk_EVP_SIGNATURE_push(sig_stack, sig) <= 0)
+        EVP_SIGNATURE_free(
+            sig); /* up-ref successful but push to stack failed */
 }
 
 static void list_signatures(void)
@@ -790,13 +785,14 @@ static void list_signatures(void)
             continue;
 
         names = sk_OPENSSL_CSTRING_new(name_cmp);
-        if (names != NULL && EVP_SIGNATURE_names_do_all(k, collect_names, names)) {
+        if (names != NULL
+            && EVP_SIGNATURE_names_do_all(k, collect_names, names)) {
             count++;
             BIO_printf(bio_out, "  ");
             print_names(bio_out, names);
 
             BIO_printf(bio_out, " @ %s\n",
-                    OSSL_PROVIDER_get0_name(EVP_SIGNATURE_get0_provider(k)));
+                       OSSL_PROVIDER_get0_name(EVP_SIGNATURE_get0_provider(k)));
 
             if (verbose) {
                 const char *desc = EVP_SIGNATURE_get0_description(k);
@@ -804,9 +800,9 @@ static void list_signatures(void)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("settable operation parameters",
-                                EVP_SIGNATURE_settable_ctx_params(k), 4);
+                                  EVP_SIGNATURE_settable_ctx_params(k), 4);
                 print_param_types("retrievable operation parameters",
-                                EVP_SIGNATURE_gettable_ctx_params(k), 4);
+                                  EVP_SIGNATURE_gettable_ctx_params(k), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -836,8 +832,7 @@ static int list_provider_tls_sigalgs(const OSSL_PARAM params[], void *data)
 static int list_tls_sigalg_caps(OSSL_PROVIDER *provider, void *cbdata)
 {
     OSSL_PROVIDER_get_capabilities(provider, "TLS-SIGALG",
-                                   list_provider_tls_sigalgs,
-                                   cbdata);
+                                   list_provider_tls_sigalgs, cbdata);
     /* As built-in providers don't have this capability, never error */
     return 1;
 }
@@ -871,7 +866,7 @@ static void list_tls_groups(int version, int all)
         BIO_printf(bio_out, "%s%c", sk_OPENSSL_CSTRING_value(groups, i),
                    (i < num - 1) ? ':' : '\n');
     }
- err:
+err:
     SSL_CTX_free(ctx);
     sk_OPENSSL_CSTRING_free(groups);
     return;
@@ -895,14 +890,14 @@ static void list_tls_signatures(void)
         BIO_printf(bio_err,
                    "ERROR: could not list all provider signature algorithms\n");
     if (tls_sigalg_listed < 2)
-        BIO_printf(bio_out,
-                   "\nNo TLS sig algs registered by currently active providers");
+        BIO_printf(
+            bio_out,
+            "\nNo TLS sig algs registered by currently active providers");
     BIO_printf(bio_out, "\n");
 }
 
 DEFINE_STACK_OF(EVP_KEM)
-static int kem_cmp(const EVP_KEM * const *a,
-                   const EVP_KEM * const *b)
+static int kem_cmp(const EVP_KEM *const *a, const EVP_KEM *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_KEM_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_KEM_get0_provider(*b)));
@@ -912,9 +907,8 @@ static void collect_kem(EVP_KEM *kem, void *stack)
 {
     STACK_OF(EVP_KEM) *kem_stack = stack;
 
-    if (is_kem_fetchable(kem)
-            && EVP_KEM_up_ref(kem)
-            && sk_EVP_KEM_push(kem_stack, kem) <= 0)
+    if (is_kem_fetchable(kem) && EVP_KEM_up_ref(kem)
+        && sk_EVP_KEM_push(kem_stack, kem) <= 0)
         EVP_KEM_free(kem); /* up-ref successful but push to stack failed */
 }
 
@@ -948,9 +942,9 @@ static void list_kems(void)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("settable operation parameters",
-                                EVP_KEM_settable_ctx_params(k), 4);
+                                  EVP_KEM_settable_ctx_params(k), 4);
                 print_param_types("retrievable operation parameters",
-                                EVP_KEM_gettable_ctx_params(k), 4);
+                                  EVP_KEM_gettable_ctx_params(k), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -961,8 +955,8 @@ static void list_kems(void)
 }
 
 DEFINE_STACK_OF(EVP_ASYM_CIPHER)
-static int asymcipher_cmp(const EVP_ASYM_CIPHER * const *a,
-                          const EVP_ASYM_CIPHER * const *b)
+static int asymcipher_cmp(const EVP_ASYM_CIPHER *const *a,
+                          const EVP_ASYM_CIPHER *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_ASYM_CIPHER_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_ASYM_CIPHER_get0_provider(*b)));
@@ -973,9 +967,10 @@ static void collect_asymciph(EVP_ASYM_CIPHER *asym_cipher, void *stack)
     STACK_OF(EVP_ASYM_CIPHER) *asym_cipher_stack = stack;
 
     if (is_asym_cipher_fetchable(asym_cipher)
-            && EVP_ASYM_CIPHER_up_ref(asym_cipher)
-            && sk_EVP_ASYM_CIPHER_push(asym_cipher_stack, asym_cipher) <= 0)
-        EVP_ASYM_CIPHER_free(asym_cipher); /* up-ref successful but push to stack failed */
+        && EVP_ASYM_CIPHER_up_ref(asym_cipher)
+        && sk_EVP_ASYM_CIPHER_push(asym_cipher_stack, asym_cipher) <= 0)
+        EVP_ASYM_CIPHER_free(
+            asym_cipher); /* up-ref successful but push to stack failed */
 }
 
 static void list_asymciphers(void)
@@ -997,13 +992,14 @@ static void list_asymciphers(void)
 
         names = sk_OPENSSL_CSTRING_new(name_cmp);
         if (names != NULL
-                && EVP_ASYM_CIPHER_names_do_all(k, collect_names, names)) {
+            && EVP_ASYM_CIPHER_names_do_all(k, collect_names, names)) {
             count++;
             BIO_printf(bio_out, "  ");
             print_names(bio_out, names);
 
-            BIO_printf(bio_out, " @ %s\n",
-                    OSSL_PROVIDER_get0_name(EVP_ASYM_CIPHER_get0_provider(k)));
+            BIO_printf(
+                bio_out, " @ %s\n",
+                OSSL_PROVIDER_get0_name(EVP_ASYM_CIPHER_get0_provider(k)));
 
             if (verbose) {
                 const char *desc = EVP_ASYM_CIPHER_get0_description(k);
@@ -1011,9 +1007,9 @@ static void list_asymciphers(void)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("settable operation parameters",
-                                EVP_ASYM_CIPHER_settable_ctx_params(k), 4);
+                                  EVP_ASYM_CIPHER_settable_ctx_params(k), 4);
                 print_param_types("retrievable operation parameters",
-                                EVP_ASYM_CIPHER_gettable_ctx_params(k), 4);
+                                  EVP_ASYM_CIPHER_gettable_ctx_params(k), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -1024,8 +1020,7 @@ static void list_asymciphers(void)
 }
 
 DEFINE_STACK_OF(EVP_KEYEXCH)
-static int kex_cmp(const EVP_KEYEXCH * const *a,
-                   const EVP_KEYEXCH * const *b)
+static int kex_cmp(const EVP_KEYEXCH *const *a, const EVP_KEYEXCH *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(EVP_KEYEXCH_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(EVP_KEYEXCH_get0_provider(*b)));
@@ -1035,9 +1030,8 @@ static void collect_kex(EVP_KEYEXCH *kex, void *stack)
 {
     STACK_OF(EVP_KEYEXCH) *kex_stack = stack;
 
-    if (is_keyexch_fetchable(kex)
-            && EVP_KEYEXCH_up_ref(kex)
-            && sk_EVP_KEYEXCH_push(kex_stack, kex) <= 0)
+    if (is_keyexch_fetchable(kex) && EVP_KEYEXCH_up_ref(kex)
+        && sk_EVP_KEYEXCH_push(kex_stack, kex) <= 0)
         EVP_KEYEXCH_free(kex); /* up-ref successful but push to stack failed */
 }
 
@@ -1057,13 +1051,14 @@ static void list_keyexchanges(void)
             continue;
 
         names = sk_OPENSSL_CSTRING_new(name_cmp);
-        if (names != NULL && EVP_KEYEXCH_names_do_all(k, collect_names, names)) {
+        if (names != NULL
+            && EVP_KEYEXCH_names_do_all(k, collect_names, names)) {
             count++;
             BIO_printf(bio_out, "  ");
             print_names(bio_out, names);
 
             BIO_printf(bio_out, " @ %s\n",
-                    OSSL_PROVIDER_get0_name(EVP_KEYEXCH_get0_provider(k)));
+                       OSSL_PROVIDER_get0_name(EVP_KEYEXCH_get0_provider(k)));
 
             if (verbose) {
                 const char *desc = EVP_KEYEXCH_get0_description(k);
@@ -1071,9 +1066,9 @@ static void list_keyexchanges(void)
                 if (desc != NULL)
                     BIO_printf(bio_out, "    description: %s\n", desc);
                 print_param_types("settable operation parameters",
-                                EVP_KEYEXCH_settable_ctx_params(k), 4);
+                                  EVP_KEYEXCH_settable_ctx_params(k), 4);
                 print_param_types("retrievable operation parameters",
-                                EVP_KEYEXCH_gettable_ctx_params(k), 4);
+                                  EVP_KEYEXCH_gettable_ctx_params(k), 4);
             }
         }
         sk_OPENSSL_CSTRING_free(names);
@@ -1112,18 +1107,18 @@ static void list_objects(void)
             continue;
         }
         if (n < 0)
-            break;               /* Error */
+            break; /* Error */
 
         if (n > oid_size) {
             oid_buf = OPENSSL_realloc(oid_buf, n + 1);
             if (oid_buf == NULL) {
                 BIO_printf(bio_err, "ERROR: Memory allocation\n");
-                break;           /* Error */
+                break; /* Error */
             }
             oid_size = n + 1;
         }
         if (OBJ_obj2txt(oid_buf, oid_size, obj, 1) < 0)
-            break;               /* Error */
+            break; /* Error */
         if (ln == NULL || strcmp(sn, ln) == 0)
             BIO_printf(bio_out, "%s = %s\n", sn, oid_buf);
         else
@@ -1150,16 +1145,14 @@ static void list_options_for_command(const char *command)
     if ((o = fp->help) == NULL)
         return;
 
-    for ( ; o->name != NULL; o++) {
+    for (; o->name != NULL; o++) {
         char c = o->valtype;
 
         if (o->name == OPT_PARAM_STR)
             break;
 
-        if (o->name == OPT_HELP_STR
-                || o->name == OPT_MORE_STR
-                || o->name == OPT_SECTION_STR
-                || o->name[0] == '\0')
+        if (o->name == OPT_HELP_STR || o->name == OPT_MORE_STR
+            || o->name == OPT_SECTION_STR || o->name[0] == '\0')
             continue;
         BIO_printf(bio_out, "%s %c\n", o->name, c == '\0' ? '-' : c);
     }
@@ -1260,8 +1253,8 @@ static void list_pkey(void)
             } else {
                 BIO_printf(bio_out, " Name: %s\n", pinfo);
                 BIO_printf(bio_out, "\tType: %s Algorithm\n",
-                           pkey_flags & ASN1_PKEY_DYNAMIC ?
-                           "External" : "Builtin");
+                           pkey_flags & ASN1_PKEY_DYNAMIC ? "External"
+                                                          : "Builtin");
                 BIO_printf(bio_out, "\tOID: %s\n", OBJ_nid2ln(pkey_id));
                 if (pem_str == NULL)
                     pem_str = "(none)";
@@ -1290,7 +1283,7 @@ static void list_pkey_meth(void)
             EVP_PKEY_meth_get0_info(&pkey_id, &pkey_flags, pmeth);
             BIO_printf(bio_out, " %s\n", OBJ_nid2ln(pkey_id));
             BIO_printf(bio_out, "\tType: %s Algorithm\n",
-                       pkey_flags & ASN1_PKEY_DYNAMIC ?  "External" : "Builtin");
+                       pkey_flags & ASN1_PKEY_DYNAMIC ? "External" : "Builtin");
         }
     }
 #endif
@@ -1306,8 +1299,8 @@ static void list_pkey_meth(void)
 }
 
 DEFINE_STACK_OF(OSSL_STORE_LOADER)
-static int store_cmp(const OSSL_STORE_LOADER * const *a,
-                     const OSSL_STORE_LOADER * const *b)
+static int store_cmp(const OSSL_STORE_LOADER *const *a,
+                     const OSSL_STORE_LOADER *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(OSSL_STORE_LOADER_get0_provider(*a)),
                   OSSL_PROVIDER_get0_name(OSSL_STORE_LOADER_get0_provider(*b)));
@@ -1318,8 +1311,9 @@ static void collect_store_loaders(OSSL_STORE_LOADER *store, void *stack)
     STACK_OF(OSSL_STORE_LOADER) *store_stack = stack;
 
     if (OSSL_STORE_LOADER_up_ref(store)
-            && sk_OSSL_STORE_LOADER_push(store_stack, store) <= 0)
-        OSSL_STORE_LOADER_free(store); /* up-ref successful but push to stack failed */
+        && sk_OSSL_STORE_LOADER_push(store_stack, store) <= 0)
+        OSSL_STORE_LOADER_free(
+            store); /* up-ref successful but push to stack failed */
 }
 
 static void list_store_loaders(void)
@@ -1343,13 +1337,14 @@ static void list_store_loaders(void)
             continue;
 
         names = sk_OPENSSL_CSTRING_new(name_cmp);
-        if (names != NULL && OSSL_STORE_LOADER_names_do_all(l, collect_names,
-                                                            names)) {
+        if (names != NULL
+            && OSSL_STORE_LOADER_names_do_all(l, collect_names, names)) {
             BIO_printf(bio_out, "  ");
             print_names(bio_out, names);
 
-            BIO_printf(bio_out, " @ %s\n",
-                       OSSL_PROVIDER_get0_name(OSSL_STORE_LOADER_get0_provider(l)));
+            BIO_printf(
+                bio_out, " @ %s\n",
+                OSSL_PROVIDER_get0_name(OSSL_STORE_LOADER_get0_provider(l)));
 
             if (verbose) {
                 const char *desc = OSSL_STORE_LOADER_get0_description(l);
@@ -1366,8 +1361,8 @@ static void list_store_loaders(void)
 }
 
 DEFINE_STACK_OF(OSSL_PROVIDER)
-static int provider_cmp(const OSSL_PROVIDER * const *a,
-                        const OSSL_PROVIDER * const *b)
+static int provider_cmp(const OSSL_PROVIDER *const *a,
+                        const OSSL_PROVIDER *const *b)
 {
     return strcmp(OSSL_PROVIDER_get0_name(*a), OSSL_PROVIDER_get0_name(*b));
 }
@@ -1411,10 +1406,10 @@ static void list_provider_info(void)
         BIO_printf(bio_out, "  %s\n", provname);
 
         /* Query the "known" information parameters, the order matches below */
-        params[0] = OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_NAME,
-                                                  &name, 0);
-        params[1] = OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_VERSION,
-                                                  &version, 0);
+        params[0] =
+            OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_NAME, &name, 0);
+        params[1] =
+            OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_VERSION, &version, 0);
         params[2] = OSSL_PARAM_construct_int(OSSL_PROV_PARAM_STATUS, &status);
         params[3] = OSSL_PARAM_construct_utf8_ptr(OSSL_PROV_PARAM_BUILDINFO,
                                                   &buildinfo, 0);
@@ -1431,7 +1426,8 @@ static void list_provider_info(void)
             if (OSSL_PARAM_modified(params + 1))
                 BIO_printf(bio_out, "    version: %s\n", version);
             if (OSSL_PARAM_modified(params + 2))
-                BIO_printf(bio_out, "    status: %sactive\n", status ? "" : "in");
+                BIO_printf(bio_out, "    status: %sactive\n",
+                           status ? "" : "in");
             if (verbose) {
                 if (OSSL_PARAM_modified(params + 3))
                     BIO_printf(bio_out, "    build info: %s\n", buildinfo);
@@ -1619,20 +1615,38 @@ static void list_disabled(void)
 /* Unified enum for help and list commands. */
 typedef enum HELPLIST_CHOICE {
     OPT_COMMON,
-    OPT_ONE, OPT_VERBOSE,
+    OPT_ONE,
+    OPT_VERBOSE,
     OPT_ALL_ARGORITHMS,
-    OPT_COMMANDS, OPT_DIGEST_COMMANDS, OPT_MAC_ALGORITHMS, OPT_OPTIONS,
-    OPT_DIGEST_ALGORITHMS, OPT_CIPHER_COMMANDS, OPT_CIPHER_ALGORITHMS,
-    OPT_PK_ALGORITHMS, OPT_PK_METHOD, OPT_DISABLED,
-    OPT_KDF_ALGORITHMS, OPT_RANDOM_INSTANCES, OPT_RANDOM_GENERATORS,
-    OPT_ENCODERS, OPT_DECODERS, OPT_KEYMANAGERS, OPT_KEYEXCHANGE_ALGORITHMS,
+    OPT_COMMANDS,
+    OPT_DIGEST_COMMANDS,
+    OPT_MAC_ALGORITHMS,
+    OPT_OPTIONS,
+    OPT_DIGEST_ALGORITHMS,
+    OPT_CIPHER_COMMANDS,
+    OPT_CIPHER_ALGORITHMS,
+    OPT_PK_ALGORITHMS,
+    OPT_PK_METHOD,
+    OPT_DISABLED,
+    OPT_KDF_ALGORITHMS,
+    OPT_RANDOM_INSTANCES,
+    OPT_RANDOM_GENERATORS,
+    OPT_ENCODERS,
+    OPT_DECODERS,
+    OPT_KEYMANAGERS,
+    OPT_KEYEXCHANGE_ALGORITHMS,
     OPT_SKEYMANAGERS,
-    OPT_KEM_ALGORITHMS, OPT_SIGNATURE_ALGORITHMS,
-    OPT_TLS_SIGNATURE_ALGORITHMS, OPT_ASYM_CIPHER_ALGORITHMS,
-    OPT_STORE_LOADERS, OPT_PROVIDER_INFO, OPT_OBJECTS,
+    OPT_KEM_ALGORITHMS,
+    OPT_SIGNATURE_ALGORITHMS,
+    OPT_TLS_SIGNATURE_ALGORITHMS,
+    OPT_ASYM_CIPHER_ALGORITHMS,
+    OPT_STORE_LOADERS,
+    OPT_PROVIDER_INFO,
+    OPT_OBJECTS,
     OPT_SELECT_NAME,
 #if !defined(OPENSSL_NO_TLS1_3) || !defined(OPENSSL_NO_TLS1_2)
-    OPT_ALL_TLS_GROUPS, OPT_TLS_GROUPS,
+    OPT_ALL_TLS_GROUPS,
+    OPT_TLS_GROUPS,
 # if !defined(OPENSSL_NO_TLS1_2)
     OPT_TLS1_2,
 # endif
@@ -1678,31 +1692,29 @@ const OPTIONS list_options[] = {
 #endif
     {"cipher-algorithms", OPT_CIPHER_ALGORITHMS, '-',
      "List of symmetric cipher algorithms"},
-    {"encoders", OPT_ENCODERS, '-', "List of encoding methods" },
-    {"decoders", OPT_DECODERS, '-', "List of decoding methods" },
-    {"key-managers", OPT_KEYMANAGERS, '-', "List of key managers" },
-    {"skey-managers", OPT_SKEYMANAGERS, '-', "List of symmetric key managers" },
+    {"encoders", OPT_ENCODERS, '-', "List of encoding methods"},
+    {"decoders", OPT_DECODERS, '-', "List of decoding methods"},
+    {"key-managers", OPT_KEYMANAGERS, '-', "List of key managers"},
+    {"skey-managers", OPT_SKEYMANAGERS, '-', "List of symmetric key managers"},
     {"key-exchange-algorithms", OPT_KEYEXCHANGE_ALGORITHMS, '-',
-     "List of key exchange algorithms" },
+     "List of key exchange algorithms"},
     {"kem-algorithms", OPT_KEM_ALGORITHMS, '-',
-     "List of key encapsulation mechanism algorithms" },
+     "List of key encapsulation mechanism algorithms"},
     {"signature-algorithms", OPT_SIGNATURE_ALGORITHMS, '-',
-     "List of signature algorithms" },
+     "List of signature algorithms"},
     {"tls-signature-algorithms", OPT_TLS_SIGNATURE_ALGORITHMS, '-',
-     "List of TLS signature algorithms" },
+     "List of TLS signature algorithms"},
     {"asymcipher-algorithms", OPT_ASYM_CIPHER_ALGORITHMS, '-',
-      "List of asymmetric cipher algorithms" },
+     "List of asymmetric cipher algorithms"},
     {"public-key-algorithms", OPT_PK_ALGORITHMS, '-',
      "List of public key algorithms"},
-    {"public-key-methods", OPT_PK_METHOD, '-',
-     "List of public key methods"},
-    {"store-loaders", OPT_STORE_LOADERS, '-',
-     "List of store loaders"},
+    {"public-key-methods", OPT_PK_METHOD, '-', "List of public key methods"},
+    {"store-loaders", OPT_STORE_LOADERS, '-', "List of store loaders"},
 #if !defined(OPENSSL_NO_TLS1_2) || !defined(OPENSSL_NO_TLS1_3)
     {"tls-groups", OPT_TLS_GROUPS, '-',
-     "List implemented TLS key exchange 'groups'" },
+     "List implemented TLS key exchange 'groups'"},
     {"all-tls-groups", OPT_ALL_TLS_GROUPS, '-',
-     "List implemented TLS key exchange 'groups' and all aliases" },
+     "List implemented TLS key exchange 'groups' and all aliases"},
 # ifndef OPENSSL_NO_TLS1_2
     {"tls1_2", OPT_TLS1_2, '-',
      "When listing 'groups', list those compatible with TLS1.2"},
@@ -1712,21 +1724,17 @@ const OPTIONS list_options[] = {
      "When listing 'groups', list those compatible with TLS1.3"},
 # endif
 #endif
-    {"providers", OPT_PROVIDER_INFO, '-',
-     "List of provider information"},
+    {"providers", OPT_PROVIDER_INFO, '-', "List of provider information"},
 #ifndef OPENSSL_NO_DEPRECATED_3_0
-    {"engines", OPT_ENGINES, '-',
-     "List of loaded engines"},
+    {"engines", OPT_ENGINES, '-', "List of loaded engines"},
 #endif
     {"disabled", OPT_DISABLED, '-', "List of disabled features"},
-    {"options", OPT_OPTIONS, 's',
-     "List options for specified command"},
+    {"options", OPT_OPTIONS, 's', "List options for specified command"},
     {"objects", OPT_OBJECTS, '-',
      "List built in objects (OID<->name mappings)"},
 
     OPT_PROV_OPTIONS,
-    {NULL}
-};
+    {NULL}};
 
 int list_main(int argc, char **argv)
 {
@@ -1773,14 +1781,16 @@ int list_main(int argc, char **argv)
         unsigned int disabled:1;
         unsigned int objects:1;
         unsigned int options:1;
-    } todo = { 0, };
+    } todo = {
+        0,
+    };
 
-    verbose = 0;                 /* Clear a possible previous call */
+    verbose = 0; /* Clear a possible previous call */
 
     prog = opt_init(argc, argv, list_options);
     while ((o = opt_next()) != OPT_EOF) {
         switch (o) {
-        case OPT_EOF:  /* Never hit, but suppresses warning */
+        case OPT_EOF: /* Never hit, but suppresses warning */
         case OPT_ERR:
 opthelp:
             BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);

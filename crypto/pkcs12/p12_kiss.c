@@ -76,8 +76,7 @@ int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert,
     }
 
     /* If needed, allocate stack for other certificates */
-    if ((cert != NULL || ca != NULL)
-            && (ocerts = sk_X509_new_null()) == NULL) {
+    if ((cert != NULL || ca != NULL) && (ocerts = sk_X509_new_null()) == NULL) {
         ERR_raise(ERR_LIB_PKCS12, ERR_R_CRYPTO_LIB);
         goto err;
     }
@@ -86,15 +85,14 @@ int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert,
         int err = ERR_peek_last_error();
 
         if (ERR_GET_LIB(err) != ERR_LIB_EVP
-                && ERR_GET_REASON(err) != EVP_R_UNSUPPORTED_ALGORITHM)
+            && ERR_GET_REASON(err) != EVP_R_UNSUPPORTED_ALGORITHM)
             ERR_raise(ERR_LIB_PKCS12, PKCS12_R_PARSE_ERROR);
         goto err;
     }
 
     /* Split the certs in ocerts over *cert and *ca as far as requested */
     while ((x = sk_X509_shift(ocerts)) != NULL) {
-        if (pkey != NULL && *pkey != NULL
-                && cert != NULL && *cert == NULL) {
+        if (pkey != NULL && *pkey != NULL && cert != NULL && *cert == NULL) {
             int match;
 
             ERR_set_mark();
@@ -117,7 +115,7 @@ int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert,
 
     return 1;
 
- err:
+err:
 
     if (pkey != NULL) {
         EVP_PKEY_free(*pkey);
@@ -130,7 +128,6 @@ int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert,
     X509_free(x);
     OSSL_STACK_OF_X509_free(ocerts);
     return 0;
-
 }
 
 /* Parse the outer PKCS#12 structure */
@@ -159,8 +156,8 @@ static int parse_pk12(PKCS12 *p12, const char *pass, int passlen,
             sk_PKCS7_pop_free(asafes, PKCS7_free);
             return 0;
         }
-        if (!parse_bags(bags, pass, passlen, pkey, ocerts,
-                        p7->ctx.libctx, p7->ctx.propq)) {
+        if (!parse_bags(bags, pass, passlen, pkey, ocerts, p7->ctx.libctx,
+                        p7->ctx.propq)) {
             sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
             sk_PKCS7_pop_free(asafes, PKCS7_free);
             return 0;
@@ -178,9 +175,8 @@ static int parse_bags(const STACK_OF(PKCS12_SAFEBAG) *bags, const char *pass,
 {
     int i;
     for (i = 0; i < sk_PKCS12_SAFEBAG_num(bags); i++) {
-        if (!parse_bag(sk_PKCS12_SAFEBAG_value(bags, i),
-                       pass, passlen, pkey, ocerts,
-                       libctx, propq))
+        if (!parse_bag(sk_PKCS12_SAFEBAG_value(bags, i), pass, passlen, pkey,
+                       ocerts, libctx, propq))
             return 0;
     }
     return 1;
@@ -207,8 +203,8 @@ static int parse_bag(PKCS12_SAFEBAG *bag, const char *pass, int passlen,
     case NID_keyBag:
         if (pkey == NULL || *pkey != NULL)
             return 1;
-        *pkey = EVP_PKCS82PKEY_ex(PKCS12_SAFEBAG_get0_p8inf(bag),
-                                  libctx, propq);
+        *pkey =
+            EVP_PKCS82PKEY_ex(PKCS12_SAFEBAG_get0_p8inf(bag), libctx, propq);
         if (*pkey == NULL)
             return 0;
         break;
@@ -216,8 +212,8 @@ static int parse_bag(PKCS12_SAFEBAG *bag, const char *pass, int passlen,
     case NID_pkcs8ShroudedKeyBag:
         if (pkey == NULL || *pkey != NULL)
             return 1;
-        if ((p8 = PKCS12_decrypt_skey_ex(bag, pass, passlen,
-                                         libctx, propq)) == NULL)
+        if ((p8 = PKCS12_decrypt_skey_ex(bag, pass, passlen, libctx, propq))
+            == NULL)
             return 0;
         *pkey = EVP_PKCS82PKEY_ex(p8, libctx, propq);
         PKCS8_PRIV_KEY_INFO_free(p8);
@@ -227,7 +223,7 @@ static int parse_bag(PKCS12_SAFEBAG *bag, const char *pass, int passlen,
 
     case NID_certBag:
         if (ocerts == NULL
-                || PKCS12_SAFEBAG_get_bag_nid(bag) != NID_x509Certificate)
+            || PKCS12_SAFEBAG_get_bag_nid(bag) != NID_x509Certificate)
             return 1;
         if ((x509 = PKCS12_SAFEBAG_get1_cert_ex(bag, libctx, propq)) == NULL)
             return 0;

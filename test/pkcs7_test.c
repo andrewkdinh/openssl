@@ -45,8 +45,7 @@ static const unsigned char cert_der[] = {
     0xbc, 0xf7, 0x1e, 0x9a, 0xf9, 0x5b, 0x02, 0x21, 0x00, 0xd1, 0x61, 0x86,
     0xce, 0x66, 0x31, 0xe4, 0x2f, 0x54, 0xbd, 0xf5, 0xc8, 0x2b, 0xb3, 0x44,
     0xce, 0x24, 0xf8, 0xa5, 0x0b, 0x72, 0x11, 0x21, 0x34, 0xb9, 0x15, 0x4a,
-    0x5f, 0x0e, 0x27, 0x32, 0xa9
-};
+    0x5f, 0x0e, 0x27, 0x32, 0xa9};
 
 static const unsigned char smroot_der[] = {
     0x30, 0x82, 0x03, 0x7B, 0x30, 0x82, 0x02, 0x63, 0xA0, 0x03, 0x02, 0x01,
@@ -123,8 +122,7 @@ static const unsigned char smroot_der[] = {
     0x13, 0xA4, 0x55, 0x5E, 0x1D, 0x74, 0xFC, 0x0C, 0x3E, 0x8B, 0xFF, 0x12,
     0xEE, 0xD1, 0xE9, 0x11, 0x48, 0x0F, 0xDE, 0x10, 0x64, 0xD4, 0xFF, 0xB0,
     0x45, 0x00, 0x56, 0x0F, 0x16, 0xC7, 0x07, 0x6F, 0x25, 0x13, 0xEE, 0x35,
-    0x8E, 0xF8, 0x77, 0x24, 0xE6, 0xD0, 0x59
-};
+    0x8E, 0xF8, 0x77, 0x24, 0xE6, 0xD0, 0x59};
 
 static int pkcs7_verify_test(void)
 {
@@ -142,25 +140,23 @@ static int pkcs7_verify_test(void)
         "Content-Transfer-Encoding: base64\nContent-Disposition: attachment; filename=\"smime.p7s\"\n\n",
         "MIIDEgYJKoZIhvcNAQcCoIIDAzCCAv8CAQExDzANBglghkgBZQMEAgEFADALBgkq\nhkiG9w0BBwGgggFVMIIBUTCB96ADAgECAgIDCTAKBggqhkjOPQQDAjAnMQswCQYD\nVQQGEwJVUzEYMBYGA1UEAwwPY3J5cHRvZ3JhcGh5IENBMB4XDTE3MDEwMTEyMDEw\nMFoXDTM4MTIzMTA4MzAwMFowJzELMAkGA1UEBhMCVVMxGDAWBgNVBAMMD2NyeXB0\nb2dyYXBoeSBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABBj/z7v5Obj13cPu\nwECLBnUGq0/N2CxSJE4f4BBGZ7VfFblivTvPDG++Gve0oQ+0uctuhrNQ+WxRv8GC\n",
         "177F+QWjEzARMA8GA1UdEwEB/wQFMAMBAf8wCgYIKoZIzj0EAwIDSQAwRgIhANES\n742XWm64tkGnz8DnpG6u2lHkZFQr3oaVvPcemvlbAiEA0WGGzmYx5C9UvfXIK7NE\nziT4pQtyESE0uRVKXw4nMqkxggGBMIIBfQIBATAtMCcxCzAJBgNVBAYTAlVTMRgw\nFgYDVQQDDA9jcnlwdG9ncmFwaHkgQ0ECAgMJMA0GCWCGSAFlAwQCAQUAoIHkMBgG\nCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIxMDUyMDE4\nNTA0OVowLwYJKoZIhvcNAQkEMSIEIOdwMRgQrqcnmMYvag+BVvErcc6bwUXI94Ds\n",
-        "QkiyIU9pMHkGCSqGSIb3DQEJDzFsMGowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB\nFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqG\nSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMAoGCCqGSM49BAMCBEcw\nRQIhANYMJku1fW9T1MIEcAyREArz9kXCY4tWck5Pt0xzrYhaAiBDSP6e43zj4YtI\nuvQW+Lzv+dNF8EPuhgoPNe17RuUSLw==\n\n------9B5319FF2E4428B17CD26B69294E7F31--\n\n"
-    };
+        "QkiyIU9pMHkGCSqGSIb3DQEJDzFsMGowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB\nFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqG\nSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMAoGCCqGSM49BAMCBEcw\nRQIhANYMJku1fW9T1MIEcAyREArz9kXCY4tWck5Pt0xzrYhaAiBDSP6e43zj4YtI\nuvQW+Lzv+dNF8EPuhgoPNe17RuUSLw==\n\n------9B5319FF2E4428B17CD26B69294E7F31--\n\n"};
     const char *signed_data = "Content-Type: text/plain\r\n\r\nhello world";
 
     if (!TEST_ptr(bio = BIO_new(BIO_s_mem())))
         goto end;
-    for  (i = 0; i < OSSL_NELEM(sig); ++i)
-        BIO_puts(bio, sig[i]);
+    for (i = 0; i < OSSL_NELEM(sig); ++i) BIO_puts(bio, sig[i]);
 
     ret = TEST_ptr(msg_bio = BIO_new_mem_buf(signed_data, strlen(signed_data)))
-          && TEST_ptr(x509_bio = BIO_new_mem_buf(cert_der, sizeof(cert_der)))
-          && TEST_ptr(cert = d2i_X509_bio(x509_bio, NULL))
-          && TEST_int_eq(ERR_peek_error(), 0)
-          && TEST_ptr(store = X509_STORE_new())
-          && TEST_true(X509_STORE_add_cert(store, cert))
-          && TEST_ptr(p7 = SMIME_read_PKCS7(bio, NULL))
-          && TEST_int_eq(ERR_peek_error(), 0)
-          && TEST_true(PKCS7_verify(p7, NULL, store, msg_bio, NULL, PKCS7_TEXT))
-          && TEST_int_eq(ERR_peek_error(), 0);
+        && TEST_ptr(x509_bio = BIO_new_mem_buf(cert_der, sizeof(cert_der)))
+        && TEST_ptr(cert = d2i_X509_bio(x509_bio, NULL))
+        && TEST_int_eq(ERR_peek_error(), 0)
+        && TEST_ptr(store = X509_STORE_new())
+        && TEST_true(X509_STORE_add_cert(store, cert))
+        && TEST_ptr(p7 = SMIME_read_PKCS7(bio, NULL))
+        && TEST_int_eq(ERR_peek_error(), 0)
+        && TEST_true(PKCS7_verify(p7, NULL, store, msg_bio, NULL, PKCS7_TEXT))
+        && TEST_int_eq(ERR_peek_error(), 0);
 end:
     X509_STORE_free(store);
     X509_free(cert);
@@ -358,25 +354,24 @@ static int pkcs7_inner_content_verify_test(void)
         0x1F, 0xD8, 0xA4, 0x53, 0xDD, 0xAE, 0xF2, 0xF5, 0x73, 0xEA, 0xFE, 0x50,
         0x99, 0x1B, 0x16, 0x1C, 0xBD, 0x4E, 0xFD, 0x8B, 0x2E, 0x22, 0x31, 0x05,
         0x90, 0x9D, 0x41, 0x7C, 0xA7, 0x83, 0xE9, 0xCA, 0x8E, 0x01, 0x6D, 0xB2,
-        0x2D, 0x6F, 0x81
-    };
+        0x2D, 0x6F, 0x81};
 
     if (!TEST_ptr(bio = BIO_new_mem_buf(sig_der, sizeof sig_der)))
         goto end;
 
     ret = TEST_ptr(x509_bio = BIO_new_mem_buf(smroot_der, sizeof smroot_der))
-            && TEST_ptr(cert = d2i_X509_bio(x509_bio, NULL))
-            && TEST_int_eq(ERR_peek_error(), 0)
-            && TEST_ptr(store = X509_STORE_new())
-            && TEST_true(X509_STORE_add_cert(store, cert))
-            && TEST_ptr(param = X509_STORE_get0_param(store))
-            && TEST_true(X509_VERIFY_PARAM_set_purpose(param,
-                                                       X509_PURPOSE_CODE_SIGN))
-            && TEST_true(X509_STORE_set1_param(store, param))
-            && TEST_ptr(p7 = d2i_PKCS7_bio(bio, NULL))
-            && TEST_int_eq(ERR_peek_error(), 0)
-            && TEST_true(PKCS7_verify(p7, NULL, store, NULL, NULL, 0))
-            && TEST_int_eq(ERR_peek_error(), 0);
+        && TEST_ptr(cert = d2i_X509_bio(x509_bio, NULL))
+        && TEST_int_eq(ERR_peek_error(), 0)
+        && TEST_ptr(store = X509_STORE_new())
+        && TEST_true(X509_STORE_add_cert(store, cert))
+        && TEST_ptr(param = X509_STORE_get0_param(store))
+        && TEST_true(
+              X509_VERIFY_PARAM_set_purpose(param, X509_PURPOSE_CODE_SIGN))
+        && TEST_true(X509_STORE_set1_param(store, param))
+        && TEST_ptr(p7 = d2i_PKCS7_bio(bio, NULL))
+        && TEST_int_eq(ERR_peek_error(), 0)
+        && TEST_true(PKCS7_verify(p7, NULL, store, NULL, NULL, 0))
+        && TEST_int_eq(ERR_peek_error(), 0);
 end:
     X509_STORE_free(store);
     X509_free(cert);

@@ -79,35 +79,24 @@ static const ssl_cipher_table ssl_cipher_table_mac[SSL_MD_NUM_IDX] = {
 
 /* *INDENT-OFF* */
 static const ssl_cipher_table ssl_cipher_table_kx[] = {
-    {SSL_kRSA,      NID_kx_rsa},
-    {SSL_kECDHE,    NID_kx_ecdhe},
-    {SSL_kDHE,      NID_kx_dhe},
-    {SSL_kECDHEPSK, NID_kx_ecdhe_psk},
-    {SSL_kDHEPSK,   NID_kx_dhe_psk},
-    {SSL_kRSAPSK,   NID_kx_rsa_psk},
-    {SSL_kPSK,      NID_kx_psk},
-    {SSL_kSRP,      NID_kx_srp},
-    {SSL_kGOST,     NID_kx_gost},
-    {SSL_kGOST18,   NID_kx_gost18},
-    {SSL_kANY,      NID_kx_any}
-};
+    {SSL_kRSA, NID_kx_rsa},        {SSL_kECDHE, NID_kx_ecdhe},
+    {SSL_kDHE, NID_kx_dhe},        {SSL_kECDHEPSK, NID_kx_ecdhe_psk},
+    {SSL_kDHEPSK, NID_kx_dhe_psk}, {SSL_kRSAPSK, NID_kx_rsa_psk},
+    {SSL_kPSK, NID_kx_psk},        {SSL_kSRP, NID_kx_srp},
+    {SSL_kGOST, NID_kx_gost},      {SSL_kGOST18, NID_kx_gost18},
+    {SSL_kANY, NID_kx_any}};
 
 static const ssl_cipher_table ssl_cipher_table_auth[] = {
-    {SSL_aRSA,    NID_auth_rsa},
-    {SSL_aECDSA,  NID_auth_ecdsa},
-    {SSL_aPSK,    NID_auth_psk},
-    {SSL_aDSS,    NID_auth_dss},
-    {SSL_aGOST01, NID_auth_gost01},
-    {SSL_aGOST12, NID_auth_gost12},
-    {SSL_aSRP,    NID_auth_srp},
-    {SSL_aNULL,   NID_auth_null},
-    {SSL_aANY,    NID_auth_any}
-};
+    {SSL_aRSA, NID_auth_rsa},       {SSL_aECDSA, NID_auth_ecdsa},
+    {SSL_aPSK, NID_auth_psk},       {SSL_aDSS, NID_auth_dss},
+    {SSL_aGOST01, NID_auth_gost01}, {SSL_aGOST12, NID_auth_gost12},
+    {SSL_aSRP, NID_auth_srp},       {SSL_aNULL, NID_auth_null},
+    {SSL_aANY, NID_auth_any}};
 /* *INDENT-ON* */
 
 /* Utility function for table lookup */
-static int ssl_cipher_info_find(const ssl_cipher_table *table,
-                                size_t table_cnt, uint32_t mask)
+static int ssl_cipher_info_find(const ssl_cipher_table *table, size_t table_cnt,
+                                uint32_t mask)
 {
     size_t i;
     for (i = 0; i < table_cnt; i++, table++) {
@@ -133,8 +122,7 @@ static const int default_mac_pkey_id[SSL_MD_NUM_IDX] = {
     /* GOST2012_512 */
     EVP_PKEY_HMAC,
     /* MD5/SHA1, SHA224, SHA512, MAGMAOMAC, KUZNYECHIKOMAC */
-    NID_undef, NID_undef, NID_undef, NID_undef, NID_undef
-};
+    NID_undef, NID_undef, NID_undef, NID_undef, NID_undef};
 
 #define CIPHER_ADD      1
 #define CIPHER_KILL     2
@@ -236,7 +224,8 @@ static const SSL_CIPHER cipher_aliases[] = {
     {0, SSL_TXT_CAMELLIA256, NULL, 0, 0, 0, SSL_CAMELLIA256},
     {0, SSL_TXT_CAMELLIA, NULL, 0, 0, 0, SSL_CAMELLIA},
     {0, SSL_TXT_CHACHA20, NULL, 0, 0, 0, SSL_CHACHA20},
-    {0, SSL_TXT_GOST2012_GOST8912_GOST8912, NULL, 0, 0, 0, SSL_eGOST2814789CNT12},
+    {0, SSL_TXT_GOST2012_GOST8912_GOST8912, NULL, 0, 0, 0,
+     SSL_eGOST2814789CNT12},
 
     {0, SSL_TXT_ARIA, NULL, 0, 0, 0, SSL_ARIA},
     {0, SSL_TXT_ARIA_GCM, NULL, 0, 0, 0, SSL_ARIA128GCM | SSL_ARIA256GCM},
@@ -268,10 +257,10 @@ static const SSL_CIPHER cipher_aliases[] = {
     {0, SSL_TXT_FIPS, NULL, 0, 0, 0, ~SSL_eNULL, 0, 0, 0, 0, 0, SSL_FIPS},
 
     /* "EDH-" aliases to "DHE-" labels (for backward compatibility) */
-    {0, SSL3_TXT_EDH_DSS_DES_192_CBC3_SHA, NULL, 0,
-     SSL_kDHE, SSL_aDSS, SSL_3DES, SSL_SHA1, 0, 0, 0, 0, SSL_HIGH | SSL_FIPS},
-    {0, SSL3_TXT_EDH_RSA_DES_192_CBC3_SHA, NULL, 0,
-     SSL_kDHE, SSL_aRSA, SSL_3DES, SSL_SHA1, 0, 0, 0, 0, SSL_HIGH | SSL_FIPS},
+    {0, SSL3_TXT_EDH_DSS_DES_192_CBC3_SHA, NULL, 0, SSL_kDHE, SSL_aDSS,
+     SSL_3DES, SSL_SHA1, 0, 0, 0, 0, SSL_HIGH | SSL_FIPS},
+    {0, SSL3_TXT_EDH_RSA_DES_192_CBC3_SHA, NULL, 0, SSL_kDHE, SSL_aRSA,
+     SSL_3DES, SSL_SHA1, 0, 0, 0, 0, SSL_HIGH | SSL_FIPS},
 
 };
 
@@ -286,8 +275,8 @@ static int get_optional_pkey_id(const char *pkey_name)
     const EVP_PKEY_ASN1_METHOD *ameth;
     int pkey_id = 0;
     ameth = EVP_PKEY_asn1_find_str(NULL, pkey_name, -1);
-    if (ameth && EVP_PKEY_asn1_get0_info(&pkey_id, NULL, NULL, NULL, NULL,
-                                         ameth) > 0)
+    if (ameth
+        && EVP_PKEY_asn1_get0_info(&pkey_id, NULL, NULL, NULL, NULL, ameth) > 0)
         return pkey_id;
     return 0;
 }
@@ -301,8 +290,8 @@ static int get_optional_pkey_id(const char *pkey_name)
     int pkey_id = 0;
     ameth = EVP_PKEY_asn1_find_str(&tmpeng, pkey_name, -1);
     if (ameth) {
-        if (EVP_PKEY_asn1_get0_info(&pkey_id, NULL, NULL, NULL, NULL,
-                                    ameth) <= 0)
+        if (EVP_PKEY_asn1_get0_info(&pkey_id, NULL, NULL, NULL, NULL, ameth)
+            <= 0)
             pkey_id = 0;
     }
     tls_engine_finish(tmpeng);
@@ -321,8 +310,8 @@ int ssl_load_ciphers(SSL_CTX *ctx)
     ctx->disabled_enc_mask = 0;
     for (i = 0, t = ssl_cipher_table_cipher; i < SSL_ENC_NUM_IDX; i++, t++) {
         if (t->nid != NID_undef) {
-            const EVP_CIPHER *cipher
-                = ssl_evp_cipher_fetch(ctx->libctx, t->nid, ctx->propq);
+            const EVP_CIPHER *cipher =
+                ssl_evp_cipher_fetch(ctx->libctx, t->nid, ctx->propq);
 
             ctx->ssl_cipher_methods[i] = cipher;
             if (cipher == NULL)
@@ -331,8 +320,7 @@ int ssl_load_ciphers(SSL_CTX *ctx)
     }
     ctx->disabled_mac_mask = 0;
     for (i = 0, t = ssl_cipher_table_mac; i < SSL_MD_NUM_IDX; i++, t++) {
-        const EVP_MD *md
-            = ssl_evp_md_fetch(ctx->libctx, t->nid, ctx->propq);
+        const EVP_MD *md = ssl_evp_md_fetch(ctx->libctx, t->nid, ctx->propq);
 
         ctx->ssl_digest_methods[i] = md;
         if (md == NULL) {
@@ -428,11 +416,11 @@ int ssl_load_ciphers(SSL_CTX *ctx)
     /*
      * Disable GOST key exchange if no GOST signature algs are available *
      */
-    if ((ctx->disabled_auth_mask & (SSL_aGOST01 | SSL_aGOST12)) ==
-        (SSL_aGOST01 | SSL_aGOST12))
+    if ((ctx->disabled_auth_mask & (SSL_aGOST01 | SSL_aGOST12))
+        == (SSL_aGOST01 | SSL_aGOST12))
         ctx->disabled_mkey_mask |= SSL_kGOST;
 
-    if ((ctx->disabled_auth_mask & SSL_aGOST12) ==  SSL_aGOST12)
+    if ((ctx->disabled_auth_mask & SSL_aGOST12) == SSL_aGOST12)
         ctx->disabled_mkey_mask |= SSL_kGOST18;
 
     return 1;
@@ -441,8 +429,8 @@ int ssl_load_ciphers(SSL_CTX *ctx)
 int ssl_cipher_get_evp_cipher(SSL_CTX *ctx, const SSL_CIPHER *sslc,
                               const EVP_CIPHER **enc)
 {
-    int i = ssl_cipher_info_lookup(ssl_cipher_table_cipher,
-                                   sslc->algorithm_enc);
+    int i =
+        ssl_cipher_info_lookup(ssl_cipher_table_cipher, sslc->algorithm_enc);
 
     if (i == -1) {
         *enc = NULL;
@@ -459,8 +447,7 @@ int ssl_cipher_get_evp_cipher(SSL_CTX *ctx, const SSL_CIPHER *sslc,
         } else {
             const EVP_CIPHER *cipher = ctx->ssl_cipher_methods[i];
 
-            if (cipher == NULL
-                    || !ssl_evp_cipher_up_ref(cipher))
+            if (cipher == NULL || !ssl_evp_cipher_up_ref(cipher))
                 return 0;
             *enc = ctx->ssl_cipher_methods[i];
         }
@@ -469,8 +456,8 @@ int ssl_cipher_get_evp_cipher(SSL_CTX *ctx, const SSL_CIPHER *sslc,
 }
 
 int ssl_cipher_get_evp_md_mac(SSL_CTX *ctx, const SSL_CIPHER *sslc,
-                              const EVP_MD **md,
-                              int *mac_pkey_type, size_t *mac_secret_size)
+                              const EVP_MD **md, int *mac_pkey_type,
+                              size_t *mac_secret_size)
 {
     int i = ssl_cipher_info_lookup(ssl_cipher_table_mac, sslc->algorithm_mac);
 
@@ -483,7 +470,7 @@ int ssl_cipher_get_evp_md_mac(SSL_CTX *ctx, const SSL_CIPHER *sslc,
     } else {
         const EVP_MD *digest = ctx->ssl_digest_methods[i];
 
-        if (digest == NULL || !ssl_evp_md_up_ref(digest)) 
+        if (digest == NULL || !ssl_evp_md_up_ref(digest))
             return 0;
 
         *md = digest;
@@ -538,38 +525,30 @@ int ssl_cipher_get_evp(SSL_CTX *ctx, const SSL_SESSION *s,
     if ((*enc != NULL)
         && (*md != NULL
             || (EVP_CIPHER_get_flags(*enc) & EVP_CIPH_FLAG_AEAD_CIPHER))
-        && (c->algorithm_mac == SSL_AEAD
-            || mac_pkey_type == NULL || *mac_pkey_type != NID_undef)) {
+        && (c->algorithm_mac == SSL_AEAD || mac_pkey_type == NULL
+            || *mac_pkey_type != NID_undef)) {
         const EVP_CIPHER *evp = NULL;
 
-        if (use_etm
-                || s->ssl_version >> 8 != TLS1_VERSION_MAJOR
-                || s->ssl_version < TLS1_VERSION)
+        if (use_etm || s->ssl_version >> 8 != TLS1_VERSION_MAJOR
+            || s->ssl_version < TLS1_VERSION)
             return 1;
 
-        if (c->algorithm_enc == SSL_RC4
-                && c->algorithm_mac == SSL_MD5)
-            evp = ssl_evp_cipher_fetch(ctx->libctx, NID_rc4_hmac_md5,
+        if (c->algorithm_enc == SSL_RC4 && c->algorithm_mac == SSL_MD5)
+            evp =
+                ssl_evp_cipher_fetch(ctx->libctx, NID_rc4_hmac_md5, ctx->propq);
+        else if (c->algorithm_enc == SSL_AES128 && c->algorithm_mac == SSL_SHA1)
+            evp = ssl_evp_cipher_fetch(ctx->libctx, NID_aes_128_cbc_hmac_sha1,
+                                       ctx->propq);
+        else if (c->algorithm_enc == SSL_AES256 && c->algorithm_mac == SSL_SHA1)
+            evp = ssl_evp_cipher_fetch(ctx->libctx, NID_aes_256_cbc_hmac_sha1,
                                        ctx->propq);
         else if (c->algorithm_enc == SSL_AES128
-                    && c->algorithm_mac == SSL_SHA1)
-            evp = ssl_evp_cipher_fetch(ctx->libctx,
-                                       NID_aes_128_cbc_hmac_sha1,
+                 && c->algorithm_mac == SSL_SHA256)
+            evp = ssl_evp_cipher_fetch(ctx->libctx, NID_aes_128_cbc_hmac_sha256,
                                        ctx->propq);
         else if (c->algorithm_enc == SSL_AES256
-                    && c->algorithm_mac == SSL_SHA1)
-             evp = ssl_evp_cipher_fetch(ctx->libctx,
-                                        NID_aes_256_cbc_hmac_sha1,
-                                        ctx->propq);
-        else if (c->algorithm_enc == SSL_AES128
-                    && c->algorithm_mac == SSL_SHA256)
-            evp = ssl_evp_cipher_fetch(ctx->libctx,
-                                       NID_aes_128_cbc_hmac_sha256,
-                                       ctx->propq);
-        else if (c->algorithm_enc == SSL_AES256
-                    && c->algorithm_mac == SSL_SHA256)
-            evp = ssl_evp_cipher_fetch(ctx->libctx,
-                                       NID_aes_256_cbc_hmac_sha256,
+                 && c->algorithm_mac == SSL_SHA256)
+            evp = ssl_evp_cipher_fetch(ctx->libctx, NID_aes_256_cbc_hmac_sha256,
                                        ctx->propq);
 
         if (evp != NULL) {
@@ -602,7 +581,6 @@ const EVP_MD *ssl_prf_md(SSL_CONNECTION *s)
     return ssl_md(SSL_CONNECTION_GET_CTX(s),
                   ssl_get_algorithm2(s) >> TLS1_PRF_DGST_SHIFT);
 }
-
 
 #define ITEM_SEP(a) \
         (((a) == ':') || ((a) == ' ') || ((a) == ';') || ((a) == ','))
@@ -641,15 +619,10 @@ static void ll_append_head(CIPHER_ORDER **head, CIPHER_ORDER *curr,
     *head = curr;
 }
 
-static void ssl_cipher_collect_ciphers(const SSL_METHOD *ssl_method,
-                                       int num_of_ciphers,
-                                       uint32_t disabled_mkey,
-                                       uint32_t disabled_auth,
-                                       uint32_t disabled_enc,
-                                       uint32_t disabled_mac,
-                                       CIPHER_ORDER *co_list,
-                                       CIPHER_ORDER **head_p,
-                                       CIPHER_ORDER **tail_p)
+static void ssl_cipher_collect_ciphers(
+    const SSL_METHOD *ssl_method, int num_of_ciphers, uint32_t disabled_mkey,
+    uint32_t disabled_auth, uint32_t disabled_enc, uint32_t disabled_mac,
+    CIPHER_ORDER *co_list, CIPHER_ORDER **head_p, CIPHER_ORDER **tail_p)
 {
     int i, co_list_num;
     const SSL_CIPHER *c;
@@ -668,16 +641,16 @@ static void ssl_cipher_collect_ciphers(const SSL_METHOD *ssl_method,
         /* drop those that use any of that is not available */
         if (c == NULL || !c->valid)
             continue;
-        if ((c->algorithm_mkey & disabled_mkey) ||
-            (c->algorithm_auth & disabled_auth) ||
-            (c->algorithm_enc & disabled_enc) ||
-            (c->algorithm_mac & disabled_mac))
+        if ((c->algorithm_mkey & disabled_mkey)
+            || (c->algorithm_auth & disabled_auth)
+            || (c->algorithm_enc & disabled_enc)
+            || (c->algorithm_mac & disabled_mac))
             continue;
-        if (((ssl_method->ssl3_enc->enc_flags & SSL_ENC_FLAG_DTLS) == 0) &&
-            c->min_tls == 0)
+        if (((ssl_method->ssl3_enc->enc_flags & SSL_ENC_FLAG_DTLS) == 0)
+            && c->min_tls == 0)
             continue;
-        if (((ssl_method->ssl3_enc->enc_flags & SSL_ENC_FLAG_DTLS) != 0) &&
-            c->min_dtls == 0)
+        if (((ssl_method->ssl3_enc->enc_flags & SSL_ENC_FLAG_DTLS) != 0)
+            && c->min_dtls == 0)
             continue;
 
         co_list[co_list_num].cipher = c;
@@ -711,13 +684,11 @@ static void ssl_cipher_collect_ciphers(const SSL_METHOD *ssl_method,
     }
 }
 
-static void ssl_cipher_collect_aliases(const SSL_CIPHER **ca_list,
-                                       int num_of_group_aliases,
-                                       uint32_t disabled_mkey,
-                                       uint32_t disabled_auth,
-                                       uint32_t disabled_enc,
-                                       uint32_t disabled_mac,
-                                       CIPHER_ORDER *head)
+static void
+ssl_cipher_collect_aliases(const SSL_CIPHER **ca_list, int num_of_group_aliases,
+                           uint32_t disabled_mkey, uint32_t disabled_auth,
+                           uint32_t disabled_enc, uint32_t disabled_mac,
+                           CIPHER_ORDER *head)
 {
     CIPHER_ORDER *ciph_curr;
     const SSL_CIPHER **ca_curr;
@@ -784,7 +755,8 @@ static void ssl_cipher_apply_rule(uint32_t cipher_id, uint32_t alg_mkey,
     const SSL_CIPHER *cp;
     int reverse = 0;
 
-    OSSL_TRACE_BEGIN(TLS_CIPHER) {
+    OSSL_TRACE_BEGIN(TLS_CIPHER)
+    {
         BIO_printf(trc_out,
                    "Applying rule %d with %08x/%08x/%08x/%08x/%08x %08x (%d)\n",
                    rule, (unsigned int)alg_mkey, (unsigned int)alg_auth,
@@ -793,7 +765,7 @@ static void ssl_cipher_apply_rule(uint32_t cipher_id, uint32_t alg_mkey,
     }
 
     if (rule == CIPHER_DEL || rule == CIPHER_BUMP)
-        reverse = 1;            /* needed to maintain sorting between currently
+        reverse = 1; /* needed to maintain sorting between currently
                                  * deleted ciphers */
 
     head = *head_p;
@@ -830,16 +802,15 @@ static void ssl_cipher_apply_rule(uint32_t cipher_id, uint32_t alg_mkey,
                 continue;
         } else {
             if (trc_out != NULL) {
-                BIO_printf(trc_out,
-                           "\nName: %s:"
-                           "\nAlgo = %08x/%08x/%08x/%08x/%08x Algo_strength = %08x\n",
-                           cp->name,
-                           (unsigned int)cp->algorithm_mkey,
-                           (unsigned int)cp->algorithm_auth,
-                           (unsigned int)cp->algorithm_enc,
-                           (unsigned int)cp->algorithm_mac,
-                           cp->min_tls,
-                           (unsigned int)cp->algo_strength);
+                BIO_printf(
+                    trc_out,
+                    "\nName: %s:"
+                    "\nAlgo = %08x/%08x/%08x/%08x/%08x Algo_strength = %08x\n",
+                    cp->name, (unsigned int)cp->algorithm_mkey,
+                    (unsigned int)cp->algorithm_auth,
+                    (unsigned int)cp->algorithm_enc,
+                    (unsigned int)cp->algorithm_mac, cp->min_tls,
+                    (unsigned int)cp->algo_strength);
             }
             if (cipher_id != 0 && (cipher_id != cp->id))
                 continue;
@@ -980,7 +951,7 @@ static int ssl_cipher_process_rulestr(const char *rule_str,
         ch = *l;
 
         if (ch == '\0')
-            break;              /* done */
+            break; /* done */
         if (ch == '-') {
             rule = CIPHER_DEL;
             l++;
@@ -1014,13 +985,12 @@ static int ssl_cipher_process_rulestr(const char *rule_str,
             buf = l;
             buflen = 0;
 #ifndef CHARSET_EBCDIC
-            while (((ch >= 'A') && (ch <= 'Z')) ||
-                   ((ch >= '0') && (ch <= '9')) ||
-                   ((ch >= 'a') && (ch <= 'z')) ||
-                   (ch == '-') || (ch == '_') || (ch == '.') || (ch == '='))
+            while (((ch >= 'A') && (ch <= 'Z')) || ((ch >= '0') && (ch <= '9'))
+                   || ((ch >= 'a') && (ch <= 'z')) || (ch == '-') || (ch == '_')
+                   || (ch == '.') || (ch == '='))
 #else
-            while (isalnum((unsigned char)ch) || (ch == '-') || (ch == '_') || (ch == '.')
-                   || (ch == '='))
+            while (isalnum((unsigned char)ch) || (ch == '-') || (ch == '_')
+                   || (ch == '.') || (ch == '='))
 #endif
             {
                 ch = *(++l);
@@ -1038,8 +1008,8 @@ static int ssl_cipher_process_rulestr(const char *rule_str,
             }
 
             if (rule == CIPHER_SPECIAL) {
-                found = 0;      /* unused -- avoid compiler warning */
-                break;          /* special treatment */
+                found = 0; /* unused -- avoid compiler warning */
+                break; /* special treatment */
             }
 
             /* check for multi-part specification */
@@ -1078,7 +1048,7 @@ static int ssl_cipher_process_rulestr(const char *rule_str,
             }
 
             if (!found)
-                break;          /* ignore this entry */
+                break; /* ignore this entry */
 
             if (ca_list[j]->algorithm_mkey) {
                 if (alg_mkey) {
@@ -1131,8 +1101,8 @@ static int ssl_cipher_process_rulestr(const char *rule_str,
             if (ca_list[j]->algo_strength & SSL_STRONG_MASK) {
                 if (algo_strength & SSL_STRONG_MASK) {
                     algo_strength &=
-                        (ca_list[j]->algo_strength & SSL_STRONG_MASK) |
-                        ~SSL_STRONG_MASK;
+                        (ca_list[j]->algo_strength & SSL_STRONG_MASK)
+                        | ~SSL_STRONG_MASK;
                     if (!(algo_strength & SSL_STRONG_MASK)) {
                         found = 0;
                         break;
@@ -1145,8 +1115,8 @@ static int ssl_cipher_process_rulestr(const char *rule_str,
             if (ca_list[j]->algo_strength & SSL_DEFAULT_MASK) {
                 if (algo_strength & SSL_DEFAULT_MASK) {
                     algo_strength &=
-                        (ca_list[j]->algo_strength & SSL_DEFAULT_MASK) |
-                        ~SSL_DEFAULT_MASK;
+                        (ca_list[j]->algo_strength & SSL_DEFAULT_MASK)
+                        | ~SSL_DEFAULT_MASK;
                     if (!(algo_strength & SSL_DEFAULT_MASK)) {
                         found = 0;
                         break;
@@ -1191,7 +1161,8 @@ static int ssl_cipher_process_rulestr(const char *rule_str,
             ok = 0;
             if ((buflen == 8) && HAS_PREFIX(buf, "STRENGTH")) {
                 ok = ssl_cipher_strength_sort(head_p, tail_p);
-            } else if (buflen == 10 && CHECK_AND_SKIP_PREFIX(buf, "SECLEVEL=")) {
+            } else if (buflen == 10
+                       && CHECK_AND_SKIP_PREFIX(buf, "SECLEVEL=")) {
                 int level = *buf - '0';
                 if (level < 0 || level > 5) {
                     ERR_raise(ERR_LIB_SSL, SSL_R_INVALID_COMMAND);
@@ -1210,19 +1181,16 @@ static int ssl_cipher_process_rulestr(const char *rule_str,
              * rest of the command, if any left, until
              * end or ':' is found.
              */
-            while ((*l != '\0') && !ITEM_SEP(*l))
-                l++;
+            while ((*l != '\0') && !ITEM_SEP(*l)) l++;
         } else if (found) {
-            ssl_cipher_apply_rule(cipher_id,
-                                  alg_mkey, alg_auth, alg_enc, alg_mac,
-                                  min_tls, algo_strength, rule, -1, head_p,
-                                  tail_p);
+            ssl_cipher_apply_rule(cipher_id, alg_mkey, alg_auth, alg_enc,
+                                  alg_mac, min_tls, algo_strength, rule, -1,
+                                  head_p, tail_p);
         } else {
-            while ((*l != '\0') && !ITEM_SEP(*l))
-                l++;
+            while ((*l != '\0') && !ITEM_SEP(*l)) l++;
         }
         if (*l == '\0')
-            break;              /* done */
+            break; /* done */
     }
 
     return retval;
@@ -1304,7 +1272,8 @@ static int ciphersuite_cb(const char *elem, int len, void *arg)
     return 1;
 }
 
-static __owur int set_ciphersuites(STACK_OF(SSL_CIPHER) **currciphers, const char *str)
+static __owur int set_ciphersuites(STACK_OF(SSL_CIPHER) **currciphers,
+                                   const char *str)
 {
     STACK_OF(SSL_CIPHER) *newciphers = sk_SSL_CIPHER_new_null();
 
@@ -1313,8 +1282,8 @@ static __owur int set_ciphersuites(STACK_OF(SSL_CIPHER) **currciphers, const cha
 
     /* Parse the list. We explicitly allow an empty list */
     if (*str != '\0'
-            && (CONF_parse_list(str, ':', 1, ciphersuite_cb, newciphers) <= 0
-                || sk_SSL_CIPHER_num(newciphers) == 0)) {
+        && (CONF_parse_list(str, ':', 1, ciphersuite_cb, newciphers) <= 0
+            || sk_SSL_CIPHER_num(newciphers) == 0)) {
         ERR_raise(ERR_LIB_SSL, SSL_R_NO_CIPHER_MATCH);
         sk_SSL_CIPHER_free(newciphers);
         return 0;
@@ -1343,8 +1312,7 @@ static int update_cipher_list_by_id(STACK_OF(SSL_CIPHER) **cipher_list_by_id,
     return 1;
 }
 
-static int update_cipher_list(SSL_CTX *ctx,
-                              STACK_OF(SSL_CIPHER) **cipher_list,
+static int update_cipher_list(SSL_CTX *ctx, STACK_OF(SSL_CIPHER) **cipher_list,
                               STACK_OF(SSL_CIPHER) **cipher_list_by_id,
                               STACK_OF(SSL_CIPHER) *tls13_ciphersuites)
 {
@@ -1360,7 +1328,7 @@ static int update_cipher_list(SSL_CTX *ctx,
      */
     while (sk_SSL_CIPHER_num(tmp_cipher_list) > 0
            && sk_SSL_CIPHER_value(tmp_cipher_list, 0)->min_tls
-              == TLS1_3_VERSION)
+               == TLS1_3_VERSION)
         (void)sk_SSL_CIPHER_delete(tmp_cipher_list, 0);
 
     /* Insert the new TLSv1.3 ciphersuites */
@@ -1369,9 +1337,10 @@ static int update_cipher_list(SSL_CTX *ctx,
 
         /* Don't include any TLSv1.3 ciphersuites that are disabled */
         if ((sslc->algorithm_enc & ctx->disabled_enc_mask) == 0
-                && (ssl_cipher_table_mac[sslc->algorithm2
-                                         & SSL_HANDSHAKE_MAC_MASK].mask
-                    & ctx->disabled_mac_mask) == 0) {
+            && (ssl_cipher_table_mac[sslc->algorithm2 & SSL_HANDSHAKE_MAC_MASK]
+                    .mask
+                & ctx->disabled_mac_mask)
+                == 0) {
             sk_SSL_CIPHER_unshift(tmp_cipher_list, sslc);
         }
     }
@@ -1392,7 +1361,8 @@ int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
     int ret = set_ciphersuites(&(ctx->tls13_ciphersuites), str);
 
     if (ret && ctx->cipher_list != NULL)
-        return update_cipher_list(ctx, &ctx->cipher_list, &ctx->cipher_list_by_id,
+        return update_cipher_list(ctx, &ctx->cipher_list,
+                                  &ctx->cipher_list_by_id,
                                   ctx->tls13_ciphersuites);
 
     return ret;
@@ -1421,12 +1391,11 @@ int SSL_set_ciphersuites(SSL *s, const char *str)
     return ret;
 }
 
-STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
-                                             STACK_OF(SSL_CIPHER) *tls13_ciphersuites,
-                                             STACK_OF(SSL_CIPHER) **cipher_list,
-                                             STACK_OF(SSL_CIPHER) **cipher_list_by_id,
-                                             const char *rule_str,
-                                             CERT *c)
+STACK_OF(SSL_CIPHER) *
+ssl_create_cipher_list(SSL_CTX *ctx, STACK_OF(SSL_CIPHER) *tls13_ciphersuites,
+                       STACK_OF(SSL_CIPHER) **cipher_list,
+                       STACK_OF(SSL_CIPHER) **cipher_list_by_id,
+                       const char *rule_str, CERT *c)
 {
     int ok, num_of_ciphers, num_of_alias_max, num_of_group_aliases, i;
     uint32_t disabled_mkey, disabled_auth, disabled_enc, disabled_mac;
@@ -1465,12 +1434,12 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
     if (num_of_ciphers > 0) {
         co_list = OPENSSL_malloc(sizeof(*co_list) * num_of_ciphers);
         if (co_list == NULL)
-            return NULL;          /* Failure */
+            return NULL; /* Failure */
     }
 
-    ssl_cipher_collect_ciphers(ssl_method, num_of_ciphers,
-                               disabled_mkey, disabled_auth, disabled_enc,
-                               disabled_mac, co_list, &head, &tail);
+    ssl_cipher_collect_ciphers(ssl_method, num_of_ciphers, disabled_mkey,
+                               disabled_auth, disabled_enc, disabled_mac,
+                               co_list, &head, &tail);
 
     /* Now arrange all ciphers by preference. */
 
@@ -1481,18 +1450,18 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
      * server has both certificates, and is using the DEFAULT, or a client
      * preference).
      */
-    ssl_cipher_apply_rule(0, SSL_kECDHE, SSL_aECDSA, 0, 0, 0, 0, CIPHER_ADD,
-                          -1, &head, &tail);
+    ssl_cipher_apply_rule(0, SSL_kECDHE, SSL_aECDSA, 0, 0, 0, 0, CIPHER_ADD, -1,
+                          &head, &tail);
     ssl_cipher_apply_rule(0, SSL_kECDHE, 0, 0, 0, 0, 0, CIPHER_ADD, -1, &head,
                           &tail);
     ssl_cipher_apply_rule(0, SSL_kECDHE, 0, 0, 0, 0, 0, CIPHER_DEL, -1, &head,
                           &tail);
 
     /* Within each strength group, we prefer GCM over CHACHA... */
-    ssl_cipher_apply_rule(0, 0, 0, SSL_AESGCM, 0, 0, 0, CIPHER_ADD, -1,
-                          &head, &tail);
-    ssl_cipher_apply_rule(0, 0, 0, SSL_CHACHA20, 0, 0, 0, CIPHER_ADD, -1,
-                          &head, &tail);
+    ssl_cipher_apply_rule(0, 0, 0, SSL_AESGCM, 0, 0, 0, CIPHER_ADD, -1, &head,
+                          &tail);
+    ssl_cipher_apply_rule(0, 0, 0, SSL_CHACHA20, 0, 0, 0, CIPHER_ADD, -1, &head,
+                          &tail);
 
     /*
      * ...and generally, our preferred cipher is AES.
@@ -1554,10 +1523,10 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
      * Because we now bump ciphers to the top of the list, we proceed in
      * reverse order of preference.
      */
-    ssl_cipher_apply_rule(0, 0, 0, 0, SSL_AEAD, 0, 0, CIPHER_BUMP, -1,
-                          &head, &tail);
-    ssl_cipher_apply_rule(0, SSL_kDHE | SSL_kECDHE, 0, 0, 0, 0, 0,
-                          CIPHER_BUMP, -1, &head, &tail);
+    ssl_cipher_apply_rule(0, 0, 0, 0, SSL_AEAD, 0, 0, CIPHER_BUMP, -1, &head,
+                          &tail);
+    ssl_cipher_apply_rule(0, SSL_kDHE | SSL_kECDHE, 0, 0, 0, 0, 0, CIPHER_BUMP,
+                          -1, &head, &tail);
     ssl_cipher_apply_rule(0, SSL_kDHE | SSL_kECDHE, 0, 0, SSL_AEAD, 0, 0,
                           CIPHER_BUMP, -1, &head, &tail);
 
@@ -1577,11 +1546,10 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
     ca_list = OPENSSL_malloc(sizeof(*ca_list) * num_of_alias_max);
     if (ca_list == NULL) {
         OPENSSL_free(co_list);
-        return NULL;          /* Failure */
+        return NULL; /* Failure */
     }
-    ssl_cipher_collect_aliases(ca_list, num_of_group_aliases,
-                               disabled_mkey, disabled_auth, disabled_enc,
-                               disabled_mac, head);
+    ssl_cipher_collect_aliases(ca_list, num_of_group_aliases, disabled_mkey,
+                               disabled_auth, disabled_enc, disabled_mac, head);
 
     /*
      * If the rule_string begins with DEFAULT, apply the default rule
@@ -1590,8 +1558,8 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
     ok = 1;
     rule_p = rule_str;
     if (HAS_PREFIX(rule_str, "DEFAULT")) {
-        ok = ssl_cipher_process_rulestr(OSSL_default_cipher_list(),
-                                        &head, &tail, ca_list, c);
+        ok = ssl_cipher_process_rulestr(OSSL_default_cipher_list(), &head,
+                                        &tail, ca_list, c);
         rule_p += 7;
         if (*rule_p == ':')
             rule_p++;
@@ -1600,9 +1568,9 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
     if (ok && (rule_p[0] != '\0'))
         ok = ssl_cipher_process_rulestr(rule_p, &head, &tail, ca_list, c);
 
-    OPENSSL_free(ca_list);      /* Not needed anymore */
+    OPENSSL_free(ca_list); /* Not needed anymore */
 
-    if (!ok) {                  /* Rule processing failure */
+    if (!ok) { /* Rule processing failure */
         OPENSSL_free(co_list);
         return NULL;
     }
@@ -1622,9 +1590,10 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
 
         /* Don't include any TLSv1.3 ciphers that are disabled */
         if ((sslc->algorithm_enc & disabled_enc) != 0
-                || (ssl_cipher_table_mac[sslc->algorithm2
-                                         & SSL_HANDSHAKE_MAC_MASK].mask
-                    & ctx->disabled_mac_mask) != 0) {
+            || (ssl_cipher_table_mac[sslc->algorithm2 & SSL_HANDSHAKE_MAC_MASK]
+                    .mask
+                & ctx->disabled_mac_mask)
+                != 0) {
             sk_SSL_CIPHER_delete(tls13_ciphersuites, i);
             i--;
             continue;
@@ -1637,7 +1606,8 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
         }
     }
 
-    OSSL_TRACE_BEGIN(TLS_CIPHER) {
+    OSSL_TRACE_BEGIN(TLS_CIPHER)
+    {
         BIO_printf(trc_out, "cipher selection:\n");
     }
     /*
@@ -1656,7 +1626,7 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
                 BIO_printf(trc_out, "<%s>\n", curr->cipher->name);
         }
     }
-    OPENSSL_free(co_list);      /* Not needed any longer */
+    OPENSSL_free(co_list); /* Not needed any longer */
     OSSL_TRACE_END(TLS_CIPHER);
 
     if (!update_cipher_list_by_id(cipher_list_by_id, cipherstack)) {
@@ -1674,7 +1644,8 @@ char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
     const char *ver;
     const char *kx, *au, *enc, *mac;
     uint32_t alg_mkey, alg_auth, alg_enc, alg_mac;
-    static const char *const format = "%-30s %-7s Kx=%-8s Au=%-5s Enc=%-22s Mac=%-4s\n";
+    static const char *const format =
+        "%-30s %-7s Kx=%-8s Au=%-5s Enc=%-22s Mac=%-4s\n";
 
     if (buf == NULL) {
         len = 128;
@@ -1964,8 +1935,7 @@ STACK_OF(SSL_COMP) *SSL_COMP_get_compression_methods(void)
     return NULL;
 }
 
-STACK_OF(SSL_COMP) *SSL_COMP_set0_compression_methods(STACK_OF(SSL_COMP)
-                                                      *meths)
+STACK_OF(SSL_COMP) *SSL_COMP_set0_compression_methods(STACK_OF(SSL_COMP) *meths)
 {
     return meths;
 }
@@ -1980,22 +1950,21 @@ STACK_OF(SSL_COMP) *SSL_COMP_get_compression_methods(void)
 {
     STACK_OF(SSL_COMP) **rv;
 
-    rv = (STACK_OF(SSL_COMP) **)OSSL_LIB_CTX_get_data(NULL,
-                                     OSSL_LIB_CTX_COMP_METHODS);
+    rv = (STACK_OF(SSL_COMP) **)OSSL_LIB_CTX_get_data(
+        NULL, OSSL_LIB_CTX_COMP_METHODS);
     if (rv != NULL)
         return *rv;
     else
         return NULL;
 }
 
-STACK_OF(SSL_COMP) *SSL_COMP_set0_compression_methods(STACK_OF(SSL_COMP)
-                                                      *meths)
+STACK_OF(SSL_COMP) *SSL_COMP_set0_compression_methods(STACK_OF(SSL_COMP) *meths)
 {
     STACK_OF(SSL_COMP) **comp_methods;
     STACK_OF(SSL_COMP) *old_meths;
 
-    comp_methods = (STACK_OF(SSL_COMP) **)OSSL_LIB_CTX_get_data(NULL,
-                                              OSSL_LIB_CTX_COMP_METHODS);
+    comp_methods = (STACK_OF(SSL_COMP) **)OSSL_LIB_CTX_get_data(
+        NULL, OSSL_LIB_CTX_COMP_METHODS);
     if (comp_methods == NULL) {
         old_meths = meths;
     } else {
@@ -2080,10 +2049,10 @@ int SSL_COMP_get_id(const SSL_COMP *comp)
 }
 
 const SSL_CIPHER *ssl_get_cipher_by_char(SSL_CONNECTION *s,
-                                         const unsigned char *ptr,
-                                         int all)
+                                         const unsigned char *ptr, int all)
 {
-    const SSL_CIPHER *c = SSL_CONNECTION_GET_SSL(s)->method->get_cipher_by_char(ptr);
+    const SSL_CIPHER *c =
+        SSL_CONNECTION_GET_SSL(s)->method->get_cipher_by_char(ptr);
 
     if (c == NULL || (!all && c->valid == 0))
         return NULL;
@@ -2133,10 +2102,11 @@ int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
     return ssl_cipher_table_auth[i].nid;
 }
 
-int ssl_get_md_idx(int md_nid) {
+int ssl_get_md_idx(int md_nid)
+{
     int i;
 
-    for(i = 0; i < SSL_MD_NUM_IDX; i++) {
+    for (i = 0; i < SSL_MD_NUM_IDX; i++) {
         if (md_nid == ssl_cipher_table_mac[i].nid)
             return i;
     }
@@ -2193,8 +2163,8 @@ int ssl_cipher_get_overhead(const SSL_CIPHER *c, size_t *mac_overhead,
 
             /* If it wasn't AEAD or SSL_eNULL, we expect it to be a
                known CBC cipher. */
-            if (e_ciph == NULL ||
-                EVP_CIPHER_get_mode(e_ciph) != EVP_CIPH_CBC_MODE)
+            if (e_ciph == NULL
+                || EVP_CIPHER_get_mode(e_ciph) != EVP_CIPH_CBC_MODE)
                 return 0;
 
             in = 1; /* padding length byte */

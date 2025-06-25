@@ -135,7 +135,7 @@ STACK_OF(X509_EXTENSION) *X509v3_add_ext(STACK_OF(X509_EXTENSION) **x,
     if (*x == NULL)
         *x = sk;
     return sk;
- err:
+err:
     X509_EXTENSION_free(new_ex);
     if (x != NULL && *x == NULL)
         sk_X509_EXTENSION_free(sk);
@@ -143,8 +143,9 @@ STACK_OF(X509_EXTENSION) *X509v3_add_ext(STACK_OF(X509_EXTENSION) **x,
 }
 
 /* This returns NULL also in non-error case *target == NULL && sk_X509_EXTENSION_num(exts) <= 0 */
-STACK_OF(X509_EXTENSION) *X509v3_add_extensions(STACK_OF(X509_EXTENSION) **target,
-                                                const STACK_OF(X509_EXTENSION) *exts)
+STACK_OF(X509_EXTENSION) *
+X509v3_add_extensions(STACK_OF(X509_EXTENSION) **target,
+                      const STACK_OF(X509_EXTENSION) *exts)
 {
     int i;
 
@@ -173,8 +174,7 @@ STACK_OF(X509_EXTENSION) *X509v3_add_extensions(STACK_OF(X509_EXTENSION) **targe
 }
 
 X509_EXTENSION *X509_EXTENSION_create_by_NID(X509_EXTENSION **ex, int nid,
-                                             int crit,
-                                             ASN1_OCTET_STRING *data)
+                                             int crit, ASN1_OCTET_STRING *data)
 {
     ASN1_OBJECT *obj;
     X509_EXTENSION *ret;
@@ -214,7 +214,7 @@ X509_EXTENSION *X509_EXTENSION_create_by_OBJ(X509_EXTENSION **ex,
     if ((ex != NULL) && (*ex == NULL))
         *ex = ret;
     return ret;
- err:
+err:
     if ((ex == NULL) || (ret != *ex))
         X509_EXTENSION_free(ret);
     return NULL;

@@ -32,7 +32,8 @@ static int cache_objects(X509_LOOKUP *lctx, CACHED_STORE *store,
 
     if (ctx == NULL
         && (ctx = OSSL_STORE_open_ex(store->uri, store->libctx, store->propq,
-                                     NULL, NULL, NULL, NULL, NULL)) == NULL)
+                                     NULL, NULL, NULL, NULL, NULL))
+            == NULL)
         return 0;
     store->ctx = ctx;
 
@@ -97,8 +98,7 @@ static int cache_objects(X509_LOOKUP *lctx, CACHED_STORE *store,
                                          OSSL_STORE_INFO_get0_CERT(info));
                 break;
             case OSSL_STORE_INFO_CRL:
-                ok = X509_STORE_add_crl(xstore,
-                                        OSSL_STORE_INFO_get0_CRL(info));
+                ok = X509_STORE_add_crl(xstore, OSSL_STORE_INFO_get0_CRL(info));
                 break;
             }
         }
@@ -112,7 +112,6 @@ static int cache_objects(X509_LOOKUP *lctx, CACHED_STORE *store,
 
     return ok;
 }
-
 
 static void free_store(CACHED_STORE *store)
 {
@@ -149,9 +148,8 @@ static int by_store_ctrl_ex(X509_LOOKUP *ctx, int cmd, const char *argp,
             if (propq != NULL)
                 store->propq = OPENSSL_strdup(propq);
             store->ctx = OSSL_STORE_open_ex(argp, libctx, propq, NULL, NULL,
-                                           NULL, NULL, NULL);
-            if (store->ctx == NULL
-                || (propq != NULL && store->propq == NULL)
+                                            NULL, NULL, NULL);
+            if (store->ctx == NULL || (propq != NULL && store->propq == NULL)
                 || store->uri == NULL) {
                 free_store(store);
                 return 0;
@@ -186,8 +184,8 @@ static int by_store_ctrl_ex(X509_LOOKUP *ctx, int cmd, const char *argp,
     }
 }
 
-static int by_store_ctrl(X509_LOOKUP *ctx, int cmd,
-                         const char *argp, long argl, char **retp)
+static int by_store_ctrl(X509_LOOKUP *ctx, int cmd, const char *argp, long argl,
+                         char **retp)
 {
     return by_store_ctrl_ex(ctx, cmd, argp, argl, retp, NULL, NULL);
 }
@@ -270,18 +268,17 @@ static int by_store_subject(X509_LOOKUP *ctx, X509_LOOKUP_TYPE type,
 
 static X509_LOOKUP_METHOD x509_store_lookup = {
     "Load certs from STORE URIs",
-    NULL,                        /* new_item */
-    by_store_free,               /* free */
-    NULL,                        /* init */
-    NULL,                        /* shutdown */
-    by_store_ctrl,               /* ctrl */
-    by_store_subject,            /* get_by_subject */
-    NULL,                        /* get_by_issuer_serial */
-    NULL,                        /* get_by_fingerprint */
-    NULL,                        /* get_by_alias */
-    NULL,                        /* get_by_subject_ex */
-    by_store_ctrl_ex
-};
+    NULL, /* new_item */
+    by_store_free, /* free */
+    NULL, /* init */
+    NULL, /* shutdown */
+    by_store_ctrl, /* ctrl */
+    by_store_subject, /* get_by_subject */
+    NULL, /* get_by_issuer_serial */
+    NULL, /* get_by_fingerprint */
+    NULL, /* get_by_alias */
+    NULL, /* get_by_subject_ex */
+    by_store_ctrl_ex};
 
 X509_LOOKUP_METHOD *X509_LOOKUP_store(void)
 {

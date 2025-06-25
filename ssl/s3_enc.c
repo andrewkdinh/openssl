@@ -16,7 +16,8 @@
 #include "internal/cryptlib.h"
 #include "internal/ssl_unwrap.h"
 
-static int ssl3_generate_key_block(SSL_CONNECTION *s, unsigned char *km, int num)
+static int ssl3_generate_key_block(SSL_CONNECTION *s, unsigned char *km,
+                                   int num)
 {
     const EVP_MD *md5 = NULL, *sha1 = NULL;
     EVP_MD_CTX *m5;
@@ -49,8 +50,7 @@ static int ssl3_generate_key_block(SSL_CONNECTION *s, unsigned char *km, int num
 
         memset(buf, c, k);
         c++;
-        if (!EVP_DigestInit_ex(s1, sha1, NULL)
-            || !EVP_DigestUpdate(s1, buf, k)
+        if (!EVP_DigestInit_ex(s1, sha1, NULL) || !EVP_DigestUpdate(s1, buf, k)
             || !EVP_DigestUpdate(s1, s->session->master_key,
                                  s->session->master_key_length)
             || !EVP_DigestUpdate(s1, s->s3.server_random, SSL3_RANDOM_SIZE)
@@ -80,7 +80,7 @@ static int ssl3_generate_key_block(SSL_CONNECTION *s, unsigned char *km, int num
     }
     OPENSSL_cleanse(smd, sizeof(smd));
     ret = 1;
- err:
+err:
     EVP_MD_CTX_free(m5);
     EVP_MD_CTX_free(s1);
     ssl_evp_md_free(md5);
@@ -122,8 +122,8 @@ int ssl3_change_cipher_state(SSL_CONNECTION *s, int which)
     key_len = EVP_CIPHER_get_key_length(ciph);
     iv_len = EVP_CIPHER_get_iv_length(ciph);
 
-    if ((which == SSL3_CHANGE_CIPHER_CLIENT_WRITE) ||
-        (which == SSL3_CHANGE_CIPHER_SERVER_READ)) {
+    if ((which == SSL3_CHANGE_CIPHER_CLIENT_WRITE)
+        || (which == SSL3_CHANGE_CIPHER_SERVER_READ)) {
         mac_secret = &(p[0]);
         n = md_len + md_len;
         key = &(p[n]);
@@ -145,8 +145,7 @@ int ssl3_change_cipher_state(SSL_CONNECTION *s, int which)
         goto err;
     }
 
-    if (!ssl_set_new_record_layer(s, SSL3_VERSION,
-                                  direction,
+    if (!ssl_set_new_record_layer(s, SSL3_VERSION, direction,
                                   OSSL_RECORD_PROTECTION_LEVEL_APPLICATION,
                                   NULL, 0, key, key_len, iv, iv_len, mac_secret,
                                   md_len, ciph, 0, NID_undef, md, comp, NULL)) {
@@ -155,7 +154,7 @@ int ssl3_change_cipher_state(SSL_CONNECTION *s, int which)
     }
 
     return 1;
- err:
+err:
     return 0;
 }
 
@@ -361,20 +360,20 @@ size_t ssl3_final_finish_mac(SSL_CONNECTION *s, const char *sender, size_t len,
         if (EVP_DigestUpdate(ctx, sender, len) <= 0
             || EVP_MD_CTX_set_params(ctx, digest_cmd_params) <= 0
             || EVP_DigestFinal_ex(ctx, p, NULL) <= 0) {
-                SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
-                ret = 0;
+            SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
+            ret = 0;
         }
     }
 
- err:
+err:
     EVP_MD_CTX_free(ctx);
 
     return ret;
 }
 
 int ssl3_generate_master_secret(SSL_CONNECTION *s, unsigned char *out,
-                                unsigned char *p,
-                                size_t len, size_t *secret_size)
+                                unsigned char *p, size_t len,
+                                size_t *secret_size)
 {
     static const unsigned char *const salt[3] = {
 #ifndef CHARSET_EBCDIC
@@ -399,13 +398,15 @@ int ssl3_generate_master_secret(SSL_CONNECTION *s, unsigned char *out,
     }
     for (i = 0; i < 3; i++) {
         if (EVP_DigestInit_ex(ctx, SSL_CONNECTION_GET_CTX(s)->sha1, NULL) <= 0
-            || EVP_DigestUpdate(ctx, salt[i],
-                                strlen((const char *)salt[i])) <= 0
+            || EVP_DigestUpdate(ctx, salt[i], strlen((const char *)salt[i]))
+                <= 0
             || EVP_DigestUpdate(ctx, p, len) <= 0
             || EVP_DigestUpdate(ctx, &(s->s3.client_random[0]),
-                                SSL3_RANDOM_SIZE) <= 0
+                                SSL3_RANDOM_SIZE)
+                <= 0
             || EVP_DigestUpdate(ctx, &(s->s3.server_random[0]),
-                                SSL3_RANDOM_SIZE) <= 0
+                                SSL3_RANDOM_SIZE)
+                <= 0
             || EVP_DigestFinal_ex(ctx, buf, &n) <= 0
             || EVP_DigestInit_ex(ctx, SSL_CONNECTION_GET_CTX(s)->md5, NULL) <= 0
             || EVP_DigestUpdate(ctx, p, len) <= 0
@@ -476,7 +477,7 @@ int ssl3_alert_code(int code)
     case SSL_AD_USER_CANCELLED:
         return SSL3_AD_HANDSHAKE_FAILURE;
     case SSL_AD_NO_RENEGOTIATION:
-        return -1;            /* Don't send it :-) */
+        return -1; /* Don't send it :-) */
     case SSL_AD_UNSUPPORTED_EXTENSION:
         return SSL3_AD_HANDSHAKE_FAILURE;
     case SSL_AD_CERTIFICATE_UNOBTAINABLE:

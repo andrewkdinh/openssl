@@ -43,14 +43,12 @@ int ossl_dh_generate_ffc_parameters(DH *dh, int type, int pbits, int qbits,
 
 #ifndef FIPS_MODULE
     if (type == DH_PARAMGEN_TYPE_FIPS_186_2)
-        ret = ossl_ffc_params_FIPS186_2_generate(dh->libctx, &dh->params,
-                                                 FFC_PARAM_TYPE_DH,
-                                                 pbits, qbits, &res, cb);
+        ret = ossl_ffc_params_FIPS186_2_generate(
+            dh->libctx, &dh->params, FFC_PARAM_TYPE_DH, pbits, qbits, &res, cb);
     else
 #endif
-        ret = ossl_ffc_params_FIPS186_4_generate(dh->libctx, &dh->params,
-                                                 FFC_PARAM_TYPE_DH,
-                                                 pbits, qbits, &res, cb);
+        ret = ossl_ffc_params_FIPS186_4_generate(
+            dh->libctx, &dh->params, FFC_PARAM_TYPE_DH, pbits, qbits, &res, cb);
     if (ret > 0)
         dh->dirty_cnt++;
     return ret;
@@ -102,8 +100,7 @@ static int dh_gen_named_group(OSSL_LIB_CTX *libctx, DH *ret, int prime_len)
         return 0;
 
     dh = ossl_dh_new_by_nid_ex(libctx, nid);
-    if (dh != NULL
-        && ossl_ffc_params_copy(&ret->params, &dh->params)) {
+    if (dh != NULL && ossl_ffc_params_copy(&ret->params, &dh->params)) {
         ok = 1;
         ret->dirty_cnt++;
     }
@@ -221,11 +218,11 @@ static int dh_builtin_genparams(DH *ret, int prime_len, int generator,
     if (!BN_set_word(ret->params.g, g))
         goto err;
     /* We are using safe prime p, set key length equivalent to RFC 7919 */
-    ret->length = (2 * ossl_ifc_ffc_compute_security_bits(prime_len)
-                   + 24) / 25 * 25;
+    ret->length =
+        (2 * ossl_ifc_ffc_compute_security_bits(prime_len) + 24) / 25 * 25;
     ret->dirty_cnt++;
     ok = 1;
- err:
+err:
     if (ok == -1) {
         ERR_raise(ERR_LIB_DH, ERR_R_BN_LIB);
         ok = 0;

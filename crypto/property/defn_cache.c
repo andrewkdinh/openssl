@@ -53,23 +53,23 @@ void ossl_property_defns_free(void *vproperty_defns)
     LHASH_OF(PROPERTY_DEFN_ELEM) *property_defns = vproperty_defns;
 
     if (property_defns != NULL) {
-        lh_PROPERTY_DEFN_ELEM_doall(property_defns,
-                                    &property_defn_free);
+        lh_PROPERTY_DEFN_ELEM_doall(property_defns, &property_defn_free);
         lh_PROPERTY_DEFN_ELEM_free(property_defns);
     }
 }
 
-void *ossl_property_defns_new(OSSL_LIB_CTX *ctx) {
+void *ossl_property_defns_new(OSSL_LIB_CTX *ctx)
+{
     return lh_PROPERTY_DEFN_ELEM_new(&property_defn_hash, &property_defn_cmp);
 }
 
 OSSL_PROPERTY_LIST *ossl_prop_defn_get(OSSL_LIB_CTX *ctx, const char *prop)
 {
     PROPERTY_DEFN_ELEM elem, *r;
-    LHASH_OF(PROPERTY_DEFN_ELEM) *property_defns;
+    LHASH_OF(PROPERTY_DEFN_ELEM) * property_defns;
 
-    property_defns = ossl_lib_ctx_get_data(ctx,
-                                           OSSL_LIB_CTX_PROPERTY_DEFN_INDEX);
+    property_defns =
+        ossl_lib_ctx_get_data(ctx, OSSL_LIB_CTX_PROPERTY_DEFN_INDEX);
     if (!ossl_assert(property_defns != NULL) || !ossl_lib_ctx_read_lock(ctx))
         return NULL;
 
@@ -91,11 +91,11 @@ int ossl_prop_defn_set(OSSL_LIB_CTX *ctx, const char *prop,
 {
     PROPERTY_DEFN_ELEM elem, *old, *p = NULL;
     size_t len;
-    LHASH_OF(PROPERTY_DEFN_ELEM) *property_defns;
+    LHASH_OF(PROPERTY_DEFN_ELEM) * property_defns;
     int res = 1;
 
-    property_defns = ossl_lib_ctx_get_data(ctx,
-                                           OSSL_LIB_CTX_PROPERTY_DEFN_INDEX);
+    property_defns =
+        ossl_lib_ctx_get_data(ctx, OSSL_LIB_CTX_PROPERTY_DEFN_INDEX);
     if (property_defns == NULL)
         return 0;
 
@@ -130,7 +130,7 @@ int ossl_prop_defn_set(OSSL_LIB_CTX *ctx, const char *prop,
     }
     OPENSSL_free(p);
     res = 0;
- end:
+end:
     ossl_lib_ctx_unlock(ctx);
     return res;
 }

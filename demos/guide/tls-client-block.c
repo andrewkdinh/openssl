@@ -26,7 +26,8 @@
 #include <openssl/err.h>
 
 /* Helper function to create a BIO connected to the server */
-static BIO *create_socket_bio(const char *hostname, const char *port, int family)
+static BIO *create_socket_bio(const char *hostname, const char *port,
+                              int family)
 {
     int sock = -1;
     BIO_ADDRINFO *res;
@@ -36,8 +37,8 @@ static BIO *create_socket_bio(const char *hostname, const char *port, int family
     /*
      * Lookup IP address info for the server.
      */
-    if (!BIO_lookup_ex(hostname, port, BIO_LOOKUP_CLIENT, family, SOCK_STREAM, 0,
-                       &res))
+    if (!BIO_lookup_ex(hostname, port, BIO_LOOKUP_CLIENT, family, SOCK_STREAM,
+                       0, &res))
         return NULL;
 
     /*
@@ -208,7 +209,7 @@ int main(int argc, char *argv[])
          */
         if (SSL_get_verify_result(ssl) != X509_V_OK)
             printf("Verify error: %s\n",
-                X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
+                   X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
         goto end;
     }
 
@@ -254,7 +255,7 @@ int main(int argc, char *argv[])
          * Some error occurred other than a graceful close down by the
          * peer.
          */
-        printf ("Failed reading remaining data\n");
+        printf("Failed reading remaining data\n");
         goto end;
     }
 
@@ -276,7 +277,7 @@ int main(int argc, char *argv[])
 
     /* Success! */
     res = EXIT_SUCCESS;
- end:
+end:
     /*
      * If something bad happened then we will dump the contents of the
      * OpenSSL error stack to stderr. There might be some useful diagnostic

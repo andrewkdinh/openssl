@@ -20,13 +20,15 @@
 #ifndef OPENSSL_NO_SCRYPT
 /* PKCS#5 scrypt password based encryption structures */
 
-ASN1_SEQUENCE(SCRYPT_PARAMS) = {
+ASN1_SEQUENCE(SCRYPT_PARAMS)
+    = {
         ASN1_SIMPLE(SCRYPT_PARAMS, salt, ASN1_OCTET_STRING),
         ASN1_SIMPLE(SCRYPT_PARAMS, costParameter, ASN1_INTEGER),
         ASN1_SIMPLE(SCRYPT_PARAMS, blockSize, ASN1_INTEGER),
         ASN1_SIMPLE(SCRYPT_PARAMS, parallelizationParameter, ASN1_INTEGER),
         ASN1_OPT(SCRYPT_PARAMS, keyLength, ASN1_INTEGER),
-} ASN1_SEQUENCE_END(SCRYPT_PARAMS)
+    }
+ASN1_SEQUENCE_END(SCRYPT_PARAMS)
 
 IMPLEMENT_ASN1_FUNCTIONS(SCRYPT_PARAMS)
 
@@ -135,7 +137,8 @@ X509_ALGOR *PKCS5_pbe2_set_scrypt(const EVP_CIPHER *cipher,
     /* Encode PBE2PARAM into parameter */
 
     if (ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(PBE2PARAM), pbe2,
-                                &ret->parameter) == NULL) {
+                                &ret->parameter)
+        == NULL) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_ASN1_LIB);
         goto err;
     }
@@ -145,7 +148,7 @@ X509_ALGOR *PKCS5_pbe2_set_scrypt(const EVP_CIPHER *cipher,
 
     return ret;
 
- err:
+err:
     PBE2PARAM_free(pbe2);
     X509_ALGOR_free(ret);
     EVP_CIPHER_CTX_free(ctx);
@@ -219,7 +222,8 @@ static X509_ALGOR *pkcs5_scrypt_set(const unsigned char *salt, size_t saltlen,
     /* Encode SCRYPT_PARAMS into parameter of pbe2 */
 
     if (ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(SCRYPT_PARAMS), sparam,
-                                &keyfunc->parameter) == NULL) {
+                                &keyfunc->parameter)
+        == NULL) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_ASN1_LIB);
         goto err;
     }
@@ -227,7 +231,7 @@ static X509_ALGOR *pkcs5_scrypt_set(const unsigned char *salt, size_t saltlen,
     SCRYPT_PARAMS_free(sparam);
     return keyfunc;
 
- err:
+err:
     SCRYPT_PARAMS_free(sparam);
     X509_ALGOR_free(keyfunc);
     return NULL;
@@ -235,8 +239,9 @@ static X509_ALGOR *pkcs5_scrypt_set(const unsigned char *salt, size_t saltlen,
 
 int PKCS5_v2_scrypt_keyivgen_ex(EVP_CIPHER_CTX *ctx, const char *pass,
                                 int passlen, ASN1_TYPE *param,
-                                const EVP_CIPHER *c, const EVP_MD *md, int en_de,
-                                OSSL_LIB_CTX *libctx, const char *propq)
+                                const EVP_CIPHER *c, const EVP_MD *md,
+                                int en_de, OSSL_LIB_CTX *libctx,
+                                const char *propq)
 {
     unsigned char *salt, key[EVP_MAX_KEY_LENGTH];
     uint64_t p, r, N;
@@ -280,8 +285,9 @@ int PKCS5_v2_scrypt_keyivgen_ex(EVP_CIPHER_CTX *ctx, const char *pass,
     if (ASN1_INTEGER_get_uint64(&N, sparam->costParameter) == 0
         || ASN1_INTEGER_get_uint64(&r, sparam->blockSize) == 0
         || ASN1_INTEGER_get_uint64(&p, sparam->parallelizationParameter) == 0
-        || EVP_PBE_scrypt_ex(NULL, 0, NULL, 0, N, r, p, 0, NULL, 0,
-                             libctx, propq) == 0) {
+        || EVP_PBE_scrypt_ex(NULL, 0, NULL, 0, N, r, p, 0, NULL, 0, libctx,
+                             propq)
+            == 0) {
         ERR_raise(ERR_LIB_EVP, EVP_R_ILLEGAL_SCRYPT_PARAMETERS);
         goto err;
     }
@@ -290,22 +296,24 @@ int PKCS5_v2_scrypt_keyivgen_ex(EVP_CIPHER_CTX *ctx, const char *pass,
 
     salt = sparam->salt->data;
     saltlen = sparam->salt->length;
-    if (EVP_PBE_scrypt_ex(pass, passlen, salt, saltlen, N, r, p, 0, key,
-                          keylen, libctx, propq) == 0)
+    if (EVP_PBE_scrypt_ex(pass, passlen, salt, saltlen, N, r, p, 0, key, keylen,
+                          libctx, propq)
+        == 0)
         goto err;
     rv = EVP_CipherInit_ex(ctx, NULL, NULL, key, NULL, en_de);
- err:
+err:
     if (keylen)
         OPENSSL_cleanse(key, keylen);
     SCRYPT_PARAMS_free(sparam);
     return rv;
 }
 
-int PKCS5_v2_scrypt_keyivgen(EVP_CIPHER_CTX *ctx, const char *pass,
-                             int passlen, ASN1_TYPE *param,
-                             const EVP_CIPHER *c, const EVP_MD *md, int en_de)
+int PKCS5_v2_scrypt_keyivgen(EVP_CIPHER_CTX *ctx, const char *pass, int passlen,
+                             ASN1_TYPE *param, const EVP_CIPHER *c,
+                             const EVP_MD *md, int en_de)
 {
-    return PKCS5_v2_scrypt_keyivgen_ex(ctx, pass, passlen, param, c, md, en_de, NULL, NULL);
+    return PKCS5_v2_scrypt_keyivgen_ex(ctx, pass, passlen, param, c, md, en_de,
+                                       NULL, NULL);
 }
 
 #endif /* OPENSSL_NO_SCRYPT */

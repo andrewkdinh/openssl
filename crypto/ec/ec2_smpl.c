@@ -86,11 +86,11 @@ int ossl_ec_GF2m_simple_group_copy(EC_GROUP *dest, const EC_GROUP *src)
     dest->poly[3] = src->poly[3];
     dest->poly[4] = src->poly[4];
     dest->poly[5] = src->poly[5];
-    if (bn_wexpand(dest->a, (int)(dest->poly[0] + BN_BITS2 - 1) / BN_BITS2) ==
-        NULL)
+    if (bn_wexpand(dest->a, (int)(dest->poly[0] + BN_BITS2 - 1) / BN_BITS2)
+        == NULL)
         return 0;
-    if (bn_wexpand(dest->b, (int)(dest->poly[0] + BN_BITS2 - 1) / BN_BITS2) ==
-        NULL)
+    if (bn_wexpand(dest->b, (int)(dest->poly[0] + BN_BITS2 - 1) / BN_BITS2)
+        == NULL)
         return 0;
     bn_set_all_zero(dest->a);
     bn_set_all_zero(dest->b);
@@ -98,9 +98,9 @@ int ossl_ec_GF2m_simple_group_copy(EC_GROUP *dest, const EC_GROUP *src)
 }
 
 /* Set the curve parameters of an EC_GROUP structure. */
-int ossl_ec_GF2m_simple_group_set_curve(EC_GROUP *group,
-                                        const BIGNUM *p, const BIGNUM *a,
-                                        const BIGNUM *b, BN_CTX *ctx)
+int ossl_ec_GF2m_simple_group_set_curve(EC_GROUP *group, const BIGNUM *p,
+                                        const BIGNUM *a, const BIGNUM *b,
+                                        BN_CTX *ctx)
 {
     int ret = 0, i;
 
@@ -130,7 +130,7 @@ int ossl_ec_GF2m_simple_group_set_curve(EC_GROUP *group,
     bn_set_all_zero(group->b);
 
     ret = 1;
- err:
+err:
     return ret;
 }
 
@@ -160,7 +160,7 @@ int ossl_ec_GF2m_simple_group_get_curve(const EC_GROUP *group, BIGNUM *p,
 
     ret = 1;
 
- err:
+err:
     return ret;
 }
 
@@ -182,7 +182,7 @@ int ossl_ec_GF2m_simple_group_check_discriminant(const EC_GROUP *group,
 {
     int ret = 0;
     BIGNUM *b;
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX *new_ctx = NULL;
 
     if (ctx == NULL) {
@@ -192,7 +192,7 @@ int ossl_ec_GF2m_simple_group_check_discriminant(const EC_GROUP *group,
             goto err;
         }
     }
-#endif
+# endif
     BN_CTX_start(ctx);
     b = BN_CTX_get(ctx);
     if (b == NULL)
@@ -210,11 +210,11 @@ int ossl_ec_GF2m_simple_group_check_discriminant(const EC_GROUP *group,
 
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return ret;
 }
 
@@ -309,7 +309,7 @@ int ossl_ec_GF2m_simple_point_set_affine_coordinates(const EC_GROUP *group,
     point->Z_is_one = 1;
     ret = 1;
 
- err:
+err:
     return ret;
 }
 
@@ -345,7 +345,7 @@ int ossl_ec_GF2m_simple_point_get_affine_coordinates(const EC_GROUP *group,
     }
     ret = 1;
 
- err:
+err:
     return ret;
 }
 
@@ -358,9 +358,9 @@ int ossl_ec_GF2m_simple_add(const EC_GROUP *group, EC_POINT *r,
 {
     BIGNUM *x0, *y0, *x1, *y1, *x2, *y2, *s, *t;
     int ret = 0;
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX *new_ctx = NULL;
-#endif
+# endif
 
     if (EC_POINT_is_at_infinity(group, a)) {
         if (!EC_POINT_copy(r, b))
@@ -374,13 +374,13 @@ int ossl_ec_GF2m_simple_add(const EC_GROUP *group, EC_POINT *r,
         return 1;
     }
 
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     if (ctx == NULL) {
         ctx = new_ctx = BN_CTX_new();
         if (ctx == NULL)
             return 0;
     }
-#endif
+# endif
 
     BN_CTX_start(ctx);
     x0 = BN_CTX_get(ctx);
@@ -462,11 +462,11 @@ int ossl_ec_GF2m_simple_add(const EC_GROUP *group, EC_POINT *r,
 
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return ret;
 }
 
@@ -505,17 +505,17 @@ int ossl_ec_GF2m_simple_is_at_infinity(const EC_GROUP *group,
  * in the EC_GROUP.  A point is valid if it satisfies the Weierstrass equation:
  *      y^2 + x*y = x^3 + a*x^2 + b.
  */
-int ossl_ec_GF2m_simple_is_on_curve(const EC_GROUP *group, const EC_POINT *point,
-                                    BN_CTX *ctx)
+int ossl_ec_GF2m_simple_is_on_curve(const EC_GROUP *group,
+                                    const EC_POINT *point, BN_CTX *ctx)
 {
     int ret = -1;
     BIGNUM *lh, *y2;
-    int (*field_mul) (const EC_GROUP *, BIGNUM *, const BIGNUM *,
-                      const BIGNUM *, BN_CTX *);
-    int (*field_sqr) (const EC_GROUP *, BIGNUM *, const BIGNUM *, BN_CTX *);
-#ifndef FIPS_MODULE
+    int (*field_mul)(const EC_GROUP *, BIGNUM *, const BIGNUM *, const BIGNUM *,
+                     BN_CTX *);
+    int (*field_sqr)(const EC_GROUP *, BIGNUM *, const BIGNUM *, BN_CTX *);
+# ifndef FIPS_MODULE
     BN_CTX *new_ctx = NULL;
-#endif
+# endif
 
     if (EC_POINT_is_at_infinity(group, point))
         return 1;
@@ -527,13 +527,13 @@ int ossl_ec_GF2m_simple_is_on_curve(const EC_GROUP *group, const EC_POINT *point
     if (!point->Z_is_one)
         return -1;
 
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     if (ctx == NULL) {
         ctx = new_ctx = BN_CTX_new();
         if (ctx == NULL)
             return -1;
     }
-#endif
+# endif
 
     BN_CTX_start(ctx);
     y2 = BN_CTX_get(ctx);
@@ -563,11 +563,11 @@ int ossl_ec_GF2m_simple_is_on_curve(const EC_GROUP *group, const EC_POINT *point
         goto err;
     ret = BN_is_zero(lh);
 
- err:
+err:
     BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return ret;
 }
 
@@ -583,9 +583,9 @@ int ossl_ec_GF2m_simple_cmp(const EC_GROUP *group, const EC_POINT *a,
 {
     BIGNUM *aX, *aY, *bX, *bY;
     int ret = -1;
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX *new_ctx = NULL;
-#endif
+# endif
 
     if (EC_POINT_is_at_infinity(group, a)) {
         return EC_POINT_is_at_infinity(group, b) ? 0 : 1;
@@ -598,13 +598,13 @@ int ossl_ec_GF2m_simple_cmp(const EC_GROUP *group, const EC_POINT *a,
         return ((BN_cmp(a->X, b->X) == 0) && BN_cmp(a->Y, b->Y) == 0) ? 0 : 1;
     }
 
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     if (ctx == NULL) {
         ctx = new_ctx = BN_CTX_new();
         if (ctx == NULL)
             return -1;
     }
-#endif
+# endif
 
     BN_CTX_start(ctx);
     aX = BN_CTX_get(ctx);
@@ -620,11 +620,11 @@ int ossl_ec_GF2m_simple_cmp(const EC_GROUP *group, const EC_POINT *a,
         goto err;
     ret = ((BN_cmp(aX, bX) == 0) && BN_cmp(aY, bY) == 0) ? 0 : 1;
 
- err:
+err:
     BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return ret;
 }
 
@@ -634,20 +634,20 @@ int ossl_ec_GF2m_simple_make_affine(const EC_GROUP *group, EC_POINT *point,
 {
     BIGNUM *x, *y;
     int ret = 0;
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX *new_ctx = NULL;
-#endif
+# endif
 
     if (point->Z_is_one || EC_POINT_is_at_infinity(group, point))
         return 1;
 
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     if (ctx == NULL) {
         ctx = new_ctx = BN_CTX_new();
         if (ctx == NULL)
             return 0;
     }
-#endif
+# endif
 
     BN_CTX_start(ctx);
     x = BN_CTX_get(ctx);
@@ -667,11 +667,11 @@ int ossl_ec_GF2m_simple_make_affine(const EC_GROUP *group, EC_POINT *point,
 
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
-#ifndef FIPS_MODULE
+# ifndef FIPS_MODULE
     BN_CTX_free(new_ctx);
-#endif
+# endif
     return ret;
 }
 
@@ -718,10 +718,8 @@ int ossl_ec_GF2m_simple_field_div(const EC_GROUP *group, BIGNUM *r,
  * Modified to blind s and r independently.
  * s:= p, r := 2p
  */
-static
-int ec_GF2m_simple_ladder_pre(const EC_GROUP *group,
-                              EC_POINT *r, EC_POINT *s,
-                              EC_POINT *p, BN_CTX *ctx)
+static int ec_GF2m_simple_ladder_pre(const EC_GROUP *group, EC_POINT *r,
+                                     EC_POINT *s, EC_POINT *p, BN_CTX *ctx)
 {
     /* if p is not affine, something is wrong */
     if (p->Z_is_one == 0)
@@ -771,10 +769,8 @@ int ec_GF2m_simple_ladder_pre(const EC_GROUP *group,
  * http://www.hyperelliptic.org/EFD/g12o/auto-code/shortw/xz/ladder/mladd-2003-s.op3
  * s := r + s, r := 2r
  */
-static
-int ec_GF2m_simple_ladder_step(const EC_GROUP *group,
-                               EC_POINT *r, EC_POINT *s,
-                               EC_POINT *p, BN_CTX *ctx)
+static int ec_GF2m_simple_ladder_step(const EC_GROUP *group, EC_POINT *r,
+                                      EC_POINT *s, EC_POINT *p, BN_CTX *ctx)
 {
     if (!group->meth->field_mul(group, r->Y, r->Z, s->X, ctx)
         || !group->meth->field_mul(group, s->X, r->X, s->Z, ctx)
@@ -801,10 +797,8 @@ int ec_GF2m_simple_ladder_step(const EC_GROUP *group,
  * without Precomputation" (Lopez and Dahab, CHES 1999),
  * Appendix Alg Mxy.
  */
-static
-int ec_GF2m_simple_ladder_post(const EC_GROUP *group,
-                               EC_POINT *r, EC_POINT *s,
-                               EC_POINT *p, BN_CTX *ctx)
+static int ec_GF2m_simple_ladder_post(const EC_GROUP *group, EC_POINT *r,
+                                      EC_POINT *s, EC_POINT *p, BN_CTX *ctx)
 {
     int ret = 0;
     BIGNUM *t0, *t1, *t2 = NULL;
@@ -813,8 +807,7 @@ int ec_GF2m_simple_ladder_post(const EC_GROUP *group,
         return EC_POINT_set_to_infinity(group, r);
 
     if (BN_is_zero(s->Z)) {
-        if (!EC_POINT_copy(r, p)
-            || !EC_POINT_invert(group, r, ctx)) {
+        if (!EC_POINT_copy(r, p) || !EC_POINT_invert(group, r, ctx)) {
             ERR_raise(ERR_LIB_EC, ERR_R_EC_LIB);
             return 0;
         }
@@ -847,8 +840,7 @@ int ec_GF2m_simple_ladder_post(const EC_GROUP *group,
         || !group->meth->field_mul(group, r->X, r->Z, t2, ctx)
         || !BN_GF2m_add(t2, p->X, r->X)
         || !group->meth->field_mul(group, t2, t2, t1, ctx)
-        || !BN_GF2m_add(r->Y, p->Y, t2)
-        || !BN_one(r->Z))
+        || !BN_GF2m_add(r->Y, p->Y, t2) || !BN_one(r->Z))
         goto err;
 
     r->Z_is_one = 1;
@@ -859,17 +851,15 @@ int ec_GF2m_simple_ladder_post(const EC_GROUP *group,
 
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
 
-static
-int ec_GF2m_simple_points_mul(const EC_GROUP *group, EC_POINT *r,
-                              const BIGNUM *scalar, size_t num,
-                              const EC_POINT *points[],
-                              const BIGNUM *scalars[],
-                              BN_CTX *ctx)
+static int ec_GF2m_simple_points_mul(const EC_GROUP *group, EC_POINT *r,
+                                     const BIGNUM *scalar, size_t num,
+                                     const EC_POINT *points[],
+                                     const BIGNUM *scalars[], BN_CTX *ctx)
 {
     int ret = 0;
     EC_POINT *t = NULL;
@@ -916,7 +906,7 @@ int ec_GF2m_simple_points_mul(const EC_GROUP *group, EC_POINT *r,
 
     ret = 1;
 
- err:
+err:
     EC_POINT_free(t);
     return ret;
 }
@@ -994,8 +984,7 @@ const EC_METHOD *EC_GF2m_simple_method(void)
         0, /* blind_coordinates */
         ec_GF2m_simple_ladder_pre,
         ec_GF2m_simple_ladder_step,
-        ec_GF2m_simple_ladder_post
-    };
+        ec_GF2m_simple_ladder_post};
 
     return &ret;
 }

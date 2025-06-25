@@ -35,8 +35,8 @@ int EC_POINT_set_compressed_coordinates(const EC_GROUP *group, EC_POINT *point,
     }
     if (group->meth->flags & EC_FLAGS_DEFAULT_OCT) {
         if (group->meth->field_type == NID_X9_62_prime_field)
-            return ossl_ec_GFp_simple_set_compressed_coordinates(group, point, x,
-                                                                 y_bit, ctx);
+            return ossl_ec_GFp_simple_set_compressed_coordinates(group, point,
+                                                                 x, y_bit, ctx);
         else
 #ifdef OPENSSL_NO_EC2M
         {
@@ -44,12 +44,12 @@ int EC_POINT_set_compressed_coordinates(const EC_GROUP *group, EC_POINT *point,
             return 0;
         }
 #else
-            return ossl_ec_GF2m_simple_set_compressed_coordinates(group, point,
-                                                                  x, y_bit, ctx);
+            return ossl_ec_GF2m_simple_set_compressed_coordinates(
+                group, point, x, y_bit, ctx);
 #endif
     }
-    return group->meth->point_set_compressed_coordinates(group, point, x,
-                                                         y_bit, ctx);
+    return group->meth->point_set_compressed_coordinates(group, point, x, y_bit,
+                                                         ctx);
 }
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
@@ -98,8 +98,8 @@ size_t EC_POINT_point2oct(const EC_GROUP *group, const EC_POINT *point,
             return 0;
         }
 #else
-            return ossl_ec_GF2m_simple_point2oct(group, point,
-                                                 form, buf, len, ctx);
+            return ossl_ec_GF2m_simple_point2oct(group, point, form, buf, len,
+                                                 ctx);
 #endif
     }
 
@@ -135,8 +135,8 @@ int EC_POINT_oct2point(const EC_GROUP *group, EC_POINT *point,
 }
 
 size_t EC_POINT_point2buf(const EC_GROUP *group, const EC_POINT *point,
-                          point_conversion_form_t form,
-                          unsigned char **pbuf, BN_CTX *ctx)
+                          point_conversion_form_t form, unsigned char **pbuf,
+                          BN_CTX *ctx)
 {
     size_t len;
     unsigned char *buf;

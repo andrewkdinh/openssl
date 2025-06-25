@@ -40,8 +40,7 @@ int ossl_dsa_key_fromdata(DSA *dsa, const OSSL_PARAM params[],
         param_priv_key =
             OSSL_PARAM_locate_const(params, OSSL_PKEY_PARAM_PRIV_KEY);
     }
-    param_pub_key =
-        OSSL_PARAM_locate_const(params, OSSL_PKEY_PARAM_PUB_KEY);
+    param_pub_key = OSSL_PARAM_locate_const(params, OSSL_PKEY_PARAM_PUB_KEY);
 
     /* It's ok if neither half is present */
     if (param_priv_key == NULL && param_pub_key == NULL)
@@ -57,7 +56,7 @@ int ossl_dsa_key_fromdata(DSA *dsa, const OSSL_PARAM params[],
 
     return 1;
 
- err:
+err:
     BN_clear_free(priv_key);
     BN_free(pub_key);
     return 0;
@@ -107,14 +106,14 @@ DSA *ossl_dsa_dup(const DSA *dsa, int selection)
         goto err;
 
 #ifndef FIPS_MODULE
-    if (!CRYPTO_dup_ex_data(CRYPTO_EX_INDEX_DSA,
-                            &dupkey->ex_data, &dsa->ex_data))
+    if (!CRYPTO_dup_ex_data(CRYPTO_EX_INDEX_DSA, &dupkey->ex_data,
+                            &dsa->ex_data))
         goto err;
 #endif
 
     return dupkey;
 
- err:
+err:
     DSA_free(dupkey);
     return NULL;
 }
@@ -180,14 +179,14 @@ DSA *ossl_dsa_key_from_pkcs8(const PKCS8_PRIV_KEY_INFO *p8inf,
 
     goto done;
 
- decerr:
+decerr:
     ERR_raise(ERR_LIB_DSA, DSA_R_DECODE_ERROR);
- dsaerr:
+dsaerr:
     BN_free(dsa_privkey);
     BN_free(dsa_pubkey);
     DSA_free(dsa);
     dsa = NULL;
- done:
+done:
     BN_CTX_free(ctx);
     ASN1_STRING_clear_free(privkey);
     return dsa;

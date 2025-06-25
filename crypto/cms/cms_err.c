@@ -166,8 +166,7 @@ static const ERR_STRING_DATA CMS_str_reasons[] = {
     {ERR_PACK(ERR_LIB_CMS, 0, CMS_R_VERIFICATION_FAILURE),
      "verification failure"},
     {ERR_PACK(ERR_LIB_CMS, 0, CMS_R_WRAP_ERROR), "wrap error"},
-    {0, NULL}
-};
+    {0, NULL}};
 
 # endif
 

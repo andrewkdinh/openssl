@@ -76,10 +76,8 @@ static int do_create(const char *value, const char *name)
         ostr = p + 1;
         if (*ostr == '\0')
             return 0;
-        while (ossl_isspace(*ostr))
-            ostr++;
-        while (ossl_isspace(*ln))
-            ln++;
+        while (ossl_isspace(*ostr)) ostr++;
+        while (ossl_isspace(*ln)) ln++;
         p--;
         while (ossl_isspace(*p)) {
             if (p == ln)

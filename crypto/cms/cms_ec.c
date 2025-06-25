@@ -30,8 +30,8 @@ static EVP_PKEY *pkey_type2param(int ptype, const void *pval,
         size_t pmlen = (size_t)pstr->length;
         int selection = OSSL_KEYMGMT_SELECT_ALL_PARAMETERS;
 
-        ctx = OSSL_DECODER_CTX_new_for_pkey(&pkey, "DER", NULL, "EC",
-                                            selection, libctx, propq);
+        ctx = OSSL_DECODER_CTX_new_for_pkey(&pkey, "DER", NULL, "EC", selection,
+                                            libctx, propq);
         if (ctx == NULL)
             goto err;
 
@@ -50,7 +50,7 @@ static EVP_PKEY *pkey_type2param(int ptype, const void *pval,
         if (pctx == NULL || EVP_PKEY_paramgen_init(pctx) <= 0)
             goto err;
         if (OBJ_obj2txt(groupname, sizeof(groupname), poid, 0) <= 0
-                || EVP_PKEY_CTX_set_group_name(pctx, groupname) <= 0) {
+            || EVP_PKEY_CTX_set_group_name(pctx, groupname) <= 0) {
             ERR_raise(ERR_LIB_CMS, CMS_R_DECODE_ERROR);
             goto err;
         }
@@ -63,15 +63,15 @@ static EVP_PKEY *pkey_type2param(int ptype, const void *pval,
     ERR_raise(ERR_LIB_CMS, CMS_R_DECODE_ERROR);
     return NULL;
 
- err:
+err:
     EVP_PKEY_free(pkey);
     EVP_PKEY_CTX_free(pctx);
     OSSL_DECODER_CTX_free(ctx);
     return NULL;
 }
 
-static int ecdh_cms_set_peerkey(EVP_PKEY_CTX *pctx,
-                                X509_ALGOR *alg, ASN1_BIT_STRING *pubkey)
+static int ecdh_cms_set_peerkey(EVP_PKEY_CTX *pctx, X509_ALGOR *alg,
+                                ASN1_BIT_STRING *pubkey)
 {
     const ASN1_OBJECT *aoid;
     int atype;
@@ -99,8 +99,7 @@ static int ecdh_cms_set_peerkey(EVP_PKEY_CTX *pctx,
         if (!EVP_PKEY_copy_parameters(pkpeer, pk))
             goto err;
     } else {
-        pkpeer = pkey_type2param(atype, aval,
-                                 EVP_PKEY_CTX_get0_libctx(pctx),
+        pkpeer = pkey_type2param(atype, aval, EVP_PKEY_CTX_get0_libctx(pctx),
                                  EVP_PKEY_CTX_get0_propq(pctx));
         if (pkpeer == NULL)
             goto err;
@@ -116,7 +115,7 @@ static int ecdh_cms_set_peerkey(EVP_PKEY_CTX *pctx,
 
     if (EVP_PKEY_derive_set_peer(pctx, pkpeer) > 0)
         rv = 1;
- err:
+err:
     EVP_PKEY_free(pkpeer);
     return rv;
 }
@@ -189,7 +188,8 @@ static int ecdh_cms_set_shared_info(EVP_PKEY_CTX *pctx, CMS_RecipientInfo *ri)
         goto err;
     OBJ_obj2txt(name, sizeof(name), kekalg->algorithm, 0);
     kekcipher = EVP_CIPHER_fetch(pctx->libctx, name, pctx->propquery);
-    if (kekcipher == NULL || EVP_CIPHER_get_mode(kekcipher) != EVP_CIPH_WRAP_MODE)
+    if (kekcipher == NULL
+        || EVP_CIPHER_get_mode(kekcipher) != EVP_CIPH_WRAP_MODE)
         goto err;
     if (!EVP_EncryptInit_ex(kekctx, kekcipher, NULL, NULL, NULL))
         goto err;
@@ -210,7 +210,7 @@ static int ecdh_cms_set_shared_info(EVP_PKEY_CTX *pctx, CMS_RecipientInfo *ri)
     der = NULL;
 
     rv = 1;
- err:
+err:
     EVP_CIPHER_free(kekcipher);
     X509_ALGOR_free(kekalg);
     OPENSSL_free(der);
@@ -229,8 +229,8 @@ static int ecdh_cms_decrypt(CMS_RecipientInfo *ri)
         X509_ALGOR *alg;
         ASN1_BIT_STRING *pubkey;
 
-        if (!CMS_RecipientInfo_kari_get0_orig_id(ri, &alg, &pubkey,
-                                                 NULL, NULL, NULL))
+        if (!CMS_RecipientInfo_kari_get0_orig_id(ri, &alg, &pubkey, NULL, NULL,
+                                                 NULL))
             return 0;
         if (alg == NULL || pubkey == NULL)
             return 0;
@@ -269,8 +269,8 @@ static int ecdh_cms_encrypt(CMS_RecipientInfo *ri)
         return 0;
     /* Get ephemeral key */
     pkey = EVP_PKEY_CTX_get0_pkey(pctx);
-    if (!CMS_RecipientInfo_kari_get0_orig_id(ri, &talg, &pubkey,
-                                             NULL, NULL, NULL))
+    if (!CMS_RecipientInfo_kari_get0_orig_id(ri, &talg, &pubkey, NULL, NULL,
+                                             NULL))
         goto err;
     X509_ALGOR_get0(&aoid, NULL, NULL, talg);
     /* Is everything uninitialised? */
@@ -373,7 +373,7 @@ static int ecdh_cms_encrypt(CMS_RecipientInfo *ri)
     if (!rv)
         ASN1_STRING_free(wrap_str);
 
- err:
+err:
     OPENSSL_free(penc);
     X509_ALGOR_free(wrap_alg);
     return rv;

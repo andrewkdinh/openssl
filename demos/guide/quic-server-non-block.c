@@ -67,8 +67,8 @@ static void warnx(const char *fmt, ...)
  * are accepted.
  */
 static const unsigned char alpn_ossltest[] = {
-    8,  'h', 't', 't', 'p', '/', '1', '.', '0',
-    10, 'h', 'q', '-', 'i', 'n', 't', 'e', 'r', 'o', 'p',
+    8,   'h', 't', 't', 'p', '/', '1', '.', '0', 10,
+    'h', 'q', '-', 'i', 'n', 't', 'e', 'r', 'o', 'p',
 };
 
 /*
@@ -79,8 +79,8 @@ static int select_alpn(SSL *ssl, const unsigned char **out,
                        unsigned int in_len, void *arg)
 {
     if (SSL_select_next_proto((unsigned char **)out, out_len, alpn_ossltest,
-                              sizeof(alpn_ossltest), in,
-                              in_len) == OPENSSL_NPN_NEGOTIATED)
+                              sizeof(alpn_ossltest), in, in_len)
+        == OPENSSL_NPN_NEGOTIATED)
         return SSL_TLSEXT_ERR_OK;
     return SSL_TLSEXT_ERR_ALERT_FATAL;
 }
@@ -413,9 +413,8 @@ static int run_quic_server(SSL_CTX *ctx, int fd)
         }
 
         /* Echo client input */
-        while (!SSL_write_ex2(conn, buf,
-                              total_read,
-                              SSL_WRITE_FLAG_CONCLUDE, &total_written)) {
+        while (!SSL_write_ex2(conn, buf, total_read, SSL_WRITE_FLAG_CONCLUDE,
+                              &total_written)) {
             if (handle_io_failure(conn, 0) == 1)
                 continue;
             fprintf(stderr, "Failed to write data\n");

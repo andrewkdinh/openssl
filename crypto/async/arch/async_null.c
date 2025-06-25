@@ -35,4 +35,3 @@ void async_local_cleanup(void)
 {
 }
 #endif
-

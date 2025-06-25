@@ -13,7 +13,7 @@
 #include "ui_local.h"
 
 #ifndef BUFSIZ
-#define BUFSIZ 256
+# define BUFSIZ 256
 #endif
 
 int UI_UTIL_read_pw_string(char *buf, int length, const char *prompt,
@@ -22,9 +22,8 @@ int UI_UTIL_read_pw_string(char *buf, int length, const char *prompt,
     char buff[BUFSIZ];
     int ret;
 
-    ret =
-        UI_UTIL_read_pw(buf, buff, (length > BUFSIZ) ? BUFSIZ : length,
-                        prompt, verify);
+    ret = UI_UTIL_read_pw(buf, buff, (length > BUFSIZ) ? BUFSIZ : length,
+                          prompt, verify);
     OPENSSL_cleanse(buff, BUFSIZ);
     return ret;
 }
@@ -89,10 +88,9 @@ static CRYPTO_ONCE get_index_once = CRYPTO_ONCE_STATIC_INIT;
 static int ui_method_data_index = -1;
 DEFINE_RUN_ONCE_STATIC(ui_method_data_index_init)
 {
-    ui_method_data_index = CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_UI_METHOD,
-                                                   0, NULL, ui_new_method_data,
-                                                   ui_dup_method_data,
-                                                   ui_free_method_data);
+    ui_method_data_index = CRYPTO_get_ex_new_index(
+        CRYPTO_EX_INDEX_UI_METHOD, 0, NULL, ui_new_method_data,
+        ui_dup_method_data, ui_free_method_data);
     return 1;
 }
 
@@ -103,28 +101,26 @@ static int ui_open(UI *ui)
 static int ui_read(UI *ui, UI_STRING *uis)
 {
     switch (UI_get_string_type(uis)) {
-    case UIT_PROMPT:
-        {
-            int len;
-            char result[PEM_BUFSIZE + 1]; /* reserve one byte at the end */
-            const struct pem_password_cb_data *data =
-                UI_method_get_ex_data(UI_get_method(ui), ui_method_data_index);
-            int maxsize = UI_get_result_maxsize(uis);
+    case UIT_PROMPT: {
+        int len;
+        char result[PEM_BUFSIZE + 1]; /* reserve one byte at the end */
+        const struct pem_password_cb_data *data =
+            UI_method_get_ex_data(UI_get_method(ui), ui_method_data_index);
+        int maxsize = UI_get_result_maxsize(uis);
 
-            if (maxsize > PEM_BUFSIZE)
-                maxsize = PEM_BUFSIZE;
-            len = data->cb(result, maxsize, data->rwflag,
-                           UI_get0_user_data(ui));
-            if (len > maxsize)
-                return -1;
-            if (len >= 0)
-                result[len] = '\0';
-            if (len < 0)
-                return len;
-            if (UI_set_result_ex(ui, uis, result, len) >= 0)
-                return 1;
-            return 0;
-        }
+        if (maxsize > PEM_BUFSIZE)
+            maxsize = PEM_BUFSIZE;
+        len = data->cb(result, maxsize, data->rwflag, UI_get0_user_data(ui));
+        if (len > maxsize)
+            return -1;
+        if (len >= 0)
+            result[len] = '\0';
+        if (len < 0)
+            return len;
+        if (UI_set_result_ex(ui, uis, result, len) >= 0)
+            return 1;
+        return 0;
+    }
     case UIT_VERIFY:
     case UIT_NONE:
     case UIT_BOOLEAN:
@@ -149,7 +145,8 @@ UI_METHOD *UI_UTIL_wrap_read_pem_callback(pem_password_cb *cb, int rwflag)
     UI_METHOD *ui_method = NULL;
 
     if ((data = OPENSSL_zalloc(sizeof(*data))) == NULL
-        || (ui_method = UI_create_method("PEM password callback wrapper")) == NULL
+        || (ui_method = UI_create_method("PEM password callback wrapper"))
+            == NULL
         || UI_method_set_opener(ui_method, ui_open) < 0
         || UI_method_set_reader(ui_method, ui_read) < 0
         || UI_method_set_writer(ui_method, ui_write) < 0

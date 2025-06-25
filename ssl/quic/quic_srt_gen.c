@@ -11,8 +11,8 @@
 #include <openssl/evp.h>
 
 struct quic_srt_gen_st {
-    EVP_MAC         *mac;
-    EVP_MAC_CTX     *mac_ctx;
+    EVP_MAC *mac;
+    EVP_MAC_CTX *mac_ctx;
 };
 
 /*

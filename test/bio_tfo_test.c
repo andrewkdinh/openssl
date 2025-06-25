@@ -46,8 +46,8 @@
  * The 4th time is client-TFO only, the 5th time is server-TFO only.
  */
 
-#  define SOCKET_DATA "FooBar"
-#  define SOCKET_DATA_LEN sizeof(SOCKET_DATA)
+# define SOCKET_DATA "FooBar"
+# define SOCKET_DATA_LEN sizeof(SOCKET_DATA)
 
 static int test_bio_tfo(int idx)
 {
@@ -81,10 +81,10 @@ static int test_bio_tfo(int idx)
 
     /* ACCEPT SOCKET */
     if (!TEST_ptr(abio = BIO_new_accept("localhost:0"))
-            || !TEST_true(BIO_set_nbio_accept(abio, 1))
-            || !TEST_true(BIO_set_tfo_accept(abio, server_tfo))
-            || !TEST_int_gt(BIO_do_accept(abio), 0)
-            || !TEST_ptr(port = BIO_get_accept_port(abio))) {
+        || !TEST_true(BIO_set_nbio_accept(abio, 1))
+        || !TEST_true(BIO_set_tfo_accept(abio, server_tfo))
+        || !TEST_int_gt(BIO_do_accept(abio), 0)
+        || !TEST_ptr(port = BIO_get_accept_port(abio))) {
         sockerr = get_last_socket_error();
         goto err;
     }
@@ -93,9 +93,9 @@ static int test_bio_tfo(int idx)
 
     /* CLIENT SOCKET */
     if (!TEST_ptr(cbio = BIO_new_connect("localhost"))
-            || !TEST_long_gt(BIO_set_conn_port(cbio, port), 0)
-            || !TEST_long_gt(BIO_set_nbio(cbio, 1), 0)
-            || !TEST_long_gt(BIO_set_tfo(cbio, client_tfo), 0)) {
+        || !TEST_long_gt(BIO_set_conn_port(cbio, port), 0)
+        || !TEST_long_gt(BIO_set_nbio(cbio, 1), 0)
+        || !TEST_long_gt(BIO_set_tfo(cbio, client_tfo), 0)) {
         sockerr = get_last_socket_error();
         goto err;
     }
@@ -141,13 +141,20 @@ static int test_bio_tfo(int idx)
         }
     } else {
         if (idx == 0)
-            BIO_printf(bio_err, "Success: non-TFO connection accepted without data\n");
+            BIO_printf(bio_err,
+                       "Success: non-TFO connection accepted without data\n");
         else if (idx == 1)
-            BIO_printf(bio_err, "Ignore: connection accepted before data, possibly no TFO cookie, or TFO may not be enabled\n");
+            BIO_printf(
+                bio_err,
+                "Ignore: connection accepted before data, possibly no TFO cookie, or TFO may not be enabled\n");
         else if (idx == 4)
-            BIO_printf(bio_err, "Success: connection accepted before data, client TFO is disabled\n");
+            BIO_printf(
+                bio_err,
+                "Success: connection accepted before data, client TFO is disabled\n");
         else
-            BIO_printf(bio_err, "Warning: connection accepted before data, TFO may not be enabled\n");
+            BIO_printf(
+                bio_err,
+                "Warning: connection accepted before data, TFO may not be enabled\n");
         sbio = BIO_pop(abio);
         goto success;
     }
@@ -173,9 +180,10 @@ static int test_bio_tfo(int idx)
     }
     BIO_printf(bio_err, "Success: Server accepted socket after write\n");
     if (!TEST_ptr(sbio = BIO_pop(abio))
-            || !TEST_true(BIO_read_ex(sbio, read_buffer, sizeof(read_buffer), &bytes))
-            || !TEST_size_t_eq(bytes, SOCKET_DATA_LEN)
-            || !TEST_strn_eq(read_buffer, SOCKET_DATA, SOCKET_DATA_LEN)) {
+        || !TEST_true(
+            BIO_read_ex(sbio, read_buffer, sizeof(read_buffer), &bytes))
+        || !TEST_size_t_eq(bytes, SOCKET_DATA_LEN)
+        || !TEST_strn_eq(read_buffer, SOCKET_DATA, SOCKET_DATA_LEN)) {
         sockerr = get_last_socket_error();
         goto err;
     }
@@ -242,31 +250,34 @@ static int test_fd_tfo(int idx)
         goto err;
 
     switch (ai->ai_family) {
-        case AF_INET:
-            port = ((struct sockaddr_in *)ai->ai_addr)->sin_port;
-            addr = &((struct sockaddr_in *)ai->ai_addr)->sin_addr;
-            addrlen = sizeof(((struct sockaddr_in *)ai->ai_addr)->sin_addr);
-            BIO_printf(bio_err, "Using IPv4\n");
-            break;
-        case AF_INET6:
-            port = ((struct sockaddr_in6 *)ai->ai_addr)->sin6_port;
-            addr = &((struct sockaddr_in6 *)ai->ai_addr)->sin6_addr;
-            addrlen = sizeof(((struct sockaddr_in6 *)ai->ai_addr)->sin6_addr);
-            BIO_printf(bio_err, "Using IPv6\n");
-            break;
-        default:
-            BIO_printf(bio_err, "Unknown address family %d\n", ai->ai_family);
-            goto err;
+    case AF_INET:
+        port = ((struct sockaddr_in *)ai->ai_addr)->sin_port;
+        addr = &((struct sockaddr_in *)ai->ai_addr)->sin_addr;
+        addrlen = sizeof(((struct sockaddr_in *)ai->ai_addr)->sin_addr);
+        BIO_printf(bio_err, "Using IPv4\n");
+        break;
+    case AF_INET6:
+        port = ((struct sockaddr_in6 *)ai->ai_addr)->sin6_port;
+        addr = &((struct sockaddr_in6 *)ai->ai_addr)->sin6_addr;
+        addrlen = sizeof(((struct sockaddr_in6 *)ai->ai_addr)->sin6_addr);
+        BIO_printf(bio_err, "Using IPv6\n");
+        break;
+    default:
+        BIO_printf(bio_err, "Unknown address family %d\n", ai->ai_family);
+        goto err;
     }
 
     if (!TEST_ptr(baddr = BIO_ADDR_new())
-            || !TEST_true(BIO_ADDR_rawmake(baddr, ai->ai_family, addr, addrlen, port)))
+        || !TEST_true(
+            BIO_ADDR_rawmake(baddr, ai->ai_family, addr, addrlen, port)))
         goto err;
 
     /* ACCEPT SOCKET */
 
-    if (!TEST_int_ge(afd = BIO_socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol, 0), 0)
-            || !TEST_true(BIO_listen(afd, baddr, server_flags)))
+    if (!TEST_int_ge(afd = BIO_socket(ai->ai_family, ai->ai_socktype,
+                                      ai->ai_protocol, 0),
+                     0)
+        || !TEST_true(BIO_listen(afd, baddr, server_flags)))
         goto err;
 
     /* UPDATE ADDRESS WITH PORT */
@@ -275,25 +286,28 @@ static int test_fd_tfo(int idx)
         goto err;
 
     switch (sstorage.ss_family) {
-        case AF_INET:
-            port = ((struct sockaddr_in *)&sstorage)->sin_port;
-            addr = &((struct sockaddr_in *)&sstorage)->sin_addr;
-            addrlen = sizeof(((struct sockaddr_in *)&sstorage)->sin_addr);
-            break;
-        case AF_INET6:
-            port = ((struct sockaddr_in6 *)&sstorage)->sin6_port;
-            addr = &((struct sockaddr_in6 *)&sstorage)->sin6_addr;
-            addrlen = sizeof(((struct sockaddr_in6 *)&sstorage)->sin6_addr);
-            break;
-        default:
-            goto err;
+    case AF_INET:
+        port = ((struct sockaddr_in *)&sstorage)->sin_port;
+        addr = &((struct sockaddr_in *)&sstorage)->sin_addr;
+        addrlen = sizeof(((struct sockaddr_in *)&sstorage)->sin_addr);
+        break;
+    case AF_INET6:
+        port = ((struct sockaddr_in6 *)&sstorage)->sin6_port;
+        addr = &((struct sockaddr_in6 *)&sstorage)->sin6_addr;
+        addrlen = sizeof(((struct sockaddr_in6 *)&sstorage)->sin6_addr);
+        break;
+    default:
+        goto err;
     }
 
-    if(!TEST_true(BIO_ADDR_rawmake(baddr, sstorage.ss_family, addr, addrlen, port)))
+    if (!TEST_true(
+            BIO_ADDR_rawmake(baddr, sstorage.ss_family, addr, addrlen, port)))
         goto err;
 
     /* CLIENT SOCKET */
-    if (!TEST_int_ge(cfd = BIO_socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol, 0), 0))
+    if (!TEST_int_ge(cfd = BIO_socket(ai->ai_family, ai->ai_socktype,
+                                      ai->ai_protocol, 0),
+                     0))
         goto err;
 
     /* FIRST ACCEPT: no connection should be established */
@@ -343,29 +357,37 @@ static int test_fd_tfo(int idx)
         }
     } else {
         if (idx == 0)
-            BIO_printf(bio_err, "Success: non-TFO connection accepted without data\n");
+            BIO_printf(bio_err,
+                       "Success: non-TFO connection accepted without data\n");
         else if (idx == 1)
-            BIO_printf(bio_err, "Ignore: connection accepted before data, possibly no TFO cookie, or TFO may not be enabled\n");
+            BIO_printf(
+                bio_err,
+                "Ignore: connection accepted before data, possibly no TFO cookie, or TFO may not be enabled\n");
         else if (idx == 4)
-            BIO_printf(bio_err, "Success: connection accepted before data, client TFO is disabled\n");
+            BIO_printf(
+                bio_err,
+                "Success: connection accepted before data, client TFO is disabled\n");
         else
-            BIO_printf(bio_err, "Warning: connection accepted before data, TFO may not be enabled\n");
+            BIO_printf(
+                bio_err,
+                "Warning: connection accepted before data, TFO may not be enabled\n");
         goto success;
     }
 
     /* SEND DATA: this should establish the actual TFO connection */
-#ifdef OSSL_TFO_SENDTO
+# ifdef OSSL_TFO_SENDTO
     if (!TEST_int_ge(sendto(cfd, SOCKET_DATA, SOCKET_DATA_LEN, OSSL_TFO_SENDTO,
-                            (struct sockaddr *)&sstorage, slen), 0)) {
+                            (struct sockaddr *)&sstorage, slen),
+                     0)) {
         sockerr = get_last_socket_error();
         goto err;
     }
-#else
+# else
     if (!TEST_int_ge(writesocket(cfd, SOCKET_DATA, SOCKET_DATA_LEN), 0)) {
         sockerr = get_last_socket_error();
         goto err;
     }
-#endif
+# endif
 
     /* macOS needs some time for this to happen, so put in a select */
     if (!TEST_int_ge(BIO_socket_wait(afd, 1, time(NULL) + 2), 0)) {
@@ -384,7 +406,7 @@ static int test_fd_tfo(int idx)
     BIO_printf(bio_err, "Success: Server accepted socket after write\n");
     bytes_read = readsocket(sfd, read_buffer, sizeof(read_buffer));
     if (!TEST_int_eq(bytes_read, SOCKET_DATA_LEN)
-            || !TEST_strn_eq(read_buffer, SOCKET_DATA, SOCKET_DATA_LEN)) {
+        || !TEST_strn_eq(read_buffer, SOCKET_DATA, SOCKET_DATA_LEN)) {
         sockerr = get_last_socket_error();
         goto err;
     }

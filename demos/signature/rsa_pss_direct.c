@@ -85,8 +85,8 @@ static int sign(OSSL_LIB_CTX *libctx, unsigned char **sig, size_t *sig_len)
     }
 
     /* Determine length of signature. */
-    if (EVP_PKEY_sign(ctx, NULL, sig_len,
-                      test_digest, sizeof(test_digest)) == 0) {
+    if (EVP_PKEY_sign(ctx, NULL, sig_len, test_digest, sizeof(test_digest))
+        == 0) {
         fprintf(stderr, "Failed to get signature length\n");
         goto end;
     }
@@ -99,8 +99,8 @@ static int sign(OSSL_LIB_CTX *libctx, unsigned char **sig, size_t *sig_len)
     }
 
     /* Generate signature. */
-    if (EVP_PKEY_sign(ctx, *sig, sig_len,
-                      test_digest, sizeof(test_digest)) != 1) {
+    if (EVP_PKEY_sign(ctx, *sig, sig_len, test_digest, sizeof(test_digest))
+        != 1) {
         fprintf(stderr, "Failed to sign\n");
         goto end;
     }
@@ -121,7 +121,8 @@ end:
  * This function demonstrates verification of an RSA signature over a SHA-256
  * digest using the PSS signature scheme.
  */
-static int verify(OSSL_LIB_CTX *libctx, const unsigned char *sig, size_t sig_len)
+static int verify(OSSL_LIB_CTX *libctx, const unsigned char *sig,
+                  size_t sig_len)
 {
     int ret = 0;
     const unsigned char *ppub_key = NULL;
@@ -168,9 +169,10 @@ static int verify(OSSL_LIB_CTX *libctx, const unsigned char *sig, size_t sig_len
     }
 
     /* Verify signature. */
-    if (EVP_PKEY_verify(ctx, sig, sig_len,
-                        test_digest, sizeof(test_digest)) == 0) {
-        fprintf(stderr, "Failed to verify signature; "
+    if (EVP_PKEY_verify(ctx, sig, sig_len, test_digest, sizeof(test_digest))
+        == 0) {
+        fprintf(stderr,
+                "Failed to verify signature; "
                 "signature may be invalid\n");
         goto end;
     }

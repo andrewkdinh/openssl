@@ -22,8 +22,7 @@
 static int probable_prime(BIGNUM *rnd, int bits, int safe, prime_t *mods,
                           BN_CTX *ctx);
 static int probable_prime_dh(BIGNUM *rnd, int bits, int safe, prime_t *mods,
-                             const BIGNUM *add, const BIGNUM *rem,
-                             BN_CTX *ctx);
+                             const BIGNUM *add, const BIGNUM *rem, BN_CTX *ctx);
 static int bn_is_prime_int(const BIGNUM *w, int checks, BN_CTX *ctx,
                            int do_trial_division, BN_GENCB *cb);
 
@@ -41,26 +40,28 @@ static int bn_is_prime_int(const BIGNUM *w, int checks, BN_CTX *ctx,
  * Generated using process in test/bn_internal_test.c test_bn_small_factors().
  * This includes 751 (which is not currently included in SP 800-89).
  */
-static const BN_ULONG small_prime_factors[] = {
-    BN_DEF(0x3ef4e3e1, 0xc4309333), BN_DEF(0xcd2d655f, 0x71161eb6),
-    BN_DEF(0x0bf94862, 0x95e2238c), BN_DEF(0x24f7912b, 0x3eb233d3),
-    BN_DEF(0xbf26c483, 0x6b55514b), BN_DEF(0x5a144871, 0x0a84d817),
-    BN_DEF(0x9b82210a, 0x77d12fee), BN_DEF(0x97f050b3, 0xdb5b93c2),
-    BN_DEF(0x4d6c026b, 0x4acad6b9), BN_DEF(0x54aec893, 0xeb7751f3),
-    BN_DEF(0x36bc85c4, 0xdba53368), BN_DEF(0x7f5ec78e, 0xd85a1b28),
-    BN_DEF(0x6b322244, 0x2eb072d8), BN_DEF(0x5e2b3aea, 0xbba51112),
-    BN_DEF(0x0e2486bf, 0x36ed1a6c), BN_DEF(0xec0c5727, 0x5f270460),
-    (BN_ULONG)0x000017b1
-};
+static const BN_ULONG small_prime_factors[] = {BN_DEF(0x3ef4e3e1, 0xc4309333),
+                                               BN_DEF(0xcd2d655f, 0x71161eb6),
+                                               BN_DEF(0x0bf94862, 0x95e2238c),
+                                               BN_DEF(0x24f7912b, 0x3eb233d3),
+                                               BN_DEF(0xbf26c483, 0x6b55514b),
+                                               BN_DEF(0x5a144871, 0x0a84d817),
+                                               BN_DEF(0x9b82210a, 0x77d12fee),
+                                               BN_DEF(0x97f050b3, 0xdb5b93c2),
+                                               BN_DEF(0x4d6c026b, 0x4acad6b9),
+                                               BN_DEF(0x54aec893, 0xeb7751f3),
+                                               BN_DEF(0x36bc85c4, 0xdba53368),
+                                               BN_DEF(0x7f5ec78e, 0xd85a1b28),
+                                               BN_DEF(0x6b322244, 0x2eb072d8),
+                                               BN_DEF(0x5e2b3aea, 0xbba51112),
+                                               BN_DEF(0x0e2486bf, 0x36ed1a6c),
+                                               BN_DEF(0xec0c5727, 0x5f270460),
+                                               (BN_ULONG)0x000017b1};
 
 #define BN_SMALL_PRIME_FACTORS_TOP OSSL_NELEM(small_prime_factors)
 static const BIGNUM _bignum_small_prime_factors = {
-    (BN_ULONG *)small_prime_factors,
-    BN_SMALL_PRIME_FACTORS_TOP,
-    BN_SMALL_PRIME_FACTORS_TOP,
-    0,
-    BN_FLG_STATIC_DATA
-};
+    (BN_ULONG *)small_prime_factors, BN_SMALL_PRIME_FACTORS_TOP,
+    BN_SMALL_PRIME_FACTORS_TOP, 0, BN_FLG_STATIC_DATA};
 
 const BIGNUM *ossl_bn_get0_small_factors(void)
 {
@@ -120,9 +121,8 @@ int BN_GENCB_call(BN_GENCB *cb, int a, int b)
     return 0;
 }
 
-int BN_generate_prime_ex2(BIGNUM *ret, int bits, int safe,
-                          const BIGNUM *add, const BIGNUM *rem, BN_GENCB *cb,
-                          BN_CTX *ctx)
+int BN_generate_prime_ex2(BIGNUM *ret, int bits, int safe, const BIGNUM *add,
+                          const BIGNUM *rem, BN_GENCB *cb, BN_CTX *ctx)
 {
     BIGNUM *t;
     int found = 0;
@@ -152,7 +152,7 @@ int BN_generate_prime_ex2(BIGNUM *ret, int bits, int safe,
     t = BN_CTX_get(ctx);
     if (t == NULL)
         goto err;
- loop:
+loop:
     /* make a random number and set the top and bottom bits */
     if (add == NULL) {
         if (!probable_prime(ret, bits, safe, mods, ctx))
@@ -200,7 +200,7 @@ int BN_generate_prime_ex2(BIGNUM *ret, int bits, int safe,
     }
     /* we have a prime :-) */
     found = 1;
- err:
+err:
     OPENSSL_free(mods);
     BN_CTX_end(ctx);
     bn_check_top(ret);
@@ -208,8 +208,8 @@ int BN_generate_prime_ex2(BIGNUM *ret, int bits, int safe,
 }
 
 #ifndef FIPS_MODULE
-int BN_generate_prime_ex(BIGNUM *ret, int bits, int safe,
-                         const BIGNUM *add, const BIGNUM *rem, BN_GENCB *cb)
+int BN_generate_prime_ex(BIGNUM *ret, int bits, int safe, const BIGNUM *add,
+                         const BIGNUM *rem, BN_GENCB *cb)
 {
     BN_CTX *ctx = BN_CTX_new();
     int retval;
@@ -366,11 +366,10 @@ int ossl_bn_miller_rabin_is_prime(const BIGNUM *w, int iterations, BN_CTX *ctx,
 
     if (!(b != NULL
             /* w1 := w - 1 */
-            && BN_copy(w1, w)
-            && BN_sub_word(w1, 1)
+          && BN_copy(w1, w)
+          && BN_sub_word(w1, 1)
             /* w3 := w - 3 */
-            && BN_copy(w3, w)
-            && BN_sub_word(w3, 3)))
+          && BN_copy(w3, w) && BN_sub_word(w3, 3)))
         goto err;
 
     /* check w is larger than 3, otherwise the random b will be too small */
@@ -379,8 +378,7 @@ int ossl_bn_miller_rabin_is_prime(const BIGNUM *w, int iterations, BN_CTX *ctx,
 
     /* (Step 1) Calculate largest integer 'a' such that 2^a divides w-1 */
     a = 1;
-    while (!BN_is_bit_set(w1, a))
-        a++;
+    while (!BN_is_bit_set(w1, a)) a++;
     /* (Step 2) m = (w-1) / 2^a */
     if (!BN_rshift(m, w1, a))
         goto err;
@@ -397,7 +395,7 @@ int ossl_bn_miller_rabin_is_prime(const BIGNUM *w, int iterations, BN_CTX *ctx,
     for (i = 0; i < iterations; ++i) {
         /* (Step 4.1) obtain a Random string of bits b where 1 < b < w-1 */
         if (!BN_priv_rand_range_ex(b, w3, 0, ctx)
-                || !BN_add_word(b, 2)) /* 1 < b < w-1 */
+            || !BN_add_word(b, 2)) /* 1 < b < w-1 */
             goto err;
 
         if (enhanced) {
@@ -418,7 +416,7 @@ int ossl_bn_miller_rabin_is_prime(const BIGNUM *w, int iterations, BN_CTX *ctx,
         if (BN_is_one(z) || BN_cmp(z, w1) == 0)
             goto outer_loop;
         /* (Step 4.7) for j = 1 to a-1 */
-        for (j = 1; j < a ; ++j) {
+        for (j = 1; j < a; ++j) {
             /* (Step 4.7.1 - 4.7.2) x = z. z = x^2 mod w */
             if (!BN_copy(x, z) || !BN_mod_mul(z, x, x, w, ctx))
                 goto err;
@@ -454,7 +452,7 @@ composite:
         }
         ret = 1;
         goto err;
-outer_loop: ;
+outer_loop:;
         /* (Step 4.1.5) */
         if (!BN_GENCB_call(cb, 1, i))
             goto err;
@@ -492,7 +490,7 @@ static int probable_prime(BIGNUM *rnd, int bits, int safe, prime_t *mods,
     int trial_divisions = calc_trial_divisions(bits);
     BN_ULONG maxdelta = BN_MASK2 - primes[trial_divisions - 1];
 
- again:
+again:
     if (!BN_priv_rand_ex(rnd, bits, BN_RAND_TOP_TWO, BN_RAND_BOTTOM_ODD, 0,
                          ctx))
         return 0;
@@ -503,10 +501,10 @@ static int probable_prime(BIGNUM *rnd, int bits, int safe, prime_t *mods,
         BN_ULONG mod = BN_mod_word(rnd, (BN_ULONG)primes[i]);
         if (mod == (BN_ULONG)-1)
             return 0;
-        mods[i] = (prime_t) mod;
+        mods[i] = (prime_t)mod;
     }
     delta = 0;
- loop:
+loop:
     for (i = 1; i < trial_divisions; i++) {
         /*
          * check that rnd is a prime and also that
@@ -516,7 +514,7 @@ static int probable_prime(BIGNUM *rnd, int bits, int safe, prime_t *mods,
          * we check only the primes up to sqrt(rnd)
          */
         if (bits <= 31 && delta <= 0x7fffffff
-                && square(primes[i]) > BN_get_word(rnd) + delta)
+            && square(primes[i]) > BN_get_word(rnd) + delta)
             break;
         if (safe ? (mods[i] + delta) % primes[i] <= 1
                  : (mods[i] + delta) % primes[i] == 0) {
@@ -543,8 +541,7 @@ static int probable_prime(BIGNUM *rnd, int bits, int safe, prime_t *mods,
  * Returns 1 on success and 0 on error.
  */
 static int probable_prime_dh(BIGNUM *rnd, int bits, int safe, prime_t *mods,
-                             const BIGNUM *add, const BIGNUM *rem,
-                             BN_CTX *ctx)
+                             const BIGNUM *add, const BIGNUM *rem, BN_CTX *ctx)
 {
     int i, ret = 0;
     BIGNUM *t1;
@@ -559,7 +556,7 @@ static int probable_prime_dh(BIGNUM *rnd, int bits, int safe, prime_t *mods,
     if (maxdelta > BN_MASK2 - BN_get_word(add))
         maxdelta = BN_MASK2 - BN_get_word(add);
 
- again:
+again:
     if (!BN_rand_ex(rnd, bits, BN_RAND_TOP_ONE, BN_RAND_BOTTOM_ODD, 0, ctx))
         goto err;
 
@@ -577,8 +574,7 @@ static int probable_prime_dh(BIGNUM *rnd, int bits, int safe, prime_t *mods,
             goto err;
     }
 
-    if (BN_num_bits(rnd) < bits
-            || BN_get_word(rnd) < (safe ? 5u : 3u)) {
+    if (BN_num_bits(rnd) < bits || BN_get_word(rnd) < (safe ? 5u : 3u)) {
         if (!BN_add(rnd, rnd, add))
             goto err;
     }
@@ -588,14 +584,14 @@ static int probable_prime_dh(BIGNUM *rnd, int bits, int safe, prime_t *mods,
         BN_ULONG mod = BN_mod_word(rnd, (BN_ULONG)primes[i]);
         if (mod == (BN_ULONG)-1)
             goto err;
-        mods[i] = (prime_t) mod;
+        mods[i] = (prime_t)mod;
     }
     delta = 0;
- loop:
+loop:
     for (i = 1; i < trial_divisions; i++) {
         /* check that rnd is a prime */
         if (bits <= 31 && delta <= 0x7fffffff
-                && square(primes[i]) > BN_get_word(rnd) + delta)
+            && square(primes[i]) > BN_get_word(rnd) + delta)
             break;
         /* rnd mod p == 1 implies q = (rnd-1)/2 is divisible by p */
         if (safe ? (mods[i] + delta) % primes[i] <= 1
@@ -610,7 +606,7 @@ static int probable_prime_dh(BIGNUM *rnd, int bits, int safe, prime_t *mods,
         goto err;
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
     bn_check_top(rnd);
     return ret;

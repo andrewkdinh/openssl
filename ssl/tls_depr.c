@@ -70,10 +70,9 @@ int tls_engine_load_ssl_client_cert(SSL_CONNECTION *s, X509 **px509,
 {
     SSL *ssl = SSL_CONNECTION_GET_SSL(s);
 
-    return ENGINE_load_ssl_client_cert(SSL_CONNECTION_GET_CTX(s)->client_cert_engine,
-                                       ssl,
-                                       SSL_get_client_CA_list(ssl),
-                                       px509, ppkey, NULL, NULL, NULL);
+    return ENGINE_load_ssl_client_cert(
+        SSL_CONNECTION_GET_CTX(s)->client_cert_engine, ssl,
+        SSL_get_client_CA_list(ssl), px509, ppkey, NULL, NULL, NULL);
 }
 #endif
 
@@ -170,10 +169,9 @@ EVP_PKEY *ssl_dh_to_pkey(DH *dh)
 }
 
 /* Some deprecated public APIs pass EC_KEY objects */
-int ssl_set_tmp_ecdh_groups(uint16_t **pext, size_t *pextlen,
-                            uint16_t **ksext, size_t *ksextlen,
-                            size_t **tplext, size_t *tplextlen,
-                            void *key)
+int ssl_set_tmp_ecdh_groups(uint16_t **pext, size_t *pextlen, uint16_t **ksext,
+                            size_t *ksextlen, size_t **tplext,
+                            size_t *tplextlen, void *key)
 {
 # ifndef OPENSSL_NO_EC
     const EC_GROUP *group = EC_KEY_get0_group((const EC_KEY *)key);
@@ -186,9 +184,7 @@ int ssl_set_tmp_ecdh_groups(uint16_t **pext, size_t *pextlen,
     nid = EC_GROUP_get_curve_name(group);
     if (nid == NID_undef)
         return 0;
-    return tls1_set_groups(pext, pextlen,
-                           ksext, ksextlen,
-                           tplext, tplextlen,
+    return tls1_set_groups(pext, pextlen, ksext, ksextlen, tplext, tplextlen,
                            &nid, 1);
 # else
     return 0;
@@ -202,14 +198,14 @@ int ssl_set_tmp_ecdh_groups(uint16_t **pext, size_t *pextlen,
  */
 # if !defined(OPENSSL_NO_DH)
 void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx,
-                                 DH *(*dh) (SSL *ssl, int is_export,
-                                            int keylength))
+                                 DH *(*dh)(SSL *ssl, int is_export,
+                                           int keylength))
 {
     SSL_CTX_callback_ctrl(ctx, SSL_CTRL_SET_TMP_DH_CB, (void (*)(void))dh);
 }
 
-void SSL_set_tmp_dh_callback(SSL *ssl, DH *(*dh) (SSL *ssl, int is_export,
-                                                  int keylength))
+void SSL_set_tmp_dh_callback(SSL *ssl,
+                             DH *(*dh)(SSL *ssl, int is_export, int keylength))
 {
     SSL_callback_ctrl(ssl, SSL_CTRL_SET_TMP_DH_CB, (void (*)(void))dh);
 }

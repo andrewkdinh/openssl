@@ -29,14 +29,16 @@ static int test_x509_req_detect_invalid_version(void)
     X509_REQ *req = NULL;
     int ret = 0;
 
-    certFilePath = test_mk_file_path(certsDir, "x509-req-detect-invalid-version.pem");
+    certFilePath =
+        test_mk_file_path(certsDir, "x509-req-detect-invalid-version.pem");
     if (certFilePath == NULL)
         goto err;
     if (!TEST_ptr(bio = BIO_new_file(certFilePath, "r")))
         goto err;
     req = PEM_read_bio_X509_REQ(bio, NULL, 0, NULL);
     if (req == NULL) {
-        ret = 1; /* success, reading PEM with invalid CSR data is allowed to fail. */
+        ret =
+            1; /* success, reading PEM with invalid CSR data is allowed to fail. */
         goto err;
     }
     if (!TEST_ptr(pkey = X509_REQ_get_pubkey(req)))

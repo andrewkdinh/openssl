@@ -67,8 +67,7 @@ static int keccak_init(void *vctx, ossl_unused const OSSL_PARAM params[])
 
 static int keccak_init_params(void *vctx, const OSSL_PARAM params[])
 {
-    return keccak_init(vctx, NULL)
-            && shake_set_ctx_params(vctx, params);
+    return keccak_init(vctx, NULL) && shake_set_ctx_params(vctx, params);
 }
 
 static int keccak_update(void *vctx, const unsigned char *inp, size_t len)
@@ -151,8 +150,8 @@ static size_t generic_sha3_absorb(void *vctx, const void *inp, size_t len)
 {
     KECCAK1600_CTX *ctx = vctx;
 
-    if (!(ctx->xof_state == XOF_STATE_INIT ||
-          ctx->xof_state == XOF_STATE_ABSORB))
+    if (!(ctx->xof_state == XOF_STATE_INIT
+          || ctx->xof_state == XOF_STATE_ABSORB))
         return 0;
     ctx->xof_state = XOF_STATE_ABSORB;
     return SHA3_absorb(ctx->A, inp, len, ctx->block_size);
@@ -168,18 +167,11 @@ static int generic_sha3_squeeze(void *vctx, unsigned char *out, size_t outlen)
     return ossl_sha3_squeeze((KECCAK1600_CTX *)vctx, out, outlen);
 }
 
-static PROV_SHA3_METHOD sha3_generic_md = {
-    generic_sha3_absorb,
-    generic_sha3_final,
-    NULL
-};
+static PROV_SHA3_METHOD sha3_generic_md = {generic_sha3_absorb,
+                                           generic_sha3_final, NULL};
 
-static PROV_SHA3_METHOD shake_generic_md =
-{
-    generic_sha3_absorb,
-    generic_sha3_final,
-    generic_sha3_squeeze
-};
+static PROV_SHA3_METHOD shake_generic_md = {
+    generic_sha3_absorb, generic_sha3_final, generic_sha3_squeeze};
 
 #if defined(S390_SHA3)
 
@@ -196,8 +188,8 @@ static size_t s390x_sha3_absorb(void *vctx, const void *inp, size_t len)
     size_t rem = len % ctx->block_size;
     unsigned int fc;
 
-    if (!(ctx->xof_state == XOF_STATE_INIT ||
-          ctx->xof_state == XOF_STATE_ABSORB))
+    if (!(ctx->xof_state == XOF_STATE_INIT
+          || ctx->xof_state == XOF_STATE_ABSORB))
         return 0;
     if (len - rem > 0) {
         fc = ctx->pad;
@@ -215,8 +207,8 @@ static int s390x_sha3_final(void *vctx, unsigned char *out, size_t outlen)
 
     if (!ossl_prov_is_running())
         return 0;
-    if (!(ctx->xof_state == XOF_STATE_INIT ||
-          ctx->xof_state == XOF_STATE_ABSORB))
+    if (!(ctx->xof_state == XOF_STATE_INIT
+          || ctx->xof_state == XOF_STATE_ABSORB))
         return 0;
     fc = ctx->pad | S390X_KLMD_DUFOP;
     fc |= ctx->xof_state == XOF_STATE_INIT ? S390X_KLMD_NIP : 0;
@@ -233,8 +225,8 @@ static int s390x_shake_final(void *vctx, unsigned char *out, size_t outlen)
 
     if (!ossl_prov_is_running())
         return 0;
-    if (!(ctx->xof_state == XOF_STATE_INIT ||
-          ctx->xof_state == XOF_STATE_ABSORB))
+    if (!(ctx->xof_state == XOF_STATE_INIT
+          || ctx->xof_state == XOF_STATE_ABSORB))
         return 0;
     fc = ctx->pad | S390X_KLMD_DUFOP;
     fc |= ctx->xof_state == XOF_STATE_INIT ? S390X_KLMD_NIP : 0;
@@ -296,8 +288,8 @@ static int s390x_keccakc_final(void *vctx, unsigned char *out, size_t outlen,
 
     if (!ossl_prov_is_running())
         return 0;
-    if (!(ctx->xof_state == XOF_STATE_INIT ||
-          ctx->xof_state == XOF_STATE_ABSORB))
+    if (!(ctx->xof_state == XOF_STATE_INIT
+          || ctx->xof_state == XOF_STATE_ABSORB))
         return 0;
     fc = ctx->pad;
     fc |= ctx->xof_state == XOF_STATE_INIT ? S390X_KIMD_NIP : 0;
@@ -377,12 +369,12 @@ static int s390x_keccakc_squeeze(void *vctx, unsigned char *out, size_t outlen,
 
 static int s390x_keccak_squeeze(void *vctx, unsigned char *out, size_t outlen)
 {
-     return s390x_keccakc_squeeze(vctx, out, outlen, 0x01);
+    return s390x_keccakc_squeeze(vctx, out, outlen, 0x01);
 }
 
 static int s390x_kmac_squeeze(void *vctx, unsigned char *out, size_t outlen)
 {
-     return s390x_keccakc_squeeze(vctx, out, outlen, 0x04);
+    return s390x_keccakc_squeeze(vctx, out, outlen, 0x04);
 }
 
 static PROV_SHA3_METHOD sha3_s390x_md = {
@@ -448,16 +440,10 @@ static size_t armsha3_sha3_absorb(void *vctx, const void *inp, size_t len)
     return SHA3_absorb_cext(ctx->A, inp, len, ctx->block_size);
 }
 
-static PROV_SHA3_METHOD sha3_ARMSHA3_md = {
-    armsha3_sha3_absorb,
-    generic_sha3_final
-};
-static PROV_SHA3_METHOD shake_ARMSHA3_md =
-{
-    armsha3_sha3_absorb,
-    generic_sha3_final,
-    generic_sha3_squeeze
-};
+static PROV_SHA3_METHOD sha3_ARMSHA3_md = {armsha3_sha3_absorb,
+                                           generic_sha3_final};
+static PROV_SHA3_METHOD shake_ARMSHA3_md = {
+    armsha3_sha3_absorb, generic_sha3_final, generic_sha3_squeeze};
 # define SHAKE_SET_MD(uname, typ)                                              \
     if (OPENSSL_armcap_P & ARMV8_HAVE_SHA3_AND_WORTH_USING) {                  \
         ctx->meth = shake_ARMSHA3_md;                                          \
@@ -559,7 +545,7 @@ static void keccak_freectx(void *vctx)
 {
     KECCAK1600_CTX *ctx = (KECCAK1600_CTX *)vctx;
 
-    OPENSSL_clear_free(ctx,  sizeof(*ctx));
+    OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
 static void keccak_copyctx(void *voutctx, void *vinctx)
@@ -573,8 +559,8 @@ static void keccak_copyctx(void *voutctx, void *vinctx)
 static void *keccak_dupctx(void *ctx)
 {
     KECCAK1600_CTX *in = (KECCAK1600_CTX *)ctx;
-    KECCAK1600_CTX *ret = ossl_prov_is_running() ? OPENSSL_malloc(sizeof(*ret))
-                                                 : NULL;
+    KECCAK1600_CTX *ret =
+        ossl_prov_is_running() ? OPENSSL_malloc(sizeof(*ret)) : NULL;
 
     if (ret != NULL)
         *ret = *in;
@@ -587,8 +573,7 @@ static const OSSL_PARAM *shake_gettable_ctx_params(ossl_unused void *ctx,
     static const OSSL_PARAM known_shake_gettable_ctx_params[] = {
         {OSSL_DIGEST_PARAM_XOFLEN, OSSL_PARAM_UNSIGNED_INTEGER, NULL, 0, 0},
         {OSSL_DIGEST_PARAM_SIZE, OSSL_PARAM_UNSIGNED_INTEGER, NULL, 0, 0},
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
     return known_shake_gettable_ctx_params;
 }
 
@@ -622,8 +607,7 @@ static const OSSL_PARAM *shake_settable_ctx_params(ossl_unused void *ctx,
     static const OSSL_PARAM known_shake_settable_ctx_params[] = {
         {OSSL_DIGEST_PARAM_XOFLEN, OSSL_PARAM_UNSIGNED_INTEGER, NULL, 0, 0},
         {OSSL_DIGEST_PARAM_SIZE, OSSL_PARAM_UNSIGNED_INTEGER, NULL, 0, 0},
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
 
     return known_shake_settable_ctx_params;
 }
@@ -676,25 +660,25 @@ static int shake_set_ctx_params(void *vctx, const OSSL_PARAM params[])
 
 /* ossl_sha3_224_functions */
 IMPLEMENT_SHA3_functions(224)
-/* ossl_sha3_256_functions */
-IMPLEMENT_SHA3_functions(256)
-/* ossl_sha3_384_functions */
-IMPLEMENT_SHA3_functions(384)
-/* ossl_sha3_512_functions */
-IMPLEMENT_SHA3_functions(512)
-/* ossl_keccak_224_functions */
-IMPLEMENT_KECCAK_functions(224)
-/* ossl_keccak_256_functions */
-IMPLEMENT_KECCAK_functions(256)
-/* ossl_keccak_384_functions */
-IMPLEMENT_KECCAK_functions(384)
-/* ossl_keccak_512_functions */
-IMPLEMENT_KECCAK_functions(512)
-/* ossl_shake_128_functions */
-IMPLEMENT_SHAKE_functions(128)
-/* ossl_shake_256_functions */
-IMPLEMENT_SHAKE_functions(256)
-/* ossl_keccak_kmac_128_functions */
-IMPLEMENT_KMAC_functions(128)
-/* ossl_keccak_kmac_256_functions */
-IMPLEMENT_KMAC_functions(256)
+    /* ossl_sha3_256_functions */
+    IMPLEMENT_SHA3_functions(256)
+    /* ossl_sha3_384_functions */
+    IMPLEMENT_SHA3_functions(384)
+    /* ossl_sha3_512_functions */
+    IMPLEMENT_SHA3_functions(512)
+    /* ossl_keccak_224_functions */
+    IMPLEMENT_KECCAK_functions(224)
+    /* ossl_keccak_256_functions */
+    IMPLEMENT_KECCAK_functions(256)
+    /* ossl_keccak_384_functions */
+    IMPLEMENT_KECCAK_functions(384)
+    /* ossl_keccak_512_functions */
+    IMPLEMENT_KECCAK_functions(512)
+    /* ossl_shake_128_functions */
+    IMPLEMENT_SHAKE_functions(128)
+    /* ossl_shake_256_functions */
+    IMPLEMENT_SHAKE_functions(256)
+    /* ossl_keccak_kmac_128_functions */
+    IMPLEMENT_KMAC_functions(128)
+    /* ossl_keccak_kmac_256_functions */
+    IMPLEMENT_KMAC_functions(256)

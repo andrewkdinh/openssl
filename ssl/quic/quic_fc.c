@@ -25,10 +25,10 @@ int ossl_quic_txfc_init(QUIC_TXFC *txfc, QUIC_TXFC *conn_txfc)
     if (conn_txfc != NULL && conn_txfc->parent != NULL)
         return 0;
 
-    txfc->swm                   = 0;
-    txfc->cwm                   = 0;
-    txfc->parent                = conn_txfc;
-    txfc->has_become_blocked    = 0;
+    txfc->swm = 0;
+    txfc->cwm = 0;
+    txfc->parent = conn_txfc;
+    txfc->has_become_blocked = 0;
     return 1;
 }
 
@@ -124,40 +124,36 @@ uint64_t ossl_quic_txfc_get_swm(QUIC_TXFC *txfc)
  */
 
 int ossl_quic_rxfc_init(QUIC_RXFC *rxfc, QUIC_RXFC *conn_rxfc,
-                        uint64_t initial_window_size,
-                        uint64_t max_window_size,
-                        OSSL_TIME (*now)(void *now_arg),
-                        void *now_arg)
+                        uint64_t initial_window_size, uint64_t max_window_size,
+                        OSSL_TIME (*now)(void *now_arg), void *now_arg)
 {
     if (conn_rxfc != NULL && conn_rxfc->parent != NULL)
         return 0;
 
-    rxfc->swm               = 0;
-    rxfc->cwm               = initial_window_size;
-    rxfc->rwm               = 0;
-    rxfc->esrwm             = 0;
-    rxfc->hwm               = 0;
-    rxfc->cur_window_size   = initial_window_size;
-    rxfc->max_window_size   = max_window_size;
-    rxfc->parent            = conn_rxfc;
-    rxfc->error_code        = 0;
-    rxfc->has_cwm_changed   = 0;
-    rxfc->epoch_start       = ossl_time_zero();
-    rxfc->now               = now;
-    rxfc->now_arg           = now_arg;
-    rxfc->is_fin            = 0;
-    rxfc->standalone        = 0;
+    rxfc->swm = 0;
+    rxfc->cwm = initial_window_size;
+    rxfc->rwm = 0;
+    rxfc->esrwm = 0;
+    rxfc->hwm = 0;
+    rxfc->cur_window_size = initial_window_size;
+    rxfc->max_window_size = max_window_size;
+    rxfc->parent = conn_rxfc;
+    rxfc->error_code = 0;
+    rxfc->has_cwm_changed = 0;
+    rxfc->epoch_start = ossl_time_zero();
+    rxfc->now = now;
+    rxfc->now_arg = now_arg;
+    rxfc->is_fin = 0;
+    rxfc->standalone = 0;
     return 1;
 }
 
 int ossl_quic_rxfc_init_standalone(QUIC_RXFC *rxfc,
                                    uint64_t initial_window_size,
-                                   OSSL_TIME (*now)(void *arg),
-                                   void *now_arg)
+                                   OSSL_TIME (*now)(void *arg), void *now_arg)
 {
-    if (!ossl_quic_rxfc_init(rxfc, NULL,
-                             initial_window_size, initial_window_size,
-                             now, now_arg))
+    if (!ossl_quic_rxfc_init(rxfc, NULL, initial_window_size,
+                             initial_window_size, now, now_arg))
         return 0;
 
     rxfc->standalone = 1;
@@ -169,16 +165,15 @@ QUIC_RXFC *ossl_quic_rxfc_get_parent(QUIC_RXFC *rxfc)
     return rxfc->parent;
 }
 
-void ossl_quic_rxfc_set_max_window_size(QUIC_RXFC *rxfc,
-                                        size_t max_window_size)
+void ossl_quic_rxfc_set_max_window_size(QUIC_RXFC *rxfc, size_t max_window_size)
 {
     rxfc->max_window_size = max_window_size;
 }
 
 static void rxfc_start_epoch(QUIC_RXFC *rxfc)
 {
-    rxfc->epoch_start   = rxfc->now(rxfc->now_arg);
-    rxfc->esrwm         = rxfc->rwm;
+    rxfc->epoch_start = rxfc->now(rxfc->now_arg);
+    rxfc->esrwm = rxfc->rwm;
 }
 
 static int on_rx_controlled_bytes(QUIC_RXFC *rxfc, uint64_t num_bytes)
@@ -235,9 +230,9 @@ static int rxfc_cwm_bump_desired(QUIC_RXFC *rxfc)
 {
     int err = 0;
     uint64_t window_rem = rxfc->cwm - rxfc->rwm;
-    uint64_t threshold
-        = safe_muldiv_uint64_t(rxfc->cur_window_size,
-                               WINDOW_THRESHOLD_NUM, WINDOW_THRESHOLD_DEN, &err);
+    uint64_t threshold =
+        safe_muldiv_uint64_t(rxfc->cur_window_size, WINDOW_THRESHOLD_NUM,
+                             WINDOW_THRESHOLD_DEN, &err);
 
     if (err)
         /*
@@ -274,14 +269,14 @@ static int rxfc_should_bump_window_size(QUIC_RXFC *rxfc, OSSL_TIME rtt)
      * our 64-bit nanosecond representation, which will afford plenty of
      * precision left over after the division anyway.
      */
-    uint64_t  b = rxfc->rwm - rxfc->esrwm;
+    uint64_t b = rxfc->rwm - rxfc->esrwm;
     OSSL_TIME now, dt, t_window;
 
     if (b == 0)
         return 0;
 
-    now      = rxfc->now(rxfc->now_arg);
-    dt       = ossl_time_subtract(now, rxfc->epoch_start);
+    now = rxfc->now(rxfc->now_arg);
+    dt = ossl_time_subtract(now, rxfc->epoch_start);
     t_window = ossl_time_muldiv(dt, rxfc->cur_window_size, b);
 
     return ossl_time_compare(t_window, ossl_time_multiply(rtt, 4)) < 0;
@@ -300,7 +295,8 @@ static void rxfc_adjust_window_size(QUIC_RXFC *rxfc, uint64_t min_window_size,
 
     if (new_window_size < min_window_size)
         new_window_size = min_window_size;
-    if (new_window_size > rxfc->max_window_size) /* takes precedence over min size */
+    if (new_window_size
+        > rxfc->max_window_size) /* takes precedence over min size */
         new_window_size = rxfc->max_window_size;
 
     rxfc->cur_window_size = new_window_size;
@@ -325,8 +321,7 @@ static void rxfc_update_cwm(QUIC_RXFC *rxfc, uint64_t min_window_size,
 }
 
 static int rxfc_on_retire(QUIC_RXFC *rxfc, uint64_t num_bytes,
-                          uint64_t min_window_size,
-                          OSSL_TIME rtt)
+                          uint64_t min_window_size, OSSL_TIME rtt)
 {
     if (ossl_time_is_zero(rxfc->epoch_start))
         /* This happens when we retire our first ever bytes. */
@@ -337,9 +332,7 @@ static int rxfc_on_retire(QUIC_RXFC *rxfc, uint64_t num_bytes,
     return 1;
 }
 
-int ossl_quic_rxfc_on_retire(QUIC_RXFC *rxfc,
-                             uint64_t num_bytes,
-                             OSSL_TIME rtt)
+int ossl_quic_rxfc_on_retire(QUIC_RXFC *rxfc, uint64_t num_bytes, OSSL_TIME rtt)
 {
     if (rxfc->parent == NULL && !rxfc->standalone)
         return 0;

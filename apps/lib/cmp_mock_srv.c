@@ -17,21 +17,21 @@
 
 /* the context for the CMP mock server */
 typedef struct {
-    X509 *refCert;             /* cert to expect for oldCertID in kur/rr msg */
-    X509 *certOut;             /* certificate to be returned in cp/ip/kup msg */
-    EVP_PKEY *keyOut;          /* Private key to be returned for central keygen */
-    X509_CRL *crlOut;          /* CRL to be returned in genp for crls */
-    STACK_OF(X509) *chainOut;  /* chain of certOut to add to extraCerts field */
+    X509 *refCert; /* cert to expect for oldCertID in kur/rr msg */
+    X509 *certOut; /* certificate to be returned in cp/ip/kup msg */
+    EVP_PKEY *keyOut; /* Private key to be returned for central keygen */
+    X509_CRL *crlOut; /* CRL to be returned in genp for crls */
+    STACK_OF(X509) *chainOut; /* chain of certOut to add to extraCerts field */
     STACK_OF(X509) *caPubsOut; /* used in caPubs of ip and in caCerts of genp */
-    X509 *newWithNew;          /* to return in newWithNew of rootKeyUpdate */
-    X509 *newWithOld;          /* to return in newWithOld of rootKeyUpdate */
-    X509 *oldWithNew;          /* to return in oldWithNew of rootKeyUpdate */
+    X509 *newWithNew; /* to return in newWithNew of rootKeyUpdate */
+    X509 *newWithOld; /* to return in newWithOld of rootKeyUpdate */
+    X509 *oldWithNew; /* to return in oldWithNew of rootKeyUpdate */
     OSSL_CMP_PKISI *statusOut; /* status for ip/cp/kup/rp msg unless polling */
-    int sendError;             /* send error response on given request type */
-    OSSL_CMP_MSG *req;         /* original request message during polling */
-    int pollCount;             /* number of polls before actual cert response */
-    int curr_pollCount;        /* number of polls so far for current request */
-    int checkAfterTime;        /* time the client should wait between polling */
+    int sendError; /* send error response on given request type */
+    OSSL_CMP_MSG *req; /* original request message during polling */
+    int pollCount; /* number of polls before actual cert response */
+    int curr_pollCount; /* number of polls so far for current request */
+    int checkAfterTime; /* time the client should wait between polling */
 } mock_srv_ctx;
 
 static void mock_srv_ctx_free(mock_srv_ctx *ctx)
@@ -62,7 +62,7 @@ static mock_srv_ctx *mock_srv_ctx_new(void)
 
     /* all other elements are initialized to 0 or NULL, respectively */
     return ctx;
- err:
+err:
     mock_srv_ctx_free(ctx);
     return NULL;
 }
@@ -103,8 +103,7 @@ int ossl_cmp_mock_srv_set1_keyOut(OSSL_CMP_SRV_CTX *srv_ctx, EVP_PKEY *pkey)
     return 1;
 }
 
-int ossl_cmp_mock_srv_set1_crlOut(OSSL_CMP_SRV_CTX *srv_ctx,
-                                  X509_CRL *crl)
+int ossl_cmp_mock_srv_set1_crlOut(OSSL_CMP_SRV_CTX *srv_ctx, X509_CRL *crl)
 {
     mock_srv_ctx *ctx = OSSL_CMP_SRV_CTX_get0_custom_ctx(srv_ctx);
 
@@ -230,8 +229,7 @@ static int delayed_delivery(OSSL_CMP_SRV_CTX *srv_ctx, const OSSL_CMP_MSG *req)
      * For ir/cr/p10cr/kur delayed delivery is handled separately in
      * process_cert_request
      */
-    if (req_type == OSSL_CMP_IR
-        || req_type == OSSL_CMP_CR
+    if (req_type == OSSL_CMP_IR || req_type == OSSL_CMP_CR
         || req_type == OSSL_CMP_P10CR
         || req_type == OSSL_CMP_KUR
         /* Client may use error to abort the ongoing polling */
@@ -248,8 +246,8 @@ static int delayed_delivery(OSSL_CMP_SRV_CTX *srv_ctx, const OSSL_CMP_MSG *req)
 }
 
 /* check for matching reference cert components, as far as given */
-static int refcert_cmp(const X509 *refcert,
-                       const X509_NAME *issuer, const ASN1_INTEGER *serial)
+static int refcert_cmp(const X509 *refcert, const X509_NAME *issuer,
+                       const ASN1_INTEGER *serial)
 {
     const X509_NAME *ref_issuer;
     const ASN1_INTEGER *ref_serial;
@@ -279,22 +277,19 @@ static int clean_transaction(OSSL_CMP_SRV_CTX *srv_ctx,
     return 1;
 }
 
-static OSSL_CMP_PKISI *process_cert_request(OSSL_CMP_SRV_CTX *srv_ctx,
-                                            const OSSL_CMP_MSG *cert_req,
-                                            ossl_unused int certReqId,
-                                            const OSSL_CRMF_MSG *crm,
-                                            const X509_REQ *p10cr,
-                                            X509 **certOut,
-                                            STACK_OF(X509) **chainOut,
-                                            STACK_OF(X509) **caPubs)
+static OSSL_CMP_PKISI *
+process_cert_request(OSSL_CMP_SRV_CTX *srv_ctx, const OSSL_CMP_MSG *cert_req,
+                     ossl_unused int certReqId, const OSSL_CRMF_MSG *crm,
+                     const X509_REQ *p10cr, X509 **certOut,
+                     STACK_OF(X509) **chainOut, STACK_OF(X509) **caPubs)
 {
     mock_srv_ctx *ctx = OSSL_CMP_SRV_CTX_get0_custom_ctx(srv_ctx);
     int bodytype, central_keygen;
     OSSL_CMP_PKISI *si = NULL;
     EVP_PKEY *keyOut = NULL;
 
-    if (ctx == NULL || cert_req == NULL
-            || certOut == NULL || chainOut == NULL || caPubs == NULL) {
+    if (ctx == NULL || cert_req == NULL || certOut == NULL || chainOut == NULL
+        || caPubs == NULL) {
         ERR_raise(ERR_LIB_CMP, CMP_R_NULL_ARGUMENT);
         return NULL;
     }
@@ -340,8 +335,8 @@ static OSSL_CMP_PKISI *process_cert_request(OSSL_CMP_SRV_CTX *srv_ctx,
                 }
                 str = sk_ASN1_UTF8STRING_value(strs, 0);
                 if (str == NULL
-                    || (data =
-                        (const char *)ASN1_STRING_get0_data(str)) == NULL) {
+                    || (data = (const char *)ASN1_STRING_get0_data(str))
+                        == NULL) {
                     ERR_raise(ERR_LIB_CMP, ERR_R_PASSED_INVALID_ARGUMENT);
                     return NULL;
                 }
@@ -356,23 +351,21 @@ static OSSL_CMP_PKISI *process_cert_request(OSSL_CMP_SRV_CTX *srv_ctx,
 
     /* accept cert update request only for the reference cert, if given */
     if (bodytype == OSSL_CMP_KUR
-            && crm != NULL /* thus not p10cr */ && ctx->refCert != NULL) {
+        && crm != NULL /* thus not p10cr */ && ctx->refCert != NULL) {
         const OSSL_CRMF_CERTID *cid = OSSL_CRMF_MSG_get0_regCtrl_oldCertID(crm);
 
         if (cid == NULL) {
             ERR_raise(ERR_LIB_CMP, CMP_R_MISSING_CERTID);
             return NULL;
         }
-        if (!refcert_cmp(ctx->refCert,
-                         OSSL_CRMF_CERTID_get0_issuer(cid),
+        if (!refcert_cmp(ctx->refCert, OSSL_CRMF_CERTID_get0_issuer(cid),
                          OSSL_CRMF_CERTID_get0_serialNumber(cid))) {
             ERR_raise(ERR_LIB_CMP, CMP_R_WRONG_CERTID);
             return NULL;
         }
     }
 
-    if (ctx->certOut != NULL
-            && (*certOut = X509_dup(ctx->certOut)) == NULL)
+    if (ctx->certOut != NULL && (*certOut = X509_dup(ctx->certOut)) == NULL)
         /* Should return a cert produced from request template, see FR #16054 */
         goto err;
 
@@ -380,10 +373,10 @@ static OSSL_CMP_PKISI *process_cert_request(OSSL_CMP_SRV_CTX *srv_ctx,
     if (central_keygen < 0)
         goto err;
     if (central_keygen == 1
-        && (ctx->keyOut == NULL
-            || (keyOut = EVP_PKEY_dup(ctx->keyOut)) == NULL
-            || !OSSL_CMP_CTX_set0_newPkey(OSSL_CMP_SRV_CTX_get0_cmp_ctx(srv_ctx),
-                                          1 /* priv */, keyOut))) {
+        && (ctx->keyOut == NULL || (keyOut = EVP_PKEY_dup(ctx->keyOut)) == NULL
+            || !OSSL_CMP_CTX_set0_newPkey(
+                OSSL_CMP_SRV_CTX_get0_cmp_ctx(srv_ctx), 1 /* priv */,
+                keyOut))) {
         EVP_PKEY_free(keyOut);
         goto err;
     }
@@ -393,17 +386,17 @@ static OSSL_CMP_PKISI *process_cert_request(OSSL_CMP_SRV_CTX *srv_ctx,
      */
 
     if (ctx->chainOut != NULL
-            && (*chainOut = X509_chain_up_ref(ctx->chainOut)) == NULL)
+        && (*chainOut = X509_chain_up_ref(ctx->chainOut)) == NULL)
         goto err;
     if (ctx->caPubsOut != NULL /* OSSL_CMP_PKIBODY_IP not visible here */
-            && (*caPubs = X509_chain_up_ref(ctx->caPubsOut)) == NULL)
+        && (*caPubs = X509_chain_up_ref(ctx->caPubsOut)) == NULL)
         goto err;
     if (ctx->statusOut != NULL
-            && (si = OSSL_CMP_PKISI_dup(ctx->statusOut)) == NULL)
+        && (si = OSSL_CMP_PKISI_dup(ctx->statusOut)) == NULL)
         goto err;
     return si;
 
- err:
+err:
     X509_free(*certOut);
     *certOut = NULL;
     OSSL_STACK_OF_X509_free(*chainOut);
@@ -425,7 +418,7 @@ static OSSL_CMP_PKISI *process_rr(OSSL_CMP_SRV_CTX *srv_ctx,
         return NULL;
     }
     if (ctx->sendError == 1
-            || ctx->sendError == OSSL_CMP_MSG_get_bodytype(rr)) {
+        || ctx->sendError == OSSL_CMP_MSG_get_bodytype(rr)) {
         ERR_raise(ERR_LIB_CMP, CMP_R_ERROR_PROCESSING_MESSAGE);
         return NULL;
     }
@@ -433,7 +426,7 @@ static OSSL_CMP_PKISI *process_rr(OSSL_CMP_SRV_CTX *srv_ctx,
     /* allow any RR derived from CSR which does not include issuer and serial */
     if ((issuer != NULL || serial != NULL)
         /* accept revocation only for the reference cert, if given */
-            && !refcert_cmp(ctx->refCert, issuer, serial)) {
+        && !refcert_cmp(ctx->refCert, issuer, serial)) {
         ERR_raise_data(ERR_LIB_CMP, CMP_R_REQUEST_NOT_ACCEPTED,
                        "wrong certificate to revoke");
         return NULL;
@@ -471,9 +464,9 @@ static int check_client_crl(const STACK_OF(OSSL_CMP_CRLSTATUS) *crlStatusList,
                 ERR_raise(ERR_LIB_CMP, CMP_R_UNKNOWN_CRL_ISSUER);
                 return -1;
             }
-        } else {  
-            ERR_raise(ERR_LIB_CMP, CMP_R_SENDER_GENERALNAME_TYPE_NOT_SUPPORTED);  
-            return -1; /* error according to RFC 9483 section 4.3.4 */  
+        } else {
+            ERR_raise(ERR_LIB_CMP, CMP_R_SENDER_GENERALNAME_TYPE_NOT_SUPPORTED);
+            return -1; /* error according to RFC 9483 section 4.3.4 */
         }
     }
 
@@ -490,89 +483,81 @@ static OSSL_CMP_ITAV *process_genm_itav(mock_srv_ctx *ctx, int req_nid,
     case NID_id_it_caCerts:
         rsp = OSSL_CMP_ITAV_new_caCerts(ctx->caPubsOut);
         break;
-    case NID_id_it_rootCaCert:
-        {
-            X509 *rootcacert = NULL;
+    case NID_id_it_rootCaCert: {
+        X509 *rootcacert = NULL;
 
-            if (!OSSL_CMP_ITAV_get0_rootCaCert(req, &rootcacert))
-                return NULL;
-
-            if (rootcacert != NULL
-                && X509_NAME_cmp(X509_get_subject_name(rootcacert),
-                                 X509_get_subject_name(ctx->newWithNew)) != 0)
-                /* The subjects do not match */
-                rsp = OSSL_CMP_ITAV_new_rootCaKeyUpdate(NULL, NULL, NULL);
-            else
-                rsp = OSSL_CMP_ITAV_new_rootCaKeyUpdate(ctx->newWithNew,
-                                                        ctx->newWithOld,
-                                                        ctx->oldWithNew);
-        }
-        break;
-    case NID_id_it_crlStatusList:
-        {
-            STACK_OF(OSSL_CMP_CRLSTATUS) *crlstatuslist = NULL;
-            int res = 0;
-
-            if (!OSSL_CMP_ITAV_get0_crlStatusList(req, &crlstatuslist))
-                return NULL;
-
-            res = check_client_crl(crlstatuslist, ctx->crlOut);
-            if (res < 0)
-                rsp = NULL;
-            else
-                rsp = OSSL_CMP_ITAV_new_crls(res == 0 ? NULL : ctx->crlOut);
-        }
-        break;
-    case NID_id_it_certReqTemplate:
-        {
-            OSSL_CRMF_CERTTEMPLATE *reqtemp;
-            OSSL_CMP_ATAVS *keyspec = NULL;
-            X509_ALGOR *keyalg = NULL;
-            OSSL_CMP_ATAV *rsakeylen, *eckeyalg;
-            int ok = 0;
-
-            if ((reqtemp = OSSL_CRMF_CERTTEMPLATE_new()) == NULL)
-                return NULL;
-
-            if (!OSSL_CRMF_CERTTEMPLATE_fill(reqtemp, NULL, NULL,
-                                             X509_get_issuer_name(ctx->refCert),
-                                             NULL))
-                goto crt_err;
-
-            if ((keyalg = X509_ALGOR_new()) == NULL)
-                goto crt_err;
-
-            (void)X509_ALGOR_set0(keyalg, OBJ_nid2obj(NID_X9_62_id_ecPublicKey),
-                                  V_ASN1_UNDEF, NULL); /* cannot fail */
-
-            eckeyalg = OSSL_CMP_ATAV_new_algId(keyalg);
-            rsakeylen = OSSL_CMP_ATAV_new_rsaKeyLen(4096);
-            ok = OSSL_CMP_ATAV_push1(&keyspec, eckeyalg)
-                 && OSSL_CMP_ATAV_push1(&keyspec, rsakeylen);
-            OSSL_CMP_ATAV_free(eckeyalg);
-            OSSL_CMP_ATAV_free(rsakeylen);
-            X509_ALGOR_free(keyalg);
-
-            if (!ok)
-                goto crt_err;
-
-            rsp = OSSL_CMP_ITAV_new0_certReqTemplate(reqtemp, keyspec);
-            return rsp;
-
-        crt_err:
-            OSSL_CRMF_CERTTEMPLATE_free(reqtemp);
-            OSSL_CMP_ATAVS_free(keyspec);
+        if (!OSSL_CMP_ITAV_get0_rootCaCert(req, &rootcacert))
             return NULL;
-        }
-        break;
+
+        if (rootcacert != NULL
+            && X509_NAME_cmp(X509_get_subject_name(rootcacert),
+                             X509_get_subject_name(ctx->newWithNew))
+                != 0)
+            /* The subjects do not match */
+            rsp = OSSL_CMP_ITAV_new_rootCaKeyUpdate(NULL, NULL, NULL);
+        else
+            rsp = OSSL_CMP_ITAV_new_rootCaKeyUpdate(
+                ctx->newWithNew, ctx->newWithOld, ctx->oldWithNew);
+    } break;
+    case NID_id_it_crlStatusList: {
+        STACK_OF(OSSL_CMP_CRLSTATUS) *crlstatuslist = NULL;
+        int res = 0;
+
+        if (!OSSL_CMP_ITAV_get0_crlStatusList(req, &crlstatuslist))
+            return NULL;
+
+        res = check_client_crl(crlstatuslist, ctx->crlOut);
+        if (res < 0)
+            rsp = NULL;
+        else
+            rsp = OSSL_CMP_ITAV_new_crls(res == 0 ? NULL : ctx->crlOut);
+    } break;
+    case NID_id_it_certReqTemplate: {
+        OSSL_CRMF_CERTTEMPLATE *reqtemp;
+        OSSL_CMP_ATAVS *keyspec = NULL;
+        X509_ALGOR *keyalg = NULL;
+        OSSL_CMP_ATAV *rsakeylen, *eckeyalg;
+        int ok = 0;
+
+        if ((reqtemp = OSSL_CRMF_CERTTEMPLATE_new()) == NULL)
+            return NULL;
+
+        if (!OSSL_CRMF_CERTTEMPLATE_fill(
+                reqtemp, NULL, NULL, X509_get_issuer_name(ctx->refCert), NULL))
+            goto crt_err;
+
+        if ((keyalg = X509_ALGOR_new()) == NULL)
+            goto crt_err;
+
+        (void)X509_ALGOR_set0(keyalg, OBJ_nid2obj(NID_X9_62_id_ecPublicKey),
+                              V_ASN1_UNDEF, NULL); /* cannot fail */
+
+        eckeyalg = OSSL_CMP_ATAV_new_algId(keyalg);
+        rsakeylen = OSSL_CMP_ATAV_new_rsaKeyLen(4096);
+        ok = OSSL_CMP_ATAV_push1(&keyspec, eckeyalg)
+            && OSSL_CMP_ATAV_push1(&keyspec, rsakeylen);
+        OSSL_CMP_ATAV_free(eckeyalg);
+        OSSL_CMP_ATAV_free(rsakeylen);
+        X509_ALGOR_free(keyalg);
+
+        if (!ok)
+            goto crt_err;
+
+        rsp = OSSL_CMP_ITAV_new0_certReqTemplate(reqtemp, keyspec);
+        return rsp;
+
+crt_err:
+        OSSL_CRMF_CERTTEMPLATE_free(reqtemp);
+        OSSL_CMP_ATAVS_free(keyspec);
+        return NULL;
+    } break;
     default:
         rsp = OSSL_CMP_ITAV_dup(req);
     }
     return rsp;
 }
 
-static int process_genm(OSSL_CMP_SRV_CTX *srv_ctx,
-                        const OSSL_CMP_MSG *genm,
+static int process_genm(OSSL_CMP_SRV_CTX *srv_ctx, const OSSL_CMP_MSG *genm,
                         const STACK_OF(OSSL_CMP_ITAV) *in,
                         STACK_OF(OSSL_CMP_ITAV) **out)
 {
@@ -582,9 +567,8 @@ static int process_genm(OSSL_CMP_SRV_CTX *srv_ctx,
         ERR_raise(ERR_LIB_CMP, CMP_R_NULL_ARGUMENT);
         return 0;
     }
-    if (ctx->sendError == 1
-            || ctx->sendError == OSSL_CMP_MSG_get_bodytype(genm)
-            || sk_OSSL_CMP_ITAV_num(in) > 1) {
+    if (ctx->sendError == 1 || ctx->sendError == OSSL_CMP_MSG_get_bodytype(genm)
+        || sk_OSSL_CMP_ITAV_num(in) > 1) {
         ERR_raise(ERR_LIB_CMP, CMP_R_ERROR_PROCESSING_MESSAGE);
         return 0;
     }
@@ -601,8 +585,8 @@ static int process_genm(OSSL_CMP_SRV_CTX *srv_ctx,
         return 0;
     }
 
-    *out = sk_OSSL_CMP_ITAV_deep_copy(in, OSSL_CMP_ITAV_dup,
-                                      OSSL_CMP_ITAV_free);
+    *out =
+        sk_OSSL_CMP_ITAV_deep_copy(in, OSSL_CMP_ITAV_dup, OSSL_CMP_ITAV_free);
     return *out != NULL;
 }
 
@@ -628,7 +612,7 @@ static void process_error(OSSL_CMP_SRV_CTX *srv_ctx, const OSSL_CMP_MSG *error,
     } else {
         sibuf = OSSL_CMP_snprint_PKIStatusInfo(statusInfo, buf, sizeof(buf));
         BIO_printf(bio_err, "pkiStatusInfo: %s\n",
-                   sibuf != NULL ? sibuf: "<invalid>");
+                   sibuf != NULL ? sibuf : "<invalid>");
     }
 
     if (errorCode == NULL)
@@ -665,8 +649,8 @@ static int process_certConf(OSSL_CMP_SRV_CTX *srv_ctx,
         return 0;
     }
     if (ctx->sendError == 1
-            || ctx->sendError == OSSL_CMP_MSG_get_bodytype(certConf)
-            || ctx->certOut == NULL) {
+        || ctx->sendError == OSSL_CMP_MSG_get_bodytype(certConf)
+        || ctx->certOut == NULL) {
         ERR_raise(ERR_LIB_CMP, CMP_R_ERROR_PROCESSING_MESSAGE);
         return 0;
     }
@@ -685,21 +669,20 @@ static int process_certConf(OSSL_CMP_SRV_CTX *srv_ctx,
 /* return 0 on failure, 1 on success, setting *req or otherwise *check_after */
 static int process_pollReq(OSSL_CMP_SRV_CTX *srv_ctx,
                            const OSSL_CMP_MSG *pollReq,
-                           ossl_unused int certReqId,
-                           OSSL_CMP_MSG **req, int64_t *check_after)
+                           ossl_unused int certReqId, OSSL_CMP_MSG **req,
+                           int64_t *check_after)
 {
     mock_srv_ctx *ctx = OSSL_CMP_SRV_CTX_get0_custom_ctx(srv_ctx);
 
     if (req != NULL)
         *req = NULL;
-    if (ctx == NULL || pollReq == NULL
-            || req == NULL || check_after == NULL) {
+    if (ctx == NULL || pollReq == NULL || req == NULL || check_after == NULL) {
         ERR_raise(ERR_LIB_CMP, CMP_R_NULL_ARGUMENT);
         return 0;
     }
 
     if (ctx->sendError == 1
-            || ctx->sendError == OSSL_CMP_MSG_get_bodytype(pollReq)) {
+        || ctx->sendError == OSSL_CMP_MSG_get_bodytype(pollReq)) {
         ERR_raise(ERR_LIB_CMP, CMP_R_ERROR_PROCESSING_MESSAGE);
         return 0;
     }
@@ -725,11 +708,11 @@ OSSL_CMP_SRV_CTX *ossl_cmp_mock_srv_new(OSSL_LIB_CTX *libctx, const char *propq)
     mock_srv_ctx *ctx = mock_srv_ctx_new();
 
     if (srv_ctx != NULL && ctx != NULL
-            && OSSL_CMP_SRV_CTX_init(srv_ctx, ctx, process_cert_request,
-                                     process_rr, process_genm, process_error,
-                                     process_certConf, process_pollReq)
-            && OSSL_CMP_SRV_CTX_init_trans(srv_ctx,
-                                           delayed_delivery, clean_transaction))
+        && OSSL_CMP_SRV_CTX_init(srv_ctx, ctx, process_cert_request, process_rr,
+                                 process_genm, process_error, process_certConf,
+                                 process_pollReq)
+        && OSSL_CMP_SRV_CTX_init_trans(srv_ctx, delayed_delivery,
+                                       clean_transaction))
         return srv_ctx;
 
     mock_srv_ctx_free(ctx);

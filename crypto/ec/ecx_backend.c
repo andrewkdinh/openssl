@@ -71,9 +71,8 @@ int ossl_ecx_key_fromdata(ECX_KEY *ecx, const OSSL_PARAM params[],
         return 0;
 
     if (param_priv_key != NULL) {
-        if (!OSSL_PARAM_get_octet_string(param_priv_key,
-                                         (void **)&ecx->privkey, ecx->keylen,
-                                         &privkeylen))
+        if (!OSSL_PARAM_get_octet_string(param_priv_key, (void **)&ecx->privkey,
+                                         ecx->keylen, &privkeylen))
             return 0;
         if (privkeylen != ecx->keylen) {
             /*
@@ -87,12 +86,10 @@ int ossl_ecx_key_fromdata(ECX_KEY *ecx, const OSSL_PARAM params[],
         }
     }
 
-
     pubkey = ecx->pubkey;
     if (param_pub_key != NULL
-        && !OSSL_PARAM_get_octet_string(param_pub_key,
-                                        (void **)&pubkey,
-                                         sizeof(ecx->pubkey), &pubkeylen))
+        && !OSSL_PARAM_get_octet_string(param_pub_key, (void **)&pubkey,
+                                        sizeof(ecx->pubkey), &pubkeylen))
         return 0;
 
     if ((param_pub_key != NULL && pubkeylen != ecx->keylen))
@@ -151,9 +148,8 @@ err:
 }
 
 #ifndef FIPS_MODULE
-ECX_KEY *ossl_ecx_key_op(const X509_ALGOR *palg,
-                         const unsigned char *p, int plen,
-                         int id, ecx_key_op_t op,
+ECX_KEY *ossl_ecx_key_op(const X509_ALGOR *palg, const unsigned char *p,
+                         int plen, int id, ecx_key_op_t op,
                          OSSL_LIB_CTX *libctx, const char *propq)
 {
     ECX_KEY *key = NULL;
@@ -221,7 +217,7 @@ ECX_KEY *ossl_ecx_key_op(const X509_ALGOR *palg,
     }
 
     return key;
- err:
+err:
     ossl_ecx_key_free(key);
     return NULL;
 }
@@ -251,8 +247,8 @@ ECX_KEY *ossl_ecx_key_from_pkcs8(const PKCS8_PRIV_KEY_INFO *p8inf,
      * EVP_PKEY_NONE means that ecx_key_op() has to figure out the key type
      * on its own.
      */
-    ecx = ossl_ecx_key_op(palg, p, plen, EVP_PKEY_NONE, KEY_OP_PRIVATE,
-                          libctx, propq);
+    ecx = ossl_ecx_key_op(palg, p, plen, EVP_PKEY_NONE, KEY_OP_PRIVATE, libctx,
+                          propq);
     ASN1_OCTET_STRING_free(oct);
     return ecx;
 }

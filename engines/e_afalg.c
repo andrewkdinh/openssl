@@ -28,8 +28,8 @@
 #define K_MAJ   4
 #define K_MIN1  1
 #define K_MIN2  0
-#if LINUX_VERSION_CODE < KERNEL_VERSION(K_MAJ, K_MIN1, K_MIN2) || \
-    !defined(AF_ALG)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(K_MAJ, K_MIN1, K_MIN2) \
+    || !defined(AF_ALG)
 # ifndef PEDANTIC
 #  warning "AFALG ENGINE requires Kernel Headers >= 4.1.0"
 #  warning "Skipping Compilation of AFALG engine"
@@ -72,17 +72,17 @@ void engine_load_afalg_int(void);
 
 /* Local Linkage Functions */
 static int afalg_init_aio(afalg_aio *aio);
-static int afalg_fin_cipher_aio(afalg_aio *ptr, int sfd,
-                                unsigned char *buf, size_t len);
+static int afalg_fin_cipher_aio(afalg_aio *ptr, int sfd, unsigned char *buf,
+                                size_t len);
 static int afalg_create_sk(afalg_ctx *actx, const char *ciphertype,
-                                const char *ciphername);
+                           const char *ciphername);
 static int afalg_destroy(ENGINE *e);
 static int afalg_init(ENGINE *e);
 static int afalg_finish(ENGINE *e);
 static const EVP_CIPHER *afalg_aes_cbc(int nid);
 static cbc_handles *get_cipher_handle(int nid);
-static int afalg_ciphers(ENGINE *e, const EVP_CIPHER **cipher,
-                         const int **nids, int nid);
+static int afalg_ciphers(ENGINE *e, const EVP_CIPHER **cipher, const int **nids,
+                         int nid);
 static int afalg_cipher_init(EVP_CIPHER_CTX *ctx, const unsigned char *key,
                              const unsigned char *iv, int enc);
 static int afalg_do_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
@@ -101,8 +101,8 @@ static int afalg_cipher_nids[] = {
 };
 
 static cbc_handles cbc_handle[] = {{AES_KEY_SIZE_128, NULL},
-                                    {AES_KEY_SIZE_192, NULL},
-                                    {AES_KEY_SIZE_256, NULL}};
+                                   {AES_KEY_SIZE_192, NULL},
+                                   {AES_KEY_SIZE_256, NULL}};
 
 static ossl_inline int io_setup(unsigned n, aio_context_t *ctx)
 {
@@ -126,15 +126,15 @@ static ossl_inline int io_read(aio_context_t ctx, long n, struct iocb **iocb)
 
 /* A version of 'struct timespec' with 32-bit time_t and nanoseconds.  */
 struct __timespec32 {
-  __kernel_long_t tv_sec;
-  __kernel_long_t tv_nsec;
+    __kernel_long_t tv_sec;
+    __kernel_long_t tv_nsec;
 };
 
 static ossl_inline int io_getevents(aio_context_t ctx, long min, long max,
-                               struct io_event *events,
-                               struct timespec *timeout)
+                                    struct io_event *events,
+                                    struct timespec *timeout)
 {
-#if defined(__NR_io_pgetevents_time64)
+# if defined(__NR_io_pgetevents_time64)
     /* Check if we are a 32-bit architecture with a 64-bit time_t */
     if (sizeof(*timeout) != sizeof(struct __timespec32)) {
         int ret = syscall(__NR_io_pgetevents_time64, ctx, min, max, events,
@@ -142,9 +142,9 @@ static ossl_inline int io_getevents(aio_context_t ctx, long min, long max,
         if (ret == 0 || errno != ENOSYS)
             return ret;
     }
-#endif
+# endif
 
-#if defined(__NR_io_getevents)
+# if defined(__NR_io_getevents)
     if (sizeof(*timeout) == sizeof(struct __timespec32))
         /*
          * time_t matches our architecture length, we can just use
@@ -161,15 +161,15 @@ static ossl_inline int io_getevents(aio_context_t ctx, long min, long max,
         if (timeout && timeout->tv_sec == (long)timeout->tv_sec) {
             struct __timespec32 ts32;
 
-            ts32.tv_sec = (__kernel_long_t) timeout->tv_sec;
-            ts32.tv_nsec = (__kernel_long_t) timeout->tv_nsec;
+            ts32.tv_sec = (__kernel_long_t)timeout->tv_sec;
+            ts32.tv_nsec = (__kernel_long_t)timeout->tv_nsec;
 
             return syscall(__NR_io_getevents, ctx, min, max, events, &ts32);
         } else {
             return syscall(__NR_io_getevents, ctx, min, max, events, NULL);
         }
     }
-#endif
+# endif
 
     errno = ENOSYS;
     return -1;
@@ -196,8 +196,8 @@ static int afalg_setup_async_event_notification(afalg_aio *aio)
             return 0;
         }
         /* Get waitfd from ASYNC_WAIT_CTX if it is already set */
-        ret = ASYNC_WAIT_CTX_get_fd(waitctx, engine_afalg_id,
-                                    &aio->efd, &custom);
+        ret =
+            ASYNC_WAIT_CTX_get_fd(waitctx, engine_afalg_id, &aio->efd, &custom);
         if (ret == 0) {
             /*
              * waitfd is not set in ASYNC_WAIT_CTX, create a new one
@@ -211,9 +211,8 @@ static int afalg_setup_async_event_notification(afalg_aio *aio)
                          AFALG_R_EVENTFD_FAILED);
                 return 0;
             }
-            ret = ASYNC_WAIT_CTX_set_wait_fd(waitctx, engine_afalg_id,
-                                             aio->efd, custom,
-                                             afalg_waitfd_cleanup);
+            ret = ASYNC_WAIT_CTX_set_wait_fd(waitctx, engine_afalg_id, aio->efd,
+                                             custom, afalg_waitfd_cleanup);
             if (ret == 0) {
                 ALG_WARN("%s(%d): Failed to set wait fd", __FILE__, __LINE__);
                 close(aio->efd);
@@ -323,18 +322,17 @@ static int afalg_fin_cipher_aio(afalg_aio *aio, int sfd, unsigned char *buf,
         }
         if (eval > 0) {
 
-#ifdef OSSL_SANITIZE_MEMORY
+# ifdef OSSL_SANITIZE_MEMORY
             /*
              * In a memory sanitiser build, the changes to memory made by the
              * system call aren't reliably detected.  By initialising the
              * memory here, the sanitiser is told that they are okay.
              */
             memset(events, 0, sizeof(events));
-#endif
+# endif
 
             /* Get results of AIO read */
-            r = io_getevents(aio->aio_ctx, 1, MAX_INFLIGHTS,
-                             events, &timeout);
+            r = io_getevents(aio->aio_ctx, 1, MAX_INFLIGHTS, events, &timeout);
             if (r > 0) {
                 /*
                  * events.res indicates the actual status of the operation.
@@ -370,14 +368,15 @@ static int afalg_fin_cipher_aio(afalg_aio *aio, int sfd, unsigned char *buf,
                          * Retries exceed for -EBUSY or unrecoverable error
                          * condition for this instance of operation.
                          */
-                        ALG_WARN
-                            ("%s(%d): Crypto Operation failed with code %lld\n",
-                             __FILE__, __LINE__, events[0].res);
+                        ALG_WARN(
+                            "%s(%d): Crypto Operation failed with code %lld\n",
+                            __FILE__, __LINE__, events[0].res);
                         BIO_snprintf(strbuf, sizeof(strbuf), "%lld", op_ret);
                         switch (events[0].res) {
                         case -ENOMEM:
                             AFALGerr(0, AFALG_R_KERNEL_OP_FAILED);
-                            ERR_add_error_data(3, "-ENOMEM ( code ", strbuf, " )");
+                            ERR_add_error_data(3, "-ENOMEM ( code ", strbuf,
+                                               " )");
                             break;
                         default:
                             AFALGerr(0, AFALG_R_KERNEL_OP_FAILED);
@@ -403,7 +402,7 @@ static int afalg_fin_cipher_aio(afalg_aio *aio, int sfd, unsigned char *buf,
 }
 
 static ossl_inline void afalg_set_op_sk(struct cmsghdr *cmsg,
-                                   const ALG_OP_TYPE op)
+                                        const ALG_OP_TYPE op)
 {
     cmsg->cmsg_level = SOL_ALG;
     cmsg->cmsg_type = ALG_SET_OP;
@@ -425,7 +424,7 @@ static void afalg_set_iv_sk(struct cmsghdr *cmsg, const unsigned char *iv,
 }
 
 static ossl_inline int afalg_set_key(afalg_ctx *actx, const unsigned char *key,
-                                const int klen)
+                                     const int klen)
 {
     int ret;
     ret = setsockopt(actx->bfd, SOL_ALG, ALG_SET_KEY, key, klen);
@@ -438,7 +437,7 @@ static ossl_inline int afalg_set_key(afalg_ctx *actx, const unsigned char *key,
 }
 
 static int afalg_create_sk(afalg_ctx *actx, const char *ciphertype,
-                                const char *ciphername)
+                           const char *ciphername)
 {
     struct sockaddr_alg sa;
     int r = -1;
@@ -447,8 +446,8 @@ static int afalg_create_sk(afalg_ctx *actx, const char *ciphertype,
 
     memset(&sa, 0, sizeof(sa));
     sa.salg_family = AF_ALG;
-    OPENSSL_strlcpy((char *) sa.salg_type, ciphertype, sizeof(sa.salg_type));
-    OPENSSL_strlcpy((char *) sa.salg_name, ciphername, sizeof(sa.salg_name));
+    OPENSSL_strlcpy((char *)sa.salg_type, ciphertype, sizeof(sa.salg_type));
+    OPENSSL_strlcpy((char *)sa.salg_name, ciphername, sizeof(sa.salg_name));
 
     actx->bfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
     if (actx->bfd == -1) {
@@ -473,7 +472,7 @@ static int afalg_create_sk(afalg_ctx *actx, const char *ciphertype,
 
     return 1;
 
- err:
+err:
     if (actx->bfd >= 0)
         close(actx->bfd);
     if (actx->sfd >= 0)
@@ -561,9 +560,8 @@ static int afalg_start_cipher_sk(afalg_ctx *actx, const unsigned char *in,
         return 0;
     }
 
-    if (sbytes != (ssize_t) inl) {
-        ALG_WARN("Cipher operation send bytes %zd != inlen %zd\n", sbytes,
-                inl);
+    if (sbytes != (ssize_t)inl) {
+        ALG_WARN("Cipher operation send bytes %zd != inlen %zd\n", sbytes, inl);
         return 0;
     }
 # endif
@@ -648,7 +646,7 @@ static int afalg_do_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
 {
     afalg_ctx *actx;
     int ret;
-    char nxtiv[ALG_AES_IV_LEN] = { 0 };
+    char nxtiv[ALG_AES_IV_LEN] = {0};
 
     if (ctx == NULL || out == NULL || in == NULL) {
         ALG_WARN("NULL parameter passed to function %s(%d)\n", __FILE__,
@@ -656,7 +654,7 @@ static int afalg_do_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
         return 0;
     }
 
-    actx = (afalg_ctx *) EVP_CIPHER_CTX_get_cipher_data(ctx);
+    actx = (afalg_ctx *)EVP_CIPHER_CTX_get_cipher_data(ctx);
     if (actx == NULL || actx->init_done != MAGIC_INIT_NUM) {
         ALG_WARN("%s afalg ctx passed\n",
                  ctx == NULL ? "NULL" : "Uninitialised");
@@ -704,7 +702,7 @@ static int afalg_cipher_cleanup(EVP_CIPHER_CTX *ctx)
         return 0;
     }
 
-    actx = (afalg_ctx *) EVP_CIPHER_CTX_get_cipher_data(ctx);
+    actx = (afalg_ctx *)EVP_CIPHER_CTX_get_cipher_data(ctx);
     if (actx == NULL || actx->init_done != MAGIC_INIT_NUM)
         return 1;
 
@@ -741,33 +739,32 @@ static const EVP_CIPHER *afalg_aes_cbc(int nid)
     cbc_handles *cipher_handle = get_cipher_handle(nid);
 
     if (cipher_handle == NULL)
-            return NULL;
+        return NULL;
     if (cipher_handle->_hidden == NULL
-        && ((cipher_handle->_hidden =
-         EVP_CIPHER_meth_new(nid,
-                             AES_BLOCK_SIZE,
-                             cipher_handle->key_size)) == NULL
-        || !EVP_CIPHER_meth_set_iv_length(cipher_handle->_hidden,
-                                          AES_IV_LEN)
-        || !EVP_CIPHER_meth_set_flags(cipher_handle->_hidden,
-                                      EVP_CIPH_CBC_MODE |
-                                      EVP_CIPH_FLAG_DEFAULT_ASN1)
-        || !EVP_CIPHER_meth_set_init(cipher_handle->_hidden,
-                                     afalg_cipher_init)
-        || !EVP_CIPHER_meth_set_do_cipher(cipher_handle->_hidden,
-                                          afalg_do_cipher)
-        || !EVP_CIPHER_meth_set_cleanup(cipher_handle->_hidden,
-                                        afalg_cipher_cleanup)
-        || !EVP_CIPHER_meth_set_impl_ctx_size(cipher_handle->_hidden,
-                                              sizeof(afalg_ctx)))) {
+        && ((cipher_handle->_hidden = EVP_CIPHER_meth_new(
+                 nid, AES_BLOCK_SIZE, cipher_handle->key_size))
+                == NULL
+            || !EVP_CIPHER_meth_set_iv_length(cipher_handle->_hidden,
+                                              AES_IV_LEN)
+            || !EVP_CIPHER_meth_set_flags(cipher_handle->_hidden,
+                                          EVP_CIPH_CBC_MODE
+                                              | EVP_CIPH_FLAG_DEFAULT_ASN1)
+            || !EVP_CIPHER_meth_set_init(cipher_handle->_hidden,
+                                         afalg_cipher_init)
+            || !EVP_CIPHER_meth_set_do_cipher(cipher_handle->_hidden,
+                                              afalg_do_cipher)
+            || !EVP_CIPHER_meth_set_cleanup(cipher_handle->_hidden,
+                                            afalg_cipher_cleanup)
+            || !EVP_CIPHER_meth_set_impl_ctx_size(cipher_handle->_hidden,
+                                                  sizeof(afalg_ctx)))) {
         EVP_CIPHER_meth_free(cipher_handle->_hidden);
-        cipher_handle->_hidden= NULL;
+        cipher_handle->_hidden = NULL;
     }
     return cipher_handle->_hidden;
 }
 
-static int afalg_ciphers(ENGINE *e, const EVP_CIPHER **cipher,
-                         const int **nids, int nid)
+static int afalg_ciphers(ENGINE *e, const EVP_CIPHER **cipher, const int **nids,
+                         int nid)
 {
     int r = 1;
 
@@ -841,14 +838,14 @@ static int bind_helper(ENGINE *e, const char *id)
 }
 
 IMPLEMENT_DYNAMIC_CHECK_FN()
-    IMPLEMENT_DYNAMIC_BIND_FN(bind_helper)
+IMPLEMENT_DYNAMIC_BIND_FN(bind_helper)
 # endif
 
 static int afalg_chk_platform(void)
 {
     int ret;
     int i;
-    int kver[3] = { -1, -1, -1 };
+    int kver[3] = {-1, -1, -1};
     int sock;
     char *str;
     struct utsname ut;
@@ -868,10 +865,10 @@ static int afalg_chk_platform(void)
 
     if (KERNEL_VERSION(kver[0], kver[1], kver[2])
         < KERNEL_VERSION(K_MAJ, K_MIN1, K_MIN2)) {
-        ALG_ERR("ASYNC AFALG not supported this kernel(%d.%d.%d)\n",
-                 kver[0], kver[1], kver[2]);
+        ALG_ERR("ASYNC AFALG not supported this kernel(%d.%d.%d)\n", kver[0],
+                kver[1], kver[2]);
         ALG_ERR("ASYNC AFALG requires kernel version %d.%d.%d or later\n",
-                 K_MAJ, K_MIN1, K_MIN2);
+                K_MAJ, K_MIN1, K_MIN2);
         AFALGerr(AFALG_F_AFALG_CHK_PLATFORM,
                  AFALG_R_KERNEL_DOES_NOT_SUPPORT_ASYNC_AFALG);
         return 0;

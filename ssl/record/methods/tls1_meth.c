@@ -20,10 +20,8 @@ static int tls1_set_crypto_state(OSSL_RECORD_LAYER *rl, int level,
                                  unsigned char *key, size_t keylen,
                                  unsigned char *iv, size_t ivlen,
                                  unsigned char *mackey, size_t mackeylen,
-                                 const EVP_CIPHER *ciph,
-                                 size_t taglen,
-                                 int mactype,
-                                 const EVP_MD *md,
+                                 const EVP_CIPHER *ciph, size_t taglen,
+                                 int mactype, const EVP_MD *md,
                                  COMP_METHOD *comp)
 {
     EVP_CIPHER_CTX *ciph_ctx;
@@ -61,22 +59,21 @@ static int tls1_set_crypto_state(OSSL_RECORD_LAYER *rl, int level,
      */
     if ((EVP_CIPHER_get_flags(ciph) & EVP_CIPH_FLAG_AEAD_CIPHER) == 0) {
         if (mactype == EVP_PKEY_HMAC) {
-            mac_key = EVP_PKEY_new_raw_private_key_ex(rl->libctx, "HMAC",
-                                                      rl->propq, mackey,
-                                                      mackeylen);
+            mac_key = EVP_PKEY_new_raw_private_key_ex(
+                rl->libctx, "HMAC", rl->propq, mackey, mackeylen);
         } else {
             /*
              * If its not HMAC then the only other types of MAC we support are
              * the GOST MACs, so we need to use the old style way of creating
              * a MAC key.
              */
-            mac_key = EVP_PKEY_new_mac_key(mactype, NULL, mackey,
-                                           (int)mackeylen);
+            mac_key =
+                EVP_PKEY_new_mac_key(mactype, NULL, mackey, (int)mackeylen);
         }
         if (mac_key == NULL
             || EVP_DigestSignInit_ex(rl->md_ctx, NULL, EVP_MD_get0_name(md),
-                                     rl->libctx, rl->propq, mac_key,
-                                     NULL) <= 0) {
+                                     rl->libctx, rl->propq, mac_key, NULL)
+                <= 0) {
             EVP_PKEY_free(mac_key);
             ERR_raise(ERR_LIB_SSL, ERR_R_INTERNAL_ERROR);
             return OSSL_RECORD_RETURN_FATAL;
@@ -86,20 +83,23 @@ static int tls1_set_crypto_state(OSSL_RECORD_LAYER *rl, int level,
 
     if (EVP_CIPHER_get_mode(ciph) == EVP_CIPH_GCM_MODE) {
         if (!EVP_CipherInit_ex(ciph_ctx, ciph, NULL, key, NULL, enc)
-                || EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_GCM_SET_IV_FIXED,
-                                       (int)ivlen, iv) <= 0) {
+            || EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_GCM_SET_IV_FIXED,
+                                   (int)ivlen, iv)
+                <= 0) {
             ERR_raise(ERR_LIB_SSL, ERR_R_INTERNAL_ERROR);
             return OSSL_RECORD_RETURN_FATAL;
         }
     } else if (EVP_CIPHER_get_mode(ciph) == EVP_CIPH_CCM_MODE) {
         if (!EVP_CipherInit_ex(ciph_ctx, ciph, NULL, NULL, NULL, enc)
-                || EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_AEAD_SET_IVLEN, 12,
-                                       NULL) <= 0
-                || EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_AEAD_SET_TAG,
-                                       (int)taglen, NULL) <= 0
-                || EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_CCM_SET_IV_FIXED,
-                                       (int)ivlen, iv) <= 0
-                || !EVP_CipherInit_ex(ciph_ctx, NULL, NULL, key, NULL, enc)) {
+            || EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_AEAD_SET_IVLEN, 12, NULL)
+                <= 0
+            || EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_AEAD_SET_TAG, (int)taglen,
+                                   NULL)
+                <= 0
+            || EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_CCM_SET_IV_FIXED,
+                                   (int)ivlen, iv)
+                <= 0
+            || !EVP_CipherInit_ex(ciph_ctx, NULL, NULL, key, NULL, enc)) {
             ERR_raise(ERR_LIB_SSL, ERR_R_INTERNAL_ERROR);
             return OSSL_RECORD_RETURN_FATAL;
         }
@@ -113,7 +113,8 @@ static int tls1_set_crypto_state(OSSL_RECORD_LAYER *rl, int level,
     if ((EVP_CIPHER_get_flags(ciph) & EVP_CIPH_FLAG_AEAD_CIPHER) != 0
         && mackeylen != 0
         && EVP_CIPHER_CTX_ctrl(ciph_ctx, EVP_CTRL_AEAD_SET_MAC_KEY,
-                               (int)mackeylen, mackey) <= 0) {
+                               (int)mackeylen, mackey)
+            <= 0) {
         ERR_raise(ERR_LIB_SSL, ERR_R_INTERNAL_ERROR);
         return OSSL_RECORD_RETURN_FATAL;
     }
@@ -123,7 +124,7 @@ static int tls1_set_crypto_state(OSSL_RECORD_LAYER *rl, int level,
      * different to that in ciph if we have an ENGINE in use
      */
     if (EVP_CIPHER_get0_provider(EVP_CIPHER_CTX_get0_cipher(ciph_ctx)) != NULL
-            && !ossl_set_tls_provider_parameters(rl, ciph_ctx, ciph, md)) {
+        && !ossl_set_tls_provider_parameters(rl, ciph_ctx, ciph, md)) {
         /* ERR_raise already called */
         return OSSL_RECORD_RETURN_FATAL;
     }
@@ -210,11 +211,13 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
         if (ivlen > 1) {
             for (ctr = 0; ctr < n_recs; ctr++) {
                 if (recs[ctr].data != recs[ctr].input) {
-                    RLAYERfatal(rl, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
+                    RLAYERfatal(rl, SSL_AD_INTERNAL_ERROR,
+                                ERR_R_INTERNAL_ERROR);
                     return 0;
-                } else if (RAND_bytes_ex(rl->libctx, recs[ctr].input,
-                                         ivlen, 0) <= 0) {
-                    RLAYERfatal(rl, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
+                } else if (RAND_bytes_ex(rl->libctx, recs[ctr].input, ivlen, 0)
+                           <= 0) {
+                    RLAYERfatal(rl, SSL_AD_INTERNAL_ERROR,
+                                ERR_R_INTERNAL_ERROR);
                     return 0;
                 }
             }
@@ -236,7 +239,8 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
 
     if (n_recs > 1) {
         if ((EVP_CIPHER_get_flags(EVP_CIPHER_CTX_get0_cipher(ds))
-                 & EVP_CIPH_FLAG_PIPELINE) == 0) {
+             & EVP_CIPH_FLAG_PIPELINE)
+            == 0) {
             /*
              * We shouldn't have been called with pipeline data if the
              * cipher doesn't support pipelining
@@ -249,7 +253,8 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
         reclen[ctr] = recs[ctr].length;
 
         if ((EVP_CIPHER_get_flags(EVP_CIPHER_CTX_get0_cipher(ds))
-                 & EVP_CIPH_FLAG_AEAD_CIPHER) != 0) {
+             & EVP_CIPH_FLAG_AEAD_CIPHER)
+            != 0) {
             unsigned char *seq;
 
             seq = rl->sequence;
@@ -314,22 +319,23 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
     }
     if (n_recs > 1) {
         /* Set the output buffers */
-        for (ctr = 0; ctr < n_recs; ctr++)
-            data[ctr] = recs[ctr].data;
+        for (ctr = 0; ctr < n_recs; ctr++) data[ctr] = recs[ctr].data;
 
         if (EVP_CIPHER_CTX_ctrl(ds, EVP_CTRL_SET_PIPELINE_OUTPUT_BUFS,
-                                (int)n_recs, data) <= 0) {
+                                (int)n_recs, data)
+            <= 0) {
             RLAYERfatal(rl, SSL_AD_INTERNAL_ERROR, SSL_R_PIPELINE_FAILURE);
             return 0;
         }
         /* Set the input buffers */
-        for (ctr = 0; ctr < n_recs; ctr++)
-            data[ctr] = recs[ctr].input;
+        for (ctr = 0; ctr < n_recs; ctr++) data[ctr] = recs[ctr].input;
 
         if (EVP_CIPHER_CTX_ctrl(ds, EVP_CTRL_SET_PIPELINE_INPUT_BUFS,
-                                (int)n_recs, data) <= 0
+                                (int)n_recs, data)
+                <= 0
             || EVP_CIPHER_CTX_ctrl(ds, EVP_CTRL_SET_PIPELINE_INPUT_LENS,
-                                   (int)n_recs, reclen) <= 0) {
+                                   (int)n_recs, reclen)
+                <= 0) {
             RLAYERfatal(rl, SSL_AD_INTERNAL_ERROR, SSL_R_PIPELINE_FAILURE);
             return 0;
         }
@@ -347,7 +353,8 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
             decrement_seq = 1;
 
         if (EVP_CIPHER_CTX_ctrl(ds, EVP_CTRL_TLSTREE, decrement_seq,
-                                rl->sequence) <= 0) {
+                                rl->sequence)
+            <= 0) {
 
             RLAYERfatal(rl, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
             return 0;
@@ -393,9 +400,8 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
                 /* Get the MAC */
                 macs[0].alloced = 0;
 
-                *p++ = OSSL_PARAM_construct_octet_ptr(OSSL_CIPHER_PARAM_TLS_MAC,
-                                                      (void **)&macs[0].mac,
-                                                      macsize);
+                *p++ = OSSL_PARAM_construct_octet_ptr(
+                    OSSL_CIPHER_PARAM_TLS_MAC, (void **)&macs[0].mac, macsize);
                 *p = OSSL_PARAM_construct_end();
 
                 if (!EVP_CIPHER_CTX_get_params(ds, params)) {
@@ -412,9 +418,10 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
         tmpr = EVP_Cipher(ds, recs[0].data, recs[0].input,
                           (unsigned int)reclen[0]);
         if ((EVP_CIPHER_get_flags(EVP_CIPHER_CTX_get0_cipher(ds))
-                 & EVP_CIPH_FLAG_CUSTOM_CIPHER) != 0
-            ? (tmpr < 0)
-            : (tmpr == 0)) {
+             & EVP_CIPH_FLAG_CUSTOM_CIPHER)
+                    != 0
+                ? (tmpr < 0)
+                : (tmpr == 0)) {
             /* AEAD can fail to verify MAC */
             return 0;
         }
@@ -443,17 +450,14 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
                  * If using Mac-then-encrypt, then this will succeed but
                  * with a random MAC if padding is invalid
                  */
-                if (!tls1_cbc_remove_padding_and_mac(&recs[ctr].length,
-                                        recs[ctr].orig_len,
-                                        recs[ctr].data,
-                                        (macs != NULL) ? &macs[ctr].mac : NULL,
-                                        (macs != NULL) ? &macs[ctr].alloced
-                                                       : NULL,
-                                        bs,
-                                        pad ? (size_t)pad : macsize,
-                                        (EVP_CIPHER_get_flags(enc)
-                                        & EVP_CIPH_FLAG_AEAD_CIPHER) != 0,
-                                        rl->libctx))
+                if (!tls1_cbc_remove_padding_and_mac(
+                        &recs[ctr].length, recs[ctr].orig_len, recs[ctr].data,
+                        (macs != NULL) ? &macs[ctr].mac : NULL,
+                        (macs != NULL) ? &macs[ctr].alloced : NULL, bs,
+                        pad ? (size_t)pad : macsize,
+                        (EVP_CIPHER_get_flags(enc) & EVP_CIPH_FLAG_AEAD_CIPHER)
+                            != 0,
+                        rl->libctx))
                     return 0;
             }
         }
@@ -461,8 +465,8 @@ static int tls1_cipher(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *recs,
     return 1;
 }
 
-static int tls1_mac(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec, unsigned char *md,
-                    int sending)
+static int tls1_mac(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec,
+                    unsigned char *md, int sending)
 {
     unsigned char *seq = rl->sequence;
     EVP_MD_CTX *hash;
@@ -489,9 +493,8 @@ static int tls1_mac(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec, unsigned char *md
         mac_ctx = hmac;
     }
 
-    if (!rl->isdtls
-            && rl->tlstree
-            && EVP_MD_CTX_ctrl(mac_ctx, EVP_MD_CTRL_TLSTREE, 0, seq) <= 0)
+    if (!rl->isdtls && rl->tlstree
+        && EVP_MD_CTX_ctrl(mac_ctx, EVP_MD_CTRL_TLSTREE, 0, seq) <= 0)
         goto end;
 
     if (rl->isdtls) {
@@ -530,24 +533,28 @@ static int tls1_mac(OSSL_RECORD_LAYER *rl, TLS_RL_RECORD *rec, unsigned char *md
         || EVP_DigestSignFinal(mac_ctx, md, &md_size) <= 0)
         goto end;
 
-    OSSL_TRACE_BEGIN(TLS) {
+    OSSL_TRACE_BEGIN(TLS)
+    {
         BIO_printf(trc_out, "seq:\n");
         BIO_dump_indent(trc_out, seq, 8, 4);
         BIO_printf(trc_out, "rec:\n");
         BIO_dump_indent(trc_out, rec->data, rec->length, 4);
-    } OSSL_TRACE_END(TLS);
+    }
+    OSSL_TRACE_END(TLS);
 
     if (!rl->isdtls && !tls_increment_sequence_ctr(rl)) {
         /* RLAYERfatal already called */
         goto end;
     }
 
-    OSSL_TRACE_BEGIN(TLS) {
+    OSSL_TRACE_BEGIN(TLS)
+    {
         BIO_printf(trc_out, "md:\n");
         BIO_dump_indent(trc_out, md, md_size, 4);
-    } OSSL_TRACE_END(TLS);
+    }
+    OSSL_TRACE_END(TLS);
     ret = 1;
- end:
+end:
     EVP_MD_CTX_free(hmac);
     return ret;
 }
@@ -581,7 +588,7 @@ int tls1_allocate_write_buffers(OSSL_RECORD_LAYER *rl,
 {
     /* Do we need to add an empty record prefix? */
     *prefix = rl->need_empty_fragments
-              && templates[0].type == SSL3_RT_APPLICATION_DATA;
+        && templates[0].type == SSL3_RT_APPLICATION_DATA;
 
     /*
      * In the prefix case we can allocate a much smaller buffer. Otherwise we
@@ -601,8 +608,7 @@ int tls1_initialise_write_packets(OSSL_RECORD_LAYER *rl,
                                   OSSL_RECORD_TEMPLATE *templates,
                                   size_t numtempl,
                                   OSSL_RECORD_TEMPLATE *prefixtempl,
-                                  WPACKET *pkt,
-                                  TLS_BUFFER *bufs,
+                                  WPACKET *pkt, TLS_BUFFER *bufs,
                                   size_t *wpinited)
 {
     size_t align = 0;
@@ -611,7 +617,7 @@ int tls1_initialise_write_packets(OSSL_RECORD_LAYER *rl,
 
     /* Do we need to add an empty record prefix? */
     prefix = rl->need_empty_fragments
-             && templates[0].type == SSL3_RT_APPLICATION_DATA;
+        && templates[0].type == SSL3_RT_APPLICATION_DATA;
 
     if (prefix) {
         /*
@@ -627,8 +633,7 @@ int tls1_initialise_write_packets(OSSL_RECORD_LAYER *rl,
 
 #if defined(SSL3_ALIGN_PAYLOAD) && SSL3_ALIGN_PAYLOAD != 0
         align = (size_t)TLS_BUFFER_get_buf(wb) + SSL3_RT_HEADER_LENGTH;
-        align = SSL3_ALIGN_PAYLOAD - 1
-                - ((align - 1) % SSL3_ALIGN_PAYLOAD);
+        align = SSL3_ALIGN_PAYLOAD - 1 - ((align - 1) % SSL3_ALIGN_PAYLOAD);
 #endif
         TLS_BUFFER_set_offset(wb, align);
 
@@ -644,10 +649,8 @@ int tls1_initialise_write_packets(OSSL_RECORD_LAYER *rl,
         }
     }
 
-    return tls_initialise_write_packets_default(rl, templates, numtempl,
-                                                NULL,
-                                                pkt + prefix, bufs + prefix,
-                                                wpinited);
+    return tls_initialise_write_packets_default(
+        rl, templates, numtempl, NULL, pkt + prefix, bufs + prefix, wpinited);
 }
 
 /* TLSv1.0, TLSv1.1 and TLSv1.2 all use the same funcs */
@@ -669,20 +672,12 @@ const struct record_functions_st tls_1_funcs = {
     NULL,
     tls_prepare_for_encryption_default,
     tls_post_encryption_processing_default,
-    NULL
-};
+    NULL};
 
 const struct record_functions_st dtls_1_funcs = {
-    tls1_set_crypto_state,
-    tls1_cipher,
-    tls1_mac,
-    tls_default_set_protocol_version,
-    tls_default_read_n,
-    dtls_get_more_records,
-    NULL,
-    NULL,
-    NULL,
-    tls_write_records_default,
+    tls1_set_crypto_state, tls1_cipher, tls1_mac,
+    tls_default_set_protocol_version, tls_default_read_n, dtls_get_more_records,
+    NULL, NULL, NULL, tls_write_records_default,
     /*
      * Don't use tls1_allocate_write_buffers since that handles empty fragment
      * records which aren't needed in DTLS. We just use the default allocation
@@ -690,11 +685,6 @@ const struct record_functions_st dtls_1_funcs = {
      */
     tls_allocate_write_buffers_default,
     /* Don't use tls1_initialise_write_packets for same reason as above */
-    tls_initialise_write_packets_default,
-    NULL,
-    dtls_prepare_record_header,
-    NULL,
-    tls_prepare_for_encryption_default,
-    dtls_post_encryption_processing,
-    NULL
-};
+    tls_initialise_write_packets_default, NULL, dtls_prepare_record_header,
+    NULL, tls_prepare_for_encryption_default, dtls_post_encryption_processing,
+    NULL};

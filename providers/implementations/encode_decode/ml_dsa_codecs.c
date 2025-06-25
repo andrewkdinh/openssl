@@ -26,17 +26,83 @@
  * Public key bytes:  1312 (0x0520)
  * Private key bytes: 2560 (0x0a00)
  */
-static const ML_COMMON_SPKI_FMT ml_dsa_44_spkifmt = {
-    { 0x30, 0x82, 0x05, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
-      0x01, 0x65, 0x03, 0x04, 0x03, 0x11, 0x03, 0x82, 0x05, 0x21, 0x00, }
-};
+static const ML_COMMON_SPKI_FMT ml_dsa_44_spkifmt = {{
+    0x30, 0x82, 0x05, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
+    0x01, 0x65, 0x03, 0x04, 0x03, 0x11, 0x03, 0x82, 0x05, 0x21, 0x00,
+}};
 static const ML_COMMON_PKCS8_FMT ml_dsa_44_p8fmt[NUM_PKCS8_FORMATS] = {
-    { "seed-priv",  0x0a2a, 0, 0x30820a26, 0x0420, 6, 0x20, 0x04820a00, 0x2a, 0x0a00, 0,      0,     },
-    { "priv-only",  0x0a04, 0, 0x04820a00, 0,      0, 0,    0,          0x04, 0x0a00, 0,      0,     },
-    { "oqskeypair", 0x0f24, 0, 0x04820f20, 0,      0, 0,    0,          0x04, 0x0a00, 0x0a04, 0x0520 },
-    { "seed-only",  0x0022, 2, 0x8020,     0,      2, 0x20, 0,          0,    0,      0,      0,     },
-    { "bare-priv",  0x0a00, 4, 0,          0,      0, 0,    0,          0,    0x0a00, 0,      0,     },
-    { "bare-seed",  0x0020, 4, 0,          0,      0, 0x20, 0,          0,    0,      0,      0,     },
+    {
+        "seed-priv",
+        0x0a2a,
+        0,
+        0x30820a26,
+        0x0420,
+        6,
+        0x20,
+        0x04820a00,
+        0x2a,
+        0x0a00,
+        0,
+        0,
+    },
+    {
+        "priv-only",
+        0x0a04,
+        0,
+        0x04820a00,
+        0,
+        0,
+        0,
+        0,
+        0x04,
+        0x0a00,
+        0,
+        0,
+    },
+    {"oqskeypair", 0x0f24, 0, 0x04820f20, 0, 0, 0, 0, 0x04, 0x0a00, 0x0a04,
+     0x0520},
+    {
+        "seed-only",
+        0x0022,
+        2,
+        0x8020,
+        0,
+        2,
+        0x20,
+        0,
+        0,
+        0,
+        0,
+        0,
+    },
+    {
+        "bare-priv",
+        0x0a00,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x0a00,
+        0,
+        0,
+    },
+    {
+        "bare-seed",
+        0x0020,
+        4,
+        0,
+        0,
+        0,
+        0x20,
+        0,
+        0,
+        0,
+        0,
+        0,
+    },
 };
 
 /*
@@ -44,17 +110,83 @@ static const ML_COMMON_PKCS8_FMT ml_dsa_44_p8fmt[NUM_PKCS8_FORMATS] = {
  * Public key bytes:  1952 (0x07a0)
  * Private key bytes: 4032 (0x0fc0)
  */
-static const ML_COMMON_SPKI_FMT ml_dsa_65_spkifmt = {
-    { 0x30, 0x82, 0x07, 0xb2, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
-      0x01, 0x65, 0x03, 0x04, 0x03, 0x12, 0x03, 0x82, 0x07, 0xa1, 0x00, }
-};
+static const ML_COMMON_SPKI_FMT ml_dsa_65_spkifmt = {{
+    0x30, 0x82, 0x07, 0xb2, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
+    0x01, 0x65, 0x03, 0x04, 0x03, 0x12, 0x03, 0x82, 0x07, 0xa1, 0x00,
+}};
 static const ML_COMMON_PKCS8_FMT ml_dsa_65_p8fmt[NUM_PKCS8_FORMATS] = {
-    { "seed-priv",  0x0fea, 0, 0x30820fe6, 0x0420, 6, 0x20, 0x04820fc0, 0x2a, 0x0fc0, 0,      0,     },
-    { "priv-only",  0x0fc4, 0, 0x04820fc0, 0,      0, 0,    0,          0x04, 0x0fc0, 0,      0,     },
-    { "oqskeypair", 0x1764, 0, 0x04821760, 0,      0, 0,    0,          0x04, 0x0fc0, 0x0fc4, 0x07a0 },
-    { "seed-only",  0x0022, 2, 0x8020,     0,      2, 0x20, 0,          0,    0,      0,      0,     },
-    { "bare-priv",  0x0fc0, 4, 0,          0,      0, 0,    0,          0,    0x0fc0, 0,      0,     },
-    { "bare-seed",  0x0020, 4, 0,          0,      0, 0x20, 0,          0,    0,      0,      0,     },
+    {
+        "seed-priv",
+        0x0fea,
+        0,
+        0x30820fe6,
+        0x0420,
+        6,
+        0x20,
+        0x04820fc0,
+        0x2a,
+        0x0fc0,
+        0,
+        0,
+    },
+    {
+        "priv-only",
+        0x0fc4,
+        0,
+        0x04820fc0,
+        0,
+        0,
+        0,
+        0,
+        0x04,
+        0x0fc0,
+        0,
+        0,
+    },
+    {"oqskeypair", 0x1764, 0, 0x04821760, 0, 0, 0, 0, 0x04, 0x0fc0, 0x0fc4,
+     0x07a0},
+    {
+        "seed-only",
+        0x0022,
+        2,
+        0x8020,
+        0,
+        2,
+        0x20,
+        0,
+        0,
+        0,
+        0,
+        0,
+    },
+    {
+        "bare-priv",
+        0x0fc0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x0fc0,
+        0,
+        0,
+    },
+    {
+        "bare-seed",
+        0x0020,
+        4,
+        0,
+        0,
+        0,
+        0x20,
+        0,
+        0,
+        0,
+        0,
+        0,
+    },
 };
 
 /*-
@@ -62,17 +194,83 @@ static const ML_COMMON_PKCS8_FMT ml_dsa_65_p8fmt[NUM_PKCS8_FORMATS] = {
  * Public key bytes:  2592 (0x0a20)
  * Private key bytes: 4896 (0x1320)
  */
-static const ML_COMMON_SPKI_FMT ml_dsa_87_spkifmt = {
-    { 0x30, 0x82, 0x0a, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
-      0x01, 0x65, 0x03, 0x04, 0x03, 0x13, 0x03, 0x82, 0x0a, 0x21, 0x00, }
-};
+static const ML_COMMON_SPKI_FMT ml_dsa_87_spkifmt = {{
+    0x30, 0x82, 0x0a, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
+    0x01, 0x65, 0x03, 0x04, 0x03, 0x13, 0x03, 0x82, 0x0a, 0x21, 0x00,
+}};
 static const ML_COMMON_PKCS8_FMT ml_dsa_87_p8fmt[NUM_PKCS8_FORMATS] = {
-    { "seed-priv",  0x134a, 0, 0x30821346, 0x0420, 6, 0x20, 0x04821320, 0x2a, 0x1320, 0,      0,     },
-    { "priv-only",  0x1324, 0, 0x04821320, 0,      0, 0,    0,          0x04, 0x1320, 0,      0,     },
-    { "oqskeypair", 0x1d44, 0, 0x04821d40, 0,      0, 0,    0,          0x04, 0x1320, 0x1324, 0x0a20 },
-    { "seed-only",  0x0022, 2, 0x8020,     0,      2, 0x20, 0,          0,    0,      0,      0,     },
-    { "bare-priv",  0x1320, 4, 0,          0,      0, 0,    0,          0,    0x1320, 0,      0,     },
-    { "bare-seed",  0x0020, 4, 0,          0,      0, 0x20, 0,          0,    0,      0,      0,     },
+    {
+        "seed-priv",
+        0x134a,
+        0,
+        0x30821346,
+        0x0420,
+        6,
+        0x20,
+        0x04821320,
+        0x2a,
+        0x1320,
+        0,
+        0,
+    },
+    {
+        "priv-only",
+        0x1324,
+        0,
+        0x04821320,
+        0,
+        0,
+        0,
+        0,
+        0x04,
+        0x1320,
+        0,
+        0,
+    },
+    {"oqskeypair", 0x1d44, 0, 0x04821d40, 0, 0, 0, 0, 0x04, 0x1320, 0x1324,
+     0x0a20},
+    {
+        "seed-only",
+        0x0022,
+        2,
+        0x8020,
+        0,
+        2,
+        0x20,
+        0,
+        0,
+        0,
+        0,
+        0,
+    },
+    {
+        "bare-priv",
+        0x1320,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x1320,
+        0,
+        0,
+    },
+    {
+        "bare-seed",
+        0x0020,
+        4,
+        0,
+        0,
+        0,
+        0x20,
+        0,
+        0,
+        0,
+        0,
+        0,
+    },
 };
 
 /* Indices of slots in the codec table below */
@@ -84,10 +282,9 @@ static const ML_COMMON_PKCS8_FMT ml_dsa_87_p8fmt[NUM_PKCS8_FORMATS] = {
  * Per-variant fixed parameters
  */
 static const ML_COMMON_CODEC codecs[3] = {
-    { &ml_dsa_44_spkifmt, ml_dsa_44_p8fmt },
-    { &ml_dsa_65_spkifmt, ml_dsa_65_p8fmt },
-    { &ml_dsa_87_spkifmt, ml_dsa_87_p8fmt }
-};
+    {&ml_dsa_44_spkifmt, ml_dsa_44_p8fmt},
+    {&ml_dsa_65_spkifmt, ml_dsa_65_p8fmt},
+    {&ml_dsa_87_spkifmt, ml_dsa_87_p8fmt}};
 
 /* Retrieve the parameters of one of the ML-DSA variants */
 static const ML_COMMON_CODEC *ml_dsa_get_codec(int evp_type)
@@ -103,9 +300,8 @@ static const ML_COMMON_CODEC *ml_dsa_get_codec(int evp_type)
     return NULL;
 }
 
-ML_DSA_KEY *
-ossl_ml_dsa_d2i_PUBKEY(const uint8_t *pk, int pk_len, int evp_type,
-                       PROV_CTX *provctx, const char *propq)
+ML_DSA_KEY *ossl_ml_dsa_d2i_PUBKEY(const uint8_t *pk, int pk_len, int evp_type,
+                                   PROV_CTX *provctx, const char *propq)
 {
     OSSL_LIB_CTX *libctx = PROV_LIBCTX_OF(provctx);
     const ML_COMMON_CODEC *codec;
@@ -115,8 +311,9 @@ ossl_ml_dsa_d2i_PUBKEY(const uint8_t *pk, int pk_len, int evp_type,
     if ((params = ossl_ml_dsa_params_get(evp_type)) == NULL
         || (codec = ml_dsa_get_codec(evp_type)) == NULL)
         return NULL;
-    if (pk_len != ML_COMMON_SPKI_OVERHEAD + (ossl_ssize_t) params->pk_len
-        || memcmp(pk, codec->spkifmt->asn1_prefix, ML_COMMON_SPKI_OVERHEAD) != 0)
+    if (pk_len != ML_COMMON_SPKI_OVERHEAD + (ossl_ssize_t)params->pk_len
+        || memcmp(pk, codec->spkifmt->asn1_prefix, ML_COMMON_SPKI_OVERHEAD)
+            != 0)
         return NULL;
     pk_len -= ML_COMMON_SPKI_OVERHEAD;
     pk += ML_COMMON_SPKI_OVERHEAD;
@@ -124,7 +321,7 @@ ossl_ml_dsa_d2i_PUBKEY(const uint8_t *pk, int pk_len, int evp_type,
     if ((ret = ossl_ml_dsa_key_new(libctx, propq, evp_type)) == NULL)
         return NULL;
 
-    if (!ossl_ml_dsa_pk_decode(ret, pk, (size_t) pk_len)) {
+    if (!ossl_ml_dsa_pk_decode(ret, pk, (size_t)pk_len)) {
         ERR_raise_data(ERR_LIB_PROV, PROV_R_BAD_ENCODING,
                        "errror parsing %s public key from input SPKI",
                        params->alg);
@@ -135,10 +332,9 @@ ossl_ml_dsa_d2i_PUBKEY(const uint8_t *pk, int pk_len, int evp_type,
     return ret;
 }
 
-ML_DSA_KEY *
-ossl_ml_dsa_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
-                      int evp_type, PROV_CTX *provctx,
-                      const char *propq)
+ML_DSA_KEY *ossl_ml_dsa_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
+                                  int evp_type, PROV_CTX *provctx,
+                                  const char *propq)
 {
     const ML_DSA_PARAMS *v;
     const ML_COMMON_CODEC *codec;
@@ -173,8 +369,8 @@ ossl_ml_dsa_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
     /* Get the list of enabled decoders. Their order is not important here. */
     formats = ossl_prov_ctx_get_param(
         provctx, OSSL_PKEY_PARAM_ML_DSA_INPUT_FORMATS, NULL);
-    fmt_slots = ossl_ml_common_pkcs8_fmt_order(v->alg, codec->p8fmt,
-                                               "input", formats);
+    fmt_slots =
+        ossl_ml_common_pkcs8_fmt_order(v->alg, codec->p8fmt, "input", formats);
     if (fmt_slots == NULL)
         goto end;
 
@@ -252,11 +448,11 @@ ossl_ml_dsa_d2i_PKCS8(const uint8_t *prvenc, int prvlen,
         priv = buf + p8fmt->priv_offset;
     /* Any OQS public key content is ignored */
 
-    if (ossl_ml_dsa_set_prekey(key, 0, 0,
-                               seed, ML_DSA_SEED_BYTES, priv, v->sk_len))
+    if (ossl_ml_dsa_set_prekey(key, 0, 0, seed, ML_DSA_SEED_BYTES, priv,
+                               v->sk_len))
         ret = key;
 
- end:
+end:
     OPENSSL_free(fmt_slots);
     PKCS8_PRIV_KEY_INFO_free(p8inf);
     if (ret == NULL)
@@ -275,8 +471,7 @@ int ossl_ml_dsa_i2d_pubkey(const ML_DSA_KEY *key, unsigned char **out)
                        "no %s public key data available", params->alg);
         return 0;
     }
-    if (out != NULL
-        && (*out = OPENSSL_memdup(pk, params->pk_len)) == NULL)
+    if (out != NULL && (*out = OPENSSL_memdup(pk, params->pk_len)) == NULL)
         return 0;
     return (int)params->pk_len;
 }
@@ -302,8 +497,7 @@ int ossl_ml_dsa_i2d_prvkey(const ML_DSA_KEY *key, uint8_t **out,
 
     if (sk == NULL) {
         ERR_raise_data(ERR_LIB_PROV, PROV_R_NOT_A_PRIVATE_KEY,
-                       "no %s private key data available",
-                       params->alg);
+                       "no %s private key data available", params->alg);
         return 0;
     }
 
@@ -335,7 +529,7 @@ int ossl_ml_dsa_i2d_prvkey(const ML_DSA_KEY *key, uint8_t **out,
         goto end;
     }
 
-    if ((pos = buf = OPENSSL_malloc((size_t) len)) == NULL)
+    if ((pos = buf = OPENSSL_malloc((size_t)len)) == NULL)
         goto end;
 
     switch (p8fmt->p8_shift) {
@@ -396,7 +590,7 @@ int ossl_ml_dsa_i2d_prvkey(const ML_DSA_KEY *key, uint8_t **out,
         ret = len;
     }
 
- end:
+end:
     OPENSSL_free(fmt_slots);
     if (ret == 0)
         OPENSSL_free(buf);
@@ -432,8 +626,9 @@ int ossl_ml_dsa_key_to_text(BIO *out, const ML_DSA_KEY *key, int selection)
         }
         if (BIO_printf(out, "%s Private-Key:\n", params->alg) <= 0)
             return 0;
-        if (seed != NULL && !ossl_bio_print_labeled_buf(out, "seed:", seed,
-                                                        ML_DSA_SEED_BYTES))
+        if (seed != NULL
+            && !ossl_bio_print_labeled_buf(out, "seed:", seed,
+                                           ML_DSA_SEED_BYTES))
             return 0;
         if (!ossl_bio_print_labeled_buf(out, "priv:", sk, params->sk_len))
             return 0;

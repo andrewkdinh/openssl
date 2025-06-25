@@ -112,7 +112,7 @@ int ossl_cmac_init(CMAC_CTX *ctx, const void *key, size_t keylen,
                    const EVP_CIPHER *cipher, ENGINE *impl,
                    const OSSL_PARAM param[])
 {
-    static const unsigned char zero_iv[EVP_MAX_BLOCK_LENGTH] = { 0 };
+    static const unsigned char zero_iv[EVP_MAX_BLOCK_LENGTH] = {0};
     int block_len;
 
     /* All zeros means restart */
@@ -242,7 +242,6 @@ int CMAC_Update(CMAC_CTX *ctx, const void *in, size_t dlen)
     memcpy(ctx->last_block, data, dlen);
     ctx->nlast_block = dlen;
     return 1;
-
 }
 
 int CMAC_Final(CMAC_CTX *ctx, unsigned char *out, size_t *poutlen)
@@ -260,14 +259,12 @@ int CMAC_Final(CMAC_CTX *ctx, unsigned char *out, size_t *poutlen)
     lb = ctx->nlast_block;
     /* Is last block complete? */
     if (lb == bl) {
-        for (i = 0; i < bl; i++)
-            out[i] = ctx->last_block[i] ^ ctx->k1[i];
+        for (i = 0; i < bl; i++) out[i] = ctx->last_block[i] ^ ctx->k1[i];
     } else {
         ctx->last_block[lb] = 0x80;
         if (bl - lb > 1)
             memset(ctx->last_block + lb + 1, 0, bl - lb - 1);
-        for (i = 0; i < bl; i++)
-            out[i] = ctx->last_block[i] ^ ctx->k2[i];
+        for (i = 0; i < bl; i++) out[i] = ctx->last_block[i] ^ ctx->k2[i];
     }
     if (EVP_Cipher(ctx->cctx, out, out, bl) <= 0) {
         OPENSSL_cleanse(out, bl);

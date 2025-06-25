@@ -22,9 +22,9 @@
 # include "internal/e_os.h"
 # if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
 
-# ifndef timersub
+#  ifndef timersub
 /* struct timeval * subtraction; a must be greater than or equal to b */
-#  define timersub(a, b, res)                                         \
+#   define timersub(a, b, res)                                         \
      do {                                                             \
          (res)->tv_sec = (a)->tv_sec - (b)->tv_sec;                   \
          if ((a)->tv_usec < (b)->tv_usec) {                           \
@@ -34,7 +34,7 @@
              (res)->tv_usec = (a)->tv_usec - (b)->tv_usec;            \
          }                                                            \
      } while(0)
-# endif
+#  endif
 
 static char *prog;
 
@@ -213,8 +213,9 @@ int main(int ac, char **av)
     OPENSSL_free(contents);
     return EXIT_SUCCESS;
 #else
-    fprintf(stderr,
-            "This tool is not supported on this platform for lack of POSIX1.2001 support\n");
+    fprintf(
+        stderr,
+        "This tool is not supported on this platform for lack of POSIX1.2001 support\n");
     exit(EXIT_FAILURE);
 #endif
 }

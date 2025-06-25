@@ -64,8 +64,7 @@ char **copy_argv(int *argc, char *argv[])
     if (p == NULL)
         OPENSSL_atexit(cleanup_argv);
 
-    for (i = 0; i < count; i++)
-        newargv[i] = argv[i];
+    for (i = 0; i < count; i++) newargv[i] = argv[i];
     newargv[i] = NULL;
     *argc = i;
     return newargv;

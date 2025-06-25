@@ -93,8 +93,7 @@ void spawn_loop(const char *prog)
         exit(1);
     }
     kidpids = app_malloc(n_responders * sizeof(*kidpids), "child PID array");
-    for (i = 0; i < n_responders; ++i)
-        kidpids[i] = 0;
+    for (i = 0; i < n_responders; ++i) kidpids[i] = 0;
 
     signal(SIGINT, noteterm);
     signal(SIGTERM, noteterm);
@@ -116,9 +115,10 @@ void spawn_loop(const char *prog)
                     }
                 }
                 if (i >= n_responders) {
-                    log_HTTP1(prog, LOG_CRIT,
-                              "internal error: no matching child slot for pid: %ld",
-                              (long)fpid);
+                    log_HTTP1(
+                        prog, LOG_CRIT,
+                        "internal error: no matching child slot for pid: %ld",
+                        (long)fpid);
                     killall(1, kidpids);
                 }
                 if (status != 0) {
@@ -141,8 +141,8 @@ void spawn_loop(const char *prog)
                 }
                 break;
             } else if (errno != EINTR) {
-                log_HTTP1(prog, LOG_CRIT,
-                          "waitpid() failed: %s", strerror(errno));
+                log_HTTP1(prog, LOG_CRIT, "waitpid() failed: %s",
+                          strerror(errno));
                 killall(1, kidpids);
             }
         }
@@ -165,7 +165,7 @@ void spawn_loop(const char *prog)
                 _exit(1);
             }
             return;
-        default:            /* parent */
+        default: /* parent */
             for (i = 0; i < n_responders; ++i) {
                 if (kidpids[i] == 0) {
                     kidpids[i] = fpid;
@@ -174,8 +174,7 @@ void spawn_loop(const char *prog)
                 }
             }
             if (i >= n_responders) {
-                log_HTTP(prog, LOG_CRIT,
-                         "internal error: no free child slots");
+                log_HTTP(prog, LOG_CRIT, "internal error: no free child slots");
                 killall(1, kidpids);
             }
             break;
@@ -228,7 +227,7 @@ BIO *http_server_init(const char *prog, const char *port, int verb)
 
     return acbio;
 
- err:
+err:
     ERR_print_errors(bio_err);
     BIO_free_all(acbio);
     BIO_free(bufbio);
@@ -248,8 +247,8 @@ static int urldecode(char *p)
             *out++ = *p;
         } else if (isxdigit(_UC(p[1])) && isxdigit(_UC(p[2]))) {
             /* Don't check, can't fail because of ixdigit() call. */
-            *out++ = (OPENSSL_hexchar2int(p[1]) << 4)
-                | OPENSSL_hexchar2int(p[2]);
+            *out++ =
+                (OPENSSL_hexchar2int(p[1]) << 4) | OPENSSL_hexchar2int(p[2]);
             p += 2;
         } else {
             return -1;
@@ -263,8 +262,8 @@ static int urldecode(char *p)
 /* if found_keep_alive != NULL, return this way connection persistence state */
 int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
                              char **ppath, BIO **pcbio, BIO *acbio,
-                             int *found_keep_alive,
-                             const char *prog, int accept_get, int timeout)
+                             int *found_keep_alive, const char *prog,
+                             int accept_get, int timeout)
 {
     BIO *cbio = *pcbio, *getbio = NULL, *b64 = NULL;
     int len;
@@ -285,8 +284,8 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
             log_HTTP(prog, LOG_ERR, "cannot get port listening on");
             goto fatal;
         }
-        log_HTTP1(prog, LOG_DEBUG,
-                  "awaiting new connection on port %s ...", port);
+        log_HTTP1(prog, LOG_DEBUG, "awaiting new connection on port %s ...",
+                  port);
         OPENSSL_free(port);
 
         if (BIO_do_accept(acbio) <= 0)
@@ -322,11 +321,11 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
     }
 
     if (((end = strchr(reqbuf, '\r')) != NULL && end[1] == '\n')
-            || (end = strchr(reqbuf, '\n')) != NULL)
+        || (end = strchr(reqbuf, '\n')) != NULL)
         *end = '\0';
     if (log_get_verbosity() < LOG_TRACE)
-        trace_log_message(-1, prog, LOG_INFO,
-                          "received request, 1st line: %s", reqbuf);
+        trace_log_message(-1, prog, LOG_INFO, "received request, 1st line: %s",
+                          reqbuf);
     log_HTTP(prog, LOG_TRACE, "received request header:");
     log_HTTP1(prog, LOG_TRACE, "%s", reqbuf);
     if (end == NULL) {
@@ -338,16 +337,15 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
 
     url = meth = reqbuf;
     if ((accept_get && CHECK_AND_SKIP_PREFIX(url, "GET "))
-            || CHECK_AND_SKIP_PREFIX(url, "POST ")) {
+        || CHECK_AND_SKIP_PREFIX(url, "POST ")) {
 
         /* Expecting (GET|POST) {sp} /URL {sp} HTTP/1.x */
         url[-1] = '\0';
-        while (*url == ' ')
-            url++;
+        while (*url == ' ') url++;
         if (*url != '/') {
             log_HTTP2(prog, LOG_WARNING,
-                      "invalid %s -- URL does not begin with '/': %s",
-                      meth, url);
+                      "invalid %s -- URL does not begin with '/': %s", meth,
+                      url);
             (void)http_server_send_status(prog, cbio, 400, "Bad Request");
             goto out;
         }
@@ -359,8 +357,8 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
                 break;
         if (!HAS_PREFIX(end, HTTP_VERSION_STR)) {
             log_HTTP2(prog, LOG_WARNING,
-                      "invalid %s -- bad HTTP/version string: %s",
-                      meth, end + 1);
+                      "invalid %s -- bad HTTP/version string: %s", meth,
+                      end + 1);
             (void)http_server_send_status(prog, cbio, 400, "Bad Request");
             goto out;
         }
@@ -405,10 +403,8 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
     }
 
     /* chop any further/duplicate leading or trailing '/' */
-    while (*url == '/')
-        url++;
-    while (end >= url + 2 && end[-2] == '/' && end[-1] == '/')
-        end--;
+    while (*url == '/') url++;
+    while (end >= url + 2 && end[-2] == '/' && end[-1] == '/') end--;
     *end = '\0';
 
     /* Read and skip past the headers. */
@@ -425,8 +421,9 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
         if (((end = strchr(inbuf, '\r')) != NULL && end[1] == '\n')
             || (end = strchr(inbuf, '\n')) != NULL)
             *end = '\0';
-        log_HTTP1(prog, LOG_TRACE, "%s", *inbuf == '\0' ?
-                  " " /* workaround for "" getting ignored */ : inbuf);
+        log_HTTP1(prog, LOG_TRACE, "%s",
+                  *inbuf == '\0' ? " " /* workaround for "" getting ignored */
+                                 : inbuf);
         if (end == NULL) {
             log_HTTP(prog, LOG_WARNING,
                      "error parsing HTTP header: missing end of line");
@@ -446,8 +443,7 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
             goto out;
         }
         *(value++) = '\0';
-        while (*value == ' ')
-            value++;
+        while (*value == ' ') value++;
         /* https://tools.ietf.org/html/rfc7230#section-6.3 Persistence */
         if (found_keep_alive != NULL
             && OPENSSL_strcasecmp(key, "Connection") == 0) {
@@ -471,15 +467,15 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
                  "error parsing DER-encoded request content");
         (void)http_server_send_status(prog, cbio, 400, "Bad Request");
     } else if (ppath != NULL && (*ppath = OPENSSL_strdup(url)) == NULL) {
-        log_HTTP1(prog, LOG_ERR,
-                  "out of memory allocating %zu bytes", strlen(url) + 1);
+        log_HTTP1(prog, LOG_ERR, "out of memory allocating %zu bytes",
+                  strlen(url) + 1);
         ASN1_item_free(req, it);
         goto fatal;
     }
 
     *preq = req;
 
- out:
+out:
     BIO_free_all(getbio);
 # ifdef HTTP_DAEMON
     if (timeout > 0)
@@ -488,7 +484,7 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
 # endif
     return ret;
 
- fatal:
+fatal:
     (void)http_server_send_status(prog, cbio, 500, "Internal Server Error");
     if (ppath != NULL) {
         OPENSSL_free(*ppath);
@@ -502,16 +498,16 @@ int http_server_get_asn1_req(const ASN1_ITEM *it, ASN1_VALUE **preq,
 
 /* assumes that cbio does not do an encoding that changes the output length */
 int http_server_send_asn1_resp(const char *prog, BIO *cbio, int keep_alive,
-                               const char *content_type,
-                               const ASN1_ITEM *it, const ASN1_VALUE *resp)
+                               const char *content_type, const ASN1_ITEM *it,
+                               const ASN1_VALUE *resp)
 {
     char buf[200], *p;
-    int ret = BIO_snprintf(buf, sizeof(buf), HTTP_1_0" 200 OK\r\n%s"
-                           "Content-type: %s\r\n"
-                           "Content-Length: %d\r\n",
+    int ret = BIO_snprintf(buf, sizeof(buf),
+                           HTTP_1_0 " 200 OK\r\n%s"
+                                    "Content-type: %s\r\n"
+                                    "Content-Length: %d\r\n",
                            keep_alive ? "Connection: keep-alive\r\n" : "",
-                           content_type,
-                           ASN1_item_i2d(resp, NULL, it));
+                           content_type, ASN1_item_i2d(resp, NULL, it));
 
     if (ret < 0 || (size_t)ret >= sizeof(buf))
         return 0;
@@ -528,11 +524,11 @@ int http_server_send_asn1_resp(const char *prog, BIO *cbio, int keep_alive,
     return ret;
 }
 
-int http_server_send_status(const char *prog, BIO *cbio,
-                            int status, const char *reason)
+int http_server_send_status(const char *prog, BIO *cbio, int status,
+                            const char *reason)
 {
     char buf[200];
-    int ret = BIO_snprintf(buf, sizeof(buf), HTTP_1_0" %d %s\r\n\r\n",
+    int ret = BIO_snprintf(buf, sizeof(buf), HTTP_1_0 " %d %s\r\n\r\n",
                            /* This implicitly cancels keep-alive */
                            status, reason);
 

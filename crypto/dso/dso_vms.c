@@ -51,8 +51,7 @@ static int vms_load(DSO *dso);
 static int vms_unload(DSO *dso);
 static DSO_FUNC_TYPE vms_bind_func(DSO *dso, const char *symname);
 static char *vms_name_converter(DSO *dso, const char *filename);
-static char *vms_merger(DSO *dso, const char *filespec1,
-                        const char *filespec2);
+static char *vms_merger(DSO *dso, const char *filespec1, const char *filespec2);
 
 static DSO_METHOD dso_meth_vms = {
     "OpenSSL 'VMS' shared library method",
@@ -222,7 +221,7 @@ static int vms_load(DSO *dso)
     /* Success (for now, we lie.  We actually do not know...) */
     dso->loaded_filename = filename;
     return 1;
- err:
+err:
     /* Cleanup! */
     OPENSSL_free(p);
     OPENSSL_free(filename);
@@ -269,12 +268,11 @@ static int do_find_symbol(DSO_VMS_INTERNAL *ptr,
     lib$establish(lib$sig_to_ret);
 
     if (ptr->imagename_dsc.dsc$w_length)
-        return lib$find_image_symbol(&ptr->filename_dsc,
-                                     symname_dsc, sym,
+        return lib$find_image_symbol(&ptr->filename_dsc, symname_dsc, sym,
                                      &ptr->imagename_dsc, flags);
     else
-        return lib$find_image_symbol(&ptr->filename_dsc,
-                                     symname_dsc, sym, 0, flags);
+        return lib$find_image_symbol(&ptr->filename_dsc, symname_dsc, sym, 0,
+                                     flags);
 }
 
 # ifndef LIB$M_FIS_MIXEDCASE
@@ -352,13 +350,12 @@ void vms_bind_sym(DSO *dso, const char *symname, void **sym)
 
             if (ptr->imagename_dsc.dsc$w_length)
                 ERR_raise_data(ERR_LIB_DSO, DSO_R_SYM_FAILURE,
-                               "Symbol %s in %s (%s): %s",
-                               symname, ptr->filename, ptr->imagename,
-                               errstring);
+                               "Symbol %s in %s (%s): %s", symname,
+                               ptr->filename, ptr->imagename, errstring);
             else
                 ERR_raise_data(ERR_LIB_DSO, DSO_R_SYM_FAILURE,
-                               "Symbol %s in %s: %s",
-                               symname, ptr->filename, errstring);
+                               "Symbol %s in %s: %s", symname, ptr->filename,
+                               errstring);
         }
         return;
     }
@@ -372,8 +369,7 @@ static DSO_FUNC_TYPE vms_bind_func(DSO *dso, const char *symname)
     return sym;
 }
 
-static char *vms_merger(DSO *dso, const char *filespec1,
-                        const char *filespec2)
+static char *vms_merger(DSO *dso, const char *filespec1, const char *filespec2)
 {
     int status;
     int filespec1len, filespec2len;
@@ -422,7 +418,7 @@ static char *vms_merger(DSO *dso, const char *filespec1,
     FAB_OR_NAML(fab, nam).FAB_OR_NAML_DNS = filespec2len;
     NAMX_DNA_FNA_SET(fab)
 
-        nam.NAMX_ESA = esa;
+    nam.NAMX_ESA = esa;
     nam.NAMX_ESS = NAMX_MAXRSS;
     nam.NAMX_NOP = NAM$M_SYNCHK | NAM$M_PWD;
     SET_NAMX_NO_SHORT_UPCASE(nam);
@@ -449,8 +445,8 @@ static char *vms_merger(DSO *dso, const char *filespec1,
             errstring[length] = '\0';
 
             ERR_raise_data(ERR_LIB_DSO, DSO_R_FAILURE,
-                           "filespec \"%s\", default \"%s\": %s",
-                           filespec1, filespec2, errstring);
+                           "filespec \"%s\", default \"%s\": %s", filespec1,
+                           filespec2, errstring);
         }
         return NULL;
     }

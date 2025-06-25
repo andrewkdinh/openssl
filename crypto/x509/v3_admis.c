@@ -20,30 +20,38 @@
 #include "v3_admis.h"
 #include "ext_dat.h"
 
-ASN1_SEQUENCE(NAMING_AUTHORITY) = {
-    ASN1_OPT(NAMING_AUTHORITY, namingAuthorityId, ASN1_OBJECT),
-    ASN1_OPT(NAMING_AUTHORITY, namingAuthorityUrl, ASN1_IA5STRING),
-    ASN1_OPT(NAMING_AUTHORITY, namingAuthorityText, DIRECTORYSTRING),
-} ASN1_SEQUENCE_END(NAMING_AUTHORITY)
+ASN1_SEQUENCE(NAMING_AUTHORITY)
+    = {
+        ASN1_OPT(NAMING_AUTHORITY, namingAuthorityId, ASN1_OBJECT),
+        ASN1_OPT(NAMING_AUTHORITY, namingAuthorityUrl, ASN1_IA5STRING),
+        ASN1_OPT(NAMING_AUTHORITY, namingAuthorityText, DIRECTORYSTRING),
+    }
+ASN1_SEQUENCE_END(NAMING_AUTHORITY)
 
-ASN1_SEQUENCE(PROFESSION_INFO) = {
-    ASN1_EXP_OPT(PROFESSION_INFO, namingAuthority, NAMING_AUTHORITY, 0),
-    ASN1_SEQUENCE_OF(PROFESSION_INFO, professionItems, DIRECTORYSTRING),
-    ASN1_SEQUENCE_OF_OPT(PROFESSION_INFO, professionOIDs, ASN1_OBJECT),
-    ASN1_OPT(PROFESSION_INFO, registrationNumber, ASN1_PRINTABLESTRING),
-    ASN1_OPT(PROFESSION_INFO, addProfessionInfo, ASN1_OCTET_STRING),
-} ASN1_SEQUENCE_END(PROFESSION_INFO)
+ASN1_SEQUENCE(PROFESSION_INFO)
+    = {
+        ASN1_EXP_OPT(PROFESSION_INFO, namingAuthority, NAMING_AUTHORITY, 0),
+        ASN1_SEQUENCE_OF(PROFESSION_INFO, professionItems, DIRECTORYSTRING),
+        ASN1_SEQUENCE_OF_OPT(PROFESSION_INFO, professionOIDs, ASN1_OBJECT),
+        ASN1_OPT(PROFESSION_INFO, registrationNumber, ASN1_PRINTABLESTRING),
+        ASN1_OPT(PROFESSION_INFO, addProfessionInfo, ASN1_OCTET_STRING),
+    }
+ASN1_SEQUENCE_END(PROFESSION_INFO)
 
-ASN1_SEQUENCE(ADMISSIONS) = {
-    ASN1_EXP_OPT(ADMISSIONS, admissionAuthority, GENERAL_NAME, 0),
-    ASN1_EXP_OPT(ADMISSIONS, namingAuthority, NAMING_AUTHORITY, 1),
-    ASN1_SEQUENCE_OF(ADMISSIONS, professionInfos, PROFESSION_INFO),
-} ASN1_SEQUENCE_END(ADMISSIONS)
+ASN1_SEQUENCE(ADMISSIONS)
+    = {
+        ASN1_EXP_OPT(ADMISSIONS, admissionAuthority, GENERAL_NAME, 0),
+        ASN1_EXP_OPT(ADMISSIONS, namingAuthority, NAMING_AUTHORITY, 1),
+        ASN1_SEQUENCE_OF(ADMISSIONS, professionInfos, PROFESSION_INFO),
+    }
+ASN1_SEQUENCE_END(ADMISSIONS)
 
-ASN1_SEQUENCE(ADMISSION_SYNTAX) = {
-    ASN1_OPT(ADMISSION_SYNTAX, admissionAuthority, GENERAL_NAME),
-    ASN1_SEQUENCE_OF(ADMISSION_SYNTAX, contentsOfAdmissions, ADMISSIONS),
-} ASN1_SEQUENCE_END(ADMISSION_SYNTAX)
+ASN1_SEQUENCE(ADMISSION_SYNTAX)
+    = {
+        ASN1_OPT(ADMISSION_SYNTAX, admissionAuthority, GENERAL_NAME),
+        ASN1_SEQUENCE_OF(ADMISSION_SYNTAX, contentsOfAdmissions, ADMISSIONS),
+    }
+ASN1_SEQUENCE_END(ADMISSION_SYNTAX)
 
 IMPLEMENT_ASN1_FUNCTIONS(NAMING_AUTHORITY)
 IMPLEMENT_ASN1_FUNCTIONS(PROFESSION_INFO)
@@ -57,7 +65,10 @@ const X509V3_EXT_METHOD ossl_v3_ext_admission = {
     NID_x509ExtAdmission,   /* .ext_nid = */
     0,                      /* .ext_flags = */
     ASN1_ITEM_ref(ADMISSION_SYNTAX), /* .it = */
-    NULL, NULL, NULL, NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     NULL,                   /* .i2s = */
     NULL,                   /* .s2i = */
     NULL,                   /* .i2v = */
@@ -70,7 +81,7 @@ const X509V3_EXT_METHOD ossl_v3_ext_admission = {
 static int i2r_NAMING_AUTHORITY(const struct v3_ext_method *method, void *in,
                                 BIO *bp, int ind)
 {
-    NAMING_AUTHORITY *namingAuthority = (NAMING_AUTHORITY *) in;
+    NAMING_AUTHORITY *namingAuthority = (NAMING_AUTHORITY *)in;
 
     if (namingAuthority == NULL)
         return 0;
@@ -85,15 +96,18 @@ static int i2r_NAMING_AUTHORITY(const struct v3_ext_method *method, void *in,
 
     if (namingAuthority->namingAuthorityId != NULL) {
         char objbuf[128];
-        const char *ln = OBJ_nid2ln(OBJ_obj2nid(namingAuthority->namingAuthorityId));
+        const char *ln =
+            OBJ_nid2ln(OBJ_obj2nid(namingAuthority->namingAuthorityId));
 
         if (BIO_printf(bp, "%*s  namingAuthorityId: ", ind, "") <= 0)
             goto err;
 
-        OBJ_obj2txt(objbuf, sizeof(objbuf), namingAuthority->namingAuthorityId, 1);
+        OBJ_obj2txt(objbuf, sizeof(objbuf), namingAuthority->namingAuthorityId,
+                    1);
 
-        if (BIO_printf(bp, "%s%s%s%s\n", ln ? ln : "",
-                       ln ? " (" : "", objbuf, ln ? ")" : "") <= 0)
+        if (BIO_printf(bp, "%s%s%s%s\n", ln ? ln : "", ln ? " (" : "", objbuf,
+                       ln ? ")" : "")
+            <= 0)
             goto err;
     }
     if (namingAuthority->namingAuthorityText != NULL) {
@@ -129,7 +143,8 @@ static int i2r_ADMISSION_SYNTAX(const struct v3_ext_method *method, void *in,
     }
 
     for (i = 0; i < sk_ADMISSIONS_num(admission->contentsOfAdmissions); i++) {
-        ADMISSIONS *entry = sk_ADMISSIONS_value(admission->contentsOfAdmissions, i);
+        ADMISSIONS *entry =
+            sk_ADMISSIONS_value(admission->contentsOfAdmissions, i);
 
         if (BIO_printf(bp, "%*sEntry %0d:\n", ind, "", 1 + i) <= 0)
             goto err;
@@ -143,14 +158,19 @@ static int i2r_ADMISSION_SYNTAX(const struct v3_ext_method *method, void *in,
         }
 
         if (entry->namingAuthority != NULL) {
-            if (i2r_NAMING_AUTHORITY(method, entry->namingAuthority, bp, ind + 2) <= 0)
+            if (i2r_NAMING_AUTHORITY(method, entry->namingAuthority, bp,
+                                     ind + 2)
+                <= 0)
                 goto err;
         }
 
         for (j = 0; j < sk_PROFESSION_INFO_num(entry->professionInfos); j++) {
-            PROFESSION_INFO *pinfo = sk_PROFESSION_INFO_value(entry->professionInfos, j);
+            PROFESSION_INFO *pinfo =
+                sk_PROFESSION_INFO_value(entry->professionInfos, j);
 
-            if (BIO_printf(bp, "%*s  Profession Info Entry %0d:\n", ind, "", 1 + j) <= 0)
+            if (BIO_printf(bp, "%*s  Profession Info Entry %0d:\n", ind, "",
+                           1 + j)
+                <= 0)
                 goto err;
 
             if (pinfo->registrationNumber != NULL) {
@@ -161,7 +181,9 @@ static int i2r_ADMISSION_SYNTAX(const struct v3_ext_method *method, void *in,
             }
 
             if (pinfo->namingAuthority != NULL) {
-                if (i2r_NAMING_AUTHORITY(method, pinfo->namingAuthority, bp, ind + 4) <= 0)
+                if (i2r_NAMING_AUTHORITY(method, pinfo->namingAuthority, bp,
+                                         ind + 4)
+                    <= 0)
                     goto err;
             }
 
@@ -169,8 +191,10 @@ static int i2r_ADMISSION_SYNTAX(const struct v3_ext_method *method, void *in,
 
                 if (BIO_printf(bp, "%*s    Info Entries:\n", ind, "") <= 0)
                     goto err;
-                for (k = 0; k < sk_ASN1_STRING_num(pinfo->professionItems); k++) {
-                    ASN1_STRING *val = sk_ASN1_STRING_value(pinfo->professionItems, k);
+                for (k = 0; k < sk_ASN1_STRING_num(pinfo->professionItems);
+                     k++) {
+                    ASN1_STRING *val =
+                        sk_ASN1_STRING_value(pinfo->professionItems, k);
 
                     if (BIO_printf(bp, "%*s      ", ind, "") <= 0
                         || ASN1_STRING_print(bp, val) <= 0
@@ -182,15 +206,18 @@ static int i2r_ADMISSION_SYNTAX(const struct v3_ext_method *method, void *in,
             if (pinfo->professionOIDs != NULL) {
                 if (BIO_printf(bp, "%*s    Profession OIDs:\n", ind, "") <= 0)
                     goto err;
-                for (k = 0; k < sk_ASN1_OBJECT_num(pinfo->professionOIDs); k++) {
-                    ASN1_OBJECT *obj = sk_ASN1_OBJECT_value(pinfo->professionOIDs, k);
+                for (k = 0; k < sk_ASN1_OBJECT_num(pinfo->professionOIDs);
+                     k++) {
+                    ASN1_OBJECT *obj =
+                        sk_ASN1_OBJECT_value(pinfo->professionOIDs, k);
                     const char *ln = OBJ_nid2ln(OBJ_obj2nid(obj));
                     char objbuf[128];
 
                     OBJ_obj2txt(objbuf, sizeof(objbuf), obj, 1);
                     if (BIO_printf(bp, "%*s      %s%s%s%s\n", ind, "",
-                                   ln ? ln : "", ln ? " (" : "",
-                                   objbuf, ln ? ")" : "") <= 0)
+                                   ln ? ln : "", ln ? " (" : "", objbuf,
+                                   ln ? ")" : "")
+                        <= 0)
                         goto err;
                 }
             }
@@ -213,7 +240,8 @@ void NAMING_AUTHORITY_set0_authorityId(NAMING_AUTHORITY *n, ASN1_OBJECT *id)
     n->namingAuthorityId = id;
 }
 
-const ASN1_IA5STRING *NAMING_AUTHORITY_get0_authorityURL(const NAMING_AUTHORITY *n)
+const ASN1_IA5STRING *
+NAMING_AUTHORITY_get0_authorityURL(const NAMING_AUTHORITY *n)
 {
     return n->namingAuthorityUrl;
 }
@@ -224,7 +252,8 @@ void NAMING_AUTHORITY_set0_authorityURL(NAMING_AUTHORITY *n, ASN1_IA5STRING *u)
     n->namingAuthorityUrl = u;
 }
 
-const ASN1_STRING *NAMING_AUTHORITY_get0_authorityText(const NAMING_AUTHORITY *n)
+const ASN1_STRING *
+NAMING_AUTHORITY_get0_authorityText(const NAMING_AUTHORITY *n)
 {
     return n->namingAuthorityText;
 }
@@ -235,7 +264,8 @@ void NAMING_AUTHORITY_set0_authorityText(NAMING_AUTHORITY *n, ASN1_STRING *t)
     n->namingAuthorityText = t;
 }
 
-const GENERAL_NAME *ADMISSION_SYNTAX_get0_admissionAuthority(const ADMISSION_SYNTAX *as)
+const GENERAL_NAME *
+ADMISSION_SYNTAX_get0_admissionAuthority(const ADMISSION_SYNTAX *as)
 {
     return as->admissionAuthority;
 }
@@ -247,7 +277,8 @@ void ADMISSION_SYNTAX_set0_admissionAuthority(ADMISSION_SYNTAX *as,
     as->admissionAuthority = aa;
 }
 
-const STACK_OF(ADMISSIONS) *ADMISSION_SYNTAX_get0_contentsOfAdmissions(const ADMISSION_SYNTAX *as)
+const STACK_OF(ADMISSIONS) *
+ADMISSION_SYNTAX_get0_contentsOfAdmissions(const ADMISSION_SYNTAX *as)
 {
     return as->contentsOfAdmissions;
 }
@@ -292,7 +323,8 @@ void ADMISSIONS_set0_professionInfos(ADMISSIONS *a, PROFESSION_INFOS *pi)
     a->professionInfos = pi;
 }
 
-const ASN1_OCTET_STRING *PROFESSION_INFO_get0_addProfessionInfo(const PROFESSION_INFO *pi)
+const ASN1_OCTET_STRING *
+PROFESSION_INFO_get0_addProfessionInfo(const PROFESSION_INFO *pi)
 {
     return pi->addProfessionInfo;
 }
@@ -304,7 +336,8 @@ void PROFESSION_INFO_set0_addProfessionInfo(PROFESSION_INFO *pi,
     pi->addProfessionInfo = aos;
 }
 
-const NAMING_AUTHORITY *PROFESSION_INFO_get0_namingAuthority(const PROFESSION_INFO *pi)
+const NAMING_AUTHORITY *
+PROFESSION_INFO_get0_namingAuthority(const PROFESSION_INFO *pi)
 {
     return pi->namingAuthority;
 }
@@ -316,7 +349,8 @@ void PROFESSION_INFO_set0_namingAuthority(PROFESSION_INFO *pi,
     pi->namingAuthority = na;
 }
 
-const STACK_OF(ASN1_STRING) *PROFESSION_INFO_get0_professionItems(const PROFESSION_INFO *pi)
+const STACK_OF(ASN1_STRING) *
+PROFESSION_INFO_get0_professionItems(const PROFESSION_INFO *pi)
 {
     return pi->professionItems;
 }
@@ -328,7 +362,8 @@ void PROFESSION_INFO_set0_professionItems(PROFESSION_INFO *pi,
     pi->professionItems = as;
 }
 
-const STACK_OF(ASN1_OBJECT) *PROFESSION_INFO_get0_professionOIDs(const PROFESSION_INFO *pi)
+const STACK_OF(ASN1_OBJECT) *
+PROFESSION_INFO_get0_professionOIDs(const PROFESSION_INFO *pi)
 {
     return pi->professionOIDs;
 }
@@ -340,7 +375,8 @@ void PROFESSION_INFO_set0_professionOIDs(PROFESSION_INFO *pi,
     pi->professionOIDs = po;
 }
 
-const ASN1_PRINTABLESTRING *PROFESSION_INFO_get0_registrationNumber(const PROFESSION_INFO *pi)
+const ASN1_PRINTABLESTRING *
+PROFESSION_INFO_get0_registrationNumber(const PROFESSION_INFO *pi)
 {
     return pi->registrationNumber;
 }

@@ -22,8 +22,7 @@ static BIT_STRING_BITNAME ns_cert_type_table[] = {
     {5, "SSL CA", "sslCA"},
     {6, "S/MIME CA", "emailCA"},
     {7, "Object Signing CA", "objCA"},
-    {-1, NULL, NULL}
-};
+    {-1, NULL, NULL}};
 
 static BIT_STRING_BITNAME key_usage_type_table[] = {
     {0, "Digital Signature", "digitalSignature"},
@@ -35,13 +34,12 @@ static BIT_STRING_BITNAME key_usage_type_table[] = {
     {6, "CRL Sign", "cRLSign"},
     {7, "Encipher Only", "encipherOnly"},
     {8, "Decipher Only", "decipherOnly"},
-    {-1, NULL, NULL}
-};
+    {-1, NULL, NULL}};
 
 const X509V3_EXT_METHOD ossl_v3_nscert =
-EXT_BITSTRING(NID_netscape_cert_type, ns_cert_type_table);
+    EXT_BITSTRING(NID_netscape_cert_type, ns_cert_type_table);
 const X509V3_EXT_METHOD ossl_v3_key_usage =
-EXT_BITSTRING(NID_key_usage, key_usage_type_table);
+    EXT_BITSTRING(NID_key_usage, key_usage_type_table);
 
 STACK_OF(CONF_VALUE) *i2v_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
                                           ASN1_BIT_STRING *bits,
@@ -55,8 +53,7 @@ STACK_OF(CONF_VALUE) *i2v_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
     return ret;
 }
 
-ASN1_BIT_STRING *v2i_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
-                                     X509V3_CTX *ctx,
+ASN1_BIT_STRING *v2i_ASN1_BIT_STRING(X509V3_EXT_METHOD *method, X509V3_CTX *ctx,
                                      STACK_OF(CONF_VALUE) *nval)
 {
     CONF_VALUE *val;

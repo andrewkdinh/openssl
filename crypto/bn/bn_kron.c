@@ -27,7 +27,7 @@ int BN_kronecker(const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx)
      * is $(-1)^{(n^2-1)/8}$ (using TeX notation).
      * Note that the sign of n does not matter.
      */
-    static const int tab[8] = { 0, 1, 0, -1, 0, -1, 0, 1 };
+    static const int tab[8] = {0, 1, 0, -1, 0, -1, 0, 1};
 
     bn_check_top(a);
     bn_check_top(b);
@@ -67,8 +67,7 @@ int BN_kronecker(const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx)
 
     /* now  B  is non-zero */
     i = 0;
-    while (!BN_is_bit_set(B, i))
-        i++;
+    while (!BN_is_bit_set(B, i)) i++;
     err = !BN_rshift(B, B, i);
     if (err)
         goto end;
@@ -106,8 +105,7 @@ int BN_kronecker(const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx)
 
         /* now  A  is non-zero */
         i = 0;
-        while (!BN_is_bit_set(A, i))
-            i++;
+        while (!BN_is_bit_set(A, i)) i++;
         err = !BN_rshift(A, A, i);
         if (err)
             goto end;
@@ -131,7 +129,7 @@ int BN_kronecker(const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx)
         B = tmp;
         tmp->neg = 0;
     }
- end:
+end:
     BN_CTX_end(ctx);
     if (err)
         return -2;

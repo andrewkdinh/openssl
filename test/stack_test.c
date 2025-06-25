@@ -23,7 +23,7 @@
  * builds.  We disable this check here.
  */
 #ifdef __clang__
-#pragma clang diagnostic ignored "-Wunused-function"
+# pragma clang diagnostic ignored "-Wunused-function"
 #endif
 
 typedef struct {
@@ -52,7 +52,7 @@ static int int_compare(const int *const *a, const int *const *b)
 
 static int test_int_stack(int reserve)
 {
-    static int v[] = { 1, 2, -4, 16, 999, 1, -173, 1, 9 };
+    static int v[] = {1, 2, -4, 16, 999, 1, -173, 1, 9};
     static int notpresent = -1;
     const int n = OSSL_NELEM(v);
     static struct {
@@ -60,25 +60,16 @@ static int test_int_stack(int reserve)
         int unsorted;
         int sorted;
         int ex;
-    } finds[] = {
-        { 2,    1,  5,  5   },
-        { 9,    7,  6,  6   },
-        { -173, 5,  0,  0   },
-        { 999,  3,  8,  8   },
-        { 0,   -1, -1,  1   }
-    };
+    } finds[] = {{2, 1, 5, 5},
+                 {9, 7, 6, 6},
+                 {-173, 5, 0, 0},
+                 {999, 3, 8, 8},
+                 {0, -1, -1, 1}};
     const int n_finds = OSSL_NELEM(finds);
     static struct {
         int value;
         int ex;
-    } exfinds[] = {
-        { 3,    5   },
-        { 1000, 8   },
-        { 20,   8   },
-        { -999, 0   },
-        { -5,   0   },
-        { 8,    5   }
-    };
+    } exfinds[] = {{3, 5}, {1000, 8}, {20, 8}, {-999, 0}, {-5, 0}, {8, 5}};
     const int n_exfinds = OSSL_NELEM(exfinds);
     STACK_OF(sint) *s = sk_sint_new_null();
     int i;
@@ -108,8 +99,8 @@ static int test_int_stack(int reserve)
 
     /* find unsorted -- the pointers are compared */
     for (i = 0; i < n_finds; i++) {
-        int *val = (finds[i].unsorted == -1) ? &notpresent
-                                             : v + finds[i].unsorted;
+        int *val =
+            (finds[i].unsorted == -1) ? &notpresent : v + finds[i].unsorted;
 
         if (!TEST_int_eq(sk_sint_find(s, val), finds[i].unsorted)) {
             TEST_info("int unsorted find %d", i);
@@ -119,8 +110,8 @@ static int test_int_stack(int reserve)
 
     /* find_ex unsorted */
     for (i = 0; i < n_finds; i++) {
-        int *val = (finds[i].unsorted == -1) ? &notpresent
-                                             : v + finds[i].unsorted;
+        int *val =
+            (finds[i].unsorted == -1) ? &notpresent : v + finds[i].unsorted;
 
         if (!TEST_int_eq(sk_sint_find_ex(s, val), finds[i].unsorted)) {
             TEST_info("int unsorted find_ex %d", i);
@@ -150,7 +141,8 @@ static int test_int_stack(int reserve)
             goto end;
         }
     for (i = 0; i < n_exfinds; i++)
-        if (!TEST_int_eq(sk_sint_find_ex(s, &exfinds[i].value), exfinds[i].ex)) {
+        if (!TEST_int_eq(sk_sint_find_ex(s, &exfinds[i].value),
+                         exfinds[i].ex)) {
             TEST_info("int sorted find_ex absent %d", i);
             goto end;
         }
@@ -173,7 +165,7 @@ static int uchar_compare(const unsigned char *const *a,
 
 static int test_uchar_stack(int reserve)
 {
-    static const unsigned char v[] = { 1, 3, 7, 5, 255, 0 };
+    static const unsigned char v[] = {1, 3, 7, 5, 255, 0};
     const int n = OSSL_NELEM(v);
     STACK_OF(uchar) *s = sk_uchar_new(&uchar_compare), *r = NULL;
     int i;
@@ -264,7 +256,8 @@ static SS *SS_copy(const SS *p)
     return q;
 }
 
-static void SS_free(SS *p) {
+static void SS_free(SS *p)
+{
     OPENSSL_free(p);
 }
 
@@ -329,8 +322,8 @@ static int test_SS_stack(void)
     SS_free(p);
     if (!TEST_int_eq(sk_SS_num(s), n - 1))
         goto end;
-    for (i = 0; i < n-1; i++)
-        if (!TEST_ptr_eq(sk_SS_value(s, i), v[i<3 ? i : 1+i])) {
+    for (i = 0; i < n - 1; i++)
+        if (!TEST_ptr_eq(sk_SS_value(s, i), v[i < 3 ? i : 1 + i])) {
             TEST_info("SS delete ptr item %d", i);
             goto end;
         }
@@ -367,7 +360,7 @@ static int test_SU_stack(void)
 
     /* check the pointers are correct */
     for (i = 0; i < n; i++)
-        if (!TEST_ptr_eq(sk_SU_value(s, i),  v + i)) {
+        if (!TEST_ptr_eq(sk_SU_value(s, i), v + i)) {
             TEST_info("SU pointer check %d", i);
             goto end;
         }

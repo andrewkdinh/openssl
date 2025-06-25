@@ -57,9 +57,7 @@ int ASN1_UNIVERSALSTRING_to_string(ASN1_UNIVERSALSTRING *s)
     if (i < s->length)
         return 0;
     p = s->data;
-    for (i = 3; i < s->length; i += 4) {
-        *(p++) = s->data[i];
-    }
+    for (i = 3; i < s->length; i += 4) { *(p++) = s->data[i]; }
     *(p) = '\0';
     s->length /= 4;
     s->type = ASN1_PRINTABLE_type(s->data, s->length);
@@ -77,8 +75,7 @@ int ASN1_STRING_print(BIO *bp, const ASN1_STRING *v)
     n = 0;
     p = (const char *)v->data;
     for (i = 0; i < v->length; i++) {
-        if ((p[i] > '~') || ((p[i] < ' ') &&
-                             (p[i] != '\n') && (p[i] != '\r')))
+        if ((p[i] > '~') || ((p[i] < ' ') && (p[i] != '\n') && (p[i] != '\r')))
             buf[n] = '.';
         else
             buf[n] = p[i];

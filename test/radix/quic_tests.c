@@ -58,21 +58,18 @@ DEF_SCRIPT(simple_thread_child,
  * Test: simple_thread
  * -------------------
  */
-DEF_SCRIPT(simple_thread,
-           "test that RADIX multithreading is working")
+DEF_SCRIPT(simple_thread, "test that RADIX multithreading is working")
 {
     size_t i;
 
-    for (i = 0; i < 2; ++i)
-        OP_SPAWN_THREAD(simple_thread_child);
+    for (i = 0; i < 2; ++i) OP_SPAWN_THREAD(simple_thread_child);
 }
 
 /*
  * Test: ssl_poll
  * --------------
  */
-DEF_SCRIPT(ssl_poll_child,
-           "test that SSL_poll is working (child)")
+DEF_SCRIPT(ssl_poll_child, "test that SSL_poll is working (child)")
 {
     OP_SLEEP(100);
     OP_WRITE_B(C0, "extra");
@@ -93,14 +90,14 @@ DEF_FUNC(ssl_poll_check)
     F_POP(mode);
     REQUIRE_SSL_5(La, Lax[0], Lax[1], Lax[2], Lax[3]);
 
-    items[0].desc      = SSL_as_poll_descriptor(La);
-    items[0].events    = 0;
-    items[0].revents   = 0;
+    items[0].desc = SSL_as_poll_descriptor(La);
+    items[0].events = 0;
+    items[0].revents = 0;
 
     for (i = 0; i < 4; ++i) {
-        items[i + 1].desc        = SSL_as_poll_descriptor(Lax[i]);
-        items[i + 1].events      = SSL_POLL_EVENT_R | SSL_POLL_EVENT_I;
-        items[i + 1].revents     = 0;
+        items[i + 1].desc = SSL_as_poll_descriptor(Lax[i]);
+        items[i + 1].events = SSL_POLL_EVENT_R | SSL_POLL_EVENT_I;
+        items[i + 1].revents = 0;
     }
 
     items[5].desc = SSL_as_poll_descriptor(SSL_get0_listener(La));
@@ -111,30 +108,30 @@ DEF_FUNC(ssl_poll_check)
         expected_result_count = 0;
         break;
     case 1: /* Various events reported correctly */
-        expected_result_count       = 5;
-        items[0].events             = SSL_POLL_EVENT_OS;
-        expected_items[0].revents   = SSL_POLL_EVENT_OS;
+        expected_result_count = 5;
+        items[0].events = SSL_POLL_EVENT_OS;
+        expected_items[0].revents = SSL_POLL_EVENT_OS;
 
-        expected_items[1].revents   = SSL_POLL_EVENT_R;
+        expected_items[1].revents = SSL_POLL_EVENT_R;
 
         for (i = 0; i < 4; ++i) {
-            items[i + 1].events             |= SSL_POLL_EVENT_W;
-            expected_items[i + 1].revents   |= SSL_POLL_EVENT_W;
+            items[i + 1].events |= SSL_POLL_EVENT_W;
+            expected_items[i + 1].revents |= SSL_POLL_EVENT_W;
         }
 
         break;
     case 3: /* Blocking test */
-        expected_result_count       = 1;
-        expected_items[1].revents   = SSL_POLL_EVENT_R;
+        expected_result_count = 1;
+        expected_items[1].revents = SSL_POLL_EVENT_R;
 
         p_timeout = &timeout;
-        timeout.tv_sec  = 10;
+        timeout.tv_sec = 10;
         timeout.tv_usec = 0;
         break;
     case 4: /* Listener test */
-        expected_result_count       = 1;
-        items[5].events             = SSL_POLL_EVENT_IC;
-        expected_items[5].revents   = SSL_POLL_EVENT_IC;
+        expected_result_count = 1;
+        items[5].events = SSL_POLL_EVENT_IC;
+        expected_items[5].revents = SSL_POLL_EVENT_IC;
         break;
     default:
         goto err;
@@ -159,7 +156,9 @@ DEF_FUNC(ssl_poll_check)
      * The SSL_poll call for the blocking test definitely shouldn't have
      * returned sooner than in 100ms.
      */
-    if (i == 3 && !TEST_uint64_t_ge(ossl_time2ms(ossl_time_subtract(time_after, time_before)), 100))
+    if (i == 3
+        && !TEST_uint64_t_ge(
+            ossl_time2ms(ossl_time_subtract(time_after, time_before)), 100))
         goto err;
 
     ok = 1;
@@ -167,8 +166,7 @@ err:
     return ok;
 }
 
-DEF_SCRIPT(ssl_poll,
-           "test that SSL_poll is working")
+DEF_SCRIPT(ssl_poll, "test that SSL_poll is working")
 {
     size_t i;
 
@@ -254,19 +252,19 @@ DEF_FUNC(check_writeable)
     F_POP(expect);
     REQUIRE_SSL(ssl);
 
-    item.desc      = SSL_as_poll_descriptor(ssl);
-    item.events    = SSL_POLL_EVENT_W;
-    item.revents   = 0;
+    item.desc = SSL_as_poll_descriptor(ssl);
+    item.events = SSL_POLL_EVENT_W;
+    item.revents = 0;
 
     /* Zero-timeout call. */
     result_count = SIZE_MAX;
-    if (!TEST_true(SSL_poll(&item, 1, sizeof(SSL_POLL_ITEM),
-                            p_timeout, 0, &result_count)))
+    if (!TEST_true(SSL_poll(&item, 1, sizeof(SSL_POLL_ITEM), p_timeout, 0,
+                            &result_count)))
         goto err;
 
     ok = (!!(item.revents & SSL_POLL_EVENT_W) == expect);
 
- err:
+err:
     return ok;
 }
 
@@ -298,9 +296,5 @@ DEF_SCRIPT(check_cwm, "check stream obeys cwm")
  * List of Test Scripts
  * ============================================================================
  */
-static SCRIPT_INFO *const scripts[] = {
-    USE(simple_conn)
-    USE(simple_thread)
-    USE(ssl_poll)
-    USE(check_cwm)
-};
+static SCRIPT_INFO *const scripts[] = {USE(simple_conn) USE(simple_thread)
+                                           USE(ssl_poll) USE(check_cwm)};

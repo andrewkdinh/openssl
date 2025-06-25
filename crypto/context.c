@@ -104,7 +104,8 @@ static int context_init(OSSL_LIB_CTX *ctx)
     ctx->evp_method_store = ossl_method_store_new(ctx);
     if (ctx->evp_method_store == NULL)
         goto err;
-    OSSL_TRACE1(QUERY, "context_init: allocating store %p\n", ctx->evp_method_store);
+    OSSL_TRACE1(QUERY, "context_init: allocating store %p\n",
+                ctx->evp_method_store);
 
 #ifndef FIPS_MODULE
     /* P2. Must be freed before the provider store is freed */
@@ -214,7 +215,7 @@ static int context_init(OSSL_LIB_CTX *ctx)
 
     return 1;
 
- err:
+err:
     context_deinit_objs(ctx);
 
     if (exdata_done)
@@ -258,7 +259,6 @@ static void context_deinit_objs(OSSL_LIB_CTX *ctx)
         ossl_decoder_cache_free(ctx->decoder_cache);
         ctx->decoder_cache = NULL;
     }
-
 
     /* P2. We want encoder_store to be cleaned up before the provider store */
     if (ctx->encoder_store != NULL) {
@@ -354,7 +354,6 @@ static void context_deinit_objs(OSSL_LIB_CTX *ctx)
         ctx->comp_methods = NULL;
     }
 #endif
-
 }
 
 static int context_deinit(OSSL_LIB_CTX *ctx)

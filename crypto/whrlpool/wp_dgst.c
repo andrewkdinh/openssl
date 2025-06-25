@@ -92,8 +92,8 @@ int WHIRLPOOL_Update(WHIRLPOOL_CTX *c, const void *_inp, size_t bytes)
 void WHIRLPOOL_BitUpdate(WHIRLPOOL_CTX *c, const void *_inp, size_t bits)
 {
     size_t n;
-    unsigned int bitoff = c->bitoff,
-        bitrem = bitoff % 8, inpgap = (8 - (unsigned int)bits % 8) & 7;
+    unsigned int bitoff = c->bitoff, bitrem = bitoff % 8,
+                 inpgap = (8 - (unsigned int)bits % 8) & 7;
     const unsigned char *inp = _inp;
 
     /*
@@ -110,7 +110,7 @@ void WHIRLPOOL_BitUpdate(WHIRLPOOL_CTX *c, const void *_inp, size_t bits)
                  && ++n < (WHIRLPOOL_COUNTER / sizeof(size_t)));
     }
 #ifndef OPENSSL_SMALL_FOOTPRINT
- reconsider:
+reconsider:
     if (inpgap == 0 && bitrem == 0) { /* byte-oriented loop */
         while (bits) {
             if (bitoff == 0 && (n = bits / WHIRLPOOL_BBLOCK)) {
@@ -172,7 +172,7 @@ void WHIRLPOOL_BitUpdate(WHIRLPOOL_CTX *c, const void *_inp, size_t bits)
                 goto reconsider;
             } else
 #endif
-            if (bits > 8) {
+                if (bits > 8) {
                 b = ((inp[0] << inpgap) | (inp[1] >> (8 - inpgap)));
                 b &= 0xff;
                 if (bitrem)

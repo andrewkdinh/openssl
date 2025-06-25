@@ -8,12 +8,12 @@
  */
 
 #ifndef OSSL_CRYPTO_DSA_H
-# define OSSL_CRYPTO_DSA_H
-# pragma once
+#define OSSL_CRYPTO_DSA_H
+#pragma once
 
-# include <openssl/core.h>
-# include <openssl/dsa.h>
-# include "internal/ffc.h"
+#include <openssl/core.h>
+#include <openssl/dsa.h>
+#include "internal/ffc.h"
 
 /*
  * DSA Paramgen types

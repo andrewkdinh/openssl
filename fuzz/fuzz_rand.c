@@ -22,8 +22,8 @@ static OSSL_FUNC_rand_gettable_ctx_params_fn fuzz_rand_gettable_ctx_params;
 static OSSL_FUNC_rand_get_ctx_params_fn fuzz_rand_get_ctx_params;
 static OSSL_FUNC_rand_enable_locking_fn fuzz_rand_enable_locking;
 
-static void *fuzz_rand_newctx(
-         void *provctx, void *parent, const OSSL_DISPATCH *parent_dispatch)
+static void *fuzz_rand_newctx(void *provctx, void *parent,
+                              const OSSL_DISPATCH *parent_dispatch)
 {
     int *st = OPENSSL_malloc(sizeof(*st));
 
@@ -54,9 +54,8 @@ static int fuzz_rand_uninstantiate(ossl_unused void *vrng)
     return 1;
 }
 
-static int fuzz_rand_generate(ossl_unused void *vdrbg,
-                              unsigned char *out, size_t outlen,
-                              ossl_unused unsigned int strength,
+static int fuzz_rand_generate(ossl_unused void *vdrbg, unsigned char *out,
+                              size_t outlen, ossl_unused unsigned int strength,
                               ossl_unused int prediction_resistance,
                               ossl_unused const unsigned char *adin,
                               ossl_unused size_t adinlen)
@@ -64,8 +63,7 @@ static int fuzz_rand_generate(ossl_unused void *vdrbg,
     unsigned char val = 1;
     size_t i;
 
-    for (i = 0; i < outlen; i++)
-        out[i] = val++;
+    for (i = 0; i < outlen; i++) out[i] = val++;
     return 1;
 }
 
@@ -92,38 +90,32 @@ static int fuzz_rand_get_ctx_params(void *vrng, OSSL_PARAM params[])
     return 1;
 }
 
-static const OSSL_PARAM *fuzz_rand_gettable_ctx_params(ossl_unused void *vrng,
-                                                       ossl_unused void *provctx)
+static const OSSL_PARAM *
+fuzz_rand_gettable_ctx_params(ossl_unused void *vrng, ossl_unused void *provctx)
 {
     static const OSSL_PARAM known_gettable_ctx_params[] = {
         OSSL_PARAM_int(OSSL_RAND_PARAM_STATE, NULL),
         OSSL_PARAM_uint(OSSL_RAND_PARAM_STRENGTH, NULL),
-        OSSL_PARAM_size_t(OSSL_RAND_PARAM_MAX_REQUEST, NULL),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_size_t(OSSL_RAND_PARAM_MAX_REQUEST, NULL), OSSL_PARAM_END};
     return known_gettable_ctx_params;
 }
 
 static const OSSL_DISPATCH fuzz_rand_functions[] = {
-    { OSSL_FUNC_RAND_NEWCTX, (void (*)(void))fuzz_rand_newctx },
-    { OSSL_FUNC_RAND_FREECTX, (void (*)(void))fuzz_rand_freectx },
-    { OSSL_FUNC_RAND_INSTANTIATE, (void (*)(void))fuzz_rand_instantiate },
-    { OSSL_FUNC_RAND_UNINSTANTIATE, (void (*)(void))fuzz_rand_uninstantiate },
-    { OSSL_FUNC_RAND_GENERATE, (void (*)(void))fuzz_rand_generate },
-    { OSSL_FUNC_RAND_ENABLE_LOCKING, (void (*)(void))fuzz_rand_enable_locking },
-    { OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS,
-      (void(*)(void))fuzz_rand_gettable_ctx_params },
-    { OSSL_FUNC_RAND_GET_CTX_PARAMS, (void(*)(void))fuzz_rand_get_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_RAND_NEWCTX, (void (*)(void))fuzz_rand_newctx},
+    {OSSL_FUNC_RAND_FREECTX, (void (*)(void))fuzz_rand_freectx},
+    {OSSL_FUNC_RAND_INSTANTIATE, (void (*)(void))fuzz_rand_instantiate},
+    {OSSL_FUNC_RAND_UNINSTANTIATE, (void (*)(void))fuzz_rand_uninstantiate},
+    {OSSL_FUNC_RAND_GENERATE, (void (*)(void))fuzz_rand_generate},
+    {OSSL_FUNC_RAND_ENABLE_LOCKING, (void (*)(void))fuzz_rand_enable_locking},
+    {OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS,
+     (void (*)(void))fuzz_rand_gettable_ctx_params},
+    {OSSL_FUNC_RAND_GET_CTX_PARAMS, (void (*)(void))fuzz_rand_get_ctx_params},
+    OSSL_DISPATCH_END};
 
 static const OSSL_ALGORITHM fuzz_rand_rand[] = {
-    { "fuzz", "provider=fuzz-rand", fuzz_rand_functions },
-    { NULL, NULL, NULL }
-};
+    {"fuzz", "provider=fuzz-rand", fuzz_rand_functions}, {NULL, NULL, NULL}};
 
-static const OSSL_ALGORITHM *fuzz_rand_query(void *provctx,
-                                             int operation_id,
+static const OSSL_ALGORITHM *fuzz_rand_query(void *provctx, int operation_id,
                                              int *no_cache)
 {
     *no_cache = 0;
@@ -136,10 +128,9 @@ static const OSSL_ALGORITHM *fuzz_rand_query(void *provctx,
 
 /* Functions we provide to the core */
 static const OSSL_DISPATCH fuzz_rand_method[] = {
-    { OSSL_FUNC_PROVIDER_TEARDOWN, (void (*)(void))OSSL_LIB_CTX_free },
-    { OSSL_FUNC_PROVIDER_QUERY_OPERATION, (void (*)(void))fuzz_rand_query },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_PROVIDER_TEARDOWN, (void (*)(void))OSSL_LIB_CTX_free},
+    {OSSL_FUNC_PROVIDER_QUERY_OPERATION, (void (*)(void))fuzz_rand_query},
+    OSSL_DISPATCH_END};
 
 static int fuzz_rand_provider_init(const OSSL_CORE_HANDLE *handle,
                                    const OSSL_DISPATCH *in,

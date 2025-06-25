@@ -54,10 +54,8 @@ static int dh_test(void)
     int i, alen, blen, clen, aout, bout, cout;
     int ret = 0;
 
-    if (!TEST_ptr(dh = DH_new())
-        || !TEST_ptr(p = BN_new())
-        || !TEST_ptr(q = BN_new())
-        || !TEST_ptr(g = BN_new())
+    if (!TEST_ptr(dh = DH_new()) || !TEST_ptr(p = BN_new())
+        || !TEST_ptr(q = BN_new()) || !TEST_ptr(g = BN_new())
         || !TEST_ptr(priv_key = BN_new()))
         goto err1;
 
@@ -66,8 +64,7 @@ static int dh_test(void)
      */
 
     /* using a small predefined Sophie Germain DH group with generator 3 */
-    if (!TEST_true(BN_set_word(p, 4079L))
-        || !TEST_true(BN_set_word(q, 2039L))
+    if (!TEST_true(BN_set_word(p, 4079L)) || !TEST_true(BN_set_word(q, 2039L))
         || !TEST_true(BN_set_word(g, 3L))
         || !TEST_true(DH_set0_pqg(dh, p, q, g)))
         goto err1;
@@ -77,27 +74,23 @@ static int dh_test(void)
         goto err2;
     i ^= DH_MODULUS_TOO_SMALL;
     if (!TEST_false(i & DH_CHECK_P_NOT_PRIME)
-            || !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME)
-            || !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR)
-            || !TEST_false(i & DH_NOT_SUITABLE_GENERATOR)
-            || !TEST_false(i & DH_CHECK_Q_NOT_PRIME)
-            || !TEST_false(i & DH_CHECK_INVALID_Q_VALUE)
-            || !TEST_false(i & DH_CHECK_INVALID_J_VALUE)
-            || !TEST_false(i & DH_MODULUS_TOO_SMALL)
-            || !TEST_false(i & DH_MODULUS_TOO_LARGE)
-            || !TEST_false(i))
+        || !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME)
+        || !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR)
+        || !TEST_false(i & DH_NOT_SUITABLE_GENERATOR)
+        || !TEST_false(i & DH_CHECK_Q_NOT_PRIME)
+        || !TEST_false(i & DH_CHECK_INVALID_Q_VALUE)
+        || !TEST_false(i & DH_CHECK_INVALID_J_VALUE)
+        || !TEST_false(i & DH_MODULUS_TOO_SMALL)
+        || !TEST_false(i & DH_MODULUS_TOO_LARGE) || !TEST_false(i))
         goto err2;
 
     /* test the combined getter for p, q, and g */
     DH_get0_pqg(dh, &p2, &q2, &g2);
-    if (!TEST_ptr_eq(p2, p)
-        || !TEST_ptr_eq(q2, q)
-        || !TEST_ptr_eq(g2, g))
+    if (!TEST_ptr_eq(p2, p) || !TEST_ptr_eq(q2, q) || !TEST_ptr_eq(g2, g))
         goto err2;
 
     /* test the simple getters for p, q, and g */
-    if (!TEST_ptr_eq(DH_get0_p(dh), p2)
-        || !TEST_ptr_eq(DH_get0_q(dh), q2)
+    if (!TEST_ptr_eq(DH_get0_p(dh), p2) || !TEST_ptr_eq(DH_get0_q(dh), q2)
         || !TEST_ptr_eq(DH_get0_g(dh), g2))
         goto err2;
 
@@ -108,8 +101,7 @@ static int dh_test(void)
 
     /* test the combined getter for pub_key and priv_key */
     DH_get0_key(dh, &pub_key2, &priv_key2);
-    if (!TEST_ptr_eq(pub_key2, NULL)
-        || !TEST_ptr_eq(priv_key2, priv_key))
+    if (!TEST_ptr_eq(pub_key2, NULL) || !TEST_ptr_eq(priv_key2, priv_key))
         goto err3;
 
     /* test the simple getters for pub_key and priv_key */
@@ -135,7 +127,7 @@ static int dh_test(void)
 
     /* Modulus of size: dh check max modulus bits + 1 */
     if (!TEST_true(BN_set_word(p, 1))
-            || !TEST_true(BN_lshift(p, p, OPENSSL_DH_CHECK_MAX_MODULUS_BITS)))
+        || !TEST_true(BN_lshift(p, p, OPENSSL_DH_CHECK_MAX_MODULUS_BITS)))
         goto err3;
 
     /*
@@ -156,23 +148,21 @@ static int dh_test(void)
         goto err3;
     BN_GENCB_set(_cb, &cb, NULL);
     if (!TEST_ptr(a = DH_new())
-            || !TEST_true(DH_generate_parameters_ex(a, 512,
-                                                    DH_GENERATOR_5, _cb)))
+        || !TEST_true(DH_generate_parameters_ex(a, 512, DH_GENERATOR_5, _cb)))
         goto err3;
 
     /* ... and check whether it is valid */
     if (!TEST_true(DH_check(a, &i)))
         goto err3;
     if (!TEST_false(i & DH_CHECK_P_NOT_PRIME)
-            || !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME)
-            || !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR)
-            || !TEST_false(i & DH_NOT_SUITABLE_GENERATOR)
-            || !TEST_false(i & DH_CHECK_Q_NOT_PRIME)
-            || !TEST_false(i & DH_CHECK_INVALID_Q_VALUE)
-            || !TEST_false(i & DH_CHECK_INVALID_J_VALUE)
-            || !TEST_false(i & DH_MODULUS_TOO_SMALL)
-            || !TEST_false(i & DH_MODULUS_TOO_LARGE)
-            || !TEST_false(i))
+        || !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME)
+        || !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR)
+        || !TEST_false(i & DH_NOT_SUITABLE_GENERATOR)
+        || !TEST_false(i & DH_CHECK_Q_NOT_PRIME)
+        || !TEST_false(i & DH_CHECK_INVALID_Q_VALUE)
+        || !TEST_false(i & DH_CHECK_INVALID_J_VALUE)
+        || !TEST_false(i & DH_MODULUS_TOO_SMALL)
+        || !TEST_false(i & DH_MODULUS_TOO_LARGE) || !TEST_false(i))
         goto err3;
 
     DH_get0_pqg(a, &ap, NULL, &ag);
@@ -181,9 +171,8 @@ static int dh_test(void)
     if (!TEST_ptr(b = DH_new()))
         goto err3;
 
-    if (!TEST_ptr(bp = BN_dup(ap))
-            || !TEST_ptr(bg = BN_dup(ag))
-            || !TEST_true(DH_set0_pqg(b, bp, NULL, bg)))
+    if (!TEST_ptr(bp = BN_dup(ap)) || !TEST_ptr(bg = BN_dup(ag))
+        || !TEST_true(DH_set0_pqg(b, bp, NULL, bg)))
         goto err3;
     bp = bg = NULL;
 
@@ -201,44 +190,43 @@ static int dh_test(void)
 
     /* Also test with a private-key-only copy of |b|. */
     if (!TEST_ptr(c = DHparams_dup(b))
-            || !TEST_ptr(cpriv_key = BN_dup(bpriv_key))
-            || !TEST_true(DH_set0_key(c, NULL, cpriv_key)))
+        || !TEST_ptr(cpriv_key = BN_dup(bpriv_key))
+        || !TEST_true(DH_set0_key(c, NULL, cpriv_key)))
         goto err3;
     cpriv_key = NULL;
 
     alen = DH_size(a);
     if (!TEST_ptr(abuf = OPENSSL_malloc(alen))
-            || !TEST_int_gt((aout = DH_compute_key(abuf, bpub_key, a)), 0))
+        || !TEST_int_gt((aout = DH_compute_key(abuf, bpub_key, a)), 0))
         goto err3;
 
     blen = DH_size(b);
     if (!TEST_ptr(bbuf = OPENSSL_malloc(blen))
-            || !TEST_int_gt((bout = DH_compute_key(bbuf, apub_key, b)), 0))
+        || !TEST_int_gt((bout = DH_compute_key(bbuf, apub_key, b)), 0))
         goto err3;
 
     clen = DH_size(c);
     if (!TEST_ptr(cbuf = OPENSSL_malloc(clen))
-            || !TEST_int_gt((cout = DH_compute_key(cbuf, apub_key, c)), 0))
+        || !TEST_int_gt((cout = DH_compute_key(cbuf, apub_key, c)), 0))
         goto err3;
 
-    if (!TEST_true(aout >= 20)
-            || !TEST_mem_eq(abuf, aout, bbuf, bout)
-            || !TEST_mem_eq(abuf, aout, cbuf, cout))
+    if (!TEST_true(aout >= 20) || !TEST_mem_eq(abuf, aout, bbuf, bout)
+        || !TEST_mem_eq(abuf, aout, cbuf, cout))
         goto err3;
 
     ret = 1;
     goto success;
 
- err1:
+err1:
     /* an error occurred before p,q,g were assigned to dh */
     BN_free(p);
     BN_free(q);
     BN_free(g);
- err2:
+err2:
     /* an error occurred before priv_key was assigned to dh */
     BN_free(priv_key);
- err3:
- success:
+err3:
+success:
     OPENSSL_free(abuf);
     OPENSSL_free(bbuf);
     OPENSSL_free(cbuf);
@@ -269,15 +257,12 @@ static int dh_computekey_range_test(void)
     if (!TEST_ptr(p = BN_dup(&ossl_bignum_ffdhe2048_p))
         || !TEST_ptr(q = BN_dup(&ossl_bignum_ffdhe2048_q))
         || !TEST_ptr(g = BN_dup(&ossl_bignum_const_2))
-        || !TEST_ptr(dh = DH_new())
-        || !TEST_true(DH_set0_pqg(dh, p, q, g)))
+        || !TEST_ptr(dh = DH_new()) || !TEST_true(DH_set0_pqg(dh, p, q, g)))
         goto err;
     p = q = g = NULL;
 
-    if (!TEST_int_gt(sz = DH_size(dh), 0)
-        || !TEST_ptr(buf = OPENSSL_malloc(sz))
-        || !TEST_ptr(pub = BN_new())
-        || !TEST_ptr(priv = BN_new()))
+    if (!TEST_int_gt(sz = DH_size(dh), 0) || !TEST_ptr(buf = OPENSSL_malloc(sz))
+        || !TEST_ptr(pub = BN_new()) || !TEST_ptr(priv = BN_new()))
         goto err;
 
     if (!TEST_true(BN_set_word(priv, 1))
@@ -320,9 +305,8 @@ err:
 /* Test data from RFC 5114 */
 
 static const unsigned char dhtest_1024_160_xA[] = {
-    0xB9, 0xA3, 0xB3, 0xAE, 0x8F, 0xEF, 0xC1, 0xA2, 0x93, 0x04, 0x96, 0x50,
-    0x70, 0x86, 0xF8, 0x45, 0x5D, 0x48, 0x94, 0x3E
-};
+    0xB9, 0xA3, 0xB3, 0xAE, 0x8F, 0xEF, 0xC1, 0xA2, 0x93, 0x04,
+    0x96, 0x50, 0x70, 0x86, 0xF8, 0x45, 0x5D, 0x48, 0x94, 0x3E};
 
 static const unsigned char dhtest_1024_160_yA[] = {
     0x2A, 0x85, 0x3B, 0x3D, 0x92, 0x19, 0x75, 0x01, 0xB9, 0x01, 0x5B, 0x2D,
@@ -335,13 +319,11 @@ static const unsigned char dhtest_1024_160_yA[] = {
     0x37, 0xDF, 0x9C, 0xCE, 0x95, 0xB4, 0x78, 0x75, 0x5D, 0x06, 0xBC, 0xEA,
     0x8F, 0x9D, 0x45, 0x96, 0x5F, 0x75, 0xA5, 0xF3, 0xD1, 0xDF, 0x37, 0x01,
     0x16, 0x5F, 0xC9, 0xE5, 0x0C, 0x42, 0x79, 0xCE, 0xB0, 0x7F, 0x98, 0x95,
-    0x40, 0xAE, 0x96, 0xD5, 0xD8, 0x8E, 0xD7, 0x76
-};
+    0x40, 0xAE, 0x96, 0xD5, 0xD8, 0x8E, 0xD7, 0x76};
 
 static const unsigned char dhtest_1024_160_xB[] = {
-    0x93, 0x92, 0xC9, 0xF9, 0xEB, 0x6A, 0x7A, 0x6A, 0x90, 0x22, 0xF7, 0xD8,
-    0x3E, 0x72, 0x23, 0xC6, 0x83, 0x5B, 0xBD, 0xDA
-};
+    0x93, 0x92, 0xC9, 0xF9, 0xEB, 0x6A, 0x7A, 0x6A, 0x90, 0x22,
+    0xF7, 0xD8, 0x3E, 0x72, 0x23, 0xC6, 0x83, 0x5B, 0xBD, 0xDA};
 
 static const unsigned char dhtest_1024_160_yB[] = {
     0x71, 0x7A, 0x6C, 0xB0, 0x53, 0x37, 0x1F, 0xF4, 0xA3, 0xB9, 0x32, 0x94,
@@ -354,8 +336,7 @@ static const unsigned char dhtest_1024_160_yB[] = {
     0xDB, 0x46, 0xCC, 0x2B, 0x5D, 0x52, 0x03, 0x09, 0x0E, 0xAE, 0x61, 0x26,
     0x31, 0x1E, 0x53, 0xFD, 0x2C, 0x14, 0xB5, 0x74, 0xE6, 0xA3, 0x10, 0x9A,
     0x3D, 0xA1, 0xBE, 0x41, 0xBD, 0xCE, 0xAA, 0x18, 0x6F, 0x5C, 0xE0, 0x67,
-    0x16, 0xA2, 0xB6, 0xA0, 0x7B, 0x3C, 0x33, 0xFE
-};
+    0x16, 0xA2, 0xB6, 0xA0, 0x7B, 0x3C, 0x33, 0xFE};
 
 static const unsigned char dhtest_1024_160_Z[] = {
     0x5C, 0x80, 0x4F, 0x45, 0x4D, 0x30, 0xD9, 0xC4, 0xDF, 0x85, 0x27, 0x1F,
@@ -368,14 +349,12 @@ static const unsigned char dhtest_1024_160_Z[] = {
     0xDE, 0xAE, 0xAD, 0x7E, 0x9C, 0xFB, 0xB3, 0x6A, 0xE2, 0xB4, 0x20, 0x83,
     0x5B, 0xD8, 0x3A, 0x19, 0xFB, 0x0B, 0x5E, 0x96, 0xBF, 0x8F, 0xA4, 0xD0,
     0x9E, 0x34, 0x55, 0x25, 0x16, 0x7E, 0xCD, 0x91, 0x55, 0x41, 0x6F, 0x46,
-    0xF4, 0x08, 0xED, 0x31, 0xB6, 0x3C, 0x6E, 0x6D
-};
+    0xF4, 0x08, 0xED, 0x31, 0xB6, 0x3C, 0x6E, 0x6D};
 
 static const unsigned char dhtest_2048_224_xA[] = {
-    0x22, 0xE6, 0x26, 0x01, 0xDB, 0xFF, 0xD0, 0x67, 0x08, 0xA6, 0x80, 0xF7,
-    0x47, 0xF3, 0x61, 0xF7, 0x6D, 0x8F, 0x4F, 0x72, 0x1A, 0x05, 0x48, 0xE4,
-    0x83, 0x29, 0x4B, 0x0C
-};
+    0x22, 0xE6, 0x26, 0x01, 0xDB, 0xFF, 0xD0, 0x67, 0x08, 0xA6,
+    0x80, 0xF7, 0x47, 0xF3, 0x61, 0xF7, 0x6D, 0x8F, 0x4F, 0x72,
+    0x1A, 0x05, 0x48, 0xE4, 0x83, 0x29, 0x4B, 0x0C};
 
 static const unsigned char dhtest_2048_224_yA[] = {
     0x1B, 0x3A, 0x63, 0x45, 0x1B, 0xD8, 0x86, 0xE6, 0x99, 0xE6, 0x7B, 0x49,
@@ -399,14 +378,12 @@ static const unsigned char dhtest_2048_224_yA[] = {
     0x86, 0x1D, 0x82, 0x7E, 0x2E, 0xBC, 0x8C, 0x61, 0x34, 0x55, 0x31, 0x15,
     0xB7, 0x0E, 0x71, 0x03, 0x92, 0x0A, 0xA1, 0x6D, 0x85, 0xE5, 0x2B, 0xCB,
     0xAB, 0x8D, 0x78, 0x6A, 0x68, 0x17, 0x8F, 0xA8, 0xFF, 0x7C, 0x2F, 0x5C,
-    0x71, 0x64, 0x8D, 0x6F
-};
+    0x71, 0x64, 0x8D, 0x6F};
 
 static const unsigned char dhtest_2048_224_xB[] = {
-    0x4F, 0xF3, 0xBC, 0x96, 0xC7, 0xFC, 0x6A, 0x6D, 0x71, 0xD3, 0xB3, 0x63,
-    0x80, 0x0A, 0x7C, 0xDF, 0xEF, 0x6F, 0xC4, 0x1B, 0x44, 0x17, 0xEA, 0x15,
-    0x35, 0x3B, 0x75, 0x90
-};
+    0x4F, 0xF3, 0xBC, 0x96, 0xC7, 0xFC, 0x6A, 0x6D, 0x71, 0xD3,
+    0xB3, 0x63, 0x80, 0x0A, 0x7C, 0xDF, 0xEF, 0x6F, 0xC4, 0x1B,
+    0x44, 0x17, 0xEA, 0x15, 0x35, 0x3B, 0x75, 0x90};
 
 static const unsigned char dhtest_2048_224_yB[] = {
     0x4D, 0xCE, 0xE9, 0x92, 0xA9, 0x76, 0x2A, 0x13, 0xF2, 0xF8, 0x38, 0x44,
@@ -430,8 +407,7 @@ static const unsigned char dhtest_2048_224_yB[] = {
     0x0C, 0xDD, 0x77, 0x76, 0x35, 0xA7, 0xAB, 0x5B, 0xFB, 0x1E, 0x4B, 0xB7,
     0xB8, 0x56, 0xF9, 0x68, 0x27, 0x73, 0x4C, 0x18, 0x41, 0x38, 0xE9, 0x15,
     0xD9, 0xC3, 0x00, 0x2E, 0xBC, 0xE5, 0x31, 0x20, 0x54, 0x6A, 0x7E, 0x20,
-    0x02, 0x14, 0x2B, 0x6C
-};
+    0x02, 0x14, 0x2B, 0x6C};
 
 static const unsigned char dhtest_2048_224_Z[] = {
     0x34, 0xD9, 0xBD, 0xDC, 0x1B, 0x42, 0x17, 0x6C, 0x31, 0x3F, 0xEA, 0x03,
@@ -455,14 +431,12 @@ static const unsigned char dhtest_2048_224_Z[] = {
     0x15, 0xE5, 0xD0, 0x3C, 0x17, 0xC4, 0x64, 0xC9, 0xAC, 0x1A, 0x46, 0xE2,
     0x03, 0xE1, 0x3F, 0x95, 0x29, 0x95, 0xFB, 0x03, 0xC6, 0x9D, 0x3C, 0xC4,
     0x7F, 0xCB, 0x51, 0x0B, 0x69, 0x98, 0xFF, 0xD3, 0xAA, 0x6D, 0xE7, 0x3C,
-    0xF9, 0xF6, 0x38, 0x69
-};
+    0xF9, 0xF6, 0x38, 0x69};
 
 static const unsigned char dhtest_2048_256_xA[] = {
-    0x08, 0x81, 0x38, 0x2C, 0xDB, 0x87, 0x66, 0x0C, 0x6D, 0xC1, 0x3E, 0x61,
-    0x49, 0x38, 0xD5, 0xB9, 0xC8, 0xB2, 0xF2, 0x48, 0x58, 0x1C, 0xC5, 0xE3,
-    0x1B, 0x35, 0x45, 0x43, 0x97, 0xFC, 0xE5, 0x0E
-};
+    0x08, 0x81, 0x38, 0x2C, 0xDB, 0x87, 0x66, 0x0C, 0x6D, 0xC1, 0x3E,
+    0x61, 0x49, 0x38, 0xD5, 0xB9, 0xC8, 0xB2, 0xF2, 0x48, 0x58, 0x1C,
+    0xC5, 0xE3, 0x1B, 0x35, 0x45, 0x43, 0x97, 0xFC, 0xE5, 0x0E};
 
 static const unsigned char dhtest_2048_256_yA[] = {
     0x2E, 0x93, 0x80, 0xC8, 0x32, 0x3A, 0xF9, 0x75, 0x45, 0xBC, 0x49, 0x41,
@@ -486,14 +460,12 @@ static const unsigned char dhtest_2048_256_yA[] = {
     0x93, 0x00, 0x3C, 0xBE, 0xAF, 0x66, 0x5B, 0x3C, 0x2E, 0x11, 0x3A, 0x3A,
     0x4E, 0x90, 0x52, 0x69, 0x34, 0x1D, 0xC0, 0x71, 0x14, 0x26, 0x68, 0x5F,
     0x4E, 0xF3, 0x7E, 0x86, 0x8A, 0x81, 0x26, 0xFF, 0x3F, 0x22, 0x79, 0xB5,
-    0x7C, 0xA6, 0x7E, 0x29
-};
+    0x7C, 0xA6, 0x7E, 0x29};
 
 static const unsigned char dhtest_2048_256_xB[] = {
-    0x7D, 0x62, 0xA7, 0xE3, 0xEF, 0x36, 0xDE, 0x61, 0x7B, 0x13, 0xD1, 0xAF,
-    0xB8, 0x2C, 0x78, 0x0D, 0x83, 0xA2, 0x3B, 0xD4, 0xEE, 0x67, 0x05, 0x64,
-    0x51, 0x21, 0xF3, 0x71, 0xF5, 0x46, 0xA5, 0x3D
-};
+    0x7D, 0x62, 0xA7, 0xE3, 0xEF, 0x36, 0xDE, 0x61, 0x7B, 0x13, 0xD1,
+    0xAF, 0xB8, 0x2C, 0x78, 0x0D, 0x83, 0xA2, 0x3B, 0xD4, 0xEE, 0x67,
+    0x05, 0x64, 0x51, 0x21, 0xF3, 0x71, 0xF5, 0x46, 0xA5, 0x3D};
 
 static const unsigned char dhtest_2048_256_yB[] = {
     0x57, 0x5F, 0x03, 0x51, 0xBD, 0x2B, 0x1B, 0x81, 0x74, 0x48, 0xBD, 0xF8,
@@ -517,8 +489,7 @@ static const unsigned char dhtest_2048_256_yB[] = {
     0xED, 0x12, 0x09, 0x88, 0x21, 0x93, 0x02, 0xF4, 0x29, 0x24, 0xC7, 0xCA,
     0x90, 0xB8, 0x9D, 0x24, 0xF7, 0x1B, 0x0A, 0xB6, 0x97, 0x82, 0x3D, 0x7D,
     0xEB, 0x1A, 0xFF, 0x5B, 0x0E, 0x8E, 0x4A, 0x45, 0xD4, 0x9F, 0x7F, 0x53,
-    0x75, 0x7E, 0x19, 0x13
-};
+    0x75, 0x7E, 0x19, 0x13};
 
 static const unsigned char dhtest_2048_256_Z[] = {
     0x86, 0xC7, 0x0B, 0xF8, 0xD0, 0xBB, 0x81, 0xBB, 0x01, 0x07, 0x8A, 0x17,
@@ -542,11 +513,10 @@ static const unsigned char dhtest_2048_256_Z[] = {
     0xA1, 0x0F, 0x42, 0x5E, 0x3E, 0xA7, 0x60, 0x80, 0xB4, 0xB9, 0xD6, 0xB3,
     0xCE, 0xFE, 0xA1, 0x15, 0xB2, 0xCE, 0xB8, 0x78, 0x9B, 0xB8, 0xA3, 0xB0,
     0xEA, 0x87, 0xFE, 0xBE, 0x63, 0xB6, 0xC8, 0xF8, 0x46, 0xEC, 0x6D, 0xB0,
-    0xC2, 0x6C, 0x5D, 0x7C
-};
+    0xC2, 0x6C, 0x5D, 0x7C};
 
 typedef struct {
-    DH *(*get_param) (void);
+    DH *(*get_param)(void);
     const unsigned char *xA;
     size_t xA_len;
     const unsigned char *yA;
@@ -568,11 +538,9 @@ typedef struct {
         dhtest_##pre##_Z, sizeof(dhtest_##pre##_Z) \
         }
 
-static const rfc5114_td rfctd[] = {
-        make_rfc5114_td(1024_160),
-        make_rfc5114_td(2048_224),
-        make_rfc5114_td(2048_256)
-};
+static const rfc5114_td rfctd[] = {make_rfc5114_td(1024_160),
+                                   make_rfc5114_td(2048_224),
+                                   make_rfc5114_td(2048_256)};
 
 static int rfc5114_test(void)
 {
@@ -590,28 +558,28 @@ static int rfc5114_test(void)
         td = rfctd + i;
         /* Set up DH structures setting key components */
         if (!TEST_ptr(dhA = td->get_param())
-                || !TEST_ptr(dhB = td->get_param()))
+            || !TEST_ptr(dhB = td->get_param()))
             goto bad_err;
 
         if (!TEST_ptr(priv_key = BN_bin2bn(td->xA, td->xA_len, NULL))
-                || !TEST_ptr(pub_key = BN_bin2bn(td->yA, td->yA_len, NULL))
-                || !TEST_true(DH_set0_key(dhA, pub_key, priv_key)))
+            || !TEST_ptr(pub_key = BN_bin2bn(td->yA, td->yA_len, NULL))
+            || !TEST_true(DH_set0_key(dhA, pub_key, priv_key)))
             goto bad_err;
 
         if (!TEST_ptr(priv_key = BN_bin2bn(td->xB, td->xB_len, NULL))
-                || !TEST_ptr(pub_key = BN_bin2bn(td->yB, td->yB_len, NULL))
-                || !TEST_true(DH_set0_key(dhB, pub_key, priv_key)))
+            || !TEST_ptr(pub_key = BN_bin2bn(td->yB, td->yB_len, NULL))
+            || !TEST_true(DH_set0_key(dhB, pub_key, priv_key)))
             goto bad_err;
         priv_key = pub_key = NULL;
 
         if (!TEST_int_gt(szA = DH_size(dhA), 0)
-                || !TEST_int_gt(szB = DH_size(dhB), 0)
-                || !TEST_size_t_eq(td->Z_len, (size_t)szA)
-                || !TEST_size_t_eq(td->Z_len, (size_t)szB))
+            || !TEST_int_gt(szB = DH_size(dhB), 0)
+            || !TEST_size_t_eq(td->Z_len, (size_t)szA)
+            || !TEST_size_t_eq(td->Z_len, (size_t)szB))
             goto err;
 
         if (!TEST_ptr(Z1 = OPENSSL_malloc((size_t)szA))
-                || !TEST_ptr(Z2 = OPENSSL_malloc((size_t)szB)))
+            || !TEST_ptr(Z2 = OPENSSL_malloc((size_t)szB)))
             goto bad_err;
         /*
          * Work out shared secrets using both sides and compare with expected
@@ -626,7 +594,7 @@ static int rfc5114_test(void)
             goto bad_err;
 
         if (!TEST_mem_eq(Z1, td->Z_len, td->Z, td->Z_len)
-                || !TEST_mem_eq(Z2, td->Z_len, td->Z, td->Z_len))
+            || !TEST_mem_eq(Z2, td->Z_len, td->Z, td->Z_len))
             goto err;
 
         DH_free(dhA);
@@ -640,7 +608,7 @@ static int rfc5114_test(void)
     }
     return 1;
 
- bad_err:
+bad_err:
     DH_free(dhA);
     DH_free(dhB);
     BN_free(pub_key);
@@ -650,7 +618,7 @@ static int rfc5114_test(void)
     TEST_error("Initialisation error RFC5114 set %d\n", i + 1);
     return 0;
 
- err:
+err:
     DH_free(dhA);
     DH_free(dhB);
     OPENSSL_free(Z1);
@@ -669,15 +637,14 @@ static int rfc7919_test(void)
     int ret = 0;
 
     if (!TEST_ptr(a = DH_new_by_nid(NID_ffdhe2048)))
-         goto err;
+        goto err;
 
     if (!DH_check(a, &i))
         goto err;
     if (!TEST_false(i & DH_CHECK_P_NOT_PRIME)
-            || !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME)
-            || !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR)
-            || !TEST_false(i & DH_NOT_SUITABLE_GENERATOR)
-            || !TEST_false(i))
+        || !TEST_false(i & DH_CHECK_P_NOT_SAFE_PRIME)
+        || !TEST_false(i & DH_UNABLE_TO_CHECK_GENERATOR)
+        || !TEST_false(i & DH_NOT_SUITABLE_GENERATOR) || !TEST_false(i))
         goto err;
 
     if (!DH_generate_key(a))
@@ -694,21 +661,20 @@ static int rfc7919_test(void)
 
     alen = DH_size(a);
     if (!TEST_int_gt(alen, 0) || !TEST_ptr(abuf = OPENSSL_malloc(alen))
-            || !TEST_int_gt((aout = DH_compute_key(abuf, bpub_key, a)), 0))
+        || !TEST_int_gt((aout = DH_compute_key(abuf, bpub_key, a)), 0))
         goto err;
 
     blen = DH_size(b);
     if (!TEST_int_gt(blen, 0) || !TEST_ptr(bbuf = OPENSSL_malloc(blen))
-            || !TEST_int_gt((bout = DH_compute_key(bbuf, apub_key, b)), 0))
+        || !TEST_int_gt((bout = DH_compute_key(bbuf, apub_key, b)), 0))
         goto err;
 
-    if (!TEST_true(aout >= 20)
-            || !TEST_mem_eq(abuf, aout, bbuf, bout))
+    if (!TEST_true(aout >= 20) || !TEST_mem_eq(abuf, aout, bbuf, bout))
         goto err;
 
     ret = 1;
 
- err:
+err:
     OPENSSL_free(abuf);
     OPENSSL_free(bbuf);
     DH_free(a);
@@ -717,15 +683,8 @@ static int rfc7919_test(void)
 }
 
 static int prime_groups[] = {
-    NID_ffdhe2048,
-    NID_ffdhe3072,
-    NID_ffdhe4096,
-    NID_ffdhe6144,
-    NID_ffdhe8192,
-    NID_modp_2048,
-    NID_modp_3072,
-    NID_modp_4096,
-    NID_modp_6144,
+    NID_ffdhe2048, NID_ffdhe3072, NID_ffdhe4096, NID_ffdhe6144, NID_ffdhe8192,
+    NID_modp_2048, NID_modp_3072, NID_modp_4096, NID_modp_6144,
 };
 
 static int dh_test_prime_groups(int index)
@@ -809,17 +768,13 @@ static int dh_get_nid(void)
     DH *dh1 = DH_new_by_nid(NID_ffdhe2048);
     DH *dh2 = DH_new();
 
-    if (!TEST_ptr(dh1)
-        || !TEST_ptr(dh2))
+    if (!TEST_ptr(dh1) || !TEST_ptr(dh2))
         goto err;
 
     /* Set new DH parameters manually using a existing named group's p & g */
     DH_get0_pqg(dh1, &p, &q, &g);
-    if (!TEST_ptr(p)
-        || !TEST_ptr(q)
-        || !TEST_ptr(g)
-        || !TEST_ptr(pcpy = BN_dup(p))
-        || !TEST_ptr(gcpy = BN_dup(g)))
+    if (!TEST_ptr(p) || !TEST_ptr(q) || !TEST_ptr(g)
+        || !TEST_ptr(pcpy = BN_dup(p)) || !TEST_ptr(gcpy = BN_dup(g)))
         goto err;
 
     if (!TEST_true(DH_set0_pqg(dh2, pcpy, NULL, gcpy)))
@@ -835,18 +790,16 @@ static int dh_get_nid(void)
 
     /* Test that after changing g it is no longer a named group */
     if (!TEST_ptr(gcpy = BN_dup(BN_value_one())))
-       goto err;
+        goto err;
     if (!TEST_true(DH_set0_pqg(dh2, NULL, NULL, gcpy)))
-       goto err;
+        goto err;
     gcpy = NULL;
     if (!TEST_int_eq(DH_get_nid(dh2), NID_undef))
         goto err;
 
     /* Test that setting an incorrect q results in this not being a named group */
-    if (!TEST_ptr(pcpy = BN_dup(p))
-        || !TEST_ptr(qcpy = BN_dup(q))
-        || !TEST_ptr(gcpy = BN_dup(g))
-        || !TEST_int_eq(BN_add_word(qcpy, 2), 1)
+    if (!TEST_ptr(pcpy = BN_dup(p)) || !TEST_ptr(qcpy = BN_dup(q))
+        || !TEST_ptr(gcpy = BN_dup(g)) || !TEST_int_eq(BN_add_word(qcpy, 2), 1)
         || !TEST_true(DH_set0_pqg(dh2, pcpy, qcpy, gcpy)))
         goto err;
     pcpy = qcpy = gcpy = NULL;
@@ -910,8 +863,7 @@ static const unsigned char dh_pub_der[] = {
     0x26, 0x4c, 0xa4, 0xc6, 0x26, 0xc9, 0xcc, 0xab, 0xd2, 0x1a, 0x3a, 0x82,
     0x68, 0x03, 0x49, 0x8f, 0xb0, 0xb9, 0xc8, 0x48, 0x9d, 0xc7, 0xdf, 0x8b,
     0x1c, 0xbf, 0xda, 0x89, 0x78, 0x6f, 0xd3, 0x62, 0xad, 0x35, 0xb9, 0xd3,
-    0x9b, 0xd0, 0x25, 0x65
-};
+    0x9b, 0xd0, 0x25, 0x65};
 
 /*
  * Load PKCS3 DH Parameters that contain an optional private value length.
@@ -923,11 +875,11 @@ static int dh_load_pkcs3_namedgroup_privlen_test(void)
     EVP_PKEY *pkey = NULL;
     const unsigned char *p = dh_pub_der;
 
-    ret = TEST_ptr(pkey = d2i_PUBKEY_ex(NULL, &p, sizeof(dh_pub_der),
-                                        NULL, NULL))
-          && TEST_true(EVP_PKEY_get_int_param(pkey, OSSL_PKEY_PARAM_DH_PRIV_LEN,
-                                              &privlen))
-          && TEST_int_eq(privlen, 1024);
+    ret =
+        TEST_ptr(pkey = d2i_PUBKEY_ex(NULL, &p, sizeof(dh_pub_der), NULL, NULL))
+        && TEST_true(
+            EVP_PKEY_get_int_param(pkey, OSSL_PKEY_PARAM_DH_PRIV_LEN, &privlen))
+        && TEST_int_eq(privlen, 1024);
 
     EVP_PKEY_free(pkey);
     return ret;

@@ -50,8 +50,8 @@ static EVP_PKEY *get_key(OSSL_LIB_CTX *libctx, const char *propq, int public)
         data = priv_key_der;
         data_len = sizeof(priv_key_der);
     }
-    dctx = OSSL_DECODER_CTX_new_for_pkey(&pkey, "DER", NULL, "RSA",
-                                         selection, libctx, propq);
+    dctx = OSSL_DECODER_CTX_new_for_pkey(&pkey, "DER", NULL, "RSA", selection,
+                                         libctx, propq);
     (void)OSSL_DECODER_from_data(dctx, &data, &data_len);
     OSSL_DECODER_CTX_free(dctx);
     return pkey;
@@ -76,8 +76,8 @@ static void set_optional_params(OSSL_PARAM *p, const char *propq)
      * OAEP digest then it needs to be specified here.
      */
     if (propq != NULL)
-        *p++ = OSSL_PARAM_construct_utf8_string(OSSL_ASYM_CIPHER_PARAM_OAEP_DIGEST_PROPS,
-                                                (char *)propq, 0);
+        *p++ = OSSL_PARAM_construct_utf8_string(
+            OSSL_ASYM_CIPHER_PARAM_OAEP_DIGEST_PROPS, (char *)propq, 0);
 
     /*
      * OSSL_ASYM_CIPHER_PARAM_MGF1_DIGEST and
@@ -93,9 +93,8 @@ static void set_optional_params(OSSL_PARAM *p, const char *propq)
  * RSA key length minus some additional bytes that depends on the padding mode.
  *
  */
-static int do_encrypt(OSSL_LIB_CTX *libctx,
-                      const unsigned char *in, size_t in_len,
-                      unsigned char **out, size_t *out_len)
+static int do_encrypt(OSSL_LIB_CTX *libctx, const unsigned char *in,
+                      size_t in_len, unsigned char **out, size_t *out_len)
 {
     int ret = 0, public = 1;
     size_t buf_len = 0;
@@ -128,7 +127,7 @@ static int do_encrypt(OSSL_LIB_CTX *libctx,
         goto cleanup;
     }
     buf = OPENSSL_zalloc(buf_len);
-    if (buf  == NULL) {
+    if (buf == NULL) {
         fprintf(stderr, "Malloc failed.\n");
         goto cleanup;
     }
@@ -151,8 +150,8 @@ cleanup:
     return ret;
 }
 
-static int do_decrypt(OSSL_LIB_CTX *libctx, const unsigned char *in, size_t in_len,
-                      unsigned char **out, size_t *out_len)
+static int do_decrypt(OSSL_LIB_CTX *libctx, const unsigned char *in,
+                      size_t in_len, unsigned char **out, size_t *out_len)
 {
     int ret = 0, public = 0;
     size_t buf_len = 0;
@@ -222,8 +221,8 @@ int main(void)
         fprintf(stderr, "encryption failed.\n");
         goto cleanup;
     }
-    if (!do_decrypt(libctx, encrypted, encrypted_len,
-                    &decrypted, &decrypted_len)) {
+    if (!do_decrypt(libctx, encrypted, encrypted_len, &decrypted,
+                    &decrypted_len)) {
         fprintf(stderr, "decryption failed.\n");
         goto cleanup;
     }

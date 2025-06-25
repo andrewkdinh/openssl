@@ -16,8 +16,8 @@
 #include <openssl/err.h>
 
 size_t ossl_rand_get_entropy(ossl_unused OSSL_LIB_CTX *ctx,
-                             unsigned char **pout, int entropy,
-                             size_t min_len, size_t max_len)
+                             unsigned char **pout, int entropy, size_t min_len,
+                             size_t max_len)
 {
     size_t ret = 0;
     size_t entropy_available;
@@ -33,7 +33,7 @@ size_t ossl_rand_get_entropy(ossl_unused OSSL_LIB_CTX *ctx,
     entropy_available = ossl_pool_acquire_entropy(pool);
 
     if (entropy_available > 0) {
-        ret   = ossl_rand_pool_length(pool);
+        ret = ossl_rand_pool_length(pool);
         *pout = ossl_rand_pool_detach(pool);
     }
 
@@ -41,15 +41,14 @@ size_t ossl_rand_get_entropy(ossl_unused OSSL_LIB_CTX *ctx,
     return ret;
 }
 
-size_t ossl_rand_get_user_entropy(OSSL_LIB_CTX *ctx,
-                                  unsigned char **pout, int entropy,
-                                  size_t min_len, size_t max_len)
+size_t ossl_rand_get_user_entropy(OSSL_LIB_CTX *ctx, unsigned char **pout,
+                                  int entropy, size_t min_len, size_t max_len)
 {
     EVP_RAND_CTX *rng = ossl_rand_get0_seed_noncreating(ctx);
 
     if (rng != NULL && evp_rand_can_seed(rng))
-        return evp_rand_get_seed(rng, pout, entropy, min_len, max_len,
-                                 0, NULL, 0);
+        return evp_rand_get_seed(rng, pout, entropy, min_len, max_len, 0, NULL,
+                                 0);
     else
         return ossl_rand_get_entropy(ctx, pout, entropy, min_len, max_len);
 }
@@ -60,8 +59,8 @@ void ossl_rand_cleanup_entropy(ossl_unused OSSL_LIB_CTX *ctx,
     OPENSSL_secure_clear_free(buf, len);
 }
 
-void ossl_rand_cleanup_user_entropy(OSSL_LIB_CTX *ctx,
-                                    unsigned char *buf, size_t len)
+void ossl_rand_cleanup_user_entropy(OSSL_LIB_CTX *ctx, unsigned char *buf,
+                                    size_t len)
 {
     EVP_RAND_CTX *rng = ossl_rand_get0_seed_noncreating(ctx);
 
@@ -71,8 +70,7 @@ void ossl_rand_cleanup_user_entropy(OSSL_LIB_CTX *ctx,
         OPENSSL_secure_clear_free(buf, len);
 }
 
-size_t ossl_rand_get_nonce(ossl_unused OSSL_LIB_CTX *ctx,
-                           unsigned char **pout,
+size_t ossl_rand_get_nonce(ossl_unused OSSL_LIB_CTX *ctx, unsigned char **pout,
                            size_t min_len, ossl_unused size_t max_len,
                            const void *salt, size_t salt_len)
 {
@@ -90,15 +88,14 @@ size_t ossl_rand_get_nonce(ossl_unused OSSL_LIB_CTX *ctx,
 
     if (salt != NULL && !ossl_rand_pool_add(pool, salt, salt_len, 0))
         goto err;
-    ret   = ossl_rand_pool_length(pool);
+    ret = ossl_rand_pool_length(pool);
     *pout = ossl_rand_pool_detach(pool);
- err:
+err:
     ossl_rand_pool_free(pool);
     return ret;
 }
 
-size_t ossl_rand_get_user_nonce(OSSL_LIB_CTX *ctx,
-                                unsigned char **pout,
+size_t ossl_rand_get_user_nonce(OSSL_LIB_CTX *ctx, unsigned char **pout,
                                 size_t min_len, size_t max_len,
                                 const void *salt, size_t salt_len)
 {
@@ -119,8 +116,8 @@ size_t ossl_rand_get_user_nonce(OSSL_LIB_CTX *ctx,
     return min_len;
 }
 
-void ossl_rand_cleanup_nonce(ossl_unused OSSL_LIB_CTX *ctx,
-                             unsigned char *buf, size_t len)
+void ossl_rand_cleanup_nonce(ossl_unused OSSL_LIB_CTX *ctx, unsigned char *buf,
+                             size_t len)
 {
     OPENSSL_clear_free(buf, len);
 }

@@ -68,9 +68,8 @@ int OSSL_STORE_LOADER_set_open(OSSL_STORE_LOADER *loader,
     return 1;
 }
 
-int OSSL_STORE_LOADER_set_open_ex
-    (OSSL_STORE_LOADER *loader,
-     OSSL_STORE_open_ex_fn open_ex_function)
+int OSSL_STORE_LOADER_set_open_ex(OSSL_STORE_LOADER *loader,
+                                  OSSL_STORE_open_ex_fn open_ex_function)
 {
     loader->open_ex = open_ex_function;
     return 1;
@@ -152,8 +151,8 @@ static LHASH_OF(OSSL_STORE_LOADER) *loader_register = NULL;
 static int ossl_store_register_init(void)
 {
     if (loader_register == NULL) {
-        loader_register = lh_OSSL_STORE_LOADER_new(store_loader_hash,
-                                                   store_loader_cmp);
+        loader_register =
+            lh_OSSL_STORE_LOADER_new(store_loader_hash, store_loader_cmp);
     }
     return loader_register != NULL;
 }
@@ -171,8 +170,7 @@ int ossl_store_register_loader_int(OSSL_STORE_LOADER *loader)
      */
     if (ossl_isalpha(*scheme))
         while (*scheme != '\0'
-               && (ossl_isalpha(*scheme)
-                   || ossl_isdigit(*scheme)
+               && (ossl_isalpha(*scheme) || ossl_isdigit(*scheme)
                    || strchr("+-.", *scheme) != NULL))
             scheme++;
     if (*scheme != '\0') {
@@ -232,8 +230,9 @@ const OSSL_STORE_LOADER *ossl_store_get0_loader_int(const char *scheme)
 
     if (!ossl_store_register_init())
         ERR_raise(ERR_LIB_OSSL_STORE, ERR_R_INTERNAL_ERROR);
-    else if ((loader = lh_OSSL_STORE_LOADER_retrieve(loader_register,
-                                                     &template)) == NULL)
+    else if ((loader =
+                  lh_OSSL_STORE_LOADER_retrieve(loader_register, &template))
+             == NULL)
         ERR_raise_data(ERR_LIB_OSSL_STORE, OSSL_STORE_R_UNREGISTERED_SCHEME,
                        "scheme=%s", scheme);
 
@@ -263,8 +262,8 @@ OSSL_STORE_LOADER *ossl_store_unregister_loader_int(const char *scheme)
 
     if (!ossl_store_register_init())
         ERR_raise(ERR_LIB_OSSL_STORE, ERR_R_INTERNAL_ERROR);
-    else if ((loader = lh_OSSL_STORE_LOADER_delete(loader_register,
-                                                   &template)) == NULL)
+    else if ((loader = lh_OSSL_STORE_LOADER_delete(loader_register, &template))
+             == NULL)
         ERR_raise_data(ERR_LIB_OSSL_STORE, OSSL_STORE_R_UNREGISTERED_SCHEME,
                        "scheme=%s", scheme);
 
@@ -290,9 +289,9 @@ void ossl_store_destroy_loaders_int(void)
  */
 
 IMPLEMENT_LHASH_DOALL_ARG_CONST(OSSL_STORE_LOADER, void);
-int OSSL_STORE_do_all_loaders(void (*do_function) (const OSSL_STORE_LOADER
-                                                   *loader, void *do_arg),
-                              void *do_arg)
+int OSSL_STORE_do_all_loaders(
+    void (*do_function)(const OSSL_STORE_LOADER *loader, void *do_arg),
+    void *do_arg)
 {
     if (ossl_store_register_init())
         lh_OSSL_STORE_LOADER_doall_void(loader_register, do_function, do_arg);

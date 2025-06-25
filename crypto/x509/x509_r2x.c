@@ -49,8 +49,8 @@ X509 *X509_REQ_to_X509(X509_REQ *r, int days, EVP_PKEY *pkey)
 
     if (X509_gmtime_adj(xi->validity.notBefore, 0) == NULL)
         goto err;
-    if (X509_gmtime_adj(xi->validity.notAfter, (long)60 * 60 * 24 * days) ==
-        NULL)
+    if (X509_gmtime_adj(xi->validity.notAfter, (long)60 * 60 * 24 * days)
+        == NULL)
         goto err;
 
     pubkey = X509_REQ_get0_pubkey(r);
@@ -61,7 +61,7 @@ X509 *X509_REQ_to_X509(X509_REQ *r, int days, EVP_PKEY *pkey)
         goto err;
     return ret;
 
- err:
+err:
     X509_free(ret);
     return NULL;
 }

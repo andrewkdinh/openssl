@@ -23,10 +23,24 @@
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_INFORM, OPT_OUTFORM, OPT_ENGINE, OPT_IN, OPT_OUT,
-    OPT_NOOUT, OPT_TEXT, OPT_PARAM_OUT, OPT_PUBIN, OPT_PUBOUT,
-    OPT_PASSIN, OPT_PASSOUT, OPT_PARAM_ENC, OPT_CONV_FORM, OPT_CIPHER,
-    OPT_NO_PUBLIC, OPT_CHECK, OPT_PROV_ENUM
+    OPT_INFORM,
+    OPT_OUTFORM,
+    OPT_ENGINE,
+    OPT_IN,
+    OPT_OUT,
+    OPT_NOOUT,
+    OPT_TEXT,
+    OPT_PARAM_OUT,
+    OPT_PUBIN,
+    OPT_PUBOUT,
+    OPT_PASSIN,
+    OPT_PASSOUT,
+    OPT_PARAM_ENC,
+    OPT_CONV_FORM,
+    OPT_CIPHER,
+    OPT_NO_PUBLIC,
+    OPT_CHECK,
+    OPT_PROV_ENUM
 } OPTION_CHOICE;
 
 const OPTIONS ec_options[] = {
@@ -58,8 +72,7 @@ const OPTIONS ec_options[] = {
     {"passout", OPT_PASSOUT, 's', "Output file pass phrase source"},
 
     OPT_PROV_OPTIONS,
-    {NULL}
-};
+    {NULL}};
 
 int ec_main(int argc, char **argv)
 {
@@ -86,7 +99,7 @@ int ec_main(int argc, char **argv)
         switch (o) {
         case OPT_EOF:
         case OPT_ERR:
- opthelp:
+opthelp:
             BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);
             goto end;
         case OPT_HELP:
@@ -188,26 +201,27 @@ int ec_main(int argc, char **argv)
 
     if (point_format
         && !EVP_PKEY_set_utf8_string_param(
-                eckey, OSSL_PKEY_PARAM_EC_POINT_CONVERSION_FORMAT,
-                point_format)) {
+            eckey, OSSL_PKEY_PARAM_EC_POINT_CONVERSION_FORMAT, point_format)) {
         BIO_printf(bio_err, "unable to set point conversion format\n");
         goto end;
     }
 
     if (asn1_encoding != NULL
-        && !EVP_PKEY_set_utf8_string_param(
-                eckey, OSSL_PKEY_PARAM_EC_ENCODING, asn1_encoding)) {
+        && !EVP_PKEY_set_utf8_string_param(eckey, OSSL_PKEY_PARAM_EC_ENCODING,
+                                           asn1_encoding)) {
         BIO_printf(bio_err, "unable to set asn1 encoding format\n");
         goto end;
     }
 
     if (no_public) {
-        if (!EVP_PKEY_set_int_param(eckey, OSSL_PKEY_PARAM_EC_INCLUDE_PUBLIC, 0)) {
+        if (!EVP_PKEY_set_int_param(eckey, OSSL_PKEY_PARAM_EC_INCLUDE_PUBLIC,
+                                    0)) {
             BIO_printf(bio_err, "unable to disable public key encoding\n");
             goto end;
         }
     } else {
-        if (!EVP_PKEY_set_int_param(eckey, OSSL_PKEY_PARAM_EC_INCLUDE_PUBLIC, 1)) {
+        if (!EVP_PKEY_set_int_param(eckey, OSSL_PKEY_PARAM_EC_INCLUDE_PUBLIC,
+                                    1)) {
             BIO_printf(bio_err, "unable to enable public key encoding\n");
             goto end;
         }
@@ -252,18 +266,16 @@ int ec_main(int argc, char **argv)
             assert(private);
         }
 
-        ectx = OSSL_ENCODER_CTX_new_for_pkey(eckey, selection,
-                                             output_type, output_structure,
-                                             NULL);
+        ectx = OSSL_ENCODER_CTX_new_for_pkey(eckey, selection, output_type,
+                                             output_structure, NULL);
         if (enc != NULL) {
             OSSL_ENCODER_CTX_set_cipher(ectx, EVP_CIPHER_get0_name(enc), NULL);
             /* Default passphrase prompter */
             OSSL_ENCODER_CTX_set_passphrase_ui(ectx, get_ui_method(), NULL);
             if (passout != NULL)
                 /* When passout given, override the passphrase prompter */
-                OSSL_ENCODER_CTX_set_passphrase(ectx,
-                                                (const unsigned char *)passout,
-                                                strlen(passout));
+                OSSL_ENCODER_CTX_set_passphrase(
+                    ectx, (const unsigned char *)passout, strlen(passout));
         }
         if (!OSSL_ENCODER_to_bio(ectx, out)) {
             BIO_printf(bio_err, "unable to write EC key\n");

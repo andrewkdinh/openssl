@@ -27,8 +27,8 @@ static int test_pathlen(void)
     int ret = 0;
 
     if (!TEST_ptr(b = BIO_new_file(infile, "r"))
-            || !TEST_ptr(x = PEM_read_bio_X509(b, NULL, NULL, NULL))
-            || !TEST_int_eq(pathlen = X509_get_pathlen(x), 6))
+        || !TEST_ptr(x = PEM_read_bio_X509(b, NULL, NULL, NULL))
+        || !TEST_int_eq(pathlen = X509_get_pathlen(x), 6))
         goto end;
 
     ret = 1;
@@ -47,67 +47,68 @@ static int test_asid(void)
                   *asid3 = ASIdentifiers_new(), *asid4 = ASIdentifiers_new();
     int testresult = 0;
 
-    if (!TEST_ptr(asid1)
-            || !TEST_ptr(asid2)
-            || !TEST_ptr(asid3))
+    if (!TEST_ptr(asid1) || !TEST_ptr(asid2) || !TEST_ptr(asid3))
         goto err;
 
     if (!TEST_ptr(val1 = ASN1_INTEGER_new())
-            || !TEST_true(ASN1_INTEGER_set_int64(val1, 64496)))
+        || !TEST_true(ASN1_INTEGER_set_int64(val1, 64496)))
         goto err;
 
-    if (!TEST_true(X509v3_asid_add_id_or_range(asid1, V3_ASID_ASNUM, val1, NULL)))
+    if (!TEST_true(
+            X509v3_asid_add_id_or_range(asid1, V3_ASID_ASNUM, val1, NULL)))
         goto err;
 
     val1 = NULL;
     if (!TEST_ptr(val2 = ASN1_INTEGER_new())
-            || !TEST_true(ASN1_INTEGER_set_int64(val2, 64497)))
+        || !TEST_true(ASN1_INTEGER_set_int64(val2, 64497)))
         goto err;
 
-    if (!TEST_true(X509v3_asid_add_id_or_range(asid2, V3_ASID_ASNUM, val2, NULL)))
+    if (!TEST_true(
+            X509v3_asid_add_id_or_range(asid2, V3_ASID_ASNUM, val2, NULL)))
         goto err;
 
     val2 = NULL;
     if (!TEST_ptr(val1 = ASN1_INTEGER_new())
-            || !TEST_true(ASN1_INTEGER_set_int64(val1, 64496))
-            || !TEST_ptr(val2 = ASN1_INTEGER_new())
-            || !TEST_true(ASN1_INTEGER_set_int64(val2, 64497)))
+        || !TEST_true(ASN1_INTEGER_set_int64(val1, 64496))
+        || !TEST_ptr(val2 = ASN1_INTEGER_new())
+        || !TEST_true(ASN1_INTEGER_set_int64(val2, 64497)))
         goto err;
 
     /*
      * Just tests V3_ASID_ASNUM for now. Could be extended at some point to also
      * test V3_ASID_RDI if we think it is worth it.
      */
-    if (!TEST_true(X509v3_asid_add_id_or_range(asid3, V3_ASID_ASNUM, val1, val2)))
+    if (!TEST_true(
+            X509v3_asid_add_id_or_range(asid3, V3_ASID_ASNUM, val1, val2)))
         goto err;
     val1 = val2 = NULL;
 
     /* Actual subsets */
     if (!TEST_true(X509v3_asid_subset(NULL, NULL))
-            || !TEST_true(X509v3_asid_subset(NULL, asid1))
-            || !TEST_true(X509v3_asid_subset(asid1, asid1))
-            || !TEST_true(X509v3_asid_subset(asid2, asid2))
-            || !TEST_true(X509v3_asid_subset(asid1, asid3))
-            || !TEST_true(X509v3_asid_subset(asid2, asid3))
-            || !TEST_true(X509v3_asid_subset(asid3, asid3))
-            || !TEST_true(X509v3_asid_subset(asid4, asid1))
-            || !TEST_true(X509v3_asid_subset(asid4, asid2))
-            || !TEST_true(X509v3_asid_subset(asid4, asid3)))
+        || !TEST_true(X509v3_asid_subset(NULL, asid1))
+        || !TEST_true(X509v3_asid_subset(asid1, asid1))
+        || !TEST_true(X509v3_asid_subset(asid2, asid2))
+        || !TEST_true(X509v3_asid_subset(asid1, asid3))
+        || !TEST_true(X509v3_asid_subset(asid2, asid3))
+        || !TEST_true(X509v3_asid_subset(asid3, asid3))
+        || !TEST_true(X509v3_asid_subset(asid4, asid1))
+        || !TEST_true(X509v3_asid_subset(asid4, asid2))
+        || !TEST_true(X509v3_asid_subset(asid4, asid3)))
         goto err;
 
     /* Not subsets */
     if (!TEST_false(X509v3_asid_subset(asid1, NULL))
-            || !TEST_false(X509v3_asid_subset(asid1, asid2))
-            || !TEST_false(X509v3_asid_subset(asid2, asid1))
-            || !TEST_false(X509v3_asid_subset(asid3, asid1))
-            || !TEST_false(X509v3_asid_subset(asid3, asid2))
-            || !TEST_false(X509v3_asid_subset(asid1, asid4))
-            || !TEST_false(X509v3_asid_subset(asid2, asid4))
-            || !TEST_false(X509v3_asid_subset(asid3, asid4)))
+        || !TEST_false(X509v3_asid_subset(asid1, asid2))
+        || !TEST_false(X509v3_asid_subset(asid2, asid1))
+        || !TEST_false(X509v3_asid_subset(asid3, asid1))
+        || !TEST_false(X509v3_asid_subset(asid3, asid2))
+        || !TEST_false(X509v3_asid_subset(asid1, asid4))
+        || !TEST_false(X509v3_asid_subset(asid2, asid4))
+        || !TEST_false(X509v3_asid_subset(asid3, asid4)))
         goto err;
 
     testresult = 1;
- err:
+err:
     ASN1_INTEGER_free(val1);
     ASN1_INTEGER_free(val2);
     ASIdentifiers_free(asid1);
@@ -122,26 +123,42 @@ static struct ip_ranges_st {
     const char *ip1;
     const char *ip2;
     int rorp;
-} ranges[] = {
-    { IANA_AFI_IPV4, "192.168.0.0", "192.168.0.1", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV4, "192.168.0.0", "192.168.0.2", IPAddressOrRange_addressRange},
-    { IANA_AFI_IPV4, "192.168.0.0", "192.168.0.3", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV4, "192.168.0.0", "192.168.0.254", IPAddressOrRange_addressRange},
-    { IANA_AFI_IPV4, "192.168.0.0", "192.168.0.255", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV4, "192.168.0.1", "192.168.0.255", IPAddressOrRange_addressRange},
-    { IANA_AFI_IPV4, "192.168.0.1", "192.168.0.1", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV4, "192.168.0.0", "192.168.255.255", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV4, "192.168.1.0", "192.168.255.255", IPAddressOrRange_addressRange},
-    { IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::1", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::2", IPAddressOrRange_addressRange},
-    { IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::3", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::fffe", IPAddressOrRange_addressRange},
-    { IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::ffff", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV6, "2001:0db8::1", "2001:0db8::ffff", IPAddressOrRange_addressRange},
-    { IANA_AFI_IPV6, "2001:0db8::1", "2001:0db8::1", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV6, "2001:0db8::0:0", "2001:0db8::ffff:ffff", IPAddressOrRange_addressPrefix},
-    { IANA_AFI_IPV6, "2001:0db8::1:0", "2001:0db8::ffff:ffff", IPAddressOrRange_addressRange}
-};
+} ranges[] = {{IANA_AFI_IPV4, "192.168.0.0", "192.168.0.1",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV4, "192.168.0.0", "192.168.0.2",
+               IPAddressOrRange_addressRange},
+              {IANA_AFI_IPV4, "192.168.0.0", "192.168.0.3",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV4, "192.168.0.0", "192.168.0.254",
+               IPAddressOrRange_addressRange},
+              {IANA_AFI_IPV4, "192.168.0.0", "192.168.0.255",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV4, "192.168.0.1", "192.168.0.255",
+               IPAddressOrRange_addressRange},
+              {IANA_AFI_IPV4, "192.168.0.1", "192.168.0.1",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV4, "192.168.0.0", "192.168.255.255",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV4, "192.168.1.0", "192.168.255.255",
+               IPAddressOrRange_addressRange},
+              {IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::1",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::2",
+               IPAddressOrRange_addressRange},
+              {IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::3",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::fffe",
+               IPAddressOrRange_addressRange},
+              {IANA_AFI_IPV6, "2001:0db8::0", "2001:0db8::ffff",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV6, "2001:0db8::1", "2001:0db8::ffff",
+               IPAddressOrRange_addressRange},
+              {IANA_AFI_IPV6, "2001:0db8::1", "2001:0db8::1",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV6, "2001:0db8::0:0", "2001:0db8::ffff:ffff",
+               IPAddressOrRange_addressPrefix},
+              {IANA_AFI_IPV6, "2001:0db8::1:0", "2001:0db8::ffff:ffff",
+               IPAddressOrRange_addressRange}};
 
 static int check_addr(IPAddrBlocks *addr, int type)
 {
@@ -155,13 +172,17 @@ static int check_addr(IPAddrBlocks *addr, int type)
     if (!TEST_ptr(fam))
         return 0;
 
-    if (!TEST_int_eq(fam->ipAddressChoice->type, IPAddressChoice_addressesOrRanges))
+    if (!TEST_int_eq(fam->ipAddressChoice->type,
+                     IPAddressChoice_addressesOrRanges))
         return 0;
 
-    if (!TEST_int_eq(sk_IPAddressOrRange_num(fam->ipAddressChoice->u.addressesOrRanges), 1))
+    if (!TEST_int_eq(
+            sk_IPAddressOrRange_num(fam->ipAddressChoice->u.addressesOrRanges),
+            1))
         return 0;
 
-    aorr = sk_IPAddressOrRange_value(fam->ipAddressChoice->u.addressesOrRanges, 0);
+    aorr =
+        sk_IPAddressOrRange_value(fam->ipAddressChoice->u.addressesOrRanges, 0);
     if (!TEST_ptr(aorr))
         return 0;
 
@@ -202,7 +223,8 @@ static int test_addr_ranges(void)
         if (!TEST_true(memcmp(ip1->data, ip2->data, ip1->length) <= 0))
             goto end;
 
-        if (!TEST_true(X509v3_addr_add_range(addr, ranges[i].afi, NULL, ip1->data, ip2->data)))
+        if (!TEST_true(X509v3_addr_add_range(addr, ranges[i].afi, NULL,
+                                             ip1->data, ip2->data)))
             goto end;
 
         if (!TEST_true(X509v3_addr_is_canonical(addr)))
@@ -219,7 +241,7 @@ static int test_addr_ranges(void)
     }
 
     testresult = 1;
- end:
+end:
     sk_IPAddressFamily_pop_free(addr, IPAddressFamily_free);
     ASN1_OCTET_STRING_free(ip1);
     ASN1_OCTET_STRING_free(ip2);
@@ -246,7 +268,8 @@ static int test_addr_fam_len(void)
     ip2 = a2i_IPADDRESS(ranges[0].ip2);
     if (!TEST_ptr(ip2))
         goto end;
-    if (!TEST_true(X509v3_addr_add_range(addr, ranges[0].afi, NULL, ip1->data, ip2->data)))
+    if (!TEST_true(X509v3_addr_add_range(addr, ranges[0].afi, NULL, ip1->data,
+                                         ip2->data)))
         goto end;
     if (!TEST_true(X509v3_addr_is_canonical(addr)))
         goto end;
@@ -261,11 +284,11 @@ static int test_addr_fam_len(void)
     keylen = 6;
     if ((f1 = IPAddressFamily_new()) == NULL)
         goto end;
-    if (f1->ipAddressChoice == NULL &&
-        (f1->ipAddressChoice = IPAddressChoice_new()) == NULL)
+    if (f1->ipAddressChoice == NULL
+        && (f1->ipAddressChoice = IPAddressChoice_new()) == NULL)
         goto end;
-    if (f1->addressFamily == NULL &&
-        (f1->addressFamily = ASN1_OCTET_STRING_new()) == NULL)
+    if (f1->addressFamily == NULL
+        && (f1->addressFamily = ASN1_OCTET_STRING_new()) == NULL)
         goto end;
     if (!ASN1_OCTET_STRING_set(f1->addressFamily, key, keylen))
         goto end;
@@ -289,11 +312,11 @@ static int test_addr_fam_len(void)
     keylen = 3;
     if ((f1 = IPAddressFamily_new()) == NULL)
         goto end;
-    if (f1->ipAddressChoice == NULL &&
-        (f1->ipAddressChoice = IPAddressChoice_new()) == NULL)
+    if (f1->ipAddressChoice == NULL
+        && (f1->ipAddressChoice = IPAddressChoice_new()) == NULL)
         goto end;
-    if (f1->addressFamily == NULL &&
-        (f1->addressFamily = ASN1_OCTET_STRING_new()) == NULL)
+    if (f1->addressFamily == NULL
+        && (f1->addressFamily = ASN1_OCTET_STRING_new()) == NULL)
         goto end;
     if (!ASN1_OCTET_STRING_set(f1->addressFamily, key, keylen))
         goto end;
@@ -311,7 +334,7 @@ static int test_addr_fam_len(void)
         goto end;
 
     testresult = 1;
- end:
+end:
     /* Free stack and any memory owned by detached element */
     IPAddressFamily_free(f1);
     sk_IPAddressFamily_pop_free(addr, IPAddressFamily_free);
@@ -326,47 +349,47 @@ static struct extvalues_st {
     int pass;
 } extvalues[] = {
     /* No prefix is ok */
-    { "sbgp-ipAddrBlock = IPv4:192.0.0.1\n", 1 },
-    { "sbgp-ipAddrBlock = IPv4:192.0.0.0/0\n", 1 },
-    { "sbgp-ipAddrBlock = IPv4:192.0.0.0/1\n", 1 },
-    { "sbgp-ipAddrBlock = IPv4:192.0.0.0/32\n", 1 },
+    {"sbgp-ipAddrBlock = IPv4:192.0.0.1\n", 1},
+    {"sbgp-ipAddrBlock = IPv4:192.0.0.0/0\n", 1},
+    {"sbgp-ipAddrBlock = IPv4:192.0.0.0/1\n", 1},
+    {"sbgp-ipAddrBlock = IPv4:192.0.0.0/32\n", 1},
     /* Prefix is too long */
-    { "sbgp-ipAddrBlock = IPv4:192.0.0.0/33\n", 0 },
+    {"sbgp-ipAddrBlock = IPv4:192.0.0.0/33\n", 0},
     /* Unreasonably large prefix */
-    { "sbgp-ipAddrBlock = IPv4:192.0.0.0/12341234\n", 0 },
+    {"sbgp-ipAddrBlock = IPv4:192.0.0.0/12341234\n", 0},
     /* Invalid IP addresses */
-    { "sbgp-ipAddrBlock = IPv4:192.0.0\n", 0 },
-    { "sbgp-ipAddrBlock = IPv4:256.0.0.0\n", 0 },
-    { "sbgp-ipAddrBlock = IPv4:-1.0.0.0\n", 0 },
-    { "sbgp-ipAddrBlock = IPv4:192.0.0.0.0\n", 0 },
-    { "sbgp-ipAddrBlock = IPv3:192.0.0.0\n", 0 },
+    {"sbgp-ipAddrBlock = IPv4:192.0.0\n", 0},
+    {"sbgp-ipAddrBlock = IPv4:256.0.0.0\n", 0},
+    {"sbgp-ipAddrBlock = IPv4:-1.0.0.0\n", 0},
+    {"sbgp-ipAddrBlock = IPv4:192.0.0.0.0\n", 0},
+    {"sbgp-ipAddrBlock = IPv3:192.0.0.0\n", 0},
 
     /* IPv6 */
     /* No prefix is ok */
-    { "sbgp-ipAddrBlock = IPv6:2001:db8::\n", 1 },
-    { "sbgp-ipAddrBlock = IPv6:2001::db8\n", 1 },
-    { "sbgp-ipAddrBlock = IPv6:2001:0db8:0000:0000:0000:0000:0000:0000\n", 1 },
-    { "sbgp-ipAddrBlock = IPv6:2001:db8::/0\n", 1 },
-    { "sbgp-ipAddrBlock = IPv6:2001:db8::/1\n", 1 },
-    { "sbgp-ipAddrBlock = IPv6:2001:db8::/32\n", 1 },
-    { "sbgp-ipAddrBlock = IPv6:2001:0db8:0000:0000:0000:0000:0000:0000/32\n", 1 },
-    { "sbgp-ipAddrBlock = IPv6:2001:db8::/128\n", 1 },
+    {"sbgp-ipAddrBlock = IPv6:2001:db8::\n", 1},
+    {"sbgp-ipAddrBlock = IPv6:2001::db8\n", 1},
+    {"sbgp-ipAddrBlock = IPv6:2001:0db8:0000:0000:0000:0000:0000:0000\n", 1},
+    {"sbgp-ipAddrBlock = IPv6:2001:db8::/0\n", 1},
+    {"sbgp-ipAddrBlock = IPv6:2001:db8::/1\n", 1},
+    {"sbgp-ipAddrBlock = IPv6:2001:db8::/32\n", 1},
+    {"sbgp-ipAddrBlock = IPv6:2001:0db8:0000:0000:0000:0000:0000:0000/32\n", 1},
+    {"sbgp-ipAddrBlock = IPv6:2001:db8::/128\n", 1},
     /* Prefix is too long */
-    { "sbgp-ipAddrBlock = IPv6:2001:db8::/129\n", 0 },
+    {"sbgp-ipAddrBlock = IPv6:2001:db8::/129\n", 0},
     /* Unreasonably large prefix */
-    { "sbgp-ipAddrBlock = IPv6:2001:db8::/12341234\n", 0 },
+    {"sbgp-ipAddrBlock = IPv6:2001:db8::/12341234\n", 0},
     /* Invalid IP addresses */
     /* Not enough blocks of numbers */
-    { "sbgp-ipAddrBlock = IPv6:2001:0db8:0000:0000:0000:0000:0000\n", 0 },
+    {"sbgp-ipAddrBlock = IPv6:2001:0db8:0000:0000:0000:0000:0000\n", 0},
     /* Too many blocks of numbers */
-    { "sbgp-ipAddrBlock = IPv6:2001:0db8:0000:0000:0000:0000:0000:0000:0000\n", 0 },
+    {"sbgp-ipAddrBlock = IPv6:2001:0db8:0000:0000:0000:0000:0000:0000:0000\n",
+     0},
     /* First value too large */
-    { "sbgp-ipAddrBlock = IPv6:1ffff:0db8:0000:0000:0000:0000:0000:0000\n", 0 },
+    {"sbgp-ipAddrBlock = IPv6:1ffff:0db8:0000:0000:0000:0000:0000:0000\n", 0},
     /* First value with invalid characters */
-    { "sbgp-ipAddrBlock = IPv6:fffg:0db8:0000:0000:0000:0000:0000:0000\n", 0 },
+    {"sbgp-ipAddrBlock = IPv6:fffg:0db8:0000:0000:0000:0000:0000:0000\n", 0},
     /* First value is negative */
-    { "sbgp-ipAddrBlock = IPv6:-1:0db8:0000:0000:0000:0000:0000:0000\n", 0 }
-};
+    {"sbgp-ipAddrBlock = IPv6:-1:0db8:0000:0000:0000:0000:0000:0000\n", 0}};
 
 static int test_ext_syntax(void)
 {
@@ -375,13 +398,13 @@ static int test_ext_syntax(void)
 
     for (i = 0; i < OSSL_NELEM(extvalues); i++) {
         X509V3_CTX ctx;
-        BIO *extbio = BIO_new_mem_buf(extvalues[i].value,
-                                      strlen(extvalues[i].value));
+        BIO *extbio =
+            BIO_new_mem_buf(extvalues[i].value, strlen(extvalues[i].value));
         CONF *conf;
         long eline;
 
         if (!TEST_ptr(extbio))
-            return 0 ;
+            return 0;
 
         conf = NCONF_new_ex(NULL, NULL);
         if (!TEST_ptr(conf)) {
@@ -395,15 +418,15 @@ static int test_ext_syntax(void)
             X509V3_set_nconf(&ctx, conf);
 
             if (extvalues[i].pass) {
-                if (!TEST_true(X509V3_EXT_add_nconf(conf, &ctx, "default",
-                                                    NULL))) {
+                if (!TEST_true(
+                        X509V3_EXT_add_nconf(conf, &ctx, "default", NULL))) {
                     TEST_info("Value: %s", extvalues[i].value);
                     testresult = 0;
                 }
             } else {
                 ERR_set_mark();
-                if (!TEST_false(X509V3_EXT_add_nconf(conf, &ctx, "default",
-                                                     NULL))) {
+                if (!TEST_false(
+                        X509V3_EXT_add_nconf(conf, &ctx, "default", NULL))) {
                     testresult = 0;
                     TEST_info("Value: %s", extvalues[i].value);
                     ERR_clear_last_mark();
@@ -424,9 +447,9 @@ static int test_addr_subset(void)
     int i;
     int ret = 0;
     IPAddrBlocks *addrEmpty = NULL;
-    IPAddrBlocks *addr[3] = { NULL, NULL };
-    ASN1_OCTET_STRING *ip1[3] = { NULL, NULL };
-    ASN1_OCTET_STRING *ip2[3] = { NULL, NULL };
+    IPAddrBlocks *addr[3] = {NULL, NULL};
+    ASN1_OCTET_STRING *ip1[3] = {NULL, NULL};
+    ASN1_OCTET_STRING *ip2[3] = {NULL, NULL};
     int sz = OSSL_NELEM(addr);
 
     for (i = 0; i < sz; ++i) {
@@ -440,17 +463,17 @@ static int test_addr_subset(void)
     }
 
     ret = TEST_ptr(addrEmpty = sk_IPAddressFamily_new_null())
-          && TEST_true(X509v3_addr_subset(NULL, NULL))
-          && TEST_true(X509v3_addr_subset(NULL, addr[0]))
-          && TEST_true(X509v3_addr_subset(addrEmpty, addr[0]))
-          && TEST_true(X509v3_addr_subset(addr[0], addr[0]))
-          && TEST_true(X509v3_addr_subset(addr[0], addr[1]))
-          && TEST_true(X509v3_addr_subset(addr[0], addr[2]))
-          && TEST_true(X509v3_addr_subset(addr[1], addr[2]))
-          && TEST_false(X509v3_addr_subset(addr[0], NULL))
-          && TEST_false(X509v3_addr_subset(addr[1], addr[0]))
-          && TEST_false(X509v3_addr_subset(addr[2], addr[1]))
-          && TEST_false(X509v3_addr_subset(addr[0], addrEmpty));
+        && TEST_true(X509v3_addr_subset(NULL, NULL))
+        && TEST_true(X509v3_addr_subset(NULL, addr[0]))
+        && TEST_true(X509v3_addr_subset(addrEmpty, addr[0]))
+        && TEST_true(X509v3_addr_subset(addr[0], addr[0]))
+        && TEST_true(X509v3_addr_subset(addr[0], addr[1]))
+        && TEST_true(X509v3_addr_subset(addr[0], addr[2]))
+        && TEST_true(X509v3_addr_subset(addr[1], addr[2]))
+        && TEST_false(X509v3_addr_subset(addr[0], NULL))
+        && TEST_false(X509v3_addr_subset(addr[1], addr[0]))
+        && TEST_false(X509v3_addr_subset(addr[2], addr[1]))
+        && TEST_false(X509v3_addr_subset(addr[0], addrEmpty));
 end:
     sk_IPAddressFamily_pop_free(addrEmpty, IPAddressFamily_free);
     for (i = 0; i < sz; ++i) {

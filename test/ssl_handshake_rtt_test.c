@@ -61,14 +61,12 @@ static int test_handshake_rtt(int tst)
         return 1;
 #endif
 
-    if (!TEST_true(create_ssl_ctx_pair(libctx, TLS_server_method(),
-                                       TLS_client_method(),
-                                       TLS1_VERSION,
-                                       (tst <= 1) ? TLS1_2_VERSION
-                                                  : TLS1_3_VERSION,
-                                       &sctx, &cctx, cert, privkey))
-            || !TEST_true(create_ssl_objects(sctx, cctx, &serverssl, &clientssl,
-                                             NULL, NULL)))
+    if (!TEST_true(create_ssl_ctx_pair(
+            libctx, TLS_server_method(), TLS_client_method(), TLS1_VERSION,
+            (tst <= 1) ? TLS1_2_VERSION : TLS1_3_VERSION, &sctx, &cctx, cert,
+            privkey))
+        || !TEST_true(
+            create_ssl_objects(sctx, cctx, &serverssl, &clientssl, NULL, NULL)))
         goto end;
 
     s = SSL_CONNECTION_FROM_SSL(tst % 2 == 0 ? clientssl : serverssl);
@@ -122,7 +120,7 @@ static int test_handshake_rtt(int tst)
 
     testresult = 1;
 
- end:
+end:
     SSL_free(serverssl);
     SSL_free(clientssl);
     SSL_CTX_free(sctx);

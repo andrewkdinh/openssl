@@ -51,8 +51,10 @@ int f(void) /*
     float f;
     double d;
     enum {} enu;
-    struct {} stru;
-    union {} un;
+    struct {
+    } stru;
+    union {
+    } un;
     auto a;
     extern e;
     static int stat;
@@ -61,8 +63,8 @@ int f(void) /*
     register int reg;
     OSSL_x y, *p = params;
     int params[];
-    OSSL_PARAM * (* params []) [MAX + 1];
-    XY *(* fn)(int a, char b);
+    OSSL_PARAM *(*params[])[MAX + 1];
+    XY *(*fn)(int a, char b);
     /*
      * multi-line comment should not disturb detection of local decls
      */
@@ -75,9 +77,9 @@ int f(void) /*
     {
         int x; /* just decls in block */
     }
-    if (p != (unsigned char *)
-        &(ctx->tmp[0])) {
-        i -= (p - (unsigned char *) /* do not confuse with var decl */
+    if (p != (unsigned char *)&(ctx->tmp[0])) {
+        i -= (p
+              - (unsigned char *)/* do not confuse with var decl */
               &(ctx->tmp[0]));
     }
     {
@@ -90,8 +92,8 @@ int f(void) /*
                                        ctx->tmp_len);
     }
     {
-        EVP_EncodeFinal(ctx->base64,
-                        (unsigned char *)ctx->buf, &(ctx->len)); /* no decl */
+        EVP_EncodeFinal(ctx->base64, (unsigned char *)ctx->buf,
+                        &(ctx->len)); /* no decl */
         /* push out the bytes */
         goto again;
     }
@@ -113,7 +115,7 @@ int f(void) /*
 
 int g(void)
 {
-    if (ctx == NULL) {    /* non-leading end-of-line comment */
+    if (ctx == NULL) { /* non-leading end-of-line comment */
         if (/* comment after '(' */ pem_name != NULL /* comment before ')' */)
             /* entire-line comment indent usually like for the following line */
             return NULL; /* hanging indent also for this line after comment */
@@ -122,24 +124,22 @@ int g(void)
     }
     for (i = 0; i < n; i++)
         for (; i < n; i++)
-            for (i = 0; ; i++)
+            for (i = 0;; i++)
                 for (i = 0;; i++)
-                    for (i = 0; i < n; )
-                        for (i = 0; i < n;)
-                            ;
-    for (i = 0; ; )
-        for (i = 0; ;)
-            for (i = 0;; )
+                    for (i = 0; i < n;)
+                        for (i = 0; i < n;);
+    for (i = 0;;)
+        for (i = 0;;)
+            for (i = 0;;)
                 for (i = 0;;)
-                    for (; i < n; )
+                    for (; i < n;)
                         for (; j < n;)
-                            for (; ; i++)
-                                for (;; i++)
-                                    ;
+                            for (;; i++)
+                                for (;; i++);
     for (;;) /* the only variant allowed in case of "empty" for (...) */
         ;
-    for (;;) ; /* should not trigger: space before ';' */
- lab: ;  /* should not trigger: space before ';' */
+    for (;;); /* should not trigger: space before ';' */
+lab:; /* should not trigger: space before ';' */
 
 #if X
     if (1) /* bad style: just part of control structure depends on #if */
@@ -155,8 +155,7 @@ int g(void)
             e;
     else
         f;
-    do
-        do
+    do do
             2;
         while (1);
     while (2);
@@ -170,27 +169,27 @@ int g(void)
 
     if (1)
         f(a, b);
-    do
-        1; while (2); /*@ more than one stmt just to construct case */
+    do 1;
+    while (2); /*@ more than one stmt just to construct case */
     if (1)
         f(a, b);
     else
-        do
-            1;
+        do 1;
         while (2);
     if (1)
         f(a, b);
-    else do /*@ (non-brace) code before 'do' just to construct case */
-             1;
+    else
+        do /*@ (non-brace) code before 'do' just to construct case */
+            1;
         while (2);
-    f1234(a,
-          b); do /*@ (non-brace) code before 'do' just to construct case */
-                  1;
+    f1234(a, b);
+    do /*@ (non-brace) code before 'do' just to construct case */
+        1;
     while (2);
     if (1)
-        f(a,
-          b); do /*@ (non-brace) code before 'do' just to construct case */
-                  1;
+        f(a, b);
+    do /*@ (non-brace) code before 'do' just to construct case */
+        1;
     while (2);
     if (1)
         f(a, b);
@@ -203,14 +202,12 @@ int g(void)
     else
         return;
     if (1)
-        f(a,
-          b); else /*@ (non-brace) code before 'else' just to construct case */
-        do
-            1;
+        f(a, b);
+    else /*@ (non-brace) code before 'else' just to construct case */
+        do 1;
         while (2);
 
-    if (1)
-    { /*@ brace after 'if' not on same line just to construct case */
+    if (1) { /*@ brace after 'if' not on same line just to construct case */
         c;
         d;
     }
@@ -235,14 +232,12 @@ int g(void)
 
     if (1) {
         if (2) {
-        case MAC_TYPE_MAC:
-            {
-                EVP_MAC_CTX *new_mac_ctx;
+        case MAC_TYPE_MAC: {
+            EVP_MAC_CTX *new_mac_ctx;
 
-                if (ctx->pkey == NULL)
-                    return 0;
-            }
-            break;
+            if (ctx->pkey == NULL)
+                return 0;
+        } break;
         case 1: {
             ;
         }
@@ -251,17 +246,13 @@ int g(void)
             return 0;
         }
     }
-    if (expr_line1
-        == expr_line2
-            && expr_line3) {
+    if (expr_line1 == expr_line2 && expr_line3) {
         c1;
     } else {
         c;
         d;
     }
-    if (expr_line1
-        == expr_line2
-            && expr_line3)
+    if (expr_line1 == expr_line2 && expr_line3)
         hanging_stmt;
 }
 
@@ -269,7 +260,7 @@ int g(void)
     if (ctx == NULL)                 \
         return 0;                    \
     if (ossl_param_is_empty(params)) \
-        return 1;                    \
+        return 1;
 
 #define m2                                                               \
     do { /* should not be confused with function header followed by '{' */ \
@@ -293,31 +284,24 @@ const OPTIONS passwd_options[] = {
 #endif
     OPT_R_OPTIONS,
 
-    {NULL}
-};
+    {NULL}};
 
 typedef bool (*LOG_cb_t)(int lineno, severity level, const char *msg);
-typedef * d(int)
-    x;
-typedef (int)
-x;
-typedef (int)*()
-    x;
-typedef *int *
-x;
-typedef OSSL_CMP_MSG *(*cmp_srv_process_cb_t)
-    (OSSL_CMP_SRV_CTX *ctx, OSSL_CMP_MSG *msg)
-    xx;
+typedef *d(int) x;
+typedef(int) x;
+typedef(int) * () x;
+typedef *int *x;
+typedef OSSL_CMP_MSG *(*cmp_srv_process_cb_t)(OSSL_CMP_SRV_CTX *ctx,
+                                              OSSL_CMP_MSG *msg)xx;
 
 #define IF(cond) if (cond)
 
-_Pragma("GCC diagnostic push")
-_Pragma("GCC diagnostic pop")
+_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic pop")
 
 #define CB_ERR_IF(cond, ctx, cert, depth, err) \
     if ((cond) && ((depth) < 0 || verify_cb_cert(ctx, cert, depth, err) == 0)) \
         return err
-static int verify_cb_crl(X509_STORE_CTX *ctx, int err)
+    static int verify_cb_crl(X509_STORE_CTX *ctx, int err)
 {
     ctx->error = err;
     return ctx->verify_cb(0, ctx);
@@ -341,13 +325,9 @@ typedef int (*X509_STORE_CTX_check_revocation_fn)(X509_STORE_CTX *ctx);
 DECLARE_STACK_OF(OPENSSL_CSTRING)
 bool UTIL_iterate_dir(int (*fn)(const char *file, void *arg), void *arg,
                       const char *path, bool recursive);
-size_t UTIL_url_encode(
-                       size_t *size_needed
-                       );
-size_t UTIL_url_encode(const char  *source,
-                       char        *destination,
-                       size_t      destination_len,
-                       size_t      *size_needed);
+size_t UTIL_url_encode(size_t *size_needed);
+size_t UTIL_url_encode(const char *source, char *destination,
+                       size_t destination_len, size_t *size_needed);
 #error well. oops.
 
 int f()
@@ -357,75 +337,46 @@ int f()
         c;
     c;
     if (1)
-        if (2)
-        { /*@ brace after 'if' not on same line just to construct case */
+        if (2) { /*@ brace after 'if' not on same line just to construct case */
             c;
         }
     e;
-    const usign = {
-                   0xDF,
-                   {
-                    dd
-                   },
-                   dd
-    };
-    const unsign = {
-                    0xDF, {
-                           dd
-                    },
-                    dd
-    };
+    const usign = {0xDF, {dd}, dd};
+    const unsign = {0xDF, {dd}, dd};
 }
 const unsigned char trans_id[OSSL_CMP_TRANSACTIONID_LENGTH] = {
-                                                               0xDF,
+    0xDF,
 };
-const unsigned char trans_id[OSSL_CMP_TRANSACTIONID_LENGTH] =
-    {
-     0xDF,
-    };
-typedef
-int
-a;
+const unsigned char trans_id[OSSL_CMP_TRANSACTIONID_LENGTH] = {
+    0xDF,
+};
+typedef int a;
 
-typedef
-struct
-{
+typedef struct {
     int a;
 } b;
-typedef enum {
-              w = 0
-} e_type;
+typedef enum { w = 0 } e_type;
 typedef struct {
-    enum {
-          w = 0
-    } e_type;
-    enum {
-          w = 0
-    } e_type;
+    enum { w = 0 } e_type;
+    enum { w = 0 } e_type;
 } e;
 struct s_type {
-    enum e_type {
-                 w = 0
-    };
+    enum e_type { w = 0 };
 };
-struct s_type
-{
-    enum e_type {
-                 w = 0
-    };
-    enum e2_type {
-                  w = 0
-    };
+struct s_type {
+    enum e_type { w = 0 };
+    enum e2_type { w = 0 };
 };
 
 #define X  1          + 1
-#define Y  /* .. */ 2 + 2
+#define Y /* .. */ 2 + 2
 #define Z  3          + 3 * (*a++)
 
-static varref cmp_vars[] = { /* comment.  comment?  comment!  */
+static varref cmp_vars[] = {
+    /* comment.  comment?  comment!  */
     {&opt_config}, {&opt_section},
 
-    {&opt_server}, {&opt_proxy}, {&opt_path},
+    {&opt_server}, {&opt_proxy},   {&opt_path},
 };
 
 #define SWITCH(x)                               \
@@ -462,41 +413,46 @@ static void *fun(void)
         return NULL;
 
 label0:
- label1: /* allow special indent 1 for label at outermost level in body */
+label1: /* allow special indent 1 for label at outermost level in body */
     do {
-    label2:
+label2:
         size_t available_len, data_len;
         const char *curr = txt, *next = txt;
         char *tmp;
 
         {
-        label3:
+label3:
         }
     } while (1);
 
     char *intraline_string_with_comment_delimiters_and_dbl_space = "1  /*1";
-    char *multiline_string_with_comment_delimiters_and_dbl_space = "1  /*1\
-2222222\'22222222222222222\"222222222" "33333  /*3333333333" "44  /*44444444444\
+    char *multiline_string_with_comment_delimiters_and_dbl_space =
+        "1  /*1\
+2222222\'22222222222222222\"222222222"
+        "33333  /*3333333333"
+        "44  /*44444444444\
 55555555555555\
 6666";
 }
 
-ASN1_CHOICE(OSSL_CRMF_POPO) = {
-    ASN1_IMP(OSSL_CRMF_POPO, value.raVerified, ASN1_NULL, 0),
-    ASN1_EXP(OSSL_CRMF_POPO, value.keyAgreement, OSSL_CRMF_POPOPRIVKEY, 3)
-} ASN1_CHOICE_END(OSSL_CRMF_POPO)
+ASN1_CHOICE(OSSL_CRMF_POPO)
+    = {ASN1_IMP(OSSL_CRMF_POPO, value.raVerified, ASN1_NULL, 0),
+       ASN1_EXP(OSSL_CRMF_POPO, value.keyAgreement, OSSL_CRMF_POPOPRIVKEY, 3)}
+ASN1_CHOICE_END(OSSL_CRMF_POPO)
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_CRMF_POPO)
 
 ASN1_ADB(OSSL_CRMF_ATTRIBUTETYPEANDVALUE) = {
     ADB_ENTRY(NID_id_regCtrl_regToken,
-              ASN1_SIMPLE(OSSL_CRMF_ATTRIBUTETYPEANDVALUE,
-                          value.regToken, ASN1_UTF8STRING)),
-} ASN1_ADB_END(OSSL_CRMF_ATTRIBUTETYPEANDVALUE, 0, type, 0,
-               &attributetypeandvalue_default_tt, NULL);
+              ASN1_SIMPLE(OSSL_CRMF_ATTRIBUTETYPEANDVALUE, value.regToken,
+                          ASN1_UTF8STRING)),
+}
+ASN1_ADB_END
+(OSSL_CRMF_ATTRIBUTETYPEANDVALUE, 0, type, 0, &attributetypeandvalue_default_tt,
+ NULL);
 
-ASN1_ITEM_TEMPLATE(OSSL_CRMF_MSGS) =
-    ASN1_EX_TEMPLATE_TYPE(ASN1_TFLG_SEQUENCE_OF, 0,
-                          OSSL_CRMF_MSGS, OSSL_CRMF_MSG)
+ASN1_ITEM_TEMPLATE(OSSL_CRMF_MSGS)
+    = ASN1_EX_TEMPLATE_TYPE(ASN1_TFLG_SEQUENCE_OF, 0, OSSL_CRMF_MSGS,
+                            OSSL_CRMF_MSG)
 ASN1_ITEM_TEMPLATE_END(OSSL_CRMF_MSGS)
 
 void f_looong_body_200()

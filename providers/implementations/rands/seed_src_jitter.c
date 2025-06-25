@@ -49,7 +49,8 @@ typedef struct {
     int state;
 } PROV_JITTER;
 
-static size_t get_jitter_random_value(PROV_JITTER *s, unsigned char *buf, size_t len);
+static size_t get_jitter_random_value(PROV_JITTER *s, unsigned char *buf,
+                                      size_t len);
 
 /*
  * Acquire entropy from jitterentropy library
@@ -68,7 +69,8 @@ static size_t ossl_prov_acquire_entropy_from_jitter(PROV_JITTER *s,
         buffer = ossl_rand_pool_add_begin(pool, bytes_needed);
 
         if (buffer != NULL) {
-            if (get_jitter_random_value(s, buffer, bytes_needed) == bytes_needed) {
+            if (get_jitter_random_value(s, buffer, bytes_needed)
+                == bytes_needed) {
                 ossl_rand_pool_add_end(pool, bytes_needed, 8 * bytes_needed);
             } else {
                 ossl_rand_pool_add_end(pool, 0, 0);
@@ -80,8 +82,8 @@ static size_t ossl_prov_acquire_entropy_from_jitter(PROV_JITTER *s,
 }
 
 /* Obtain random bytes from the jitter library */
-static size_t get_jitter_random_value(PROV_JITTER *s,
-                                      unsigned char *buf, size_t len)
+static size_t get_jitter_random_value(PROV_JITTER *s, unsigned char *buf,
+                                      size_t len)
 {
     struct rand_data *jitter_ec = NULL;
     ssize_t result = 0;
@@ -95,7 +97,7 @@ static size_t get_jitter_random_value(PROV_JITTER *s,
             continue;
 
         /* Do not use _safe API as per typical security policies */
-        result = jent_read_entropy(jitter_ec, (char *) buf, len);
+        result = jent_read_entropy(jitter_ec, (char *)buf, len);
         jent_entropy_collector_free(jitter_ec);
 
         /*
@@ -145,8 +147,7 @@ static void jitter_free(void *vseed)
 
 static int jitter_instantiate(void *vseed, unsigned int strength,
                               int prediction_resistance,
-                              const unsigned char *pstr,
-                              size_t pstr_len,
+                              const unsigned char *pstr, size_t pstr_len,
                               ossl_unused const OSSL_PARAM params[])
 {
     PROV_JITTER *s = (PROV_JITTER *)vseed;
@@ -209,8 +210,7 @@ static int jitter_generate(void *vseed, unsigned char *out, size_t outlen,
     return entropy_available > 0;
 }
 
-static int jitter_reseed(void *vseed,
-                         ossl_unused int prediction_resistance,
+static int jitter_reseed(void *vseed, ossl_unused int prediction_resistance,
                          ossl_unused const unsigned char *ent,
                          ossl_unused size_t ent_len,
                          ossl_unused const unsigned char *adin,
@@ -252,9 +252,7 @@ static const OSSL_PARAM *jitter_gettable_ctx_params(ossl_unused void *vseed,
     static const OSSL_PARAM known_gettable_ctx_params[] = {
         OSSL_PARAM_int(OSSL_RAND_PARAM_STATE, NULL),
         OSSL_PARAM_uint(OSSL_RAND_PARAM_STRENGTH, NULL),
-        OSSL_PARAM_size_t(OSSL_RAND_PARAM_MAX_REQUEST, NULL),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_size_t(OSSL_RAND_PARAM_MAX_REQUEST, NULL), OSSL_PARAM_END};
     return known_gettable_ctx_params;
 }
 
@@ -263,12 +261,10 @@ static int jitter_verify_zeroization(ossl_unused void *vseed)
     return 1;
 }
 
-static size_t jitter_get_seed(void *vseed, unsigned char **pout,
-                              int entropy, size_t min_len,
-                              size_t max_len,
+static size_t jitter_get_seed(void *vseed, unsigned char **pout, int entropy,
+                              size_t min_len, size_t max_len,
                               int prediction_resistance,
-                              const unsigned char *adin,
-                              size_t adin_len)
+                              const unsigned char *adin, size_t adin_len)
 {
     size_t ret = 0;
     size_t entropy_available = 0;
@@ -296,10 +292,11 @@ static size_t jitter_get_seed(void *vseed, unsigned char **pout,
 }
 
 # ifndef OPENSSL_NO_FIPS_JITTER
-size_t ossl_rand_jitter_get_seed(unsigned char **pout, int entropy, size_t min_len, size_t max_len)
+size_t ossl_rand_jitter_get_seed(unsigned char **pout, int entropy,
+                                 size_t min_len, size_t max_len)
 {
     size_t ret = 0;
-    OSSL_PARAM params[1] = { OSSL_PARAM_END };
+    OSSL_PARAM params[1] = {OSSL_PARAM_END};
     PROV_JITTER *s = jitter_new(NULL, NULL, NULL);
 
     if (s == NULL)
@@ -307,14 +304,14 @@ size_t ossl_rand_jitter_get_seed(unsigned char **pout, int entropy, size_t min_l
     if (!jitter_instantiate(s, 0, 0, NULL, 0, params))
         goto end;
     ret = jitter_get_seed(s, pout, entropy, min_len, max_len, 0, NULL, 0);
- end:
+end:
     jitter_free(s);
     return ret;
 }
 # endif
 
-static void jitter_clear_seed(ossl_unused void *vdrbg,
-                              unsigned char *out, size_t outlen)
+static void jitter_clear_seed(ossl_unused void *vdrbg, unsigned char *out,
+                              size_t outlen)
 {
     OPENSSL_secure_clear_free(out, outlen);
 }
@@ -334,26 +331,23 @@ void jitter_unlock(ossl_unused void *vctx)
 }
 
 const OSSL_DISPATCH ossl_jitter_functions[] = {
-    { OSSL_FUNC_RAND_NEWCTX, (void(*)(void))jitter_new },
-    { OSSL_FUNC_RAND_FREECTX, (void(*)(void))jitter_free },
-    { OSSL_FUNC_RAND_INSTANTIATE,
-      (void(*)(void))jitter_instantiate },
-    { OSSL_FUNC_RAND_UNINSTANTIATE,
-      (void(*)(void))jitter_uninstantiate },
-    { OSSL_FUNC_RAND_GENERATE, (void(*)(void))jitter_generate },
-    { OSSL_FUNC_RAND_RESEED, (void(*)(void))jitter_reseed },
-    { OSSL_FUNC_RAND_ENABLE_LOCKING, (void(*)(void))jitter_enable_locking },
-    { OSSL_FUNC_RAND_LOCK, (void(*)(void))jitter_lock },
-    { OSSL_FUNC_RAND_UNLOCK, (void(*)(void))jitter_unlock },
-    { OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS,
-      (void(*)(void))jitter_gettable_ctx_params },
-    { OSSL_FUNC_RAND_GET_CTX_PARAMS, (void(*)(void))jitter_get_ctx_params },
-    { OSSL_FUNC_RAND_VERIFY_ZEROIZATION,
-      (void(*)(void))jitter_verify_zeroization },
-    { OSSL_FUNC_RAND_GET_SEED, (void(*)(void))jitter_get_seed },
-    { OSSL_FUNC_RAND_CLEAR_SEED, (void(*)(void))jitter_clear_seed },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_RAND_NEWCTX, (void (*)(void))jitter_new},
+    {OSSL_FUNC_RAND_FREECTX, (void (*)(void))jitter_free},
+    {OSSL_FUNC_RAND_INSTANTIATE, (void (*)(void))jitter_instantiate},
+    {OSSL_FUNC_RAND_UNINSTANTIATE, (void (*)(void))jitter_uninstantiate},
+    {OSSL_FUNC_RAND_GENERATE, (void (*)(void))jitter_generate},
+    {OSSL_FUNC_RAND_RESEED, (void (*)(void))jitter_reseed},
+    {OSSL_FUNC_RAND_ENABLE_LOCKING, (void (*)(void))jitter_enable_locking},
+    {OSSL_FUNC_RAND_LOCK, (void (*)(void))jitter_lock},
+    {OSSL_FUNC_RAND_UNLOCK, (void (*)(void))jitter_unlock},
+    {OSSL_FUNC_RAND_GETTABLE_CTX_PARAMS,
+     (void (*)(void))jitter_gettable_ctx_params},
+    {OSSL_FUNC_RAND_GET_CTX_PARAMS, (void (*)(void))jitter_get_ctx_params},
+    {OSSL_FUNC_RAND_VERIFY_ZEROIZATION,
+     (void (*)(void))jitter_verify_zeroization},
+    {OSSL_FUNC_RAND_GET_SEED, (void (*)(void))jitter_get_seed},
+    {OSSL_FUNC_RAND_CLEAR_SEED, (void (*)(void))jitter_clear_seed},
+    OSSL_DISPATCH_END};
 #else
 NON_EMPTY_TRANSLATION_UNIT
 #endif

@@ -31,18 +31,9 @@ static int readbuffer_free(BIO *data);
 static long readbuffer_callback_ctrl(BIO *h, int cmd, BIO_info_cb *fp);
 
 static const BIO_METHOD methods_readbuffer = {
-    BIO_TYPE_BUFFER,
-    "readbuffer",
-    bwrite_conv,
-    readbuffer_write,
-    bread_conv,
-    readbuffer_read,
-    readbuffer_puts,
-    readbuffer_gets,
-    readbuffer_ctrl,
-    readbuffer_new,
-    readbuffer_free,
-    readbuffer_callback_ctrl,
+    BIO_TYPE_BUFFER, "readbuffer",    bwrite_conv,     readbuffer_write,
+    bread_conv,      readbuffer_read, readbuffer_puts, readbuffer_gets,
+    readbuffer_ctrl, readbuffer_new,  readbuffer_free, readbuffer_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_readbuffer(void)
@@ -235,8 +226,7 @@ static int readbuffer_gets(BIO *b, char *buf, int size)
     if (ctx->ibuf_len > 0) {
         p = ctx->ibuf + ctx->ibuf_off;
         found_newline = 0;
-        for (num_chars = 0;
-             (num_chars < ctx->ibuf_len) && (num_chars < size);
+        for (num_chars = 0; (num_chars < ctx->ibuf_len) && (num_chars < size);
              num_chars++) {
             *buf++ = p[num_chars];
             if (p[num_chars] == '\n') {
@@ -259,10 +249,10 @@ static int readbuffer_gets(BIO *b, char *buf, int size)
      * next bio.
      */
 
-     /* Resize if we have to */
-     if (!readbuffer_resize(ctx, 1 + size))
-         return 0;
-     /*
+    /* Resize if we have to */
+    if (!readbuffer_resize(ctx, 1 + size))
+        return 0;
+    /*
       * Read more data from the next bio using BIO_read_ex:
       * Note we cannot use BIO_gets() here as it does not work on a
       * binary stream that contains 0x00. (Since strlen() will stop at
@@ -271,21 +261,21 @@ static int readbuffer_gets(BIO *b, char *buf, int size)
       * multiple times and need to read the next available block when using
       * stdin - so we need to READ one byte at a time!
       */
-     p = ctx->ibuf + ctx->ibuf_off;
-     for (i = 0; i < size; ++i) {
-         j = BIO_read(b->next_bio, p, 1);
-         if (j <= 0) {
-             BIO_copy_next_retry(b);
-             *buf = '\0';
-             return num > 0 ? num : j;
-         }
-         *buf++ = *p;
-         num++;
-         ctx->ibuf_off++;
-         if (*p == '\n')
-             break;
-         ++p;
-     }
-     *buf = '\0';
-     return num;
+    p = ctx->ibuf + ctx->ibuf_off;
+    for (i = 0; i < size; ++i) {
+        j = BIO_read(b->next_bio, p, 1);
+        if (j <= 0) {
+            BIO_copy_next_retry(b);
+            *buf = '\0';
+            return num > 0 ? num : j;
+        }
+        *buf++ = *p;
+        num++;
+        ctx->ibuf_off++;
+        if (*p == '\n')
+            break;
+        ++p;
+    }
+    *buf = '\0';
+    return num;
 }

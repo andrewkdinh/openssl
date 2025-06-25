@@ -54,14 +54,11 @@ static void *rc4_hmac_md5_newctx(void *provctx)
 
     ctx = OPENSSL_zalloc(sizeof(*ctx));
     if (ctx != NULL)
-        ossl_cipher_generic_initkey(ctx, RC4_HMAC_MD5_KEY_BITS,
-                                    RC4_HMAC_MD5_BLOCK_BITS,
-                                    RC4_HMAC_MD5_IV_BITS,
-                                    RC4_HMAC_MD5_MODE, RC4_HMAC_MD5_FLAGS,
-                                    ossl_prov_cipher_hw_rc4_hmac_md5(
-                                        RC4_HMAC_MD5_KEY_BITS
-                                    ), NULL);
-     return ctx;
+        ossl_cipher_generic_initkey(
+            ctx, RC4_HMAC_MD5_KEY_BITS, RC4_HMAC_MD5_BLOCK_BITS,
+            RC4_HMAC_MD5_IV_BITS, RC4_HMAC_MD5_MODE, RC4_HMAC_MD5_FLAGS,
+            ossl_prov_cipher_hw_rc4_hmac_md5(RC4_HMAC_MD5_KEY_BITS), NULL);
+    return ctx;
 }
 
 static void rc4_hmac_md5_freectx(void *vctx)
@@ -69,7 +66,7 @@ static void rc4_hmac_md5_freectx(void *vctx)
     PROV_RC4_HMAC_MD5_CTX *ctx = (PROV_RC4_HMAC_MD5_CTX *)vctx;
 
     ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
-    OPENSSL_clear_free(ctx,  sizeof(*ctx));
+    OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
 static void *rc4_hmac_md5_dupctx(void *vctx)
@@ -103,8 +100,7 @@ static const OSSL_PARAM rc4_hmac_md5_known_gettable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_IVLEN, NULL),
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_AEAD_TLS1_AAD_PAD, NULL),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 const OSSL_PARAM *rc4_hmac_md5_gettable_ctx_params(ossl_unused void *cctx,
                                                    ossl_unused void *provctx)
 {
@@ -139,8 +135,7 @@ static const OSSL_PARAM rc4_hmac_md5_known_settable_ctx_params[] = {
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
     OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_IVLEN, NULL),
     OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_AEAD_TLS1_AAD, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 const OSSL_PARAM *rc4_hmac_md5_settable_ctx_params(ossl_unused void *cctx,
                                                    ossl_unused void *provctx)
 {
@@ -214,32 +209,29 @@ static int rc4_hmac_md5_set_ctx_params(void *vctx, const OSSL_PARAM params[])
 
 static int rc4_hmac_md5_get_params(OSSL_PARAM params[])
 {
-    return ossl_cipher_generic_get_params(params, RC4_HMAC_MD5_MODE,
-                                          RC4_HMAC_MD5_FLAGS,
-                                          RC4_HMAC_MD5_KEY_BITS,
-                                          RC4_HMAC_MD5_BLOCK_BITS,
-                                          RC4_HMAC_MD5_IV_BITS);
+    return ossl_cipher_generic_get_params(
+        params, RC4_HMAC_MD5_MODE, RC4_HMAC_MD5_FLAGS, RC4_HMAC_MD5_KEY_BITS,
+        RC4_HMAC_MD5_BLOCK_BITS, RC4_HMAC_MD5_IV_BITS);
 }
 
 const OSSL_DISPATCH ossl_rc4_hmac_ossl_md5_functions[] = {
-    { OSSL_FUNC_CIPHER_NEWCTX, (void (*)(void))rc4_hmac_md5_newctx },
-    { OSSL_FUNC_CIPHER_FREECTX, (void (*)(void))rc4_hmac_md5_freectx },
-    { OSSL_FUNC_CIPHER_DUPCTX, (void (*)(void))rc4_hmac_md5_dupctx },
-    { OSSL_FUNC_CIPHER_ENCRYPT_INIT, (void (*)(void))rc4_hmac_md5_einit },
-    { OSSL_FUNC_CIPHER_DECRYPT_INIT, (void (*)(void))rc4_hmac_md5_dinit },
-    { OSSL_FUNC_CIPHER_UPDATE, (void (*)(void))rc4_hmac_md5_update },
-    { OSSL_FUNC_CIPHER_FINAL, (void (*)(void))rc4_hmac_md5_final },
-    { OSSL_FUNC_CIPHER_CIPHER, (void (*)(void))rc4_hmac_md5_cipher },
-    { OSSL_FUNC_CIPHER_GET_PARAMS, (void (*)(void))rc4_hmac_md5_get_params },
-    { OSSL_FUNC_CIPHER_GETTABLE_PARAMS,
-        (void (*)(void))rc4_hmac_md5_gettable_params },
-    { OSSL_FUNC_CIPHER_GET_CTX_PARAMS,
-        (void (*)(void))rc4_hmac_md5_get_ctx_params },
-    { OSSL_FUNC_CIPHER_GETTABLE_CTX_PARAMS,
-        (void (*)(void))rc4_hmac_md5_gettable_ctx_params },
-    { OSSL_FUNC_CIPHER_SET_CTX_PARAMS,
-        (void (*)(void))rc4_hmac_md5_set_ctx_params },
-    { OSSL_FUNC_CIPHER_SETTABLE_CTX_PARAMS,
-        (void (*)(void))rc4_hmac_md5_settable_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_CIPHER_NEWCTX, (void (*)(void))rc4_hmac_md5_newctx},
+    {OSSL_FUNC_CIPHER_FREECTX, (void (*)(void))rc4_hmac_md5_freectx},
+    {OSSL_FUNC_CIPHER_DUPCTX, (void (*)(void))rc4_hmac_md5_dupctx},
+    {OSSL_FUNC_CIPHER_ENCRYPT_INIT, (void (*)(void))rc4_hmac_md5_einit},
+    {OSSL_FUNC_CIPHER_DECRYPT_INIT, (void (*)(void))rc4_hmac_md5_dinit},
+    {OSSL_FUNC_CIPHER_UPDATE, (void (*)(void))rc4_hmac_md5_update},
+    {OSSL_FUNC_CIPHER_FINAL, (void (*)(void))rc4_hmac_md5_final},
+    {OSSL_FUNC_CIPHER_CIPHER, (void (*)(void))rc4_hmac_md5_cipher},
+    {OSSL_FUNC_CIPHER_GET_PARAMS, (void (*)(void))rc4_hmac_md5_get_params},
+    {OSSL_FUNC_CIPHER_GETTABLE_PARAMS,
+     (void (*)(void))rc4_hmac_md5_gettable_params},
+    {OSSL_FUNC_CIPHER_GET_CTX_PARAMS,
+     (void (*)(void))rc4_hmac_md5_get_ctx_params},
+    {OSSL_FUNC_CIPHER_GETTABLE_CTX_PARAMS,
+     (void (*)(void))rc4_hmac_md5_gettable_ctx_params},
+    {OSSL_FUNC_CIPHER_SET_CTX_PARAMS,
+     (void (*)(void))rc4_hmac_md5_set_ctx_params},
+    {OSSL_FUNC_CIPHER_SETTABLE_CTX_PARAMS,
+     (void (*)(void))rc4_hmac_md5_settable_ctx_params},
+    OSSL_DISPATCH_END};

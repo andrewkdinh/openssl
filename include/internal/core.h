@@ -8,8 +8,8 @@
  */
 
 #ifndef OSSL_INTERNAL_CORE_H
-# define OSSL_INTERNAL_CORE_H
-# pragma once
+#define OSSL_INTERNAL_CORE_H
+#pragma once
 
 /*
  * namespaces:
@@ -56,8 +56,8 @@ void ossl_algorithm_do_all(OSSL_LIB_CTX *libctx, int operation_id,
                                       int no_store, void *data, int *result),
                            int (*reserve_store)(int no_store, void *data),
                            void (*fn)(OSSL_PROVIDER *provider,
-                                      const OSSL_ALGORITHM *algo,
-                                      int no_store, void *data),
+                                      const OSSL_ALGORITHM *algo, int no_store,
+                                      void *data),
                            int (*unreserve_store)(void *data),
                            int (*post)(OSSL_PROVIDER *, int operation_id,
                                        int no_store, void *data, int *result),

@@ -29,10 +29,12 @@ static OSSL_FUNC_keyexch_freectx_fn kdf_freectx;
 static OSSL_FUNC_keyexch_dupctx_fn kdf_dupctx;
 static OSSL_FUNC_keyexch_set_ctx_params_fn kdf_set_ctx_params;
 static OSSL_FUNC_keyexch_get_ctx_params_fn kdf_get_ctx_params;
-static OSSL_FUNC_keyexch_settable_ctx_params_fn kdf_tls1_prf_settable_ctx_params;
+static OSSL_FUNC_keyexch_settable_ctx_params_fn
+    kdf_tls1_prf_settable_ctx_params;
 static OSSL_FUNC_keyexch_settable_ctx_params_fn kdf_hkdf_settable_ctx_params;
 static OSSL_FUNC_keyexch_settable_ctx_params_fn kdf_scrypt_settable_ctx_params;
-static OSSL_FUNC_keyexch_gettable_ctx_params_fn kdf_tls1_prf_gettable_ctx_params;
+static OSSL_FUNC_keyexch_gettable_ctx_params_fn
+    kdf_tls1_prf_gettable_ctx_params;
 static OSSL_FUNC_keyexch_gettable_ctx_params_fn kdf_hkdf_gettable_ctx_params;
 static OSSL_FUNC_keyexch_gettable_ctx_params_fn kdf_scrypt_gettable_ctx_params;
 
@@ -85,10 +87,8 @@ static int kdf_init(void *vpkdfctx, void *vkdf, const OSSL_PARAM params[])
 {
     PROV_KDF_CTX *pkdfctx = (PROV_KDF_CTX *)vpkdfctx;
 
-    if (!ossl_prov_is_running()
-            || pkdfctx == NULL
-            || vkdf == NULL
-            || !ossl_kdf_data_up_ref(vkdf))
+    if (!ossl_prov_is_running() || pkdfctx == NULL || vkdf == NULL
+        || !ossl_kdf_data_up_ref(vkdf))
         return 0;
     pkdfctx->kdfdata = vkdf;
 
@@ -184,8 +184,7 @@ static const OSSL_PARAM *kdf_settable_ctx_params(ossl_unused void *vpkdfctx,
                                                  void *provctx,
                                                  const char *kdfname)
 {
-    EVP_KDF *kdf = EVP_KDF_fetch(PROV_LIBCTX_OF(provctx), kdfname,
-                                 NULL);
+    EVP_KDF *kdf = EVP_KDF_fetch(PROV_LIBCTX_OF(provctx), kdfname, NULL);
     const OSSL_PARAM *params;
 
     if (kdf == NULL)
@@ -212,8 +211,7 @@ static const OSSL_PARAM *kdf_gettable_ctx_params(ossl_unused void *vpkdfctx,
                                                  void *provctx,
                                                  const char *kdfname)
 {
-    EVP_KDF *kdf = EVP_KDF_fetch(PROV_LIBCTX_OF(provctx), kdfname,
-                                 NULL);
+    EVP_KDF *kdf = EVP_KDF_fetch(PROV_LIBCTX_OF(provctx), kdfname, NULL);
     const OSSL_PARAM *params;
 
     if (kdf == NULL)

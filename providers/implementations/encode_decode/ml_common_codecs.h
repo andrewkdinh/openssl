@@ -8,12 +8,12 @@
  */
 
 #ifndef PROV_ML_COMMON_CODECS_H
-# define PROV_ML_COMMON_CODECS_H
-# pragma once
+#define PROV_ML_COMMON_CODECS_H
+#pragma once
 
-#  include <openssl/e_os2.h>
-#  include "crypto/ml_dsa.h"
-#  include "prov/provider_ctx.h"
+#include <openssl/e_os2.h>
+#include "crypto/ml_dsa.h"
+#include "prov/provider_ctx.h"
 
  /*-
   * The DER ASN.1 encoding of ML-DSA and ML-KEM public keys prepends 22 bytes
@@ -26,7 +26,7 @@
   * -  4 byte bit string tag and length
   * -    1 bitstring lead byte
   */
-#  define ML_COMMON_SPKI_OVERHEAD   22
+#define ML_COMMON_SPKI_OVERHEAD   22
 typedef struct {
     const uint8_t asn1_prefix[ML_COMMON_SPKI_OVERHEAD];
 } ML_COMMON_SPKI_FMT;
@@ -69,7 +69,7 @@ typedef struct {
 typedef struct {
     const char *p8_name;    /* Format name */
     size_t p8_bytes;        /* Total P8 encoding length */
-    int    p8_shift;        /* 4 - (top-level tag + len) */
+    int p8_shift;        /* 4 - (top-level tag + len) */
     uint32_t p8_magic;      /* The tag + len value */
     uint16_t seed_magic;    /* Interior tag + len for the seed */
     size_t seed_offset;     /* Seed offset from start */

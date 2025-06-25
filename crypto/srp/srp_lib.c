@@ -41,20 +41,18 @@ static BIGNUM *srp_Calc_xy(const BIGNUM *x, const BIGNUM *y, const BIGNUM *N,
         goto err;
     if ((tmp = OPENSSL_malloc(numN * 2)) == NULL)
         goto err;
-    if (BN_bn2binpad(x, tmp, numN) < 0
-        || BN_bn2binpad(y, tmp + numN, numN) < 0
+    if (BN_bn2binpad(x, tmp, numN) < 0 || BN_bn2binpad(y, tmp + numN, numN) < 0
         || !EVP_Digest(tmp, numN * 2, digest, NULL, sha1, NULL))
         goto err;
     res = BN_bin2bn(digest, sizeof(digest), NULL);
- err:
+err:
     EVP_MD_free(sha1);
     OPENSSL_free(tmp);
     return res;
 }
 
 static BIGNUM *srp_Calc_k(const BIGNUM *N, const BIGNUM *g,
-                          OSSL_LIB_CTX *libctx,
-                          const char *propq)
+                          OSSL_LIB_CTX *libctx, const char *propq)
 {
     /* k = SHA1(N | PAD(g)) -- tls-srp RFC 5054 */
     return srp_Calc_xy(N, g, N, libctx, propq);
@@ -97,7 +95,7 @@ BIGNUM *SRP_Calc_server_key(const BIGNUM *A, const BIGNUM *v, const BIGNUM *u,
         BN_free(S);
         S = NULL;
     }
- err:
+err:
     BN_CTX_free(bn_ctx);
     BN_clear_free(tmp);
     return S;
@@ -110,12 +108,12 @@ BIGNUM *SRP_Calc_B_ex(const BIGNUM *b, const BIGNUM *N, const BIGNUM *g,
     BIGNUM *B = NULL, *k = NULL;
     BN_CTX *bn_ctx;
 
-    if (b == NULL || N == NULL || g == NULL || v == NULL ||
-        (bn_ctx = BN_CTX_new_ex(libctx)) == NULL)
+    if (b == NULL || N == NULL || g == NULL || v == NULL
+        || (bn_ctx = BN_CTX_new_ex(libctx)) == NULL)
         return NULL;
 
-    if ((kv = BN_new()) == NULL ||
-        (gb = BN_new()) == NULL || (B = BN_new()) == NULL)
+    if ((kv = BN_new()) == NULL || (gb = BN_new()) == NULL
+        || (B = BN_new()) == NULL)
         goto err;
 
     /* B = g**b + k*v */
@@ -127,7 +125,7 @@ BIGNUM *SRP_Calc_B_ex(const BIGNUM *b, const BIGNUM *N, const BIGNUM *g,
         BN_free(B);
         B = NULL;
     }
- err:
+err:
     BN_CTX_free(bn_ctx);
     BN_clear_free(kv);
     BN_clear_free(gb);
@@ -181,7 +179,7 @@ BIGNUM *SRP_Calc_x_ex(const BIGNUM *s, const char *user, const char *pass,
 
     res = BN_bin2bn(dig, sizeof(dig), NULL);
 
- err:
+err:
     EVP_MD_free(sha1);
     OPENSSL_free(cs);
     EVP_MD_CTX_free(ctxt);
@@ -209,9 +207,10 @@ BIGNUM *SRP_Calc_A(const BIGNUM *a, const BIGNUM *N, const BIGNUM *g)
     return A;
 }
 
-BIGNUM *SRP_Calc_client_key_ex(const BIGNUM *N, const BIGNUM *B, const BIGNUM *g,
-                            const BIGNUM *x, const BIGNUM *a, const BIGNUM *u,
-                            OSSL_LIB_CTX *libctx, const char *propq)
+BIGNUM *SRP_Calc_client_key_ex(const BIGNUM *N, const BIGNUM *B,
+                               const BIGNUM *g, const BIGNUM *x,
+                               const BIGNUM *a, const BIGNUM *u,
+                               OSSL_LIB_CTX *libctx, const char *propq)
 {
     BIGNUM *tmp = NULL, *tmp2 = NULL, *tmp3 = NULL, *k = NULL, *K = NULL;
     BIGNUM *xtmp = NULL;
@@ -221,10 +220,8 @@ BIGNUM *SRP_Calc_client_key_ex(const BIGNUM *N, const BIGNUM *B, const BIGNUM *g
         || a == NULL || (bn_ctx = BN_CTX_new_ex(libctx)) == NULL)
         return NULL;
 
-    if ((tmp = BN_new()) == NULL ||
-        (tmp2 = BN_new()) == NULL ||
-        (tmp3 = BN_new()) == NULL ||
-        (xtmp = BN_new()) == NULL)
+    if ((tmp = BN_new()) == NULL || (tmp2 = BN_new()) == NULL
+        || (tmp3 = BN_new()) == NULL || (xtmp = BN_new()) == NULL)
         goto err;
 
     BN_with_flags(xtmp, x, BN_FLG_CONSTTIME);
@@ -247,7 +244,7 @@ BIGNUM *SRP_Calc_client_key_ex(const BIGNUM *N, const BIGNUM *B, const BIGNUM *g
         K = NULL;
     }
 
- err:
+err:
     BN_CTX_free(bn_ctx);
     BN_free(xtmp);
     BN_clear_free(tmp);
@@ -278,7 +275,7 @@ int SRP_Verify_B_mod_N(const BIGNUM *B, const BIGNUM *N)
     if (!BN_nnmod(r, B, N, bn_ctx))
         goto err;
     ret = !BN_is_zero(r);
- err:
+err:
     BN_CTX_free(bn_ctx);
     BN_free(r);
     return ret;

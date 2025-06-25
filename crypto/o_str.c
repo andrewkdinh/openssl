@@ -19,7 +19,7 @@
 #define DEFAULT_SEPARATOR ':'
 #define CH_ZERO '\0'
 
-char *CRYPTO_strdup(const char *str, const char* file, int line)
+char *CRYPTO_strdup(const char *str, const char *file, int line)
 {
     char *ret;
 
@@ -31,7 +31,7 @@ char *CRYPTO_strdup(const char *str, const char* file, int line)
     return ret;
 }
 
-char *CRYPTO_strndup(const char *str, size_t s, const char* file, int line)
+char *CRYPTO_strndup(const char *str, size_t s, const char *file, int line)
 {
     size_t maxlen;
     char *ret;
@@ -49,7 +49,7 @@ char *CRYPTO_strndup(const char *str, size_t s, const char* file, int line)
     return ret;
 }
 
-void *CRYPTO_memdup(const void *data, size_t siz, const char* file, int line)
+void *CRYPTO_memdup(const void *data, size_t siz, const char *file, int line)
 {
     void *ret;
 
@@ -66,7 +66,7 @@ size_t OPENSSL_strnlen(const char *str, size_t maxlen)
 {
     const char *p;
 
-    for (p = str; maxlen-- != 0 && *p != CH_ZERO; ++p) ;
+    for (p = str; maxlen-- != 0 && *p != CH_ZERO; ++p);
 
     return p - str;
 }
@@ -86,8 +86,7 @@ size_t OPENSSL_strlcpy(char *dst, const char *src, size_t size)
 size_t OPENSSL_strlcat(char *dst, const char *src, size_t size)
 {
     size_t l = 0;
-    for (; size > 0 && *dst; size--, dst++)
-        l++;
+    for (; size > 0 && *dst; size--, dst++) l++;
     return l + OPENSSL_strlcpy(dst, src, size);
 }
 
@@ -151,9 +150,8 @@ int OPENSSL_strtoul(const char *str, char **endptr, int base,
      *    means there was some part of the string left over after translation
      * 3) If no bytes of the string were consumed
      */
-    if (errno != 0 ||
-        (endptr == NULL && **internal_endptr != '\0') ||
-        (str == *internal_endptr))
+    if (errno != 0 || (endptr == NULL && **internal_endptr != '\0')
+        || (str == *internal_endptr))
         return 0;
 
     return 1;
@@ -175,29 +173,35 @@ int OPENSSL_hexchar2int(unsigned char c)
     case '3':
         return 3;
     case '4':
-          return 4;
+        return 4;
     case '5':
-          return 5;
+        return 5;
     case '6':
-          return 6;
+        return 6;
     case '7':
-          return 7;
+        return 7;
     case '8':
-          return 8;
+        return 8;
     case '9':
-          return 9;
-    case 'a': case 'A':
-          return 0x0A;
-    case 'b': case 'B':
-          return 0x0B;
-    case 'c': case 'C':
-          return 0x0C;
-    case 'd': case 'D':
-          return 0x0D;
-    case 'e': case 'E':
-          return 0x0E;
-    case 'f': case 'F':
-          return 0x0F;
+        return 9;
+    case 'a':
+    case 'A':
+        return 0x0A;
+    case 'b':
+    case 'B':
+        return 0x0B;
+    case 'c':
+    case 'C':
+        return 0x0C;
+    case 'd':
+    case 'D':
+        return 0x0D;
+    case 'e':
+    case 'E':
+        return 0x0E;
+    case 'f':
+    case 'F':
+        return 0x0F;
     }
     return -1;
 }
@@ -211,7 +215,7 @@ static int hexstr2buf_sep(unsigned char *buf, size_t buf_n, size_t *buflen,
     const unsigned char *p;
     size_t cnt;
 
-    for (p = (const unsigned char *)str, q = buf, cnt = 0; *p; ) {
+    for (p = (const unsigned char *)str, q = buf, cnt = 0; *p;) {
         ch = *p++;
         /* A separator of CH_ZERO means there is no separator */
         if (ch == sep && sep != CH_ZERO)
@@ -344,7 +348,6 @@ char *ossl_buf2hexstr_sep(const unsigned char *buf, long buflen, char sep)
     return NULL;
 }
 
-
 /*
  * Given a buffer of length 'buflen' return a OPENSSL_malloc'ed string with
  * its hex representation @@@ (Contents of buffer are always kept in ASCII,
@@ -357,7 +360,7 @@ char *OPENSSL_buf2hexstr(const unsigned char *buf, long buflen)
 
 int openssl_strerror_r(int errnum, char *buf, size_t buflen)
 {
-#if defined(_MSC_VER) && _MSC_VER>=1400 && !defined(_WIN32_WCE)
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && !defined(_WIN32_WCE)
     return !strerror_s(buf, buflen, errnum);
 #elif defined(_GNU_SOURCE)
     char *err;
@@ -380,8 +383,8 @@ int openssl_strerror_r(int errnum, char *buf, size_t buflen)
     if (err != buf)
         OPENSSL_strlcpy(buf, err, buflen);
     return 1;
-#elif (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L) || \
-      (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 600)
+#elif (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L) \
+    || (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 600)
     /*
      * We can use "real" strerror_r. The OpenSSL version differs in that it
      * gives 1 on success and 0 on failure for consistency with other OpenSSL

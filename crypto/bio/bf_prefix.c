@@ -23,18 +23,9 @@ static int prefix_destroy(BIO *b);
 static long prefix_callback_ctrl(BIO *b, int cmd, BIO_info_cb *fp);
 
 static const BIO_METHOD prefix_meth = {
-    BIO_TYPE_BUFFER,
-    "prefix",
-    prefix_write,
-    NULL,
-    prefix_read,
-    NULL,
-    prefix_puts,
-    prefix_gets,
-    prefix_ctrl,
-    prefix_create,
-    prefix_destroy,
-    prefix_callback_ctrl,
+    BIO_TYPE_BUFFER, "prefix",      prefix_write,   NULL,
+    prefix_read,     NULL,          prefix_puts,    prefix_gets,
+    prefix_ctrl,     prefix_create, prefix_destroy, prefix_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_prefix(void)
@@ -90,14 +81,13 @@ static int prefix_write(BIO *b, const char *out, size_t outl,
      * If no prefix is set or if it's empty, and no indentation amount is set,
      * we've got nothing to do here
      */
-    if ((ctx->prefix == NULL || *ctx->prefix == '\0')
-        && ctx->indent == 0) {
+    if ((ctx->prefix == NULL || *ctx->prefix == '\0') && ctx->indent == 0) {
         /*
          * We do note if what comes next will be a new line, though, so we're
          * prepared to handle prefix and indentation the next time around.
          */
         if (outl > 0)
-            ctx->linestart = (out[outl-1] == '\n');
+            ctx->linestart = (out[outl - 1] == '\n');
         return BIO_write_ex(BIO_next(b), out, outl, numwritten);
     }
 
@@ -123,8 +113,7 @@ static int prefix_write(BIO *b, const char *out, size_t outl,
         }
 
         /* Now, go look for the next LF, or the end of the string */
-        for (i = 0, c = '\0'; i < outl && (c = out[i]) != '\n'; i++)
-            continue;
+        for (i = 0, c = '\0'; i < outl && (c = out[i]) != '\n'; i++) continue;
         if (c == '\n')
             i++;
 

@@ -113,7 +113,7 @@ static void *init_object(void)
     obj->p6 = p6_init;
 
     return obj;
- fail:
+fail:
     cleanup_object(obj);
     obj = NULL;
 
@@ -143,8 +143,8 @@ static int raw_set_params(void *vobj, const OSSL_PARAM *params)
                 return 0;
         } else if (strcmp(params->key, "p4") == 0) {
             OPENSSL_free(obj->p4);
-            if (!TEST_ptr(obj->p4 = OPENSSL_strndup(params->data,
-                                                    params->data_size)))
+            if (!TEST_ptr(obj->p4 =
+                              OPENSSL_strndup(params->data, params->data_size)))
                 return 0;
             obj->p4_l = strlen(obj->p4);
         } else if (strcmp(params->key, "p5") == 0) {
@@ -279,14 +279,12 @@ struct provider_dispatch_st {
 };
 
 /* "raw" provider */
-static const struct provider_dispatch_st provider_raw = {
-    raw_set_params, raw_get_params
-};
+static const struct provider_dispatch_st provider_raw = {raw_set_params,
+                                                         raw_get_params};
 
 /* "api" provider */
-static const struct provider_dispatch_st provider_api = {
-    api_set_params, api_get_params
-};
+static const struct provider_dispatch_st provider_api = {api_set_params,
+                                                         api_get_params};
 
 /*-
  * APPLICATION SECTION
@@ -302,14 +300,14 @@ static const struct provider_dispatch_st provider_api = {
  * they don't understand (the application may have one big bag of
  * parameters).
  */
-static int app_p1;                    /* "p1" */
-static double app_p2;                 /* "p2" is ignored */
-static BIGNUM *app_p3 = NULL;         /* "p3" */
+static int app_p1; /* "p1" */
+static double app_p2; /* "p2" is ignored */
+static BIGNUM *app_p3 = NULL; /* "p3" */
 static unsigned char bignumbin[4096]; /* "p3" */
-static char app_p4[256];              /* "p4" */
-static char app_p5[256];              /* "p5" */
-static const char *app_p6 = NULL;     /* "p6" */
-static unsigned char foo[1];          /* "foo" */
+static char app_p4[256]; /* "p4" */
+static char app_p5[256]; /* "p5" */
+static const char *app_p6 = NULL; /* "p6" */
+static unsigned char foo[1]; /* "foo" */
 
 #define app_p1_init 17           /* A random number */
 #define app_p2_init 47.11        /* Another random number */
@@ -351,15 +349,14 @@ static int init_app_variables(void)
 
 /* An array of OSSL_PARAM, specific in the most raw manner possible */
 static OSSL_PARAM static_raw_params[] = {
-    { "p1", OSSL_PARAM_INTEGER, &app_p1, sizeof(app_p1), 0 },
-    { "p3", OSSL_PARAM_UNSIGNED_INTEGER, &bignumbin, sizeof(bignumbin), 0 },
-    { "p4", OSSL_PARAM_UTF8_STRING, &app_p4, sizeof(app_p4), 0 },
-    { "p5", OSSL_PARAM_UTF8_STRING, &app_p5, sizeof(app_p5), 0 },
+    {"p1", OSSL_PARAM_INTEGER, &app_p1, sizeof(app_p1), 0},
+    {"p3", OSSL_PARAM_UNSIGNED_INTEGER, &bignumbin, sizeof(bignumbin), 0},
+    {"p4", OSSL_PARAM_UTF8_STRING, &app_p4, sizeof(app_p4), 0},
+    {"p5", OSSL_PARAM_UTF8_STRING, &app_p5, sizeof(app_p5), 0},
     /* sizeof(app_p6_init) - 1, because we know that's what we're using */
-    { "p6", OSSL_PARAM_UTF8_PTR, &app_p6, sizeof(app_p6_init) - 1, 0 },
-    { "foo", OSSL_PARAM_OCTET_STRING, &foo, sizeof(foo), 0 },
-    { NULL, 0, NULL, 0, 0 }
-};
+    {"p6", OSSL_PARAM_UTF8_PTR, &app_p6, sizeof(app_p6_init) - 1, 0},
+    {"foo", OSSL_PARAM_OCTET_STRING, &foo, sizeof(foo), 0},
+    {NULL, 0, NULL, 0, 0}};
 
 /* The same array of OSSL_PARAM, specified with the macros from params.h */
 static OSSL_PARAM static_api_params[] = {
@@ -371,8 +368,7 @@ static OSSL_PARAM static_api_params[] = {
     OSSL_PARAM_DEFN("p6", OSSL_PARAM_UTF8_PTR, &app_p6,
                     sizeof(app_p6_init) - 1),
     OSSL_PARAM_DEFN("foo", OSSL_PARAM_OCTET_STRING, &foo, sizeof(foo)),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 
 /*
  * The same array again, but constructed at run-time
@@ -385,10 +381,10 @@ static OSSL_PARAM *construct_api_params(void)
 
     params[n++] = OSSL_PARAM_construct_int("p1", &app_p1);
     params[n++] = OSSL_PARAM_construct_BN("p3", bignumbin, sizeof(bignumbin));
-    params[n++] = OSSL_PARAM_construct_utf8_string("p4", app_p4,
-                                                   sizeof(app_p4));
-    params[n++] = OSSL_PARAM_construct_utf8_string("p5", app_p5,
-                                                   sizeof(app_p5));
+    params[n++] =
+        OSSL_PARAM_construct_utf8_string("p4", app_p4, sizeof(app_p4));
+    params[n++] =
+        OSSL_PARAM_construct_utf8_string("p5", app_p5, sizeof(app_p5));
     /* sizeof(app_p6_init), because we know that's what we're using */
     params[n++] = OSSL_PARAM_construct_utf8_ptr("p6", (char **)&app_p6,
                                                 sizeof(app_p6_init));
@@ -403,13 +399,10 @@ struct param_owner_st {
     OSSL_PARAM *(*constructed_params)(void);
 };
 
-static const struct param_owner_st raw_params = {
-    static_raw_params, NULL
-};
+static const struct param_owner_st raw_params = {static_raw_params, NULL};
 
-static const struct param_owner_st api_params = {
-    static_api_params, construct_api_params
-};
+static const struct param_owner_st api_params = {static_api_params,
+                                                 construct_api_params};
 
 /*-
  * TESTING
@@ -425,16 +418,17 @@ static struct {
     const char *desc;
 } test_cases[] = {
     /* Tests within specific methods */
-    { &provider_raw, &raw_params, "raw provider vs raw params" },
-    { &provider_api, &api_params, "api provider vs api params" },
+    {&provider_raw, &raw_params, "raw provider vs raw params"},
+    {&provider_api, &api_params, "api provider vs api params"},
 
     /* Mixed methods */
-    { &provider_raw, &api_params, "raw provider vs api params" },
-    { &provider_api, &raw_params, "api provider vs raw params" },
+    {&provider_raw, &api_params, "raw provider vs api params"},
+    {&provider_api, &raw_params, "api provider vs raw params"},
 };
 
 /* Generic tester of combinations of "providers" and params */
-static int test_case_variant(OSSL_PARAM *params, const struct provider_dispatch_st *prov)
+static int test_case_variant(OSSL_PARAM *params,
+                             const struct provider_dispatch_st *prov)
 {
     BIGNUM *verify_p3 = NULL;
     void *obj = NULL;
@@ -457,21 +451,21 @@ static int test_case_variant(OSSL_PARAM *params, const struct provider_dispatch_
     init_app_variables();
 
     if (!TEST_true(prov->get_params(obj, params))
-        || !TEST_int_eq(app_p1, p1_init)        /* "provider" value */
+        || !TEST_int_eq(app_p1, p1_init) /* "provider" value */
         || !TEST_double_eq(app_p2, app_p2_init) /* Should remain untouched */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "p3"))
         || !TEST_ptr(BN_native2bn(bignumbin, p->return_size, app_p3))
-        || !TEST_BN_eq(app_p3, verify_p3)       /* "provider" value */
-        || !TEST_str_eq(app_p4, p4_init)        /* "provider" value */
+        || !TEST_BN_eq(app_p3, verify_p3) /* "provider" value */
+        || !TEST_str_eq(app_p4, p4_init) /* "provider" value */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "p5"))
         || !TEST_size_t_eq(p->return_size,
                            sizeof(p5_init) - 1) /* "provider" value */
-        || !TEST_str_eq(app_p5, p5_init)        /* "provider" value */
+        || !TEST_str_eq(app_p5, p5_init) /* "provider" value */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "p6"))
         || !TEST_size_t_eq(p->return_size,
                            sizeof(p6_init) - 1) /* "provider" value */
-        || !TEST_str_eq(app_p6, p6_init)        /* "provider" value */
-        || !TEST_char_eq(foo[0], app_foo_init)  /* Should remain untouched */
+        || !TEST_str_eq(app_p6, p6_init) /* "provider" value */
+        || !TEST_char_eq(foo[0], app_foo_init) /* Should remain untouched */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "foo")))
         errcnt++;
 
@@ -486,12 +480,13 @@ static int test_case_variant(OSSL_PARAM *params, const struct provider_dispatch_
     } else {
         struct object_st *sneakpeek = obj;
 
-        if (!TEST_int_eq(sneakpeek->p1, app_p1)         /* app value set */
-            || !TEST_double_eq(sneakpeek->p2, p2_init)  /* Should remain untouched */
-            || !TEST_BN_eq(sneakpeek->p3, app_p3)       /* app value set */
-            || !TEST_str_eq(sneakpeek->p4, app_p4)      /* app value set */
-            || !TEST_str_eq(sneakpeek->p5, app_p5)      /* app value set */
-            || !TEST_str_eq(sneakpeek->p6, app_p6))     /* app value set */
+        if (!TEST_int_eq(sneakpeek->p1, app_p1) /* app value set */
+            || !TEST_double_eq(sneakpeek->p2,
+                               p2_init) /* Should remain untouched */
+            || !TEST_BN_eq(sneakpeek->p3, app_p3) /* app value set */
+            || !TEST_str_eq(sneakpeek->p4, app_p4) /* app value set */
+            || !TEST_str_eq(sneakpeek->p5, app_p5) /* app value set */
+            || !TEST_str_eq(sneakpeek->p6, app_p6)) /* app value set */
             errcnt++;
     }
 
@@ -508,25 +503,25 @@ static int test_case_variant(OSSL_PARAM *params, const struct provider_dispatch_
     }
 
     if (!TEST_true(prov->get_params(obj, params))
-        || !TEST_int_eq(app_p1, app_p1_init)    /* app value */
+        || !TEST_int_eq(app_p1, app_p1_init) /* app value */
         || !TEST_double_eq(app_p2, app_p2_init) /* Should remain untouched */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "p3"))
         || !TEST_ptr(BN_native2bn(bignumbin, p->return_size, app_p3))
-        || !TEST_BN_eq(app_p3, verify_p3)       /* app value */
-        || !TEST_str_eq(app_p4, app_p4_init)    /* app value */
+        || !TEST_BN_eq(app_p3, verify_p3) /* app value */
+        || !TEST_str_eq(app_p4, app_p4_init) /* app value */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "p5"))
         || !TEST_size_t_eq(p->return_size,
                            sizeof(app_p5_init) - 1) /* app value */
-        || !TEST_str_eq(app_p5, app_p5_init)    /* app value */
+        || !TEST_str_eq(app_p5, app_p5_init) /* app value */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "p6"))
         || !TEST_size_t_eq(p->return_size,
                            sizeof(app_p6_init) - 1) /* app value */
-        || !TEST_str_eq(app_p6, app_p6_init)    /* app value */
-        || !TEST_char_eq(foo[0], app_foo_init)  /* Should remain untouched */
+        || !TEST_str_eq(app_p6, app_p6_init) /* app value */
+        || !TEST_char_eq(foo[0], app_foo_init) /* Should remain untouched */
         || !TEST_ptr(p = OSSL_PARAM_locate(params, "foo")))
         errcnt++;
 
- fin:
+fin:
     BN_free(verify_p3);
     verify_p3 = NULL;
     cleanup_app_variables();
@@ -555,7 +550,8 @@ static const OSSL_PARAM params_from_text[] = {
     /* Fixed size buffer */
     OSSL_PARAM_int32("int", NULL),
     OSSL_PARAM_DEFN("short", OSSL_PARAM_INTEGER, NULL, sizeof(int16_t)),
-    OSSL_PARAM_DEFN("ushort", OSSL_PARAM_UNSIGNED_INTEGER, NULL, sizeof(uint16_t)),
+    OSSL_PARAM_DEFN("ushort", OSSL_PARAM_UNSIGNED_INTEGER, NULL,
+                    sizeof(uint16_t)),
     /* Arbitrary size buffer.  Make sure the result fits in a long */
     OSSL_PARAM_DEFN("num", OSSL_PARAM_INTEGER, NULL, 0),
     OSSL_PARAM_DEFN("unum", OSSL_PARAM_UNSIGNED_INTEGER, NULL, 0),
@@ -572,45 +568,45 @@ struct int_from_text_test_st {
 };
 
 static struct int_from_text_test_st int_from_text_test_cases[] = {
-    { "int",               "",          0, 0, 0 },
-    { "int",              "0",          0, 1, 4 },
-    { "int",            "101",        101, 1, 4 },
-    { "int",           "-102",       -102, 1, 4 },
-    { "int",            "12A",         12, 1, 4 }, /* incomplete */
-    { "int",          "0x12B",      0x12B, 1, 4 },
-    { "hexint",         "12C",      0x12C, 1, 4 },
-    { "hexint",       "0x12D",          0, 1, 4 }, /* zero */
+    {"int", "", 0, 0, 0},
+    {"int", "0", 0, 1, 4},
+    {"int", "101", 101, 1, 4},
+    {"int", "-102", -102, 1, 4},
+    {"int", "12A", 12, 1, 4}, /* incomplete */
+    {"int", "0x12B", 0x12B, 1, 4},
+    {"hexint", "12C", 0x12C, 1, 4},
+    {"hexint", "0x12D", 0, 1, 4}, /* zero */
     /* test check of the target buffer size */
-    { "int",     "0x7fffffff",  INT32_MAX, 1, 4 },
-    { "int",     "2147483647",  INT32_MAX, 1, 4 },
-    { "int",     "2147483648",          0, 0, 0 }, /* too small buffer */
-    { "int",    "-2147483648",  INT32_MIN, 1, 4 },
-    { "int",    "-2147483649",          0, 0, 4 }, /* too small buffer */
-    { "short",       "0x7fff",  INT16_MAX, 1, 2 },
-    { "short",        "32767",  INT16_MAX, 1, 2 },
-    { "short",        "32768",          0, 0, 0 }, /* too small buffer */
-    { "ushort",      "0xffff", UINT16_MAX, 1, 2 },
-    { "ushort",       "65535", UINT16_MAX, 1, 2 },
-    { "ushort",       "65536",          0, 0, 0 }, /* too small buffer */
+    {"int", "0x7fffffff", INT32_MAX, 1, 4},
+    {"int", "2147483647", INT32_MAX, 1, 4},
+    {"int", "2147483648", 0, 0, 0}, /* too small buffer */
+    {"int", "-2147483648", INT32_MIN, 1, 4},
+    {"int", "-2147483649", 0, 0, 4}, /* too small buffer */
+    {"short", "0x7fff", INT16_MAX, 1, 2},
+    {"short", "32767", INT16_MAX, 1, 2},
+    {"short", "32768", 0, 0, 0}, /* too small buffer */
+    {"ushort", "0xffff", UINT16_MAX, 1, 2},
+    {"ushort", "65535", UINT16_MAX, 1, 2},
+    {"ushort", "65536", 0, 0, 0}, /* too small buffer */
     /* test check of sign extension in arbitrary size results */
-    { "num",              "0",          0, 1, 1 },
-    { "num",              "0",          0, 1, 1 },
-    { "num",           "0xff",       0xff, 1, 2 }, /* sign extension */
-    { "num",          "-0xff",      -0xff, 1, 2 }, /* sign extension */
-    { "num",           "0x7f",       0x7f, 1, 1 }, /* no sign extension */
-    { "num",          "-0x7f",      -0x7f, 1, 1 }, /* no sign extension */
-    { "num",           "0x80",       0x80, 1, 2 }, /* sign extension */
-    { "num",          "-0x80",      -0x80, 1, 1 }, /* no sign extension */
-    { "num",           "0x81",       0x81, 1, 2 }, /* sign extension */
-    { "num",          "-0x81",      -0x81, 1, 2 }, /* sign extension */
-    { "unum",          "0xff",       0xff, 1, 1 },
-    { "unum",         "-0xff",      -0xff, 0, 0 }, /* invalid neg number */
-    { "unum",          "0x7f",       0x7f, 1, 1 },
-    { "unum",         "-0x7f",      -0x7f, 0, 0 }, /* invalid neg number */
-    { "unum",          "0x80",       0x80, 1, 1 },
-    { "unum",         "-0x80",      -0x80, 0, 0 }, /* invalid neg number */
-    { "unum",          "0x81",       0x81, 1, 1 },
-    { "unum",         "-0x81",      -0x81, 0, 0 }, /* invalid neg number */
+    {"num", "0", 0, 1, 1},
+    {"num", "0", 0, 1, 1},
+    {"num", "0xff", 0xff, 1, 2}, /* sign extension */
+    {"num", "-0xff", -0xff, 1, 2}, /* sign extension */
+    {"num", "0x7f", 0x7f, 1, 1}, /* no sign extension */
+    {"num", "-0x7f", -0x7f, 1, 1}, /* no sign extension */
+    {"num", "0x80", 0x80, 1, 2}, /* sign extension */
+    {"num", "-0x80", -0x80, 1, 1}, /* no sign extension */
+    {"num", "0x81", 0x81, 1, 2}, /* sign extension */
+    {"num", "-0x81", -0x81, 1, 2}, /* sign extension */
+    {"unum", "0xff", 0xff, 1, 1},
+    {"unum", "-0xff", -0xff, 0, 0}, /* invalid neg number */
+    {"unum", "0x7f", 0x7f, 1, 1},
+    {"unum", "-0x7f", -0x7f, 0, 0}, /* invalid neg number */
+    {"unum", "0x80", 0x80, 1, 1},
+    {"unum", "-0x80", -0x80, 0, 0}, /* invalid neg number */
+    {"unum", "0x81", 0x81, 1, 1},
+    {"unum", "-0x81", -0x81, 0, 0}, /* invalid neg number */
 };
 
 static int check_int_from_text(const struct int_from_text_test_st a)
@@ -619,19 +615,19 @@ static int check_int_from_text(const struct int_from_text_test_st a)
     long int val = 0;
     int res;
 
-    if (!OSSL_PARAM_allocate_from_text(&param, params_from_text,
-                                       a.argname, a.strval, 0, NULL)) {
+    if (!OSSL_PARAM_allocate_from_text(&param, params_from_text, a.argname,
+                                       a.strval, 0, NULL)) {
         if (a.expected_res)
-            TEST_error("unexpected OSSL_PARAM_allocate_from_text() return for %s \"%s\"",
-                       a.argname, a.strval);
+            TEST_error(
+                "unexpected OSSL_PARAM_allocate_from_text() return for %s \"%s\"",
+                a.argname, a.strval);
         return !a.expected_res;
     }
 
     /* For data size zero, OSSL_PARAM_get_long() may crash */
     if (param.data_size == 0) {
         OPENSSL_free(param.data);
-        TEST_error("unexpected zero size for %s \"%s\"",
-                   a.argname, a.strval);
+        TEST_error("unexpected zero size for %s \"%s\"", a.argname, a.strval);
         return 0;
     }
     res = OSSL_PARAM_get_long(&param, &val);
@@ -639,18 +635,18 @@ static int check_int_from_text(const struct int_from_text_test_st a)
 
     if (res ^ a.expected_res) {
         TEST_error("unexpected OSSL_PARAM_get_long() return for %s \"%s\": "
-                   "%d != %d", a.argname, a.strval, a.expected_res, res);
+                   "%d != %d",
+                   a.argname, a.strval, a.expected_res, res);
         return 0;
     }
     if (val != a.expected_intval) {
-        TEST_error("unexpected result for %s \"%s\":  %li != %li",
-                   a.argname, a.strval, a.expected_intval, val);
+        TEST_error("unexpected result for %s \"%s\":  %li != %li", a.argname,
+                   a.strval, a.expected_intval, val);
         return 0;
     }
     if (param.data_size != a.expected_bufsize) {
-        TEST_error("unexpected size for %s \"%s\":  %d != %d",
-                   a.argname, a.strval,
-                   (int)a.expected_bufsize, (int)param.data_size);
+        TEST_error("unexpected size for %s \"%s\":  %d != %d", a.argname,
+                   a.strval, (int)a.expected_bufsize, (int)param.data_size);
         return 0;
     }
 
@@ -660,7 +656,7 @@ static int check_int_from_text(const struct int_from_text_test_st a)
 static int check_octetstr_from_hexstr(void)
 {
     OSSL_PARAM param;
-    static const char *values[] = { "", "F", "FF", "FFF", "FFFF", NULL };
+    static const char *values[] = {"", "F", "FF", "FFF", "FFFF", NULL};
     int i;
     int errcnt = 0;
 
@@ -672,20 +668,15 @@ static int check_octetstr_from_hexstr(void)
         ERR_clear_error();
         memset(&param, 0, sizeof(param));
         if (expected)
-            result =
-                TEST_true(OSSL_PARAM_allocate_from_text(&param,
-                                                        params_from_text,
-                                                        "hexoctets", values[i], 0,
-                                                        NULL));
+            result = TEST_true(OSSL_PARAM_allocate_from_text(
+                &param, params_from_text, "hexoctets", values[i], 0, NULL));
         else
-            result =
-                TEST_false(OSSL_PARAM_allocate_from_text(&param,
-                                                         params_from_text,
-                                                         "hexoctets", values[i], 0,
-                                                         NULL));
+            result = TEST_false(OSSL_PARAM_allocate_from_text(
+                &param, params_from_text, "hexoctets", values[i], 0, NULL));
         if (!result) {
-            TEST_error("unexpected OSSL_PARAM_allocate_from_text() %s for 'octets' \"%s\"",
-                       (expected ? "failure" : "success"), values[i]);
+            TEST_error(
+                "unexpected OSSL_PARAM_allocate_from_text() %s for 'octets' \"%s\"",
+                (expected ? "failure" : "success"), values[i]);
             errcnt++;
         }
         OPENSSL_free(param.data);
@@ -706,7 +697,8 @@ static int test_more_allocate_from_text(void)
 int setup_tests(void)
 {
     ADD_ALL_TESTS(test_case, OSSL_NELEM(test_cases));
-    ADD_ALL_TESTS(test_allocate_from_text, OSSL_NELEM(int_from_text_test_cases));
+    ADD_ALL_TESTS(test_allocate_from_text,
+                  OSSL_NELEM(int_from_text_test_cases));
     ADD_TEST(test_more_allocate_from_text);
     return 1;
 }

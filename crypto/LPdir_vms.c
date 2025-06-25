@@ -109,7 +109,7 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
             return 0;
         }
 
-        filespeclen += 4;       /* "*.*;" */
+        filespeclen += 4; /* "*.*;" */
 
         if (filespeclen > NAMX_MAXRSS) {
             errno = ENAMETOOLONG;
@@ -132,9 +132,9 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
         /* Copy the file name to storage with a 32-bit pointer. */
         ctx_filespec_32p = ctx_filespec_32;
         strcpy(ctx_filespec_32p, (*ctx)->filespec);
-#else                           /* __INITIAL_POINTER_SIZE == 64 */
+#else /* __INITIAL_POINTER_SIZE == 64 */
 # define CTX_FILESPEC (*ctx)->filespec
-#endif                          /* __INITIAL_POINTER_SIZE == 64 [else] */
+#endif /* __INITIAL_POINTER_SIZE == 64 [else] */
 
         (*ctx)->filespec_dsc.dsc$w_length = filespeclen;
         (*ctx)->filespec_dsc.dsc$b_dtype = DSC$K_DTYPE_T;

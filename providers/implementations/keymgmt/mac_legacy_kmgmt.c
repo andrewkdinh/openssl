@@ -163,18 +163,21 @@ static int mac_match(const void *keydata1, const void *keydata2, int selection)
 
     if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0) {
         if ((key1->priv_key == NULL && key2->priv_key != NULL)
-                || (key1->priv_key != NULL && key2->priv_key == NULL)
-                || key1->priv_key_len != key2->priv_key_len
-                || (key1->cipher.cipher == NULL && key2->cipher.cipher != NULL)
-                || (key1->cipher.cipher != NULL && key2->cipher.cipher == NULL))
+            || (key1->priv_key != NULL && key2->priv_key == NULL)
+            || key1->priv_key_len != key2->priv_key_len
+            || (key1->cipher.cipher == NULL && key2->cipher.cipher != NULL)
+            || (key1->cipher.cipher != NULL && key2->cipher.cipher == NULL))
             ok = 0;
         else
-            ok = ok && (key1->priv_key == NULL /* implies key2->privkey == NULL */
-                        || CRYPTO_memcmp(key1->priv_key, key2->priv_key,
-                                         key1->priv_key_len) == 0);
+            ok = ok
+                && (key1->priv_key == NULL /* implies key2->privkey == NULL */
+                    || CRYPTO_memcmp(key1->priv_key, key2->priv_key,
+                                     key1->priv_key_len)
+                        == 0);
         if (key1->cipher.cipher != NULL)
-            ok = ok && EVP_CIPHER_is_a(key1->cipher.cipher,
-                                       EVP_CIPHER_get0_name(key2->cipher.cipher));
+            ok = ok
+                && EVP_CIPHER_is_a(key1->cipher.cipher,
+                                   EVP_CIPHER_get0_name(key2->cipher.cipher));
     }
     return ok;
 }
@@ -191,7 +194,8 @@ static int mac_key_fromdata(MAC_KEY *key, const OSSL_PARAM params[])
         }
         OPENSSL_secure_clear_free(key->priv_key, key->priv_key_len);
         /* allocate at least one byte to distinguish empty key from no key set */
-        key->priv_key = OPENSSL_secure_malloc(p->data_size > 0 ? p->data_size : 1);
+        key->priv_key =
+            OPENSSL_secure_malloc(p->data_size > 0 ? p->data_size : 1);
         if (key->priv_key == NULL)
             return 0;
         memcpy(key->priv_key, p->data, p->data_size);
@@ -210,8 +214,9 @@ static int mac_key_fromdata(MAC_KEY *key, const OSSL_PARAM params[])
             return 0;
     }
 
-    if (key->cmac && !ossl_prov_cipher_load_from_params(&key->cipher, params,
-                                                        key->libctx)) {
+    if (key->cmac
+        && !ossl_prov_cipher_load_from_params(&key->cipher, params,
+                                              key->libctx)) {
         ERR_raise(ERR_LIB_PROV, ERR_R_PASSED_INVALID_ARGUMENT);
         return 0;
     }
@@ -248,9 +253,9 @@ static int key_to_params(MAC_KEY *key, OSSL_PARAM_BLD *tmpl,
         return 0;
 
     if (key->cipher.cipher != NULL
-        && !ossl_param_build_set_utf8_string(tmpl, params,
-                                             OSSL_PKEY_PARAM_CIPHER,
-                                             EVP_CIPHER_get0_name(key->cipher.cipher)))
+        && !ossl_param_build_set_utf8_string(
+            tmpl, params, OSSL_PKEY_PARAM_CIPHER,
+            EVP_CIPHER_get0_name(key->cipher.cipher)))
         return 0;
 
 #if !defined(OPENSSL_NO_ENGINE) && !defined(FIPS_MODULE)
@@ -283,7 +288,7 @@ static int mac_export(void *keydata, int selection, OSSL_CALLBACK *param_cb,
         return 0;
 
     if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0
-         && !key_to_params(key, tmpl, NULL))
+        && !key_to_params(key, tmpl, NULL))
         goto err;
 
     params = OSSL_PARAM_BLD_to_param(tmpl);
@@ -300,8 +305,7 @@ err:
 static const OSSL_PARAM mac_key_types[] = {
     OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_PRIV_KEY, NULL, 0),
     OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_PROPERTIES, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 static const OSSL_PARAM *mac_imexport_types(int selection)
 {
     if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0)
@@ -314,8 +318,7 @@ static const OSSL_PARAM cmac_key_types[] = {
     OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_CIPHER, NULL, 0),
     OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_ENGINE, NULL, 0),
     OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_PROPERTIES, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_END};
 static const OSSL_PARAM *cmac_imexport_types(int selection)
 {
     if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0)
@@ -332,8 +335,7 @@ static const OSSL_PARAM *mac_gettable_params(void *provctx)
 {
     static const OSSL_PARAM gettable_params[] = {
         OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_PRIV_KEY, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
     return gettable_params;
 }
 
@@ -343,8 +345,7 @@ static const OSSL_PARAM *cmac_gettable_params(void *provctx)
         OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_PRIV_KEY, NULL, 0),
         OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_CIPHER, NULL, 0),
         OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_ENGINE, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
     return gettable_params;
 }
 
@@ -367,8 +368,7 @@ static const OSSL_PARAM *mac_settable_params(void *provctx)
 {
     static const OSSL_PARAM settable_params[] = {
         OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_PRIV_KEY, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
     return settable_params;
 }
 
@@ -456,8 +456,7 @@ static const OSSL_PARAM *mac_gen_settable_params(ossl_unused void *genctx,
 {
     static OSSL_PARAM settable[] = {
         OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_PRIV_KEY, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
     return settable;
 }
 
@@ -467,8 +466,7 @@ static const OSSL_PARAM *cmac_gen_settable_params(ossl_unused void *genctx,
     static OSSL_PARAM settable[] = {
         OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_PRIV_KEY, NULL, 0),
         OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_CIPHER, NULL, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_END};
     return settable;
 }
 
@@ -528,46 +526,43 @@ static void mac_gen_cleanup(void *genctx)
 }
 
 const OSSL_DISPATCH ossl_mac_legacy_keymgmt_functions[] = {
-    { OSSL_FUNC_KEYMGMT_NEW, (void (*)(void))mac_new },
-    { OSSL_FUNC_KEYMGMT_FREE, (void (*)(void))mac_free },
-    { OSSL_FUNC_KEYMGMT_GET_PARAMS, (void (*) (void))mac_get_params },
-    { OSSL_FUNC_KEYMGMT_GETTABLE_PARAMS, (void (*) (void))mac_gettable_params },
-    { OSSL_FUNC_KEYMGMT_SET_PARAMS, (void (*) (void))mac_set_params },
-    { OSSL_FUNC_KEYMGMT_SETTABLE_PARAMS, (void (*) (void))mac_settable_params },
-    { OSSL_FUNC_KEYMGMT_HAS, (void (*)(void))mac_has },
-    { OSSL_FUNC_KEYMGMT_MATCH, (void (*)(void))mac_match },
-    { OSSL_FUNC_KEYMGMT_IMPORT, (void (*)(void))mac_import },
-    { OSSL_FUNC_KEYMGMT_IMPORT_TYPES, (void (*)(void))mac_imexport_types },
-    { OSSL_FUNC_KEYMGMT_EXPORT, (void (*)(void))mac_export },
-    { OSSL_FUNC_KEYMGMT_EXPORT_TYPES, (void (*)(void))mac_imexport_types },
-    { OSSL_FUNC_KEYMGMT_GEN_INIT, (void (*)(void))mac_gen_init },
-    { OSSL_FUNC_KEYMGMT_GEN_SET_PARAMS, (void (*)(void))mac_gen_set_params },
-    { OSSL_FUNC_KEYMGMT_GEN_SETTABLE_PARAMS,
-        (void (*)(void))mac_gen_settable_params },
-    { OSSL_FUNC_KEYMGMT_GEN, (void (*)(void))mac_gen },
-    { OSSL_FUNC_KEYMGMT_GEN_CLEANUP, (void (*)(void))mac_gen_cleanup },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_KEYMGMT_NEW, (void (*)(void))mac_new},
+    {OSSL_FUNC_KEYMGMT_FREE, (void (*)(void))mac_free},
+    {OSSL_FUNC_KEYMGMT_GET_PARAMS, (void (*)(void))mac_get_params},
+    {OSSL_FUNC_KEYMGMT_GETTABLE_PARAMS, (void (*)(void))mac_gettable_params},
+    {OSSL_FUNC_KEYMGMT_SET_PARAMS, (void (*)(void))mac_set_params},
+    {OSSL_FUNC_KEYMGMT_SETTABLE_PARAMS, (void (*)(void))mac_settable_params},
+    {OSSL_FUNC_KEYMGMT_HAS, (void (*)(void))mac_has},
+    {OSSL_FUNC_KEYMGMT_MATCH, (void (*)(void))mac_match},
+    {OSSL_FUNC_KEYMGMT_IMPORT, (void (*)(void))mac_import},
+    {OSSL_FUNC_KEYMGMT_IMPORT_TYPES, (void (*)(void))mac_imexport_types},
+    {OSSL_FUNC_KEYMGMT_EXPORT, (void (*)(void))mac_export},
+    {OSSL_FUNC_KEYMGMT_EXPORT_TYPES, (void (*)(void))mac_imexport_types},
+    {OSSL_FUNC_KEYMGMT_GEN_INIT, (void (*)(void))mac_gen_init},
+    {OSSL_FUNC_KEYMGMT_GEN_SET_PARAMS, (void (*)(void))mac_gen_set_params},
+    {OSSL_FUNC_KEYMGMT_GEN_SETTABLE_PARAMS,
+     (void (*)(void))mac_gen_settable_params},
+    {OSSL_FUNC_KEYMGMT_GEN, (void (*)(void))mac_gen},
+    {OSSL_FUNC_KEYMGMT_GEN_CLEANUP, (void (*)(void))mac_gen_cleanup},
+    OSSL_DISPATCH_END};
 
 const OSSL_DISPATCH ossl_cmac_legacy_keymgmt_functions[] = {
-    { OSSL_FUNC_KEYMGMT_NEW, (void (*)(void))mac_new_cmac },
-    { OSSL_FUNC_KEYMGMT_FREE, (void (*)(void))mac_free },
-    { OSSL_FUNC_KEYMGMT_GET_PARAMS, (void (*) (void))mac_get_params },
-    { OSSL_FUNC_KEYMGMT_GETTABLE_PARAMS, (void (*) (void))cmac_gettable_params },
-    { OSSL_FUNC_KEYMGMT_SET_PARAMS, (void (*) (void))mac_set_params },
-    { OSSL_FUNC_KEYMGMT_SETTABLE_PARAMS, (void (*) (void))mac_settable_params },
-    { OSSL_FUNC_KEYMGMT_HAS, (void (*)(void))mac_has },
-    { OSSL_FUNC_KEYMGMT_MATCH, (void (*)(void))mac_match },
-    { OSSL_FUNC_KEYMGMT_IMPORT, (void (*)(void))mac_import },
-    { OSSL_FUNC_KEYMGMT_IMPORT_TYPES, (void (*)(void))cmac_imexport_types },
-    { OSSL_FUNC_KEYMGMT_EXPORT, (void (*)(void))mac_export },
-    { OSSL_FUNC_KEYMGMT_EXPORT_TYPES, (void (*)(void))cmac_imexport_types },
-    { OSSL_FUNC_KEYMGMT_GEN_INIT, (void (*)(void))cmac_gen_init },
-    { OSSL_FUNC_KEYMGMT_GEN_SET_PARAMS, (void (*)(void))cmac_gen_set_params },
-    { OSSL_FUNC_KEYMGMT_GEN_SETTABLE_PARAMS,
-        (void (*)(void))cmac_gen_settable_params },
-    { OSSL_FUNC_KEYMGMT_GEN, (void (*)(void))mac_gen },
-    { OSSL_FUNC_KEYMGMT_GEN_CLEANUP, (void (*)(void))mac_gen_cleanup },
-    OSSL_DISPATCH_END
-};
-
+    {OSSL_FUNC_KEYMGMT_NEW, (void (*)(void))mac_new_cmac},
+    {OSSL_FUNC_KEYMGMT_FREE, (void (*)(void))mac_free},
+    {OSSL_FUNC_KEYMGMT_GET_PARAMS, (void (*)(void))mac_get_params},
+    {OSSL_FUNC_KEYMGMT_GETTABLE_PARAMS, (void (*)(void))cmac_gettable_params},
+    {OSSL_FUNC_KEYMGMT_SET_PARAMS, (void (*)(void))mac_set_params},
+    {OSSL_FUNC_KEYMGMT_SETTABLE_PARAMS, (void (*)(void))mac_settable_params},
+    {OSSL_FUNC_KEYMGMT_HAS, (void (*)(void))mac_has},
+    {OSSL_FUNC_KEYMGMT_MATCH, (void (*)(void))mac_match},
+    {OSSL_FUNC_KEYMGMT_IMPORT, (void (*)(void))mac_import},
+    {OSSL_FUNC_KEYMGMT_IMPORT_TYPES, (void (*)(void))cmac_imexport_types},
+    {OSSL_FUNC_KEYMGMT_EXPORT, (void (*)(void))mac_export},
+    {OSSL_FUNC_KEYMGMT_EXPORT_TYPES, (void (*)(void))cmac_imexport_types},
+    {OSSL_FUNC_KEYMGMT_GEN_INIT, (void (*)(void))cmac_gen_init},
+    {OSSL_FUNC_KEYMGMT_GEN_SET_PARAMS, (void (*)(void))cmac_gen_set_params},
+    {OSSL_FUNC_KEYMGMT_GEN_SETTABLE_PARAMS,
+     (void (*)(void))cmac_gen_settable_params},
+    {OSSL_FUNC_KEYMGMT_GEN, (void (*)(void))mac_gen},
+    {OSSL_FUNC_KEYMGMT_GEN_CLEANUP, (void (*)(void))mac_gen_cleanup},
+    OSSL_DISPATCH_END};

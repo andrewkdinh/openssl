@@ -69,8 +69,7 @@ static const ERR_STRING_DATA CRMF_str_reasons[] = {
      "unsupported method for creating popo"},
     {ERR_PACK(ERR_LIB_CRMF, 0, CRMF_R_UNSUPPORTED_POPO_METHOD),
      "unsupported popo method"},
-    {0, NULL}
-};
+    {0, NULL}};
 
 # endif
 

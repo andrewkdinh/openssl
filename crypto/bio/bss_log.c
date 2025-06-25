@@ -43,7 +43,8 @@ void *_malloc32(__size_t);
                                  * _ANSI_C_SOURCE */
 #elif defined(__DJGPP__) && defined(OPENSSL_NO_SOCK)
 # define NO_SYSLOG
-#elif (!defined(MSDOS) || defined(WATT32)) && !defined(OPENSSL_SYS_VXWORKS) && !defined(NO_SYSLOG)
+#elif (!defined(MSDOS) || defined(WATT32)) && !defined(OPENSSL_SYS_VXWORKS) \
+    && !defined(NO_SYSLOG)
 # include <syslog.h>
 #endif
 
@@ -87,18 +88,11 @@ static void xsyslog(BIO *bp, int priority, const char *string);
 static void xcloselog(BIO *bp);
 
 static const BIO_METHOD methods_slg = {
-    BIO_TYPE_MEM,
-    "syslog",
-    bwrite_conv,
-    slg_write,
-    NULL,                      /* slg_write_old,    */
+    BIO_TYPE_MEM, "syslog", bwrite_conv,
+    slg_write,    NULL,                      /* slg_write_old,    */
     NULL,                      /* slg_read,         */
-    slg_puts,
-    NULL,
-    slg_ctrl,
-    slg_new,
-    slg_free,
-    NULL,                      /* slg_callback_ctrl */
+    slg_puts,     NULL,     slg_ctrl,
+    slg_new,      slg_free, NULL,                      /* slg_callback_ctrl */
 };
 
 const BIO_METHOD *BIO_s_log(void)
@@ -134,66 +128,26 @@ static int slg_write(BIO *b, const char *in, int inl)
         char str[10];
         int log_level;
     } mapping[] = {
-        {
-            6, "PANIC ", LOG_EMERG
-        },
-        {
-            6, "EMERG ", LOG_EMERG
-        },
-        {
-            4, "EMR ", LOG_EMERG
-        },
-        {
-            6, "ALERT ", LOG_ALERT
-        },
-        {
-            4, "ALR ", LOG_ALERT
-        },
-        {
-            5, "CRIT ", LOG_CRIT
-        },
-        {
-            4, "CRI ", LOG_CRIT
-        },
-        {
-            6, "ERROR ", LOG_ERR
-        },
-        {
-            4, "ERR ", LOG_ERR
-        },
-        {
-            8, "WARNING ", LOG_WARNING
-        },
-        {
-            5, "WARN ", LOG_WARNING
-        },
-        {
-            4, "WAR ", LOG_WARNING
-        },
-        {
-            7, "NOTICE ", LOG_NOTICE
-        },
-        {
-            5, "NOTE ", LOG_NOTICE
-        },
-        {
-            4, "NOT ", LOG_NOTICE
-        },
-        {
-            5, "INFO ", LOG_INFO
-        },
-        {
-            4, "INF ", LOG_INFO
-        },
-        {
-            6, "DEBUG ", LOG_DEBUG
-        },
-        {
-            4, "DBG ", LOG_DEBUG
-        },
-        {
-            0, "", LOG_ERR
-        }
+        {6, "PANIC ", LOG_EMERG},
+        {6, "EMERG ", LOG_EMERG},
+        {4, "EMR ", LOG_EMERG},
+        {6, "ALERT ", LOG_ALERT},
+        {4, "ALR ", LOG_ALERT},
+        {5, "CRIT ", LOG_CRIT},
+        {4, "CRI ", LOG_CRIT},
+        {6, "ERROR ", LOG_ERR},
+        {4, "ERR ", LOG_ERR},
+        {8, "WARNING ", LOG_WARNING},
+        {5, "WARN ", LOG_WARNING},
+        {4, "WAR ", LOG_WARNING},
+        {7, "NOTICE ", LOG_NOTICE},
+        {5, "NOTE ", LOG_NOTICE},
+        {4, "NOT ", LOG_NOTICE},
+        {5, "INFO ", LOG_INFO},
+        {4, "INF ", LOG_INFO},
+        {6, "DEBUG ", LOG_DEBUG},
+        {4, "DBG ", LOG_DEBUG},
+        {0, "", LOG_ERR}
         /* The default */
     };
 
@@ -205,8 +159,7 @@ static int slg_write(BIO *b, const char *in, int inl)
     buf[inl] = '\0';
 
     i = 0;
-    while (strncmp(buf, mapping[i].str, mapping[i].strl) != 0)
-        i++;
+    while (strncmp(buf, mapping[i].str, mapping[i].strl) != 0) i++;
     priority = mapping[i].log_level;
     pp = buf + mapping[i].strl;
 
@@ -291,7 +244,7 @@ static void xsyslog(BIO *bp, int priority, const char *string)
 static void xcloselog(BIO *bp)
 {
     if (bp->ptr)
-        DeregisterEventSource((HANDLE) (bp->ptr));
+        DeregisterEventSource((HANDLE)(bp->ptr));
     bp->ptr = NULL;
 }
 
@@ -374,7 +327,7 @@ static void xsyslog(BIO *bp, int priority, const char *string)
 
     opc_dsc.dsc$b_dtype = DSC$K_DTYPE_T;
     opc_dsc.dsc$b_class = DSC$K_CLASS_S;
-    opc_dsc.dsc$a_pointer = (OPCDEF_TYPE) opcdef_p;
+    opc_dsc.dsc$a_pointer = (OPCDEF_TYPE)opcdef_p;
     opc_dsc.dsc$w_length = len + 8;
 
     sys$sndopr(opc_dsc, 0);

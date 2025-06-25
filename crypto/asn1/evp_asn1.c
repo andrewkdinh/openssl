@@ -31,7 +31,8 @@ int ASN1_TYPE_set_octetstring(ASN1_TYPE *a, unsigned char *data, int len)
  * if passing NULL in data, nothing is copied but the necessary length
  * for it is returned.
  */
-int ASN1_TYPE_get_octetstring(const ASN1_TYPE *a, unsigned char *data, int max_len)
+int ASN1_TYPE_get_octetstring(const ASN1_TYPE *a, unsigned char *data,
+                              int max_len)
 {
     int ret, num;
     const unsigned char *p;
@@ -84,104 +85,108 @@ typedef struct {
     ASN1_OCTET_STRING *oct;
 } asn1_int_oct;
 
-ASN1_SEQUENCE(asn1_int_oct) = {
-        ASN1_EMBED(asn1_int_oct, num, INT32),
-        ASN1_SIMPLE(asn1_int_oct, oct, ASN1_OCTET_STRING)
-} static_ASN1_SEQUENCE_END(asn1_int_oct)
+ASN1_SEQUENCE(asn1_int_oct)
+    = {ASN1_EMBED(asn1_int_oct, num, INT32),
+       ASN1_SIMPLE(asn1_int_oct, oct,
+                   ASN1_OCTET_STRING)} static_ASN1_SEQUENCE_END(asn1_int_oct)
 
-DECLARE_ASN1_ITEM(asn1_int_oct)
+        DECLARE_ASN1_ITEM(asn1_int_oct)
 
-int ASN1_TYPE_set_int_octetstring(ASN1_TYPE *a, long num, unsigned char *data,
-                                  int len)
-{
-    asn1_int_oct atmp;
-    ASN1_OCTET_STRING oct;
+            int
+            ASN1_TYPE_set_int_octetstring(ASN1_TYPE * a, long num,
+                                          unsigned char *data, int len)
+    {
+        asn1_int_oct atmp;
+        ASN1_OCTET_STRING oct;
 
-    atmp.num = num;
-    atmp.oct = &oct;
-    asn1_type_init_oct(&oct, data, len);
+        atmp.num = num;
+        atmp.oct = &oct;
+        asn1_type_init_oct(&oct, data, len);
 
-    if (ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(asn1_int_oct), &atmp, &a))
-        return 1;
-    return 0;
-}
-
-int ASN1_TYPE_get_int_octetstring(const ASN1_TYPE *a, long *num,
-                                  unsigned char *data, int max_len)
-{
-    asn1_int_oct *atmp = NULL;
-    int ret = -1;
-
-    if ((a->type != V_ASN1_SEQUENCE) || (a->value.sequence == NULL)) {
-        goto err;
+        if (ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(asn1_int_oct), &atmp, &a))
+            return 1;
+        return 0;
     }
 
-    atmp = ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(asn1_int_oct), a);
+    int ASN1_TYPE_get_int_octetstring(const ASN1_TYPE *a, long *num,
+                                      unsigned char *data, int max_len)
+    {
+        asn1_int_oct *atmp = NULL;
+        int ret = -1;
 
-    if (atmp == NULL)
-        goto err;
+        if ((a->type != V_ASN1_SEQUENCE) || (a->value.sequence == NULL)) {
+            goto err;
+        }
 
-    ret = asn1_type_get_int_oct(atmp->oct, atmp->num, num, data, max_len);
+        atmp = ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(asn1_int_oct), a);
 
-    if (ret == -1) {
- err:
-        ERR_raise(ERR_LIB_ASN1, ASN1_R_DATA_IS_WRONG);
+        if (atmp == NULL)
+            goto err;
+
+        ret = asn1_type_get_int_oct(atmp->oct, atmp->num, num, data, max_len);
+
+        if (ret == -1) {
+err:
+            ERR_raise(ERR_LIB_ASN1, ASN1_R_DATA_IS_WRONG);
+        }
+        M_ASN1_free_of(atmp, asn1_int_oct);
+        return ret;
     }
-    M_ASN1_free_of(atmp, asn1_int_oct);
-    return ret;
-}
 
-typedef struct {
-    ASN1_OCTET_STRING *oct;
-    int32_t num;
-} asn1_oct_int;
+    typedef struct {
+        ASN1_OCTET_STRING *oct;
+        int32_t num;
+    } asn1_oct_int;
 
 /*
  * Defined in RFC 5084 -
  * Section 2. "Content-Authenticated Encryption Algorithms"
  */
-ASN1_SEQUENCE(asn1_oct_int) = {
-        ASN1_SIMPLE(asn1_oct_int, oct, ASN1_OCTET_STRING),
-        ASN1_EMBED(asn1_oct_int, num, INT32)
-} static_ASN1_SEQUENCE_END(asn1_oct_int)
+    ASN1_SEQUENCE(asn1_oct_int)
+        = {ASN1_SIMPLE(asn1_oct_int, oct, ASN1_OCTET_STRING),
+           ASN1_EMBED(asn1_oct_int, num,
+                      INT32)} static_ASN1_SEQUENCE_END(asn1_oct_int)
 
-DECLARE_ASN1_ITEM(asn1_oct_int)
+            DECLARE_ASN1_ITEM(asn1_oct_int)
 
-int ossl_asn1_type_set_octetstring_int(ASN1_TYPE *a, long num,
-                                       unsigned char *data, int len)
-{
-    asn1_oct_int atmp;
-    ASN1_OCTET_STRING oct;
+                int
+                ossl_asn1_type_set_octetstring_int(ASN1_TYPE * a, long num,
+                                                   unsigned char *data, int len)
+        {
+            asn1_oct_int atmp;
+            ASN1_OCTET_STRING oct;
 
-    atmp.num = num;
-    atmp.oct = &oct;
-    asn1_type_init_oct(&oct, data, len);
+            atmp.num = num;
+            atmp.oct = &oct;
+            asn1_type_init_oct(&oct, data, len);
 
-    if (ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(asn1_oct_int), &atmp, &a))
-        return 1;
-    return 0;
-}
+            if (ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(asn1_oct_int), &atmp,
+                                        &a))
+                return 1;
+            return 0;
+        }
 
-int ossl_asn1_type_get_octetstring_int(const ASN1_TYPE *a, long *num,
-                                       unsigned char *data, int max_len)
-{
-    asn1_oct_int *atmp = NULL;
-    int ret = -1;
+        int ossl_asn1_type_get_octetstring_int(const ASN1_TYPE *a, long *num,
+                                               unsigned char *data, int max_len)
+        {
+            asn1_oct_int *atmp = NULL;
+            int ret = -1;
 
-    if ((a->type != V_ASN1_SEQUENCE) || (a->value.sequence == NULL))
-        goto err;
+            if ((a->type != V_ASN1_SEQUENCE) || (a->value.sequence == NULL))
+                goto err;
 
-    atmp = ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(asn1_oct_int), a);
+            atmp = ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(asn1_oct_int), a);
 
-    if (atmp == NULL)
-        goto err;
+            if (atmp == NULL)
+                goto err;
 
-    ret = asn1_type_get_int_oct(atmp->oct, atmp->num, num, data, max_len);
+            ret =
+                asn1_type_get_int_oct(atmp->oct, atmp->num, num, data, max_len);
 
-    if (ret == -1) {
- err:
-        ERR_raise(ERR_LIB_ASN1, ASN1_R_DATA_IS_WRONG);
-    }
-    M_ASN1_free_of(atmp, asn1_oct_int);
-    return ret;
-}
+            if (ret == -1) {
+err:
+                ERR_raise(ERR_LIB_ASN1, ASN1_R_DATA_IS_WRONG);
+            }
+            M_ASN1_free_of(atmp, asn1_oct_int);
+            return ret;
+        }

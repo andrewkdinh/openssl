@@ -8,21 +8,19 @@
  */
 
 #ifndef OSSL_RECORD_TEST_UTIL_H
-# define OSSL_RECORD_TEST_UTIL_H
+#define OSSL_RECORD_TEST_UTIL_H
 
 static int cmp_pkt_hdr(const QUIC_PKT_HDR *a, const QUIC_PKT_HDR *b,
-                       const unsigned char *b_data, size_t b_len,
-                       int cmp_data)
+                       const unsigned char *b_data, size_t b_len, int cmp_data)
 {
     int ok = 1;
 
     if (b_data == NULL) {
         b_data = b->data;
-        b_len  = b->len;
+        b_len = b->len;
     }
 
-    if (!TEST_int_eq(a->type, b->type)
-        || !TEST_int_eq(a->spin_bit, b->spin_bit)
+    if (!TEST_int_eq(a->type, b->type) || !TEST_int_eq(a->spin_bit, b->spin_bit)
         || !TEST_int_eq(a->key_phase, b->key_phase)
         || !TEST_int_eq(a->pn_len, b->pn_len)
         || !TEST_int_eq(a->partial, b->partial)

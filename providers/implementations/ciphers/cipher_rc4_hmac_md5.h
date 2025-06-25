@@ -32,5 +32,5 @@ typedef struct prov_cipher_hw_rc4_hmac_md5_st {
 
 const PROV_CIPHER_HW *ossl_prov_cipher_hw_rc4_hmac_md5(size_t keybits);
 
-void rc4_md5_enc(RC4_KEY *key, const void *in0, void *out,
-                 MD5_CTX *ctx, const void *inp, size_t blocks);
+void rc4_md5_enc(RC4_KEY *key, const void *in0, void *out, MD5_CTX *ctx,
+                 const void *inp, size_t blocks);

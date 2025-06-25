@@ -47,16 +47,16 @@ struct quic_tls_st {
     const char *error_msg;
 
     /* Whether our SSL object for TLS has been configured for use in QUIC */
-    unsigned int configured : 1;
+    unsigned int configured:1;
 
     /* Set if we have hit any error state */
-    unsigned int inerror : 1;
+    unsigned int inerror:1;
 
     /* Set if the handshake has completed */
-    unsigned int complete : 1;
+    unsigned int complete:1;
 
     /* Set if we have consumed the local transport parameters yet. */
-    unsigned int local_transport_params_consumed : 1;
+    unsigned int local_transport_params_consumed:1;
 };
 
 struct ossl_record_layer_st {
@@ -93,20 +93,16 @@ struct ossl_record_layer_st {
 static int quic_set1_bio(OSSL_RECORD_LAYER *rl, BIO *bio);
 static int quic_free(OSSL_RECORD_LAYER *r);
 
-static int
-quic_new_record_layer(OSSL_LIB_CTX *libctx, const char *propq, int vers,
-                      int role, int direction, int level, uint16_t epoch,
-                      unsigned char *secret, size_t secretlen,
-                      unsigned char *key, size_t keylen, unsigned char *iv,
-                      size_t ivlen, unsigned char *mackey, size_t mackeylen,
-                      const EVP_CIPHER *ciph, size_t taglen,
-                      int mactype,
-                      const EVP_MD *md, COMP_METHOD *comp,
-                      const EVP_MD *kdfdigest, BIO *prev, BIO *transport,
-                      BIO *next, BIO_ADDR *local, BIO_ADDR *peer,
-                      const OSSL_PARAM *settings, const OSSL_PARAM *options,
-                      const OSSL_DISPATCH *fns, void *cbarg, void *rlarg,
-                      OSSL_RECORD_LAYER **retrl)
+static int quic_new_record_layer(
+    OSSL_LIB_CTX *libctx, const char *propq, int vers, int role, int direction,
+    int level, uint16_t epoch, unsigned char *secret, size_t secretlen,
+    unsigned char *key, size_t keylen, unsigned char *iv, size_t ivlen,
+    unsigned char *mackey, size_t mackeylen, const EVP_CIPHER *ciph,
+    size_t taglen, int mactype, const EVP_MD *md, COMP_METHOD *comp,
+    const EVP_MD *kdfdigest, BIO *prev, BIO *transport, BIO *next,
+    BIO_ADDR *local, BIO_ADDR *peer, const OSSL_PARAM *settings,
+    const OSSL_PARAM *options, const OSSL_DISPATCH *fns, void *cbarg,
+    void *rlarg, OSSL_RECORD_LAYER **retrl)
 {
     OSSL_RECORD_LAYER *rl = OPENSSL_zalloc(sizeof(*rl));
     int qdir;
@@ -163,7 +159,8 @@ quic_new_record_layer(OSSL_LIB_CTX *libctx, const char *propq, int vers,
         } else if (EVP_CIPHER_is_a(ciph, "CHACHA20-POLY1305")) {
             suite_id = QRL_SUITE_CHACHA20POLY1305;
         } else {
-            QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR, SSL_R_UNKNOWN_CIPHER_TYPE);
+            QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR,
+                           SSL_R_UNKNOWN_CIPHER_TYPE);
             goto err;
         }
 
@@ -190,7 +187,7 @@ quic_new_record_layer(OSSL_LIB_CTX *libctx, const char *propq, int vers,
     }
 
     return 1;
- err:
+err:
     *retrl = NULL;
     quic_free(rl);
     return 0;
@@ -234,15 +231,13 @@ static int quic_processed_read_pending(OSSL_RECORD_LAYER *rl)
 }
 
 static size_t quic_get_max_records(OSSL_RECORD_LAYER *rl, uint8_t type,
-                                   size_t len,
-                                   size_t maxfrag, size_t *preffrag)
+                                   size_t len, size_t maxfrag, size_t *preffrag)
 {
     return 1;
 }
 
 static int quic_write_records(OSSL_RECORD_LAYER *rl,
-                              OSSL_RECORD_TEMPLATE *template,
-                              size_t numtempl)
+                              OSSL_RECORD_TEMPLATE *template, size_t numtempl)
 {
     size_t consumed;
     unsigned char alert;
@@ -263,8 +258,8 @@ static int quic_write_records(OSSL_RECORD_LAYER *rl,
          * and manufacture a dummy record header
          */
         dummyrec[0] = (rl->level == OSSL_RECORD_PROTECTION_LEVEL_NONE)
-                        ? template->type
-                        : SSL3_RT_APPLICATION_DATA;
+            ? template->type
+            : SSL3_RT_APPLICATION_DATA;
         dummyrec[1] = (unsigned char)((template->version >> 8) & 0xff);
         dummyrec[2] = (unsigned char)(template->version & 0xff);
         /*
@@ -277,7 +272,7 @@ static int quic_write_records(OSSL_RECORD_LAYER *rl,
         dummyrec[4] = (unsigned char)(template->buflen & 0xff);
 
         rl->msg_callback(1, TLS1_3_VERSION, SSL3_RT_HEADER, dummyrec,
-                            SSL3_RT_HEADER_LENGTH, rl->cbarg);
+                         SSL3_RT_HEADER_LENGTH, rl->cbarg);
 
         if (rl->level != OSSL_RECORD_PROTECTION_LEVEL_NONE) {
             rl->msg_callback(1, TLS1_3_VERSION, SSL3_RT_INNER_CONTENT_TYPE,
@@ -313,10 +308,9 @@ static int quic_write_records(OSSL_RECORD_LAYER *rl,
          * We expect this to only fail on some fatal error (e.g. malloc
          * failure)
          */
-        if (!rl->qtls->args.crypto_send_cb(template->buf + rl->written,
-                                           template->buflen - rl->written,
-                                           &consumed,
-                                           rl->qtls->args.crypto_send_cb_arg)) {
+        if (!rl->qtls->args.crypto_send_cb(
+                template->buf + rl->written, template->buflen - rl->written,
+                &consumed, rl->qtls->args.crypto_send_cb_arg)) {
             QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
             return OSSL_RECORD_RETURN_FATAL;
         }
@@ -360,17 +354,17 @@ static int quic_retry_write_records(OSSL_RECORD_LAYER *rl)
 }
 
 static int quic_read_record(OSSL_RECORD_LAYER *rl, void **rechandle,
-                            int *rversion, uint8_t *type, const unsigned char **data,
-                            size_t *datalen, uint16_t *epoch,
-                            unsigned char *seq_num)
+                            int *rversion, uint8_t *type,
+                            const unsigned char **data, size_t *datalen,
+                            uint16_t *epoch, unsigned char *seq_num)
 {
     if (rl->recread != 0 || rl->recunreleased != 0)
         return OSSL_RECORD_RETURN_FATAL;
 
     BIO_clear_retry_flags(rl->dummybio);
 
-    if (!rl->qtls->args.crypto_recv_rcd_cb(data, datalen,
-                                           rl->qtls->args.crypto_recv_rcd_cb_arg)) {
+    if (!rl->qtls->args.crypto_recv_rcd_cb(
+            data, datalen, rl->qtls->args.crypto_recv_rcd_cb_arg)) {
         QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
         return OSSL_RECORD_RETURN_FATAL;
     }
@@ -394,8 +388,8 @@ static int quic_read_record(OSSL_RECORD_LAYER *rl, void **rechandle,
          * and manufacture a dummy record header
          */
         dummyrec[0] = (rl->level == OSSL_RECORD_PROTECTION_LEVEL_NONE)
-                      ? SSL3_RT_HANDSHAKE
-                      : SSL3_RT_APPLICATION_DATA;
+            ? SSL3_RT_HANDSHAKE
+            : SSL3_RT_APPLICATION_DATA;
         dummyrec[1] = (unsigned char)((TLS1_2_VERSION >> 8) & 0xff);
         dummyrec[2] = (unsigned char)(TLS1_2_VERSION & 0xff);
         /*
@@ -418,16 +412,16 @@ static int quic_release_record(OSSL_RECORD_LAYER *rl, void *rechandle,
                                size_t length)
 {
     if (!ossl_assert(rl->recread > 0)
-            || !ossl_assert(rl->recunreleased <= rl->recread)
-            || !ossl_assert(rl == rechandle)
-            || !ossl_assert(length <= rl->recunreleased)) {
+        || !ossl_assert(rl->recunreleased <= rl->recread)
+        || !ossl_assert(rl == rechandle)
+        || !ossl_assert(length <= rl->recunreleased)) {
         QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
         return OSSL_RECORD_RETURN_FATAL;
     }
 
     if (rl->recunreleased == length) {
-        if (!rl->qtls->args.crypto_release_rcd_cb(rl->recread,
-                                                  rl->qtls->args.crypto_release_rcd_cb_arg)) {
+        if (!rl->qtls->args.crypto_release_rcd_cb(
+                rl->recread, rl->qtls->args.crypto_release_rcd_cb_arg)) {
             QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
             return OSSL_RECORD_RETURN_FATAL;
         }
@@ -469,7 +463,7 @@ static void quic_set_max_pipelines(OSSL_RECORD_LAYER *rl, size_t max_pipelines)
 }
 
 static void quic_get_state(OSSL_RECORD_LAYER *rl, const char **shortstr,
-                    const char **longstr)
+                           const char **longstr)
 {
     /*
      * According to the docs, valid read state strings are: "RH"/"read header",
@@ -548,19 +542,22 @@ static int quic_set1_bio(OSSL_RECORD_LAYER *rl, BIO *bio)
 
 static size_t quic_app_data_pending(OSSL_RECORD_LAYER *rl)
 {
-    QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
+    QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR,
+                   ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
     return (size_t)ossl_assert(0);
 }
 
 static size_t quic_get_max_record_overhead(OSSL_RECORD_LAYER *rl)
 {
-    QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
+    QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR,
+                   ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
     return (size_t)ossl_assert(0);
 }
 
 static int quic_increment_sequence_ctr(OSSL_RECORD_LAYER *rl)
 {
-    QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
+    QUIC_TLS_FATAL(rl, SSL_AD_INTERNAL_ERROR,
+                   ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
     return ossl_assert(0);
 }
 
@@ -591,8 +588,7 @@ static const OSSL_RECORD_METHOD quic_tls_record_method = {
     quic_get_max_record_overhead, /* Never called */
     quic_increment_sequence_ctr, /* Never called */
     quic_alloc_buffers,
-    quic_free_buffers
-};
+    quic_free_buffers};
 
 static int add_transport_params_cb(SSL *s, unsigned int ext_type,
                                    unsigned int context,
@@ -610,30 +606,27 @@ static int add_transport_params_cb(SSL *s, unsigned int ext_type,
 
 static void free_transport_params_cb(SSL *s, unsigned int ext_type,
                                      unsigned int context,
-                                     const unsigned char *out,
-                                     void *add_arg)
+                                     const unsigned char *out, void *add_arg)
 {
 }
 
 static int parse_transport_params_cb(SSL *s, unsigned int ext_type,
                                      unsigned int context,
-                                     const unsigned char *in,
-                                     size_t inlen, X509 *x,
-                                     size_t chainidx,
-                                     int *al, void *parse_arg)
+                                     const unsigned char *in, size_t inlen,
+                                     X509 *x, size_t chainidx, int *al,
+                                     void *parse_arg)
 {
     QUIC_TLS *qtls = parse_arg;
 
-    return qtls->args.got_transport_params_cb(in, inlen,
-                                              qtls->args.got_transport_params_cb_arg);
+    return qtls->args.got_transport_params_cb(
+        in, inlen, qtls->args.got_transport_params_cb_arg);
 }
 
 QUIC_TLS *ossl_quic_tls_new(const QUIC_TLS_ARGS *args)
 {
     QUIC_TLS *qtls;
 
-    if (args->crypto_send_cb == NULL
-        || args->crypto_recv_rcd_cb == NULL
+    if (args->crypto_send_cb == NULL || args->crypto_recv_rcd_cb == NULL
         || args->crypto_release_rcd_cb == NULL) {
         ERR_raise(ERR_LIB_SSL, ERR_R_PASSED_NULL_PARAMETER);
         return NULL;
@@ -661,10 +654,8 @@ void ossl_quic_tls_free(QUIC_TLS *qtls)
 }
 
 static int raise_error(QUIC_TLS *qtls, uint64_t error_code,
-                       const char *error_msg,
-                       const char *src_file,
-                       int src_line,
-                       const char *src_func)
+                       const char *error_msg, const char *src_file,
+                       int src_line, const char *src_func)
 {
     /*
      * When QTLS fails, add a "cover letter" error with information, potentially
@@ -686,9 +677,9 @@ static int raise_error(QUIC_TLS *qtls, uint64_t error_code,
          * We record the error information reported via the QUIC protocol
          * separately.
          */
-        qtls->error_code        = error_code;
-        qtls->error_msg         = error_msg;
-        qtls->inerror           = 1;
+        qtls->error_code = error_code;
+        qtls->error_msg = error_msg;
+        qtls->inerror = 1;
 
         ERR_pop_to_mark();
     }
@@ -728,16 +719,14 @@ int ossl_quic_tls_configure(QUIC_TLS *qtls)
     SSL_clear_options(qtls->args.s, SSL_OP_ENABLE_MIDDLEBOX_COMPAT);
     ossl_ssl_set_custom_record_layer(sc, &quic_tls_record_method, qtls);
 
-    if (!ossl_tls_add_custom_ext_intern(NULL, &sc->cert->custext,
-                                        qtls->args.is_server ? ENDPOINT_SERVER
-                                                             : ENDPOINT_CLIENT,
-                                        TLSEXT_TYPE_quic_transport_parameters,
-                                        SSL_EXT_TLS1_3_ONLY
-                                        | SSL_EXT_CLIENT_HELLO
-                                        | SSL_EXT_TLS1_3_ENCRYPTED_EXTENSIONS,
-                                        add_transport_params_cb,
-                                        free_transport_params_cb, qtls,
-                                        parse_transport_params_cb, qtls))
+    if (!ossl_tls_add_custom_ext_intern(
+            NULL, &sc->cert->custext,
+            qtls->args.is_server ? ENDPOINT_SERVER : ENDPOINT_CLIENT,
+            TLSEXT_TYPE_quic_transport_parameters,
+            SSL_EXT_TLS1_3_ONLY | SSL_EXT_CLIENT_HELLO
+                | SSL_EXT_TLS1_3_ENCRYPTED_EXTENSIONS,
+            add_transport_params_cb, free_transport_params_cb, qtls,
+            parse_transport_params_cb, qtls))
         return 0;
 
     sc->s3.flags |= TLS1_FLAGS_QUIC;
@@ -850,7 +839,8 @@ int ossl_quic_tls_tick(QUIC_TLS *qtls)
 
         qtls->complete = 1;
         ERR_pop_to_mark();
-        return qtls->args.handshake_complete_cb(qtls->args.handshake_complete_cb_arg);
+        return qtls->args.handshake_complete_cb(
+            qtls->args.handshake_complete_cb_arg);
     }
 
     ERR_pop_to_mark();
@@ -872,20 +862,18 @@ int ossl_quic_tls_set_transport_params(QUIC_TLS *qtls,
     if (qtls->local_transport_params_consumed)
         return 0;
 
-    qtls->local_transport_params       = transport_params;
-    qtls->local_transport_params_len   = transport_params_len;
+    qtls->local_transport_params = transport_params;
+    qtls->local_transport_params_len = transport_params_len;
     return 1;
 }
 
-int ossl_quic_tls_get_error(QUIC_TLS *qtls,
-                            uint64_t *error_code,
-                            const char **error_msg,
-                            ERR_STATE **error_state)
+int ossl_quic_tls_get_error(QUIC_TLS *qtls, uint64_t *error_code,
+                            const char **error_msg, ERR_STATE **error_state)
 {
     if (qtls->inerror) {
-        *error_code     = qtls->error_code;
-        *error_msg      = qtls->error_msg;
-        *error_state    = qtls->error_state;
+        *error_code = qtls->error_code;
+        *error_msg = qtls->error_msg;
+        *error_state = qtls->error_state;
     }
 
     return qtls->inerror;
@@ -911,7 +899,8 @@ int ossl_quic_tls_is_cert_request(QUIC_TLS *qtls)
  */
 int ossl_quic_tls_has_bad_max_early_data(QUIC_TLS *qtls)
 {
-    uint32_t max_early_data = SSL_get0_session(qtls->args.s)->ext.max_early_data;
+    uint32_t max_early_data =
+        SSL_get0_session(qtls->args.s)->ext.max_early_data;
 
     /*
      * If max_early_data was present we always ensure a non-zero value is
@@ -925,7 +914,8 @@ int ossl_quic_tls_set_early_data_enabled(QUIC_TLS *qtls, int enabled)
 {
     SSL_CONNECTION *sc = SSL_CONNECTION_FROM_SSL(qtls->args.s);
 
-    if (sc == NULL || !SSL_IS_QUIC_HANDSHAKE(sc) || !SSL_in_before(qtls->args.s))
+    if (sc == NULL || !SSL_IS_QUIC_HANDSHAKE(sc)
+        || !SSL_in_before(qtls->args.s))
         return 0;
 
     if (!enabled) {

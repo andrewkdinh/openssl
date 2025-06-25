@@ -8,7 +8,7 @@
  */
 
 #include "../bn_local.h"
-#if !(defined(__GNUC__) && __GNUC__>=2)
+#if !(defined(__GNUC__) && __GNUC__ >= 2)
 # include "../bn_asm.c"         /* kind of dirty hack for Sun Studio */
 #else
 /*-
@@ -71,7 +71,7 @@
  * "g"(0)               let the compiler to decide where does it
  *                      want to keep the value of zero;
  */
-# define mul_add(r,a,word,carry) do {   \
+# define mul_add(r, a, word, carry) do {   \
         register BN_ULONG high,low;     \
         asm ("mulq %3"                  \
                 : "=a"(low),"=d"(high)  \
@@ -88,7 +88,7 @@
         carry=high;                     \
         } while (0)
 
-# define mul(r,a,word,carry) do {       \
+# define mul(r, a, word, carry) do {       \
         register BN_ULONG high,low;     \
         asm ("mulq %3"                  \
                 : "=a"(low),"=d"(high)  \
@@ -101,14 +101,13 @@
         (r)=carry, carry=high;          \
         } while (0)
 # undef sqr
-# define sqr(r0,r1,a)                   \
+# define sqr(r0, r1, a)                   \
         asm ("mulq %2"                  \
                 : "=a"(r0),"=d"(r1)     \
                 : "a"(a)                \
                 : "cc");
 
-BN_ULONG bn_mul_add_words(BN_ULONG *rp, const BN_ULONG *ap, int num,
-                          BN_ULONG w)
+BN_ULONG bn_mul_add_words(BN_ULONG *rp, const BN_ULONG *ap, int num, BN_ULONG w)
 {
     BN_ULONG c1 = 0;
 
@@ -195,9 +194,10 @@ BN_ULONG bn_div_words(BN_ULONG h, BN_ULONG l, BN_ULONG d)
 {
     BN_ULONG ret, waste;
 
- asm("divq      %4":"=a"(ret), "=d"(waste)
- :     "a"(l), "d"(h), "r"(d)
- :     "cc");
+    asm("divq      %4"
+        : "=a"(ret), "=d"(waste)
+        : "a"(l), "d"(h), "r"(d)
+        : "cc");
 
     return ret;
 }
@@ -211,19 +211,19 @@ BN_ULONG bn_add_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
     if (n <= 0)
         return 0;
 
-    asm volatile ("       subq    %0,%0           \n" /* clear carry */
-                  "       jmp     1f              \n"
-                  ".p2align 4                     \n"
-                  "1:     movq    (%4,%2,8),%0    \n"
-                  "       adcq    (%5,%2,8),%0    \n"
-                  "       movq    %0,(%3,%2,8)    \n"
-                  "       lea     1(%2),%2        \n"
-                  "       dec     %1              \n"
-                  "       jnz     1b              \n"
-                  "       sbbq    %0,%0           \n"
-                  :"=&r" (ret), "+c"(n), "+r"(i)
-                  :"r"(rp), "r"(ap), "r"(bp)
-                  :"cc", "memory");
+    asm volatile("       subq    %0,%0           \n" /* clear carry */
+                 "       jmp     1f              \n"
+                 ".p2align 4                     \n"
+                 "1:     movq    (%4,%2,8),%0    \n"
+                 "       adcq    (%5,%2,8),%0    \n"
+                 "       movq    %0,(%3,%2,8)    \n"
+                 "       lea     1(%2),%2        \n"
+                 "       dec     %1              \n"
+                 "       jnz     1b              \n"
+                 "       sbbq    %0,%0           \n"
+                 : "=&r"(ret), "+c"(n), "+r"(i)
+                 : "r"(rp), "r"(ap), "r"(bp)
+                 : "cc", "memory");
 
     return ret & 1;
 }
@@ -238,19 +238,19 @@ BN_ULONG bn_sub_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
     if (n <= 0)
         return 0;
 
-    asm volatile ("       subq    %0,%0           \n" /* clear borrow */
-                  "       jmp     1f              \n"
-                  ".p2align 4                     \n"
-                  "1:     movq    (%4,%2,8),%0    \n"
-                  "       sbbq    (%5,%2,8),%0    \n"
-                  "       movq    %0,(%3,%2,8)    \n"
-                  "       lea     1(%2),%2        \n"
-                  "       dec     %1              \n"
-                  "       jnz     1b              \n"
-                  "       sbbq    %0,%0           \n"
-                  :"=&r" (ret), "+c"(n), "+r"(i)
-                  :"r"(rp), "r"(ap), "r"(bp)
-                  :"cc", "memory");
+    asm volatile("       subq    %0,%0           \n" /* clear borrow */
+                 "       jmp     1f              \n"
+                 ".p2align 4                     \n"
+                 "1:     movq    (%4,%2,8),%0    \n"
+                 "       sbbq    (%5,%2,8),%0    \n"
+                 "       movq    %0,(%3,%2,8)    \n"
+                 "       lea     1(%2),%2        \n"
+                 "       dec     %1              \n"
+                 "       jnz     1b              \n"
+                 "       sbbq    %0,%0           \n"
+                 : "=&r"(ret), "+c"(n), "+r"(i)
+                 : "r"(rp), "r"(ap), "r"(bp)
+                 : "cc", "memory");
 
     return ret & 1;
 }
@@ -320,7 +320,7 @@ BN_ULONG bn_sub_words(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n)
  */
 # if 0
 /* original macros are kept for reference purposes */
-#  define mul_add_c(a,b,c0,c1,c2)       do {    \
+#  define mul_add_c(a, b, c0, c1, c2)       do {    \
         BN_ULONG ta = (a), tb = (b);            \
         BN_ULONG lo, hi;                        \
         BN_UMULT_LOHI(lo,hi,ta,tb);             \
@@ -328,7 +328,7 @@ BN_ULONG bn_sub_words(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n)
         c1 += hi; c2 += (c1<hi)?1:0;            \
         } while(0)
 
-#  define mul_add_c2(a,b,c0,c1,c2)      do {    \
+#  define mul_add_c2(a, b, c0, c1, c2)      do {    \
         BN_ULONG ta = (a), tb = (b);            \
         BN_ULONG lo, hi, tt;                    \
         BN_UMULT_LOHI(lo,hi,ta,tb);             \
@@ -338,7 +338,7 @@ BN_ULONG bn_sub_words(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n)
         c1 += hi; c2 += (c1<hi)?1:0;            \
         } while(0)
 
-#  define sqr_add_c(a,i,c0,c1,c2)       do {    \
+#  define sqr_add_c(a, i, c0, c1, c2)       do {    \
         BN_ULONG ta = (a)[i];                   \
         BN_ULONG lo, hi;                        \
         BN_UMULT_LOHI(lo,hi,ta,ta);             \
@@ -346,7 +346,7 @@ BN_ULONG bn_sub_words(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n)
         c1 += hi; c2 += (c1<hi)?1:0;            \
         } while(0)
 # else
-#  define mul_add_c(a,b,c0,c1,c2) do {  \
+#  define mul_add_c(a, b, c0, c1, c2) do {  \
         BN_ULONG t1,t2;                 \
         asm ("mulq %3"                  \
                 : "=a"(t1),"=d"(t2)     \
@@ -358,7 +358,7 @@ BN_ULONG bn_sub_words(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n)
                 : "cc");                                \
         } while (0)
 
-#  define sqr_add_c(a,i,c0,c1,c2) do {  \
+#  define sqr_add_c(a, i, c0, c1, c2) do {  \
         BN_ULONG t1,t2;                 \
         asm ("mulq %2"                  \
                 : "=a"(t1),"=d"(t2)     \
@@ -370,7 +370,7 @@ BN_ULONG bn_sub_words(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n)
                 : "cc");                                \
         } while (0)
 
-#  define mul_add_c2(a,b,c0,c1,c2) do { \
+#  define mul_add_c2(a, b, c0, c1, c2) do { \
         BN_ULONG t1,t2;                 \
         asm ("mulq %3"                  \
                 : "=a"(t1),"=d"(t2)     \
@@ -387,7 +387,7 @@ BN_ULONG bn_sub_words(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n)
         } while (0)
 # endif
 
-# define sqr_add_c2(a,i,j,c0,c1,c2)      \
+# define sqr_add_c2(a, i, j, c0, c1, c2)      \
         mul_add_c2((a)[i],(a)[j],c0,c1,c2)
 
 void bn_mul_comba8(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b)

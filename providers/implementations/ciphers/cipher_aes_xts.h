@@ -50,8 +50,8 @@ typedef struct prov_aes_xts_ctx_st {
             } param;
             size_t offset;
             unsigned int fc;
-            unsigned int iv_set : 1;
-            unsigned int key_set : 1;
+            unsigned int iv_set:1;
+            unsigned int key_set:1;
         } s390x;
 #endif
     } plat;

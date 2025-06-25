@@ -86,7 +86,7 @@ static void ctxdbg(BIO *channel, const char *text, BN_CTX *ctx)
     BN_STACK *stack = &ctx->stack;
 
     BIO_printf(channel, "%s\n", text);
-    BIO_printf(channel, "  (%16p): ", (void*)ctx);
+    BIO_printf(channel, "  (%16p): ", (void *)ctx);
     while (bnidx < ctx->used) {
         BIO_printf(channel, "%03x ",
                    item->vals[bnidx++ % BN_CTX_POOL_SIZE].dmax);
@@ -97,8 +97,7 @@ static void ctxdbg(BIO *channel, const char *text, BN_CTX *ctx)
     bnidx = 0;
     BIO_printf(channel, "   %16s : ", "");
     while (fpidx < stack->depth) {
-        while (bnidx++ < stack->indexes[fpidx])
-            BIO_printf(channel, "    ");
+        while (bnidx++ < stack->indexes[fpidx]) BIO_printf(channel, "    ");
         BIO_printf(channel, "^^^ ");
         bnidx++;
         fpidx++;
@@ -156,10 +155,10 @@ void BN_CTX_free(BN_CTX *ctx)
     if (ctx == NULL)
         return;
 #ifndef FIPS_MODULE
-    OSSL_TRACE_BEGIN(BN_CTX) {
+    OSSL_TRACE_BEGIN(BN_CTX)
+    {
         BN_POOL_ITEM *pool = ctx->pool.head;
-        BIO_printf(trc_out,
-                   "BN_CTX_free(): stack-size=%d, pool-bignums=%d\n",
+        BIO_printf(trc_out, "BN_CTX_free(): stack-size=%d, pool-bignums=%d\n",
                    ctx->stack.size, ctx->pool.size);
         BIO_printf(trc_out, "  dmaxs: ");
         while (pool) {
@@ -169,7 +168,8 @@ void BN_CTX_free(BN_CTX *ctx)
             pool = pool->next;
         }
         BIO_printf(trc_out, "\n");
-    } OSSL_TRACE_END(BN_CTX);
+    }
+    OSSL_TRACE_END(BN_CTX);
 #endif
     BN_STACK_finish(&ctx->stack);
     BN_POOL_finish(&ctx->pool);
@@ -257,7 +257,6 @@ static void BN_STACK_finish(BN_STACK *st)
     st->indexes = NULL;
 }
 
-
 static int BN_STACK_push(BN_STACK *st, unsigned int idx)
 {
     if (st->depth == st->size) {
@@ -307,7 +306,6 @@ static void BN_POOL_finish(BN_POOL *p)
         p->head = p->current;
     }
 }
-
 
 static BIGNUM *BN_POOL_get(BN_POOL *p, int flag)
 {

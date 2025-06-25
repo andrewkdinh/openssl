@@ -28,13 +28,13 @@ OSSL_HTTP_REQ_CTX *OCSP_sendreq_new(BIO *io, const char *path,
      * no expected content type
      * max_resp_len = 100 KiB
      */
-    if (!OSSL_HTTP_REQ_CTX_set_request_line(rctx, 1 /* POST */,
-                                            NULL, NULL, path))
+    if (!OSSL_HTTP_REQ_CTX_set_request_line(rctx, 1 /* POST */, NULL, NULL,
+                                            path))
         goto err;
     /* by default, no extra headers */
-    if (!OSSL_HTTP_REQ_CTX_set_expected(rctx,
-                                        NULL /* content_type */, 1 /* asn1 */,
-                                        0 /* timeout */, 0 /* keep_alive */))
+    if (!OSSL_HTTP_REQ_CTX_set_expected(rctx, NULL /* content_type */,
+                                        1 /* asn1 */, 0 /* timeout */,
+                                        0 /* keep_alive */))
         goto err;
     if (req != NULL
         && !OSSL_HTTP_REQ_CTX_set1_req(rctx, "application/ocsp-request",
@@ -43,7 +43,7 @@ OSSL_HTTP_REQ_CTX *OCSP_sendreq_new(BIO *io, const char *path,
         goto err;
     return rctx;
 
- err:
+err:
     OSSL_HTTP_REQ_CTX_free(rctx);
     return NULL;
 }

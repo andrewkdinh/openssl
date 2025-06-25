@@ -59,8 +59,8 @@ static int write_pvk(struct key2ms_ctx_st *ctx, OSSL_CORE_BIO *cout,
     out = ossl_bio_new_from_core_bio(ctx->provctx, cout);
     if (out == NULL)
         return 0;
-    ret = i2b_PVK_bio_ex(out, pkey, ctx->pvk_encr_level,
-                         ossl_pw_pvk_password, &ctx->pwdata, libctx, NULL);
+    ret = i2b_PVK_bio_ex(out, pkey, ctx->pvk_encr_level, ossl_pw_pvk_password,
+                         &ctx->pwdata, libctx, NULL);
     BIO_free(out);
     return ret;
 }

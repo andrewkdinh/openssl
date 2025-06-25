@@ -12,7 +12,6 @@
 
 #define EVP_CTRL_RET_UNSUPPORTED -1
 
-
 struct evp_md_ctx_st {
     const EVP_MD *reqdigest;    /* The original requested digest */
     const EVP_MD *digest;
@@ -23,7 +22,7 @@ struct evp_md_ctx_st {
     /* Public key context for sign/verify */
     EVP_PKEY_CTX *pctx;
     /* Update function: usually copied from EVP_MD */
-    int (*update) (EVP_MD_CTX *ctx, const void *data, size_t count);
+    int (*update)(EVP_MD_CTX *ctx, const void *data, size_t count);
 
     /*
      * Opaque ctx returned from a providers digest algorithm implementation
@@ -31,7 +30,7 @@ struct evp_md_ctx_st {
      */
     void *algctx;
     EVP_MD *fetched_digest;
-} /* EVP_MD_CTX */ ;
+} /* EVP_MD_CTX */;
 
 struct evp_cipher_ctx_st {
     const EVP_CIPHER *cipher;
@@ -60,7 +59,7 @@ struct evp_cipher_ctx_st {
      */
     void *algctx;
     EVP_CIPHER *fetched_cipher;
-} /* EVP_CIPHER_CTX */ ;
+} /* EVP_CIPHER_CTX */;
 
 struct evp_mac_ctx_st {
     EVP_MAC *meth;               /* Method structure */
@@ -78,7 +77,7 @@ struct evp_kdf_ctx_st {
      * OSSL_FUNC_kdf_newctx()
      */
     void *algctx;
-} /* EVP_KDF_CTX */ ;
+} /* EVP_KDF_CTX */;
 
 struct evp_rand_ctx_st {
     EVP_RAND *meth;             /* Method structure */
@@ -90,7 +89,7 @@ struct evp_rand_ctx_st {
     EVP_RAND_CTX *parent;       /* Parent EVP_RAND or NULL if none */
     CRYPTO_REF_COUNT refcnt;    /* Context reference count */
     CRYPTO_RWLOCK *refcnt_lock;
-} /* EVP_RAND_CTX */ ;
+} /* EVP_RAND_CTX */;
 
 struct evp_keymgmt_st {
     int id;                      /* libcrypto internal */
@@ -137,7 +136,7 @@ struct evp_keymgmt_st {
     OSSL_FUNC_keymgmt_export_types_fn *export_types;
     OSSL_FUNC_keymgmt_export_types_ex_fn *export_types_ex;
     OSSL_FUNC_keymgmt_dup_fn *dup;
-} /* EVP_KEYMGMT */ ;
+} /* EVP_KEYMGMT */;
 
 struct evp_keyexch_st {
     int name_id;
@@ -266,14 +265,14 @@ struct evp_kem_st {
     OSSL_FUNC_kem_auth_decapsulate_init_fn *auth_decapsulate_init;
 } /* EVP_KEM */;
 
-int PKCS5_v2_PBKDF2_keyivgen(EVP_CIPHER_CTX *ctx, const char *pass,
-                             int passlen, ASN1_TYPE *param,
-                             const EVP_CIPHER *c, const EVP_MD *md,
-                             int en_de);
+int PKCS5_v2_PBKDF2_keyivgen(EVP_CIPHER_CTX *ctx, const char *pass, int passlen,
+                             ASN1_TYPE *param, const EVP_CIPHER *c,
+                             const EVP_MD *md, int en_de);
 int PKCS5_v2_PBKDF2_keyivgen_ex(EVP_CIPHER_CTX *ctx, const char *pass,
                                 int passlen, ASN1_TYPE *param,
                                 const EVP_CIPHER *c, const EVP_MD *md,
-                                int en_de, OSSL_LIB_CTX *libctx, const char *propq);
+                                int en_de, OSSL_LIB_CTX *libctx,
+                                const char *propq);
 
 struct evp_Encode_Ctx_st {
     /* number saved in a partial encode/decode */
@@ -299,20 +298,19 @@ int ossl_is_partially_overlapping(const void *ptr1, const void *ptr2, int len);
 #include <openssl/types.h>
 #include <openssl/core.h>
 
-void *evp_generic_fetch(OSSL_LIB_CTX *ctx, int operation_id,
-                        const char *name, const char *properties,
+void *evp_generic_fetch(OSSL_LIB_CTX *ctx, int operation_id, const char *name,
+                        const char *properties,
                         void *(*new_method)(int name_id,
                                             const OSSL_ALGORITHM *algodef,
                                             OSSL_PROVIDER *prov),
                         int (*up_ref_method)(void *),
                         void (*free_method)(void *));
-void *evp_generic_fetch_from_prov(OSSL_PROVIDER *prov, int operation_id,
-                                  const char *name, const char *properties,
-                                  void *(*new_method)(int name_id,
-                                                      const OSSL_ALGORITHM *algodef,
-                                                      OSSL_PROVIDER *prov),
-                                  int (*up_ref_method)(void *),
-                                  void (*free_method)(void *));
+void *evp_generic_fetch_from_prov(
+    OSSL_PROVIDER *prov, int operation_id, const char *name,
+    const char *properties,
+    void *(*new_method)(int name_id, const OSSL_ALGORITHM *algodef,
+                        OSSL_PROVIDER *prov),
+    int (*up_ref_method)(void *), void (*free_method)(void *));
 void evp_generic_do_all_prefetched(OSSL_LIB_CTX *libctx, int operation_id,
                                    void (*user_fn)(void *method, void *arg),
                                    void *user_arg);
@@ -334,20 +332,16 @@ EVP_SIGNATURE *evp_signature_fetch_from_prov(OSSL_PROVIDER *prov,
 EVP_ASYM_CIPHER *evp_asym_cipher_fetch_from_prov(OSSL_PROVIDER *prov,
                                                  const char *name,
                                                  const char *properties);
-EVP_KEYEXCH *evp_keyexch_fetch_from_prov(OSSL_PROVIDER *prov,
-                                         const char *name,
+EVP_KEYEXCH *evp_keyexch_fetch_from_prov(OSSL_PROVIDER *prov, const char *name,
                                          const char *properties);
-EVP_KEM *evp_kem_fetch_from_prov(OSSL_PROVIDER *prov,
-                                 const char *name,
+EVP_KEM *evp_kem_fetch_from_prov(OSSL_PROVIDER *prov, const char *name,
                                  const char *properties);
 EVP_CIPHER *evp_cipher_fetch_from_prov(OSSL_PROVIDER *prov,
                                        const char *algorithm,
                                        const char *properties);
-EVP_MD *evp_digest_fetch_from_prov(OSSL_PROVIDER *prov,
-                                   const char *algorithm,
+EVP_MD *evp_digest_fetch_from_prov(OSSL_PROVIDER *prov, const char *algorithm,
                                    const char *properties);
-EVP_MAC *evp_mac_fetch_from_prov(OSSL_PROVIDER *prov,
-                                 const char *algorithm,
+EVP_MAC *evp_mac_fetch_from_prov(OSSL_PROVIDER *prov, const char *algorithm,
                                  const char *properties);
 
 /* Internal structure constructors for fetched methods */
@@ -408,9 +402,8 @@ void evp_cipher_free_int(EVP_CIPHER *md);
 void evp_md_free_int(EVP_MD *md);
 
 /* OSSL_PROVIDER * is only used to get the library context */
-int evp_is_a(OSSL_PROVIDER *prov, int number,
-             const char *legacy_name, const char *name);
+int evp_is_a(OSSL_PROVIDER *prov, int number, const char *legacy_name,
+             const char *name);
 int evp_names_do_all(OSSL_PROVIDER *prov, int number,
-                     void (*fn)(const char *name, void *data),
-                     void *data);
+                     void (*fn)(const char *name, void *data), void *data);
 int evp_cipher_cache_constants(EVP_CIPHER *cipher);

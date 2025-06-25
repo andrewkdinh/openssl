@@ -14,7 +14,7 @@
 #include <openssl/asn1.h>
 
 #ifndef ASN1_PARSE_MAXDEPTH
-#define ASN1_PARSE_MAXDEPTH 128
+# define ASN1_PARSE_MAXDEPTH 128
 #endif
 
 static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
@@ -35,17 +35,19 @@ static int asn1_print_info(BIO *bp, long offset, int depth, int hl, long len,
         p = "prim: ";
     if (constructed != (V_ASN1_CONSTRUCTED | 1)) {
         if (BIO_snprintf(str, sizeof(str), "%5ld:d=%-2d hl=%ld l=%4ld %s",
-                         offset, depth, (long)hl, len, p) <= 0)
+                         offset, depth, (long)hl, len, p)
+            <= 0)
             goto err;
     } else {
         if (BIO_snprintf(str, sizeof(str), "%5ld:d=%-2d hl=%ld l=inf  %s",
-                         offset, depth, (long)hl, p) <= 0)
+                         offset, depth, (long)hl, p)
+            <= 0)
             goto err;
     }
     if (bp != NULL) {
         if (BIO_set_prefix(bp, str) <= 0) {
             if ((bio = BIO_new(BIO_f_prefix())) == NULL
-                    || (bp = BIO_push(bio, bp)) == NULL)
+                || (bp = BIO_push(bio, bp)) == NULL)
                 goto err;
             pop_f_prefix = 1;
         }
@@ -71,7 +73,7 @@ static int asn1_print_info(BIO *bp, long offset, int depth, int hl, long len,
         p = ASN1_tag2str(tag);
 
     i = (BIO_printf(bp, "%-18s", p) > 0);
- err:
+err:
     if (saved_indent >= 0)
         BIO_set_indent(bp, saved_indent);
     if (pop_f_prefix)
@@ -125,8 +127,8 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
         /*
          * if j == 0x21 it is a constructed indefinite length object
          */
-        if (!asn1_print_info(bp, (long)offset + (long)(op - *pp), depth,
-                             hl, len, tag, xclass, j, (indent) ? depth : 0))
+        if (!asn1_print_info(bp, (long)offset + (long)(op - *pp), depth, hl,
+                             len, tag, xclass, j, (indent) ? depth : 0))
             goto end;
         if (j & V_ASN1_CONSTRUCTED) {
             const unsigned char *sp = p;
@@ -140,9 +142,8 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
             }
             if ((j == 0x21) && (len == 0)) {
                 for (;;) {
-                    r = asn1_parse2(bp, &p, (long)(tot - p),
-                                    offset + (p - *pp), depth + 1,
-                                    indent, dump);
+                    r = asn1_parse2(bp, &p, (long)(tot - p), offset + (p - *pp),
+                                    depth + 1, indent, dump);
                     if (r == 0)
                         goto end;
                     if ((r == 2) || (p >= tot)) {
@@ -155,8 +156,7 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
 
                 while (p < ep) {
                     sp = p;
-                    r = asn1_parse2(bp, &p, tmp,
-                                    offset + (p - *pp), depth + 1,
+                    r = asn1_parse2(bp, &p, tmp, offset + (p - *pp), depth + 1,
                                     indent, dump);
                     if (r == 0)
                         goto end;
@@ -169,17 +169,14 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
                 goto end;
         } else {
             nl = 0;
-            if ((tag == V_ASN1_PRINTABLESTRING) ||
-                (tag == V_ASN1_T61STRING) ||
-                (tag == V_ASN1_IA5STRING) ||
-                (tag == V_ASN1_VISIBLESTRING) ||
-                (tag == V_ASN1_NUMERICSTRING) ||
-                (tag == V_ASN1_UTF8STRING) ||
-                (tag == V_ASN1_UTCTIME) || (tag == V_ASN1_GENERALIZEDTIME)) {
+            if ((tag == V_ASN1_PRINTABLESTRING) || (tag == V_ASN1_T61STRING)
+                || (tag == V_ASN1_IA5STRING) || (tag == V_ASN1_VISIBLESTRING)
+                || (tag == V_ASN1_NUMERICSTRING) || (tag == V_ASN1_UTF8STRING)
+                || (tag == V_ASN1_UTCTIME) || (tag == V_ASN1_GENERALIZEDTIME)) {
                 if (BIO_write(bp, ":", 1) <= 0)
                     goto end;
-                if ((len > 0) && BIO_write(bp, (const char *)p, (int)len)
-                    != (int)len)
+                if ((len > 0)
+                    && BIO_write(bp, (const char *)p, (int)len) != (int)len)
                     goto end;
             } else if (tag == V_ASN1_OBJECT) {
                 opp = op;
@@ -213,10 +210,9 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
                      * testing whether the octet string is printable
                      */
                     for (i = 0; i < os->length; i++) {
-                        if (((opp[i] < ' ') &&
-                             (opp[i] != '\n') &&
-                             (opp[i] != '\r') &&
-                             (opp[i] != '\t')) || (opp[i] > '~')) {
+                        if (((opp[i] < ' ') && (opp[i] != '\n')
+                             && (opp[i] != '\r') && (opp[i] != '\t'))
+                            || (opp[i] > '~')) {
                             printable = 0;
                             break;
                         }
@@ -246,12 +242,12 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
                             if (BIO_write(bp, "\n", 1) <= 0)
                                 goto end;
                         }
-                        if (BIO_dump_indent(bp,
-                                            (const char *)opp,
-                                            ((dump == -1 || dump >
-                                              os->
-                                              length) ? os->length : dump),
-                                            dump_indent) <= 0)
+                        if (BIO_dump_indent(bp, (const char *)opp,
+                                            ((dump == -1 || dump > os->length)
+                                                 ? os->length
+                                                 : dump),
+                                            dump_indent)
+                            <= 0)
                             goto end;
                         nl = 1;
                     }
@@ -317,7 +313,8 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
                 }
                 if (BIO_dump_indent(bp, (const char *)p,
                                     ((dump == -1 || dump > len) ? len : dump),
-                                    dump_indent) <= 0)
+                                    dump_indent)
+                    <= 0)
                     goto end;
                 nl = 1;
             }
@@ -348,7 +345,7 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length,
         length -= len;
     }
     ret = 1;
- end:
+end:
     ASN1_OBJECT_free(o);
     ASN1_OCTET_STRING_free(os);
     ASN1_INTEGER_free(ai);
@@ -375,8 +372,7 @@ const char *ASN1_tag2str(int tag)
         /* 25-27 */
         "GRAPHICSTRING", "VISIBLESTRING", "GENERALSTRING",
         /* 28-30 */
-        "UNIVERSALSTRING", "<ASN1 29>", "BMPSTRING"
-    };
+        "UNIVERSALSTRING", "<ASN1 29>", "BMPSTRING"};
 
     if ((tag == V_ASN1_NEG_INTEGER) || (tag == V_ASN1_NEG_ENUMERATED))
         tag &= ~0x100;

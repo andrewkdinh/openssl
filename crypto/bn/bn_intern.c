@@ -129,7 +129,7 @@ signed char *bn_compute_wNAF(const BIGNUM *scalar, int w, size_t *ret_len)
     *ret_len = j;
     return r;
 
- err:
+err:
     OPENSSL_free(r);
     return NULL;
 }
@@ -148,8 +148,7 @@ void bn_set_all_zero(BIGNUM *a)
 {
     int i;
 
-    for (i = a->top; i < a->dmax; i++)
-        a->d[i] = 0;
+    for (i = a->top; i < a->dmax; i++) a->d[i] = 0;
 }
 
 int bn_copy_words(BN_ULONG *out, const BIGNUM *in, int size)

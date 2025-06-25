@@ -162,35 +162,33 @@ void dtls1_increment_epoch(SSL_CONNECTION *s, int rw);
 uint16_t dtls1_get_epoch(SSL_CONNECTION *s, int rw);
 int ssl_release_record(SSL_CONNECTION *s, TLS_RECORD *rr, size_t length);
 
-# define HANDLE_RLAYER_READ_RETURN(s, ret) \
+#define HANDLE_RLAYER_READ_RETURN(s, ret) \
     ossl_tls_handle_rlayer_return(s, 0, ret, OPENSSL_FILE, OPENSSL_LINE)
 
-# define HANDLE_RLAYER_WRITE_RETURN(s, ret) \
+#define HANDLE_RLAYER_WRITE_RETURN(s, ret) \
     ossl_tls_handle_rlayer_return(s, 1, ret, OPENSSL_FILE, OPENSSL_LINE)
 
 int ossl_tls_handle_rlayer_return(SSL_CONNECTION *s, int writing, int ret,
                                   char *file, int line);
 
-int ssl_set_new_record_layer(SSL_CONNECTION *s, int version,
-                             int direction, int level,
-                             unsigned char *secret, size_t secretlen,
+int ssl_set_new_record_layer(SSL_CONNECTION *s, int version, int direction,
+                             int level, unsigned char *secret, size_t secretlen,
                              unsigned char *key, size_t keylen,
-                             unsigned char *iv,  size_t ivlen,
+                             unsigned char *iv, size_t ivlen,
                              unsigned char *mackey, size_t mackeylen,
-                             const EVP_CIPHER *ciph, size_t taglen,
-                             int mactype, const EVP_MD *md,
-                             const SSL_COMP *comp, const EVP_MD *kdfdigest);
+                             const EVP_CIPHER *ciph, size_t taglen, int mactype,
+                             const EVP_MD *md, const SSL_COMP *comp,
+                             const EVP_MD *kdfdigest);
 int ssl_set_record_protocol_version(SSL_CONNECTION *s, int vers);
 
-# define OSSL_FUNC_RLAYER_SKIP_EARLY_DATA        1
+#define OSSL_FUNC_RLAYER_SKIP_EARLY_DATA        1
 OSSL_CORE_MAKE_FUNC(int, rlayer_skip_early_data, (void *cbarg))
-# define OSSL_FUNC_RLAYER_MSG_CALLBACK           2
-OSSL_CORE_MAKE_FUNC(void, rlayer_msg_callback, (int write_p, int version,
-                                                int content_type,
-                                                const void *buf, size_t len,
-                                                void *cbarg))
-# define OSSL_FUNC_RLAYER_SECURITY               3
-OSSL_CORE_MAKE_FUNC(int, rlayer_security, (void *cbarg, int op, int bits,
-                                           int nid, void *other))
-# define OSSL_FUNC_RLAYER_PADDING                4
+#define OSSL_FUNC_RLAYER_MSG_CALLBACK           2
+OSSL_CORE_MAKE_FUNC(void, rlayer_msg_callback,
+                    (int write_p, int version, int content_type,
+                     const void *buf, size_t len, void *cbarg))
+#define OSSL_FUNC_RLAYER_SECURITY               3
+OSSL_CORE_MAKE_FUNC(int, rlayer_security,
+                    (void *cbarg, int op, int bits, int nid, void *other))
+#define OSSL_FUNC_RLAYER_PADDING                4
 OSSL_CORE_MAKE_FUNC(size_t, rlayer_padding, (void *cbarg, int type, size_t len))

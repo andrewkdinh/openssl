@@ -7,7 +7,7 @@
  * https://www.openssl.org/source/license.html
  */
 
-# if defined(__linux) || defined(__sun) || defined(__hpux)
+#if defined(__linux) || defined(__sun) || defined(__hpux)
 /*
  * Following definition aliases fopen to fopen64 on above mentioned
  * platforms. This makes it possible to open and sequentially access files
@@ -20,10 +20,10 @@
  * of 32-bit platforms which allow for sequential access of large files
  * without extra "magic" comprise *BSD, Darwin, IRIX...
  */
-#  ifndef _FILE_OFFSET_BITS
-#   define _FILE_OFFSET_BITS 64
-#  endif
+# ifndef _FILE_OFFSET_BITS
+#  define _FILE_OFFSET_BITS 64
 # endif
+#endif
 
 #include "internal/e_os.h"
 #include "internal/cryptlib.h"
@@ -61,21 +61,20 @@ FILE *openssl_fopen(const char *filename, const char *mode)
      * back to fopen...
      */
     if ((sz = MultiByteToWideChar(CP_UTF8, (flags = MB_ERR_INVALID_CHARS),
-                                  filename, len_0, NULL, 0)) > 0 ||
-        (GetLastError() == ERROR_INVALID_FLAGS &&
-         (sz = MultiByteToWideChar(CP_UTF8, (flags = 0),
-                                   filename, len_0, NULL, 0)) > 0)
-        ) {
+                                  filename, len_0, NULL, 0))
+            > 0
+        || (GetLastError() == ERROR_INVALID_FLAGS
+            && (sz = MultiByteToWideChar(CP_UTF8, (flags = 0), filename, len_0,
+                                         NULL, 0))
+                > 0)) {
         WCHAR wmode[8];
         WCHAR *wfilename = _alloca(sz * sizeof(WCHAR));
 
-        if (MultiByteToWideChar(CP_UTF8, flags,
-                                filename, len_0, wfilename, sz) &&
-            MultiByteToWideChar(CP_UTF8, 0, mode, strlen(mode) + 1,
-                                wmode, OSSL_NELEM(wmode)) &&
-            (file = _wfopen(wfilename, wmode)) == NULL &&
-            (errno == ENOENT || errno == EBADF)
-            ) {
+        if (MultiByteToWideChar(CP_UTF8, flags, filename, len_0, wfilename, sz)
+            && MultiByteToWideChar(CP_UTF8, 0, mode, strlen(mode) + 1, wmode,
+                                   OSSL_NELEM(wmode))
+            && (file = _wfopen(wfilename, wmode)) == NULL
+            && (errno == ENOENT || errno == EBADF)) {
             /*
              * UTF-8 decode succeeded, but no file, filename
              * could still have been locale-ized...
@@ -96,10 +95,10 @@ FILE *openssl_fopen(const char *filename, const char *mode)
             if ((newname = OPENSSL_malloc(strlen(filename) + 1)) == NULL)
                 return NULL;
 
-            for (iterator = newname, lastchar = '\0';
-                *filename; filename++, iterator++) {
-                if (lastchar == '/' && filename[0] == '.'
-                    && filename[1] != '.' && filename[1] != '/') {
+            for (iterator = newname, lastchar = '\0'; *filename;
+                 filename++, iterator++) {
+                if (lastchar == '/' && filename[0] == '.' && filename[1] != '.'
+                    && filename[1] != '/') {
                     /* Leading dots are not permitted in plain DOS. */
                     *iterator = '_';
                 } else {

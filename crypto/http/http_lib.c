@@ -51,8 +51,8 @@ static void free_pstring(char **pstr)
 }
 
 int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
-                   char **pport, int *pport_num,
-                   char **ppath, char **pquery, char **pfrag)
+                   char **pport, int *pport_num, char **ppath, char **pquery,
+                   char **pfrag)
 {
     const char *p, *tmp;
     const char *scheme, *scheme_end;
@@ -123,8 +123,7 @@ int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
         ERR_raise_data(ERR_LIB_HTTP, HTTP_R_INVALID_PORT_NUMBER, "%s", port);
         goto err;
     }
-    for (port_end = port; '0' <= *port_end && *port_end <= '9'; port_end++)
-        ;
+    for (port_end = port; '0' <= *port_end && *port_end <= '9'; port_end++);
     if (port == p) /* port was given explicitly */
         p += port_end - port;
 
@@ -156,11 +155,11 @@ int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
     }
 
     if (!copy_substring(pscheme, scheme, scheme_end)
-            || !copy_substring(phost, host, host_end)
-            || !copy_substring(pport, port, port_end)
-            || !copy_substring(puser, user, user_end)
-            || !copy_substring(pquery, query, query_end)
-            || !copy_substring(pfrag, frag, frag_end))
+        || !copy_substring(phost, host, host_end)
+        || !copy_substring(pport, port, port_end)
+        || !copy_substring(puser, user, user_end)
+        || !copy_substring(pquery, query, query_end)
+        || !copy_substring(pfrag, frag, frag_end))
         goto err;
     if (pport_num != NULL)
         *pport_num = (int)portnum;
@@ -176,10 +175,10 @@ int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
     }
     return 1;
 
- parse_err:
+parse_err:
     ERR_raise(ERR_LIB_HTTP, HTTP_R_ERROR_PARSING_URL);
 
- err:
+err:
     free_pstring(pscheme);
     free_pstring(puser);
     free_pstring(phost);
@@ -193,8 +192,8 @@ int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
 #ifndef OPENSSL_NO_HTTP
 
 int OSSL_HTTP_parse_url(const char *url, int *pssl, char **puser, char **phost,
-                        char **pport, int *pport_num,
-                        char **ppath, char **pquery, char **pfrag)
+                        char **pport, int *pport_num, char **ppath,
+                        char **pquery, char **pfrag)
 {
     char *scheme, *port;
     int ssl = 0, portnum;
@@ -202,8 +201,8 @@ int OSSL_HTTP_parse_url(const char *url, int *pssl, char **puser, char **phost,
     init_pstring(pport);
     if (pssl != NULL)
         *pssl = 0;
-    if (!OSSL_parse_url(url, &scheme, puser, phost, &port, pport_num,
-                        ppath, pquery, pfrag))
+    if (!OSSL_parse_url(url, &scheme, puser, phost, &port, pport_num, ppath,
+                        pquery, pfrag))
         return 0;
 
     /* check for optional HTTP scheme "http[s]" */
@@ -240,7 +239,7 @@ int OSSL_HTTP_parse_url(const char *url, int *pssl, char **puser, char **phost,
     }
     return 1;
 
- err:
+err:
     free_pstring(puser);
     free_pstring(phost);
     free_pstring(ppath);
@@ -259,7 +258,8 @@ static int use_proxy(const char *no_proxy, const char *server)
     if (!ossl_assert(server != NULL))
         return 0;
     sl = strlen(server);
-    if (sl >= 2 && sl < sizeof(host) + 2 && server[0] == '[' && server[sl - 1] == ']') {
+    if (sl >= 2 && sl < sizeof(host) + 2 && server[0] == '['
+        && server[sl - 1] == ']') {
         /* strip leading '[' and trailing ']' from escaped IPv6 address */
         sl -= 2;
         strncpy(host, server + 1, sl);
@@ -277,9 +277,11 @@ static int use_proxy(const char *no_proxy, const char *server)
 
     if (no_proxy != NULL)
         found = strstr(no_proxy, server);
-    while (found != NULL
-           && ((found != no_proxy && !ossl_isspace(found[-1]) && found[-1] != ',')
-               || (found[sl] != '\0' && !ossl_isspace(found[sl]) && found[sl] != ',')))
+    while (
+        found != NULL
+        && ((found != no_proxy && !ossl_isspace(found[-1]) && found[-1] != ',')
+            || (found[sl] != '\0' && !ossl_isspace(found[sl])
+                && found[sl] != ',')))
         found = strstr(found + 1, server);
     return found == NULL;
 }
@@ -295,7 +297,8 @@ const char *OSSL_HTTP_adapt_proxy(const char *proxy, const char *no_proxy,
     if (proxy == NULL)
         proxy = ossl_safe_getenv(use_ssl ? "https_proxy" : "http_proxy");
     if (proxy == NULL)
-        proxy = ossl_safe_getenv(use_ssl ? OPENSSL_HTTPS_PROXY : OPENSSL_HTTP_PROXY);
+        proxy = ossl_safe_getenv(use_ssl ? OPENSSL_HTTPS_PROXY
+                                         : OPENSSL_HTTP_PROXY);
 
     if (proxy == NULL || *proxy == '\0' || !use_proxy(no_proxy, server))
         return NULL;

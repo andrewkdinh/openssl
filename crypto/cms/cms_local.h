@@ -8,9 +8,9 @@
  */
 
 #ifndef OSSL_CRYPTO_CMS_LOCAL_H
-# define OSSL_CRYPTO_CMS_LOCAL_H
+#define OSSL_CRYPTO_CMS_LOCAL_H
 
-# include <openssl/x509.h>
+#include <openssl/x509.h>
 
 /*
  * Cryptographic message syntax (CMS) structures: taken from RFC3852
@@ -298,8 +298,8 @@ struct CMS_RevocationInfoChoice_st {
     } d;
 };
 
-# define CMS_REVCHOICE_CRL               0
-# define CMS_REVCHOICE_OTHER             1
+#define CMS_REVCHOICE_CRL               0
+#define CMS_REVCHOICE_OTHER             1
 
 struct CMS_OtherRevocationInfoFormat_st {
     ASN1_OBJECT *otherRevInfoFormat;
@@ -317,11 +317,11 @@ struct CMS_CertificateChoices {
     } d;
 };
 
-# define CMS_CERTCHOICE_CERT             0
-# define CMS_CERTCHOICE_EXCERT           1
-# define CMS_CERTCHOICE_V1ACERT          2
-# define CMS_CERTCHOICE_V2ACERT          3
-# define CMS_CERTCHOICE_OTHER            4
+#define CMS_CERTCHOICE_CERT             0
+#define CMS_CERTCHOICE_EXCERT           1
+#define CMS_CERTCHOICE_V1ACERT          2
+#define CMS_CERTCHOICE_V2ACERT          3
+#define CMS_CERTCHOICE_OTHER            4
 
 struct CMS_OtherCertificateFormat_st {
     ASN1_OBJECT *otherCertFormat;
@@ -376,18 +376,18 @@ DECLARE_ASN1_ITEM(CMS_RecipientInfo)
 DECLARE_ASN1_ITEM(CMS_PasswordRecipientInfo)
 DECLARE_ASN1_ALLOC_FUNCTIONS(CMS_IssuerAndSerialNumber)
 
-# define CMS_SIGNERINFO_ISSUER_SERIAL    0
-# define CMS_SIGNERINFO_KEYIDENTIFIER    1
+#define CMS_SIGNERINFO_ISSUER_SERIAL    0
+#define CMS_SIGNERINFO_KEYIDENTIFIER    1
 
-# define CMS_RECIPINFO_ISSUER_SERIAL     0
-# define CMS_RECIPINFO_KEYIDENTIFIER     1
+#define CMS_RECIPINFO_ISSUER_SERIAL     0
+#define CMS_RECIPINFO_KEYIDENTIFIER     1
 
-# define CMS_REK_ISSUER_SERIAL           0
-# define CMS_REK_KEYIDENTIFIER           1
+#define CMS_REK_ISSUER_SERIAL           0
+#define CMS_REK_KEYIDENTIFIER           1
 
-# define CMS_OIK_ISSUER_SERIAL           0
-# define CMS_OIK_KEYIDENTIFIER           1
-# define CMS_OIK_PUBKEY                  2
+#define CMS_OIK_ISSUER_SERIAL           0
+#define CMS_OIK_KEYIDENTIFIER           1
+#define CMS_OIK_PUBKEY                  2
 
 BIO *ossl_cms_content_bio(CMS_ContentInfo *cms);
 const CMS_CTX *ossl_cms_get0_cmsctx(const CMS_ContentInfo *cms);
@@ -404,8 +404,8 @@ CMS_ContentInfo *ossl_cms_DigestedData_create(const EVP_MD *md,
                                               OSSL_LIB_CTX *libctx,
                                               const char *propq);
 BIO *ossl_cms_DigestedData_init_bio(const CMS_ContentInfo *cms);
-int ossl_cms_DigestedData_do_final(const CMS_ContentInfo *cms,
-                                   BIO *chain, int verify);
+int ossl_cms_DigestedData_do_final(const CMS_ContentInfo *cms, BIO *chain,
+                                   int verify);
 
 BIO *ossl_cms_SignedData_init_bio(CMS_ContentInfo *cms);
 int ossl_cms_SignedData_final(CMS_ContentInfo *cms, BIO *chain,
@@ -452,7 +452,8 @@ BIO *ossl_cms_AuthEnvelopedData_init_bio(CMS_ContentInfo *cms);
 int ossl_cms_AuthEnvelopedData_final(CMS_ContentInfo *cms, BIO *cmsbio);
 CMS_EnvelopedData *ossl_cms_get0_enveloped(CMS_ContentInfo *cms);
 CMS_AuthEnvelopedData *ossl_cms_get0_auth_enveloped(CMS_ContentInfo *cms);
-CMS_EncryptedContentInfo *ossl_cms_get0_env_enc_content(const CMS_ContentInfo *cms);
+CMS_EncryptedContentInfo *
+ossl_cms_get0_env_enc_content(const CMS_ContentInfo *cms);
 
 /* RecipientInfo routines */
 int ossl_cms_env_asn1_ctrl(CMS_RecipientInfo *ri, int cmd);
@@ -465,8 +466,7 @@ void ossl_cms_RecipientInfos_set_cmsctx(CMS_ContentInfo *cms);
 int ossl_cms_RecipientInfo_kari_init(CMS_RecipientInfo *ri, X509 *recip,
                                      EVP_PKEY *recipPubKey, X509 *originator,
                                      EVP_PKEY *originatorPrivKey,
-                                     unsigned int flags,
-                                     const CMS_CTX *ctx);
+                                     unsigned int flags, const CMS_CTX *ctx);
 int ossl_cms_RecipientInfo_kari_encrypt(const CMS_ContentInfo *cms,
                                         CMS_RecipientInfo *ri);
 
@@ -476,7 +476,6 @@ int ossl_cms_RecipientInfo_pwri_crypt(const CMS_ContentInfo *cms,
 /* SignerInfo routines */
 int ossl_cms_si_check_attributes(const CMS_SignerInfo *si);
 void ossl_cms_SignerInfos_set_cmsctx(CMS_ContentInfo *cms);
-
 
 /* ESS routines */
 int ossl_cms_check_signing_certs(const CMS_SignerInfo *si,

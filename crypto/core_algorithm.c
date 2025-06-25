@@ -87,7 +87,7 @@ static int algorithm_do_map(OSSL_PROVIDER *provider, const OSSL_ALGORITHM *map,
         ret = -1;
     }
 
- end:
+end:
     data->unreserve_store(data->data);
 
     return ret;
@@ -110,15 +110,13 @@ static int algorithm_do_this(OSSL_PROVIDER *provider, void *cbdata)
     if (data->operation_id != 0)
         first_operation = last_operation = data->operation_id;
 
-    for (cur_operation = first_operation;
-         cur_operation <= last_operation;
+    for (cur_operation = first_operation; cur_operation <= last_operation;
          cur_operation++) {
         int no_store = 0;        /* Assume caching is ok */
         const OSSL_ALGORITHM *map = NULL;
         int ret = 0;
 
-        map = ossl_provider_query_operation(provider, cur_operation,
-                                            &no_store);
+        map = ossl_provider_query_operation(provider, cur_operation, &no_store);
         ret = algorithm_do_map(provider, map, cur_operation, no_store, data);
         ossl_provider_unquery_operation(provider, cur_operation, map);
 
@@ -140,14 +138,16 @@ void ossl_algorithm_do_all(OSSL_LIB_CTX *libctx, int operation_id,
                                       int no_store, void *data, int *result),
                            int (*reserve_store)(int no_store, void *data),
                            void (*fn)(OSSL_PROVIDER *provider,
-                                      const OSSL_ALGORITHM *algo,
-                                      int no_store, void *data),
+                                      const OSSL_ALGORITHM *algo, int no_store,
+                                      void *data),
                            int (*unreserve_store)(void *data),
                            int (*post)(OSSL_PROVIDER *, int operation_id,
                                        int no_store, void *data, int *result),
                            void *data)
 {
-    struct algorithm_data_st cbdata = { 0, };
+    struct algorithm_data_st cbdata = {
+        0,
+    };
 
     cbdata.libctx = libctx;
     cbdata.operation_id = operation_id;

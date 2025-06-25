@@ -56,8 +56,8 @@ int ossl_FIPS_IND_get_settable(const OSSL_FIPS_IND *ind, int id)
  * ossl_FIPS_IND_on_unapproved() functions may be required.
  */
 int ossl_FIPS_IND_on_unapproved(OSSL_FIPS_IND *ind, int id,
-                                OSSL_LIB_CTX *libctx,
-                                const char *algname, const char *opname,
+                                OSSL_LIB_CTX *libctx, const char *algname,
+                                const char *opname,
                                 OSSL_FIPS_IND_CHECK_CB *config_check_fn)
 {
     /* Set to unapproved. Once unapproved mode is set this will not be reset */
@@ -93,7 +93,8 @@ int ossl_FIPS_IND_set_ctx_param(OSSL_FIPS_IND *ind, int id,
 
 int ossl_FIPS_IND_get_ctx_param(const OSSL_FIPS_IND *ind, OSSL_PARAM params[])
 {
-    OSSL_PARAM *p = OSSL_PARAM_locate(params, OSSL_ALG_PARAM_FIPS_APPROVED_INDICATOR);
+    OSSL_PARAM *p =
+        OSSL_PARAM_locate(params, OSSL_ALG_PARAM_FIPS_APPROVED_INDICATOR);
 
     return p == NULL || OSSL_PARAM_set_int(p, ind->approved);
 }

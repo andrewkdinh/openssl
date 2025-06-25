@@ -17,7 +17,6 @@
 #include <openssl/opensslv.h>
 #include <openssl/bio.h>
 
-
 const char *DES_options(void)
 {
     static int init = 1;

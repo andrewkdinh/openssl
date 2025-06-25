@@ -32,10 +32,10 @@ typedef struct {
 
 # define data(ctx)       EVP_C_DATA(EVP_CAST_KEY,ctx)
 
-IMPLEMENT_BLOCK_CIPHER(cast5, ks, CAST, EVP_CAST_KEY,
-                       NID_cast5, 8, CAST_KEY_LENGTH, 8, 64,
-                       EVP_CIPH_VARIABLE_LENGTH, cast_init_key, NULL,
-                       EVP_CIPHER_set_asn1_iv, EVP_CIPHER_get_asn1_iv, NULL)
+IMPLEMENT_BLOCK_CIPHER(cast5, ks, CAST, EVP_CAST_KEY, NID_cast5, 8,
+                       CAST_KEY_LENGTH, 8, 64, EVP_CIPH_VARIABLE_LENGTH,
+                       cast_init_key, NULL, EVP_CIPHER_set_asn1_iv,
+                       EVP_CIPHER_get_asn1_iv, NULL)
 
 static int cast_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
                          const unsigned char *iv, int enc)

@@ -72,8 +72,8 @@ err:
  * agreement, the only PCT defined in SP 800-56A is that of Section 5.6.2.4:
  * the comparison of the original public key to a newly calculated public key.
  */
-static int dsa_keygen_knownanswer_test(DSA *dsa, BN_CTX *ctx,
-                                       OSSL_CALLBACK *cb, void *cbarg)
+static int dsa_keygen_knownanswer_test(DSA *dsa, BN_CTX *ctx, OSSL_CALLBACK *cb,
+                                       void *cbarg)
 {
     int len, ret = 0;
     OSSL_SELF_TEST *st = NULL;
@@ -88,7 +88,7 @@ static int dsa_keygen_knownanswer_test(DSA *dsa, BN_CTX *ctx,
         goto err;
 
     OSSL_SELF_TEST_onbegin(st, OSSL_SELF_TEST_TYPE_PCT_KAT,
-                               OSSL_SELF_TEST_DESC_PCT_DSA);
+                           OSSL_SELF_TEST_DESC_PCT_DSA);
 
     if (!ossl_dsa_generate_public_key(ctx, dsa, dsa->priv_key, pub_key2))
         goto err;
@@ -171,8 +171,8 @@ static int dsa_keygen(DSA *dsa)
      * Max Private key size N = len(q)
      */
     if (!ossl_ffc_generate_private_key(ctx, &dsa->params,
-                                       BN_num_bits(dsa->params.q),
-                                       MIN_STRENGTH, priv_key))
+                                       BN_num_bits(dsa->params.q), MIN_STRENGTH,
+                                       priv_key))
         goto err;
 
     if (dsa->pub_key == NULL) {
@@ -196,7 +196,7 @@ static int dsa_keygen(DSA *dsa)
 
         OSSL_SELF_TEST_get_callback(dsa->libctx, &cb, &cbarg);
         ok = dsa_keygen_pairwise_test(dsa, cb, cbarg)
-             && dsa_keygen_knownanswer_test(dsa, ctx, cb, cbarg);
+            && dsa_keygen_knownanswer_test(dsa, ctx, cb, cbarg);
         if (!ok) {
             ossl_set_error_state(OSSL_SELF_TEST_TYPE_PCT);
             BN_free(dsa->pub_key);
@@ -210,7 +210,7 @@ static int dsa_keygen(DSA *dsa)
 #endif
     dsa->dirty_cnt++;
 
- err:
+err:
     if (pub_key != dsa->pub_key)
         BN_free(pub_key);
     if (priv_key != dsa->priv_key)

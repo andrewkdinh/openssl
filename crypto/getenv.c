@@ -34,10 +34,10 @@ char *ossl_safe_getenv(const char *name)
          * For the code pages listed below, dwFlags must be set to 0.
          * Otherwise, the function fails with ERROR_INVALID_FLAGS.
          */
-        if (curacp == 50220 || curacp == 50221 || curacp == 50222 ||
-            curacp == 50225 || curacp == 50227 || curacp == 50229 ||
-            (57002 <= curacp && curacp <=57011) || curacp == 65000 ||
-            curacp == 42)
+        if (curacp == 50220 || curacp == 50221 || curacp == 50222
+            || curacp == 50225 || curacp == 50227 || curacp == 50229
+            || (57002 <= curacp && curacp <= 57011) || curacp == 65000
+            || curacp == 42)
             dwFlags = 0;
 
         /* query for buffer len */
@@ -48,7 +48,8 @@ char *ossl_safe_getenv(const char *name)
 
         if (NULL != namew) {
             /* convert name to wide string */
-            fsize = MultiByteToWideChar(curacp, dwFlags, name, -1, namew, rsize);
+            fsize =
+                MultiByteToWideChar(curacp, dwFlags, name, -1, namew, rsize);
             /* if conversion is ok, then determine value string size in wchars */
             if (fsize > 0)
                 envlen = GetEnvironmentVariableW(namew, NULL, 0);
@@ -71,8 +72,9 @@ char *ossl_safe_getenv(const char *name)
 
         if (NULL != val) {
             /* convert value string from wide to utf-8 */
-            if (WideCharToMultiByte(CP_UTF8, 0, valw, -1, val, vallen,
-                                    NULL, NULL) == 0) {
+            if (WideCharToMultiByte(CP_UTF8, 0, valw, -1, val, vallen, NULL,
+                                    NULL)
+                == 0) {
                 OPENSSL_free(val);
                 val = NULL;
             }

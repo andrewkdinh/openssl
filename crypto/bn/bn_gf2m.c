@@ -28,7 +28,6 @@
                        |  (((w) & 2) << 1) \
                        |   ((w) & 1))
 
-
 /* Platform-specific macros to accelerate squaring. */
 # if defined(SIXTY_FOUR_BIT) || defined(SIXTY_FOUR_BIT_LONG)
 #  define SQR1(w) \
@@ -269,12 +268,8 @@ int BN_GF2m_add(BIGNUM *r, const BIGNUM *a, const BIGNUM *b)
     if (bn_wexpand(r, at->top) == NULL)
         return 0;
 
-    for (i = 0; i < bt->top; i++) {
-        r->d[i] = at->d[i] ^ bt->d[i];
-    }
-    for (; i < at->top; i++) {
-        r->d[i] = at->d[i];
-    }
+    for (i = 0; i < bt->top; i++) { r->d[i] = at->d[i] ^ bt->d[i]; }
+    for (; i < at->top; i++) { r->d[i] = at->d[i]; }
 
     r->top = at->top;
     bn_correct_top(r);
@@ -311,9 +306,7 @@ int BN_GF2m_mod_arr(BIGNUM *r, const BIGNUM *a, const int p[])
     if (a != r) {
         if (!bn_wexpand(r, a->top))
             return 0;
-        for (j = 0; j < a->top; j++) {
-            r->d[j] = a->d[j];
-        }
+        for (j = 0; j < a->top; j++) { r->d[j] = a->d[j]; }
         r->top = a->top;
     }
     z = r->d;
@@ -375,7 +368,6 @@ int BN_GF2m_mod_arr(BIGNUM *r, const BIGNUM *a, const int p[])
             if (d0 && (tmp_ulong = zz >> d1))
                 z[n + 1] ^= tmp_ulong;
         }
-
     }
 
     bn_correct_top(r);
@@ -431,8 +423,7 @@ int BN_GF2m_mod_mul_arr(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
         goto err;
     s->top = zlen;
 
-    for (i = 0; i < zlen; i++)
-        s->d[i] = 0;
+    for (i = 0; i < zlen; i++) s->d[i] = 0;
 
     for (j = 0; j < b->top; j += 2) {
         y0 = b->d[j];
@@ -441,8 +432,7 @@ int BN_GF2m_mod_mul_arr(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
             x0 = a->d[i];
             x1 = ((i + 1) == a->top) ? 0 : a->d[i + 1];
             bn_GF2m_mul_2x2(zz, x1, x0, y1, y0);
-            for (k = 0; k < 4; k++)
-                s->d[i + j + k] ^= zz[k];
+            for (k = 0; k < 4; k++) s->d[i + j + k] ^= zz[k];
         }
     }
 
@@ -451,7 +441,7 @@ int BN_GF2m_mod_mul_arr(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
         ret = 1;
     bn_check_top(r);
 
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -484,14 +474,13 @@ int BN_GF2m_mod_mul(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
     }
     ret = BN_GF2m_mod_mul_arr(r, a, b, arr, ctx);
     bn_check_top(r);
- err:
+err:
     OPENSSL_free(arr);
     return ret;
 }
 
 /* Square a, reduce the result mod p, and store it in a.  r could be a. */
-int BN_GF2m_mod_sqr_arr(BIGNUM *r, const BIGNUM *a, const int p[],
-                        BN_CTX *ctx)
+int BN_GF2m_mod_sqr_arr(BIGNUM *r, const BIGNUM *a, const int p[], BN_CTX *ctx)
 {
     int i, ret = 0;
     BIGNUM *s;
@@ -514,7 +503,7 @@ int BN_GF2m_mod_sqr_arr(BIGNUM *r, const BIGNUM *a, const int p[],
         goto err;
     bn_check_top(r);
     ret = 1;
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -544,7 +533,7 @@ int BN_GF2m_mod_sqr(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
     }
     ret = BN_GF2m_mod_sqr_arr(r, a, arr, ctx);
     bn_check_top(r);
- err:
+err:
     OPENSSL_free(arr);
     return ret;
 }
@@ -555,8 +544,8 @@ int BN_GF2m_mod_sqr(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
  * Hernandez, J.L., and Menezes, A.  "Software Implementation of Elliptic
  * Curve Cryptography Over Binary Fields".
  */
-static int BN_GF2m_mod_inv_vartime(BIGNUM *r, const BIGNUM *a,
-                                   const BIGNUM *p, BN_CTX *ctx)
+static int BN_GF2m_mod_inv_vartime(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
+                                   BN_CTX *ctx)
 {
     BIGNUM *b, *c = NULL, *u = NULL, *v = NULL, *tmp;
     int ret = 0;
@@ -626,21 +615,18 @@ static int BN_GF2m_mod_inv_vartime(BIGNUM *r, const BIGNUM *a,
         if (!bn_wexpand(u, top))
             goto err;
         udp = u->d;
-        for (i = u->top; i < top; i++)
-            udp[i] = 0;
+        for (i = u->top; i < top; i++) udp[i] = 0;
         u->top = top;
         if (!bn_wexpand(b, top))
-          goto err;
+            goto err;
         bdp = b->d;
         bdp[0] = 1;
-        for (i = 1; i < top; i++)
-            bdp[i] = 0;
+        for (i = 1; i < top; i++) bdp[i] = 0;
         b->top = top;
         if (!bn_wexpand(c, top))
-          goto err;
+            goto err;
         cdp = c->d;
-        for (i = 0; i < top; i++)
-            cdp[i] = 0;
+        for (i = 0; i < top; i++) cdp[i] = 0;
         c->top = top;
         vdp = v->d;             /* It pays off to "cache" *->d pointers,
                                  * because it allows optimizer to be more
@@ -697,8 +683,7 @@ static int BN_GF2m_mod_inv_vartime(BIGNUM *r, const BIGNUM *a,
                 BN_ULONG ul;
                 int utop = (ubits - 1) / BN_BITS2;
 
-                while ((ul = udp[utop]) == 0 && utop)
-                    utop--;
+                while ((ul = udp[utop]) == 0 && utop) utop--;
                 ubits = utop * BN_BITS2 + BN_num_bits_word(ul);
             }
         }
@@ -711,7 +696,7 @@ static int BN_GF2m_mod_inv_vartime(BIGNUM *r, const BIGNUM *a,
     bn_check_top(r);
     ret = 1;
 
- err:
+err:
 # ifdef BN_DEBUG
     /* BN_CTX_end would complain about the expanded form */
     bn_correct_top(c);
@@ -744,8 +729,8 @@ int BN_GF2m_mod_inv(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
 
     /* generate blinding value */
     do {
-        if (!BN_priv_rand_ex(b, numbits - 1,
-                             BN_RAND_TOP_ANY, BN_RAND_BOTTOM_ANY, 0, ctx))
+        if (!BN_priv_rand_ex(b, numbits - 1, BN_RAND_TOP_ANY,
+                             BN_RAND_BOTTOM_ANY, 0, ctx))
             goto err;
     } while (BN_is_zero(b));
 
@@ -763,7 +748,7 @@ int BN_GF2m_mod_inv(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
 
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -774,8 +759,7 @@ int BN_GF2m_mod_inv(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
  * wrapper function is only provided for convenience; for best performance,
  * use the BN_GF2m_mod_inv function.
  */
-int BN_GF2m_mod_inv_arr(BIGNUM *r, const BIGNUM *xx, const int p[],
-                        BN_CTX *ctx)
+int BN_GF2m_mod_inv_arr(BIGNUM *r, const BIGNUM *xx, const int p[], BN_CTX *ctx)
 {
     BIGNUM *field;
     int ret = 0;
@@ -790,7 +774,7 @@ int BN_GF2m_mod_inv_arr(BIGNUM *r, const BIGNUM *xx, const int p[],
     ret = BN_GF2m_mod_inv(r, xx, field, ctx);
     bn_check_top(r);
 
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -821,7 +805,7 @@ int BN_GF2m_mod_div(BIGNUM *r, const BIGNUM *y, const BIGNUM *x,
     bn_check_top(r);
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -850,7 +834,7 @@ int BN_GF2m_mod_div_arr(BIGNUM *r, const BIGNUM *yy, const BIGNUM *xx,
     ret = BN_GF2m_mod_div(r, yy, xx, field, ctx);
     bn_check_top(r);
 
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -895,7 +879,7 @@ int BN_GF2m_mod_exp_arr(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
         goto err;
     bn_check_top(r);
     ret = 1;
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -927,7 +911,7 @@ int BN_GF2m_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
     }
     ret = BN_GF2m_mod_exp_arr(r, a, b, arr, ctx);
     bn_check_top(r);
- err:
+err:
     OPENSSL_free(arr);
     return ret;
 }
@@ -936,8 +920,7 @@ int BN_GF2m_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
  * Compute the square root of a, reduce modulo p, and store the result in r.
  * r could be a. Uses exponentiation as in algorithm A.4.1 from IEEE P1363.
  */
-int BN_GF2m_mod_sqrt_arr(BIGNUM *r, const BIGNUM *a, const int p[],
-                         BN_CTX *ctx)
+int BN_GF2m_mod_sqrt_arr(BIGNUM *r, const BIGNUM *a, const int p[], BN_CTX *ctx)
 {
     int ret = 0;
     BIGNUM *u;
@@ -959,7 +942,7 @@ int BN_GF2m_mod_sqrt_arr(BIGNUM *r, const BIGNUM *a, const int p[],
     ret = BN_GF2m_mod_exp_arr(r, a, u, p, ctx);
     bn_check_top(r);
 
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -989,7 +972,7 @@ int BN_GF2m_mod_sqrt(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
     }
     ret = BN_GF2m_mod_sqrt_arr(r, a, arr, ctx);
     bn_check_top(r);
- err:
+err:
     OPENSSL_free(arr);
     return ret;
 }
@@ -1092,7 +1075,7 @@ int BN_GF2m_mod_solve_quad_arr(BIGNUM *r, const BIGNUM *a_, const int p[],
 
     ret = 1;
 
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -1123,7 +1106,7 @@ int BN_GF2m_mod_solve_quad(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
     }
     ret = BN_GF2m_mod_solve_quad_arr(r, a, arr, ctx);
     bn_check_top(r);
- err:
+err:
     OPENSSL_free(arr);
     return ret;
 }

@@ -13,8 +13,8 @@
 
 #include "cipher_aria_ccm.h"
 
-static int ccm_aria_initkey(PROV_CCM_CTX *ctx,
-                            const unsigned char *key, size_t keylen)
+static int ccm_aria_initkey(PROV_CCM_CTX *ctx, const unsigned char *key,
+                            size_t keylen)
 {
     PROV_ARIA_CCM_CTX *actx = (PROV_ARIA_CCM_CTX *)ctx;
 
@@ -26,14 +26,12 @@ static int ccm_aria_initkey(PROV_CCM_CTX *ctx,
     return 1;
 }
 
-static const PROV_CCM_HW ccm_aria = {
-    ccm_aria_initkey,
-    ossl_ccm_generic_setiv,
-    ossl_ccm_generic_setaad,
-    ossl_ccm_generic_auth_encrypt,
-    ossl_ccm_generic_auth_decrypt,
-    ossl_ccm_generic_gettag
-};
+static const PROV_CCM_HW ccm_aria = {ccm_aria_initkey,
+                                     ossl_ccm_generic_setiv,
+                                     ossl_ccm_generic_setaad,
+                                     ossl_ccm_generic_auth_encrypt,
+                                     ossl_ccm_generic_auth_decrypt,
+                                     ossl_ccm_generic_gettag};
 const PROV_CCM_HW *ossl_prov_aria_hw_ccm(size_t keybits)
 {
     return &ccm_aria;

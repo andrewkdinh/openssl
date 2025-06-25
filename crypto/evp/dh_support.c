@@ -29,10 +29,10 @@ typedef struct dh_name2id_st {
 #endif
 
 static const DH_GENTYPE_NAME2ID dhtype2id[] = {
-    { "group", DH_PARAMGEN_TYPE_GROUP, TYPE_ANY },
-    { "generator", DH_PARAMGEN_TYPE_GENERATOR, TYPE_DH },
-    { "fips186_4", DH_PARAMGEN_TYPE_FIPS_186_4, TYPE_DHX },
-    { "fips186_2", DH_PARAMGEN_TYPE_FIPS_186_2, TYPE_DHX },
+    {"group", DH_PARAMGEN_TYPE_GROUP, TYPE_ANY},
+    {"generator", DH_PARAMGEN_TYPE_GENERATOR, TYPE_DH},
+    {"fips186_4", DH_PARAMGEN_TYPE_FIPS_186_4, TYPE_DHX},
+    {"fips186_2", DH_PARAMGEN_TYPE_FIPS_186_2, TYPE_DHX},
 };
 
 const char *ossl_dh_gen_type_id2name(int id)
@@ -52,8 +52,7 @@ int ossl_dh_gen_type_name2id(const char *name, int type)
     size_t i;
 
     for (i = 0; i < OSSL_NELEM(dhtype2id); ++i) {
-        if ((dhtype2id[i].type == TYPE_ANY
-             || type == dhtype2id[i].type)
+        if ((dhtype2id[i].type == TYPE_ANY || type == dhtype2id[i].type)
             && strcmp(dhtype2id[i].name, name) == 0)
             return dhtype2id[i].id;
     }

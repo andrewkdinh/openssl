@@ -100,7 +100,8 @@ static const ERR_STRING_DATA X509V3_str_reasons[] = {
      "no issuer details"},
     {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_NO_POLICY_IDENTIFIER),
      "no policy identifier"},
-    {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_NO_PROXY_CERT_POLICY_LANGUAGE_DEFINED),
+    {ERR_PACK(ERR_LIB_X509V3, 0,
+              X509V3_R_NO_PROXY_CERT_POLICY_LANGUAGE_DEFINED),
      "no proxy cert policy language defined"},
     {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_NO_PUBLIC_KEY), "no public key"},
     {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_NO_SUBJECT_DETAILS),
@@ -114,7 +115,8 @@ static const ERR_STRING_DATA X509V3_str_reasons[] = {
      "policy path length"},
     {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_POLICY_PATH_LENGTH_ALREADY_DEFINED),
      "policy path length already defined"},
-    {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_POLICY_WHEN_PROXY_LANGUAGE_REQUIRES_NO_POLICY),
+    {ERR_PACK(ERR_LIB_X509V3, 0,
+              X509V3_R_POLICY_WHEN_PROXY_LANGUAGE_REQUIRES_NO_POLICY),
      "policy when proxy language requires no policy"},
     {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_PURPOSE_NOT_UNIQUE),
      "purpose not unique"},
@@ -137,8 +139,7 @@ static const ERR_STRING_DATA X509V3_str_reasons[] = {
     {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_UNSUPPORTED_TYPE),
      "unsupported type"},
     {ERR_PACK(ERR_LIB_X509V3, 0, X509V3_R_USER_TOO_LONG), "user too long"},
-    {0, NULL}
-};
+    {0, NULL}};
 
 #endif
 

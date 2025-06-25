@@ -76,7 +76,8 @@ static EVP_PKEY *slh_dsa_gen_key(const char *name, uint32_t keysize,
             EVP_PKEY_free(new);
             new = NULL;
         } else {
-            OPENSSL_assert(EVP_PKEY_fromdata(ctx, &new, EVP_PKEY_KEYPAIR, params) == 1);
+            OPENSSL_assert(
+                EVP_PKEY_fromdata(ctx, &new, EVP_PKEY_KEYPAIR, params) == 1);
         }
         goto out;
     }
@@ -165,8 +166,8 @@ static const char *select_keytype(uint8_t selector, uint32_t *keysize)
  * @param out1 Pointer to store the first generated key.
  * @param out2 Pointer to store the second generated key.
  */
-static void slh_dsa_gen_keys(uint8_t **buf, size_t *len,
-                             void **out1, void **out2)
+static void slh_dsa_gen_keys(uint8_t **buf, size_t *len, void **out1,
+                             void **out2)
 {
     uint8_t selector = 0;
     const char *keytype = NULL;
@@ -202,8 +203,8 @@ static void slh_dsa_gen_keys(uint8_t **buf, size_t *len,
  * @param out2 Unused output parameter (placeholder for symmetry with
  *             other key generation functions).
  */
-static void slh_dsa_gen_key_with_params(uint8_t **buf, size_t *len,
-                                        void **out1, void **out2)
+static void slh_dsa_gen_key_with_params(uint8_t **buf, size_t *len, void **out1,
+                                        void **out2)
 {
     uint8_t selector = 0;
     const char *keytype = NULL;
@@ -347,19 +348,19 @@ static void slh_dsa_sign_verify(uint8_t **buf, size_t *len, void *key1,
     *len = 0;
 
     if (selector & 0x1)
-        params[paramidx++] = OSSL_PARAM_construct_octet_string(OSSL_SIGNATURE_PARAM_CONTEXT_STRING,
-                                                               msg, msg_len);
+        params[paramidx++] = OSSL_PARAM_construct_octet_string(
+            OSSL_SIGNATURE_PARAM_CONTEXT_STRING, msg, msg_len);
 
     if (selector & 0x2) {
         intval1 = selector & 0x4;
-        params[paramidx++] = OSSL_PARAM_construct_int(OSSL_SIGNATURE_PARAM_MESSAGE_ENCODING,
-                                                      &intval1);
+        params[paramidx++] = OSSL_PARAM_construct_int(
+            OSSL_SIGNATURE_PARAM_MESSAGE_ENCODING, &intval1);
     }
 
     if (selector & 0x8) {
         intval2 = selector & 0x10;
-        params[paramidx++] = OSSL_PARAM_construct_int(OSSL_SIGNATURE_PARAM_DETERMINISTIC,
-                                                      &intval2);
+        params[paramidx++] = OSSL_PARAM_construct_int(
+            OSSL_SIGNATURE_PARAM_DETERMINISTIC, &intval2);
     }
 
     params[paramidx] = OSSL_PARAM_construct_end();
@@ -374,7 +375,8 @@ static void slh_dsa_sign_verify(uint8_t **buf, size_t *len, void *key1,
     sig_alg = EVP_SIGNATURE_fetch(NULL, keytype, NULL);
     OPENSSL_assert(sig_alg != NULL);
 
-    OPENSSL_assert(EVP_PKEY_sign_message_init(ctx, sig_alg, params) == expect_init_rc);
+    OPENSSL_assert(EVP_PKEY_sign_message_init(ctx, sig_alg, params)
+                   == expect_init_rc);
     /*
      * the context_string parameter can be no more than 255 bytes, so if
      * our random input buffer is greater than that, we expect failure above,
@@ -508,8 +510,8 @@ struct op_table_entry {
      * @param out1  Pointer to store the first output of the operation.
      * @param out2  Pointer to store the second output of the operation.
      */
-    void (*doit)(uint8_t **buf, size_t *len, void *in1, void *in2,
-                 void **out1, void **out2);
+    void (*doit)(uint8_t **buf, size_t *len, void *in1, void *in2, void **out1,
+                 void **out2);
 
     /**
      * @brief Function pointer for cleaning up after the operation.
@@ -523,28 +525,12 @@ struct op_table_entry {
 };
 
 static struct op_table_entry ops[] = {
-    {
-        "Generate SLH-DSA keys",
-        slh_dsa_gen_keys,
-        NULL,
-        slh_dsa_clean_keys
-    }, {
-        "Generate SLH-DSA keys with params",
-        slh_dsa_gen_key_with_params,
-        NULL,
-        slh_dsa_clean_keys
-    }, {
-        "SLH-DSA Export/Import",
-        slh_dsa_gen_keys,
-        slh_dsa_export_import,
-        slh_dsa_clean_keys
-    }, {
-        "SLH-DSA sign and verify",
-        NULL,
-        slh_dsa_sign_verify,
-        slh_dsa_clean_keys
-    }
-};
+    {"Generate SLH-DSA keys", slh_dsa_gen_keys, NULL, slh_dsa_clean_keys},
+    {"Generate SLH-DSA keys with params", slh_dsa_gen_key_with_params, NULL,
+     slh_dsa_clean_keys},
+    {"SLH-DSA Export/Import", slh_dsa_gen_keys, slh_dsa_export_import,
+     slh_dsa_clean_keys},
+    {"SLH-DSA sign and verify", NULL, slh_dsa_sign_verify, slh_dsa_clean_keys}};
 
 int FuzzerInitialize(int *argc, char ***argv)
 {

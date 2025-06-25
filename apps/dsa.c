@@ -34,11 +34,23 @@
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_INFORM, OPT_OUTFORM, OPT_IN, OPT_OUT, OPT_ENGINE,
+    OPT_INFORM,
+    OPT_OUTFORM,
+    OPT_IN,
+    OPT_OUT,
+    OPT_ENGINE,
     /* Do not change the order here; see case statements below */
-    OPT_PVK_NONE, OPT_PVK_WEAK, OPT_PVK_STRONG,
-    OPT_NOOUT, OPT_TEXT, OPT_MODULUS, OPT_PUBIN,
-    OPT_PUBOUT, OPT_CIPHER, OPT_PASSIN, OPT_PASSOUT,
+    OPT_PVK_NONE,
+    OPT_PVK_WEAK,
+    OPT_PVK_STRONG,
+    OPT_NOOUT,
+    OPT_TEXT,
+    OPT_MODULUS,
+    OPT_PUBIN,
+    OPT_PUBOUT,
+    OPT_CIPHER,
+    OPT_PASSIN,
+    OPT_PASSOUT,
     OPT_PROV_ENUM
 } OPTION_CHOICE;
 
@@ -47,7 +59,8 @@ const OPTIONS dsa_options[] = {
     {"help", OPT_HELP, '-', "Display this summary"},
     {"", OPT_CIPHER, '-', "Any supported cipher"},
 #ifndef OPENSSL_NO_RC4
-    {"pvk-strong", OPT_PVK_STRONG, '-', "Enable 'Strong' PVK encoding level (default)"},
+    {"pvk-strong", OPT_PVK_STRONG, '-',
+     "Enable 'Strong' PVK encoding level (default)"},
     {"pvk-weak", OPT_PVK_WEAK, '-', "Enable 'Weak' PVK encoding level"},
     {"pvk-none", OPT_PVK_NONE, '-', "Don't enforce PVK encoding"},
 #endif
@@ -71,8 +84,7 @@ const OPTIONS dsa_options[] = {
     {"passout", OPT_PASSOUT, 's', "Output file pass phrase source"},
 
     OPT_PROV_OPTIONS,
-    {NULL}
-};
+    {NULL}};
 
 int dsa_main(int argc, char **argv)
 {
@@ -98,7 +110,7 @@ int dsa_main(int argc, char **argv)
         switch (o) {
         case OPT_EOF:
         case OPT_ERR:
- opthelp:
+opthelp:
             ret = 0;
             BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);
             goto end;
@@ -251,8 +263,8 @@ int dsa_main(int argc, char **argv)
         selection = OSSL_KEYMGMT_SELECT_PUBLIC_KEY;
     } else {
         assert(private);
-        selection = (OSSL_KEYMGMT_SELECT_KEYPAIR
-                     | OSSL_KEYMGMT_SELECT_ALL_PARAMETERS);
+        selection =
+            (OSSL_KEYMGMT_SELECT_KEYPAIR | OSSL_KEYMGMT_SELECT_ALL_PARAMETERS);
     }
 
     /* Perform the encoding */
@@ -272,14 +284,13 @@ int dsa_main(int argc, char **argv)
         OSSL_ENCODER_CTX_set_passphrase_ui(ectx, get_ui_method(), NULL);
         if (passout != NULL)
             /* When passout given, override the passphrase prompter */
-            OSSL_ENCODER_CTX_set_passphrase(ectx,
-                                            (const unsigned char *)passout,
-                                            strlen(passout));
+            OSSL_ENCODER_CTX_set_passphrase(
+                ectx, (const unsigned char *)passout, strlen(passout));
     }
 
     /* PVK requires a bit more */
     if (outformat == FORMAT_PVK) {
-        OSSL_PARAM params[2] = { OSSL_PARAM_END, OSSL_PARAM_END };
+        OSSL_PARAM params[2] = {OSSL_PARAM_END, OSSL_PARAM_END};
 
         params[0] = OSSL_PARAM_construct_int("encrypt-level", &pvk_encr);
         if (!OSSL_ENCODER_CTX_set_params(ectx, params)) {
@@ -293,7 +304,7 @@ int dsa_main(int argc, char **argv)
         goto end;
     }
     ret = 0;
- end:
+end:
     if (ret != 0)
         ERR_print_errors(bio_err);
     OSSL_ENCODER_CTX_free(ectx);

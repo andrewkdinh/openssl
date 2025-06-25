@@ -51,7 +51,7 @@ static int fbytes(unsigned char *buf, size_t num, ossl_unused const char *name,
 
     fbytes_counter = (fbytes_counter + 1) % OSSL_NELEM(numbers);
     ret = 1;
- err:
+err:
     BN_free(tmp);
     return ret;
 }
@@ -96,24 +96,23 @@ static int x9_62_tests(int n)
 
     TEST_info("ECDSA KATs for curve %s", OBJ_nid2sn(nid));
 
-#ifdef FIPS_MODULE
+# ifdef FIPS_MODULE
     if (EC_curve_nid2nist(nid) == NULL)
         return TEST_skip("skip non approved curves");
-#endif /* FIPS_MODULE */
+# endif /* FIPS_MODULE */
 
     if (!TEST_ptr(mctx = EVP_MD_CTX_new())
         /* get the message digest */
         || !TEST_ptr(message = OPENSSL_hexstr2buf(tbs, &msg_len))
-        || !TEST_true(EVP_DigestInit_ex(mctx, EVP_get_digestbynid(md_nid), NULL))
+        || !TEST_true(
+            EVP_DigestInit_ex(mctx, EVP_get_digestbynid(md_nid), NULL))
         || !TEST_true(EVP_DigestUpdate(mctx, message, msg_len))
         || !TEST_true(EVP_DigestFinal_ex(mctx, digest, &dgst_len))
         /* create the key */
         || !TEST_ptr(key = EC_KEY_new_by_curve_name(nid))
         /* load KAT variables */
-        || !TEST_ptr(r = BN_new())
-        || !TEST_ptr(s = BN_new())
-        || !TEST_true(BN_hex2bn(&r, r_in))
-        || !TEST_true(BN_hex2bn(&s, s_in)))
+        || !TEST_ptr(r = BN_new()) || !TEST_ptr(s = BN_new())
+        || !TEST_true(BN_hex2bn(&r, r_in)) || !TEST_true(BN_hex2bn(&s, s_in)))
         goto err;
 
     /* public key must match KAT */
@@ -122,28 +121,26 @@ static int x9_62_tests(int n)
         || !TEST_true(p_len = EC_KEY_key2buf(key, POINT_CONVERSION_UNCOMPRESSED,
                                              &pbuf, NULL))
         || !TEST_ptr(qbuf = OPENSSL_hexstr2buf(ecdsa_cavs_kats[n].Q, &q_len))
-        || !TEST_int_eq(q_len, p_len)
-        || !TEST_mem_eq(qbuf, q_len, pbuf, p_len))
+        || !TEST_int_eq(q_len, p_len) || !TEST_mem_eq(qbuf, q_len, pbuf, p_len))
         goto err;
 
     /* create the signature via ECDSA_sign_setup to avoid use of ECDSA nonces */
     fake_rand_set_callback(RAND_get0_private(NULL), &fbytes);
     if (!TEST_true(ECDSA_sign_setup(key, NULL, &kinv, &rp))
-        || !TEST_ptr(signature = ECDSA_do_sign_ex(digest, dgst_len,
-                                                  kinv, rp, key))
+        || !TEST_ptr(signature =
+                         ECDSA_do_sign_ex(digest, dgst_len, kinv, rp, key))
         /* verify the signature */
         || !TEST_int_eq(ECDSA_do_verify(digest, dgst_len, signature, key), 1))
         goto err;
 
     /* compare the created signature with the expected signature */
     ECDSA_SIG_get0(signature, &sig_r, &sig_s);
-    if (!TEST_BN_eq(sig_r, r)
-        || !TEST_BN_eq(sig_s, s))
+    if (!TEST_BN_eq(sig_r, r) || !TEST_BN_eq(sig_s, s))
         goto err;
 
     ret = 1;
 
- err:
+err:
     OPENSSL_free(message);
     OPENSSL_free(pbuf);
     OPENSSL_free(qbuf);
@@ -176,7 +173,7 @@ static int x9_62_tests(int n)
 static int set_sm2_id(EVP_MD_CTX *mctx, EVP_PKEY *pkey)
 {
     /* With the SM2 key type, the SM2 ID is mandatory */
-    static const char sm2_id[] = { 1, 2, 3, 4, 'l', 'e', 't', 't', 'e', 'r' };
+    static const char sm2_id[] = {1, 2, 3, 4, 'l', 'e', 't', 't', 'e', 'r'};
     EVP_PKEY_CTX *pctx;
 
     if (!TEST_ptr(pctx = EVP_MD_CTX_get_pkey_ctx(mctx))
@@ -254,17 +251,20 @@ static int test_builtin(int n, int as)
         /* negative test, verify with wrong key, 0 return */
         || !TEST_true(EVP_DigestVerifyInit(mctx, NULL, NULL, NULL, pkey_neg))
         || (as == EVP_PKEY_SM2 && !set_sm2_id(mctx, pkey_neg))
-        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)), 0)
+        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)),
+                        0)
         || !TEST_true(EVP_MD_CTX_reset(mctx))
         /* negative test, verify with wrong signature length, -1 return */
         || !TEST_true(EVP_DigestVerifyInit(mctx, NULL, NULL, NULL, pkey))
         || (as == EVP_PKEY_SM2 && !set_sm2_id(mctx, pkey))
-        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len - 1, tbs, sizeof(tbs)), -1)
+        || !TEST_int_eq(
+            EVP_DigestVerify(mctx, sig, sig_len - 1, tbs, sizeof(tbs)), -1)
         || !TEST_true(EVP_MD_CTX_reset(mctx))
         /* positive test, verify with correct key, 1 return */
         || !TEST_true(EVP_DigestVerifyInit(mctx, NULL, NULL, NULL, pkey))
         || (as == EVP_PKEY_SM2 && !set_sm2_id(mctx, pkey))
-        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)), 1)
+        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)),
+                        1)
         || !TEST_true(EVP_MD_CTX_reset(mctx)))
         goto err;
 
@@ -272,14 +272,16 @@ static int test_builtin(int n, int as)
     tbs[0] ^= 1;
     if (!TEST_true(EVP_DigestVerifyInit(mctx, NULL, NULL, NULL, pkey))
         || (as == EVP_PKEY_SM2 && !set_sm2_id(mctx, pkey))
-        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)), 0)
+        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)),
+                        0)
         || !TEST_true(EVP_MD_CTX_reset(mctx)))
         goto err;
     /* un-muck and test it verifies */
     tbs[0] ^= 1;
     if (!TEST_true(EVP_DigestVerifyInit(mctx, NULL, NULL, NULL, pkey))
         || (as == EVP_PKEY_SM2 && !set_sm2_id(mctx, pkey))
-        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)), 1)
+        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)),
+                        1)
         || !TEST_true(EVP_MD_CTX_reset(mctx)))
         goto err;
 
@@ -314,19 +316,21 @@ static int test_builtin(int n, int as)
     sig[offset] ^= dirt;
     if (!TEST_true(EVP_DigestVerifyInit(mctx, NULL, NULL, NULL, pkey))
         || (as == EVP_PKEY_SM2 && !set_sm2_id(mctx, pkey))
-        || !TEST_int_ne(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)), 1)
+        || !TEST_int_ne(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)),
+                        1)
         || !TEST_true(EVP_MD_CTX_reset(mctx)))
         goto err;
     /* un-muck and test it verifies */
     sig[offset] ^= dirt;
     if (!TEST_true(EVP_DigestVerifyInit(mctx, NULL, NULL, NULL, pkey))
         || (as == EVP_PKEY_SM2 && !set_sm2_id(mctx, pkey))
-        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)), 1)
+        || !TEST_int_eq(EVP_DigestVerify(mctx, sig, sig_len, tbs, sizeof(tbs)),
+                        1)
         || !TEST_true(EVP_MD_CTX_reset(mctx)))
         goto err;
 
     ret = 1;
- err:
+err:
     EVP_PKEY_free(pkey);
     EVP_PKEY_free(pkey_neg);
     EVP_PKEY_free(dup_pk);
@@ -352,33 +356,32 @@ static int test_ecdsa_sig_NULL(void)
     int ret;
     unsigned int siglen0;
     unsigned int siglen;
-    unsigned char dgst[128] = { 0 };
+    unsigned char dgst[128] = {0};
     EC_KEY *eckey = NULL;
     unsigned char *sig = NULL;
     BIGNUM *kinv = NULL, *rp = NULL;
 
     ret = TEST_ptr(eckey = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1))
-          && TEST_int_eq(EC_KEY_generate_key(eckey), 1)
-          && TEST_int_eq(ECDSA_sign(0, dgst, sizeof(dgst), NULL, &siglen0,
-                                    eckey), 1)
-          && TEST_int_gt(siglen0, 0)
-          && TEST_ptr(sig = OPENSSL_malloc(siglen0))
-          && TEST_int_eq(ECDSA_sign(0, dgst, sizeof(dgst), sig, &siglen,
-                                    eckey), 1)
-          && TEST_int_gt(siglen, 0)
-          && TEST_int_le(siglen, siglen0)
-          && TEST_int_eq(ECDSA_verify(0, dgst, sizeof(dgst), sig, siglen,
-                                      eckey), 1)
-          && TEST_int_eq(ECDSA_sign_setup(eckey, NULL, &kinv, &rp), 1)
-          && TEST_int_eq(ECDSA_sign_ex(0, dgst, sizeof(dgst), NULL, &siglen,
-                                       kinv, rp, eckey), 1)
-          && TEST_int_gt(siglen, 0)
-          && TEST_int_le(siglen, siglen0)
-          && TEST_int_eq(ECDSA_sign_ex(0, dgst, sizeof(dgst), sig, &siglen0,
-                                       kinv, rp, eckey), 1)
-          && TEST_int_eq(siglen, siglen0)
-          && TEST_int_eq(ECDSA_verify(0, dgst, sizeof(dgst), sig, siglen,
-                                      eckey), 1);
+        && TEST_int_eq(EC_KEY_generate_key(eckey), 1)
+        && TEST_int_eq(ECDSA_sign(0, dgst, sizeof(dgst), NULL, &siglen0, eckey),
+                       1)
+        && TEST_int_gt(siglen0, 0) && TEST_ptr(sig = OPENSSL_malloc(siglen0))
+        && TEST_int_eq(ECDSA_sign(0, dgst, sizeof(dgst), sig, &siglen, eckey),
+                       1)
+        && TEST_int_gt(siglen, 0) && TEST_int_le(siglen, siglen0)
+        && TEST_int_eq(ECDSA_verify(0, dgst, sizeof(dgst), sig, siglen, eckey),
+                       1)
+        && TEST_int_eq(ECDSA_sign_setup(eckey, NULL, &kinv, &rp), 1)
+        && TEST_int_eq(ECDSA_sign_ex(0, dgst, sizeof(dgst), NULL, &siglen, kinv,
+                                     rp, eckey),
+                       1)
+        && TEST_int_gt(siglen, 0) && TEST_int_le(siglen, siglen0)
+        && TEST_int_eq(ECDSA_sign_ex(0, dgst, sizeof(dgst), sig, &siglen0, kinv,
+                                     rp, eckey),
+                       1)
+        && TEST_int_eq(siglen, siglen0)
+        && TEST_int_eq(ECDSA_verify(0, dgst, sizeof(dgst), sig, siglen, eckey),
+                       1);
     EC_KEY_free(eckey);
     OPENSSL_free(sig);
     BN_free(kinv);

@@ -26,8 +26,7 @@
 #include "prov/provider_ctx.h"
 #include "endecoder_local.h"
 
-static int write_blob(void *provctx, OSSL_CORE_BIO *cout,
-                      void *data, int len)
+static int write_blob(void *provctx, OSSL_CORE_BIO *cout, void *data, int len)
 {
     BIO *out = ossl_bio_new_from_core_bio(provctx, cout);
     int ret;
@@ -58,11 +57,9 @@ static int key2blob_check_selection(int selection, int selection_mask)
      * The selections are kinda sorta "levels", i.e. each selection given
      * here is assumed to include those following.
      */
-    int checks[] = {
-        OSSL_KEYMGMT_SELECT_PRIVATE_KEY,
-        OSSL_KEYMGMT_SELECT_PUBLIC_KEY,
-        OSSL_KEYMGMT_SELECT_ALL_PARAMETERS
-    };
+    int checks[] = {OSSL_KEYMGMT_SELECT_PRIVATE_KEY,
+                    OSSL_KEYMGMT_SELECT_PUBLIC_KEY,
+                    OSSL_KEYMGMT_SELECT_ALL_PARAMETERS};
     size_t i;
 
     /* The decoder implementations made here support guessing */
