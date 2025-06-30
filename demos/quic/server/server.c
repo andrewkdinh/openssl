@@ -25,18 +25,14 @@
 /* ALPN string for TLS handshake */
 static const unsigned char alpn_ossltest[] = {
     /* "\x08ossltest" (hex for EBCDIC resilience) */
-    0x08, 0x6f, 0x73, 0x73, 0x6c, 0x74, 0x65, 0x73, 0x74
-};
+    0x08, 0x6f, 0x73, 0x73, 0x6c, 0x74, 0x65, 0x73, 0x74};
 
 /* This callback validates and negotiates the desired ALPN on the server side. */
-static int select_alpn(SSL *ssl,
-                       const unsigned char **out, unsigned char *out_len,
-                       const unsigned char *in, unsigned int in_len,
-                       void *arg)
+static int select_alpn(SSL *ssl, const unsigned char **out, unsigned char *out_len, const unsigned char *in,
+                       unsigned int in_len, void *arg)
 {
-    if (SSL_select_next_proto((unsigned char **)out, out_len,
-                              alpn_ossltest, sizeof(alpn_ossltest), in, in_len)
-            != OPENSSL_NPN_NEGOTIATED)
+    if (SSL_select_next_proto((unsigned char **)out, out_len, alpn_ossltest, sizeof(alpn_ossltest), in, in_len)
+        != OPENSSL_NPN_NEGOTIATED)
         return SSL_TLSEXT_ERR_ALERT_FATAL;
 
     return SSL_TLSEXT_ERR_OK;
@@ -87,8 +83,8 @@ static int create_socket(uint16_t port)
         goto err;
     }
 
-    sa.sin_family  = AF_INET;
-    sa.sin_port    = htons(port);
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(port);
 
     if (bind(fd, (const struct sockaddr *)&sa, sizeof(sa)) < 0) {
         fprintf(stderr, "cannot bind to %u\n", port);
@@ -119,8 +115,7 @@ static int run_quic_conn(SSL *conn)
      * Since we inherit our blocking mode from the parent QUIC SSL object (the
      * listener) by default, this call is also blocking.
      */
-    if (!SSL_write_ex2(conn, "hello\n", 6, SSL_WRITE_FLAG_CONCLUDE, &written)
-        || written != 6) {
+    if (!SSL_write_ex2(conn, "hello\n", 6, SSL_WRITE_FLAG_CONCLUDE, &written) || written != 6) {
         fprintf(stderr, "couldn't write on connection\n");
         ERR_print_errors_fp(stderr);
         return 0;

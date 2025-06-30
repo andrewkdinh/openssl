@@ -76,15 +76,13 @@ static void parse_env(const char *envstr)
         BIO_snprintf(buf, BUFLEN, "_%s", RISCV_capabilities[i].name);
         if (strstr(envstrupper, buf) != NULL) {
             /* Match, set relevant bit in OPENSSL_riscvcap_P[] */
-            OPENSSL_riscvcap_P[RISCV_capabilities[i].index] |=
-                (1 << RISCV_capabilities[i].bit_offset);
+            OPENSSL_riscvcap_P[RISCV_capabilities[i].index] |= (1 << RISCV_capabilities[i].bit_offset);
         }
     }
 }
 
 #ifdef OSSL_RISCV_HWPROBE
-static long riscv_hwprobe(struct riscv_hwprobe *pairs, size_t pair_count,
-                          size_t cpu_count, unsigned long *cpus,
+static long riscv_hwprobe(struct riscv_hwprobe *pairs, size_t pair_count, size_t cpu_count, unsigned long *cpus,
                           unsigned int flags)
 {
     return syscall(__NR_riscv_hwprobe, pairs, pair_count, cpu_count, cpus, flags);
@@ -93,9 +91,7 @@ static long riscv_hwprobe(struct riscv_hwprobe *pairs, size_t pair_count,
 static void hwprobe_to_cap(void)
 {
     long ret;
-    struct riscv_hwprobe pairs[OSSL_RISCV_HWPROBE_PAIR_COUNT] = {
-        OSSL_RISCV_HWPROBE_PAIR_CONTENT
-    };
+    struct riscv_hwprobe pairs[OSSL_RISCV_HWPROBE_PAIR_COUNT] = {OSSL_RISCV_HWPROBE_PAIR_CONTENT};
 
     ret = riscv_hwprobe(pairs, OSSL_RISCV_HWPROBE_PAIR_COUNT, 0, NULL, 0);
     /* if hwprobe syscall does not exist, ret would be -ENOSYS */
@@ -103,12 +99,10 @@ static void hwprobe_to_cap(void)
         for (size_t i = 0; i < kRISCVNumCaps; ++i) {
             for (size_t j = 0; j != OSSL_RISCV_HWPROBE_PAIR_COUNT; ++j) {
                 if (pairs[j].key == RISCV_capabilities[i].hwprobe_key
-                        && (pairs[j].value & RISCV_capabilities[i].hwprobe_value)
-                           != 0)
+                    && (pairs[j].value & RISCV_capabilities[i].hwprobe_value) != 0)
                     if (!IS_IN_DEPEND_VECTOR(RISCV_capabilities[i].bit_offset) || VECTOR_CAPABLE)
                         /* Match, set relevant bit in OPENSSL_riscvcap_P[] */
-                        OPENSSL_riscvcap_P[RISCV_capabilities[i].index] |=
-                            (1 << RISCV_capabilities[i].bit_offset);
+                        OPENSSL_riscvcap_P[RISCV_capabilities[i].index] |= (1 << RISCV_capabilities[i].bit_offset);
             }
         }
     }

@@ -15,14 +15,10 @@
 #include "crypto/ess.h"
 #include "crypto/x509.h"
 
-static ESS_CERT_ID *ESS_CERT_ID_new_init(const X509 *cert,
-                                         int set_issuer_serial);
-static ESS_CERT_ID_V2 *ESS_CERT_ID_V2_new_init(const EVP_MD *hash_alg,
-                                               const X509 *cert,
-                                               int set_issuer_serial);
+static ESS_CERT_ID *ESS_CERT_ID_new_init(const X509 *cert, int set_issuer_serial);
+static ESS_CERT_ID_V2 *ESS_CERT_ID_V2_new_init(const EVP_MD *hash_alg, const X509 *cert, int set_issuer_serial);
 
-ESS_SIGNING_CERT *OSSL_ESS_signing_cert_new_init(const X509 *signcert,
-                                                 const STACK_OF(X509) *certs,
+ESS_SIGNING_CERT *OSSL_ESS_signing_cert_new_init(const X509 *signcert, const STACK_OF(X509) *certs,
                                                  int set_issuer_serial)
 {
     ESS_CERT_ID *cid = NULL;
@@ -33,14 +29,12 @@ ESS_SIGNING_CERT *OSSL_ESS_signing_cert_new_init(const X509 *signcert,
         ERR_raise(ERR_LIB_ESS, ERR_R_ESS_LIB);
         goto err;
     }
-    if (sc->cert_ids == NULL
-        && (sc->cert_ids = sk_ESS_CERT_ID_new_null()) == NULL) {
+    if (sc->cert_ids == NULL && (sc->cert_ids = sk_ESS_CERT_ID_new_null()) == NULL) {
         ERR_raise(ERR_LIB_ESS, ERR_R_CRYPTO_LIB);
         goto err;
     }
 
-    if ((cid = ESS_CERT_ID_new_init(signcert, set_issuer_serial)) == NULL
-        || !sk_ESS_CERT_ID_push(sc->cert_ids, cid)) {
+    if ((cid = ESS_CERT_ID_new_init(signcert, set_issuer_serial)) == NULL || !sk_ESS_CERT_ID_push(sc->cert_ids, cid)) {
         ERR_raise(ERR_LIB_ESS, ERR_R_ESS_LIB);
         goto err;
     }
@@ -58,14 +52,13 @@ ESS_SIGNING_CERT *OSSL_ESS_signing_cert_new_init(const X509 *signcert,
     }
 
     return sc;
- err:
+err:
     ESS_SIGNING_CERT_free(sc);
     ESS_CERT_ID_free(cid);
     return NULL;
 }
 
-static ESS_CERT_ID *ESS_CERT_ID_new_init(const X509 *cert,
-                                         int set_issuer_serial)
+static ESS_CERT_ID *ESS_CERT_ID_new_init(const X509 *cert, int set_issuer_serial)
 {
     ESS_CERT_ID *cid = NULL;
     GENERAL_NAME *name = NULL;
@@ -88,8 +81,7 @@ static ESS_CERT_ID *ESS_CERT_ID_new_init(const X509 *cert,
     if (!set_issuer_serial)
         return cid;
 
-    if (cid->issuer_serial == NULL
-        && (cid->issuer_serial = ESS_ISSUER_SERIAL_new()) == NULL) {
+    if (cid->issuer_serial == NULL && (cid->issuer_serial = ESS_ISSUER_SERIAL_new()) == NULL) {
         ERR_raise(ERR_LIB_ESS, ERR_R_ESS_LIB);
         goto err;
     }
@@ -108,24 +100,20 @@ static ESS_CERT_ID *ESS_CERT_ID_new_init(const X509 *cert,
     }
     name = NULL;            /* Ownership is lost. */
     ASN1_INTEGER_free(cid->issuer_serial->serial);
-    if ((cid->issuer_serial->serial
-         = ASN1_INTEGER_dup(X509_get0_serialNumber(cert))) == NULL) {
+    if ((cid->issuer_serial->serial = ASN1_INTEGER_dup(X509_get0_serialNumber(cert))) == NULL) {
         ERR_raise(ERR_LIB_ESS, ERR_R_ASN1_LIB);
         goto err;
     }
 
     return cid;
- err:
+err:
     GENERAL_NAME_free(name);
     ESS_CERT_ID_free(cid);
     return NULL;
 }
 
-ESS_SIGNING_CERT_V2 *OSSL_ESS_signing_cert_v2_new_init(const EVP_MD *hash_alg,
-                                                       const X509 *signcert,
-                                                       const
-                                                       STACK_OF(X509) *certs,
-                                                       int set_issuer_serial)
+ESS_SIGNING_CERT_V2 *OSSL_ESS_signing_cert_v2_new_init(const EVP_MD *hash_alg, const X509 *signcert,
+                                                       const STACK_OF(X509) *certs, int set_issuer_serial)
 {
     ESS_CERT_ID_V2 *cid = NULL;
     ESS_SIGNING_CERT_V2 *sc;
@@ -161,15 +149,13 @@ ESS_SIGNING_CERT_V2 *OSSL_ESS_signing_cert_v2_new_init(const EVP_MD *hash_alg,
     }
 
     return sc;
- err:
+err:
     ESS_SIGNING_CERT_V2_free(sc);
     ESS_CERT_ID_V2_free(cid);
     return NULL;
 }
 
-static ESS_CERT_ID_V2 *ESS_CERT_ID_V2_new_init(const EVP_MD *hash_alg,
-                                               const X509 *cert,
-                                               int set_issuer_serial)
+static ESS_CERT_ID_V2 *ESS_CERT_ID_V2_new_init(const EVP_MD *hash_alg, const X509 *cert, int set_issuer_serial)
 {
     ESS_CERT_ID_V2 *cid;
     GENERAL_NAME *name = NULL;
@@ -240,7 +226,7 @@ static ESS_CERT_ID_V2 *ESS_CERT_ID_V2_new_init(const EVP_MD *hash_alg,
     }
 
     return cid;
- err:
+err:
     X509_ALGOR_free(alg);
     GENERAL_NAME_free(name);
     ESS_CERT_ID_V2_free(cid);
@@ -255,8 +241,7 @@ static int ess_issuer_serial_cmp(const ESS_ISSUER_SERIAL *is, const X509 *cert)
         return -1;
 
     issuer = sk_GENERAL_NAME_value(is->issuer, 0);
-    if (issuer->type != GEN_DIRNAME
-        || X509_NAME_cmp(issuer->d.dirn, X509_get_issuer_name(cert)) != 0)
+    if (issuer->type != GEN_DIRNAME || X509_NAME_cmp(issuer->d.dirn, X509_get_issuer_name(cert)) != 0)
         return -1;
 
     return ASN1_INTEGER_cmp(is->serial, X509_get0_serialNumber(cert));
@@ -267,8 +252,7 @@ static int ess_issuer_serial_cmp(const ESS_ISSUER_SERIAL *is, const X509 *cert)
  * The cert must be the first one in |certs| if and only if |index| is 0.
  * Return 0 on not found, -1 on error, else 1 + the position in |certs|.
  */
-static int find(const ESS_CERT_ID *cid, const ESS_CERT_ID_V2 *cid_v2,
-                int index, const STACK_OF(X509) *certs)
+static int find(const ESS_CERT_ID *cid, const ESS_CERT_ID_V2 *cid_v2, int index, const STACK_OF(X509) *certs)
 {
     const X509 *cert;
     EVP_MD *md = NULL;
@@ -308,14 +292,12 @@ static int find(const ESS_CERT_ID *cid, const ESS_CERT_ID_V2 *cid_v2,
         cert = sk_X509_value(certs, i);
 
         cid_hash_len = cid != NULL ? cid->hash->length : cid_v2->hash->length;
-        if (!X509_digest(cert, md, cert_digest, &len)
-                || cid_hash_len != len) {
+        if (!X509_digest(cert, md, cert_digest, &len) || cid_hash_len != len) {
             ERR_raise(ERR_LIB_ESS, ESS_R_ESS_CERT_DIGEST_ERROR);
             goto end;
         }
 
-        if (memcmp(cid != NULL ? cid->hash->data : cid_v2->hash->data,
-                   cert_digest, len) == 0) {
+        if (memcmp(cid != NULL ? cid->hash->data : cid_v2->hash->data, cert_digest, len) == 0) {
             is = cid != NULL ? cid->issuer_serial : cid_v2->issuer_serial;
             /* Well, it's not really required to match the serial numbers. */
             if (is == NULL || ess_issuer_serial_cmp(is, cert) == 0) {
@@ -336,10 +318,8 @@ end:
     return ret;
 }
 
-int OSSL_ESS_check_signing_certs(const ESS_SIGNING_CERT *ss,
-                                 const ESS_SIGNING_CERT_V2 *ssv2,
-                                 const STACK_OF(X509) *chain,
-                                 int require_signing_cert)
+int OSSL_ESS_check_signing_certs(const ESS_SIGNING_CERT *ss, const ESS_SIGNING_CERT_V2 *ssv2,
+                                 const STACK_OF(X509) *chain, int require_signing_cert)
 {
     int n_v1 = ss == NULL ? -1 : sk_ESS_CERT_ID_num(ss->cert_ids);
     int n_v2 = ssv2 == NULL ? -1 : sk_ESS_CERT_ID_V2_num(ssv2->cert_ids);

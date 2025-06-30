@@ -23,8 +23,7 @@
 static int bn_from_montgomery_word(BIGNUM *ret, BIGNUM *r, BN_MONT_CTX *mont);
 #endif
 
-int BN_mod_mul_montgomery(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
-                          BN_MONT_CTX *mont, BN_CTX *ctx)
+int BN_mod_mul_montgomery(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, BN_MONT_CTX *mont, BN_CTX *ctx)
 {
     int ret = bn_mul_mont_fixed_top(r, a, b, mont, ctx);
 
@@ -34,8 +33,7 @@ int BN_mod_mul_montgomery(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
     return ret;
 }
 
-int bn_mul_mont_fixed_top(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
-                          BN_MONT_CTX *mont, BN_CTX *ctx)
+int bn_mul_mont_fixed_top(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, BN_MONT_CTX *mont, BN_CTX *ctx)
 {
     BIGNUM *tmp;
     int ret = 0;
@@ -79,7 +77,7 @@ int bn_mul_mont_fixed_top(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
         goto err;
 #endif
     ret = 1;
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -159,8 +157,7 @@ static int bn_from_montgomery_word(BIGNUM *ret, BIGNUM *r, BN_MONT_CTX *mont)
 }
 #endif                          /* MONT_WORD */
 
-int BN_from_montgomery(BIGNUM *ret, const BIGNUM *a, BN_MONT_CTX *mont,
-                       BN_CTX *ctx)
+int BN_from_montgomery(BIGNUM *ret, const BIGNUM *a, BN_MONT_CTX *mont, BN_CTX *ctx)
 {
     int retn;
 
@@ -171,8 +168,7 @@ int BN_from_montgomery(BIGNUM *ret, const BIGNUM *a, BN_MONT_CTX *mont,
     return retn;
 }
 
-int bn_from_mont_fixed_top(BIGNUM *ret, const BIGNUM *a, BN_MONT_CTX *mont,
-                           BN_CTX *ctx)
+int bn_from_mont_fixed_top(BIGNUM *ret, const BIGNUM *a, BN_MONT_CTX *mont, BN_CTX *ctx)
 {
     int retn = 0;
 #ifdef MONT_WORD
@@ -213,14 +209,13 @@ int bn_from_mont_fixed_top(BIGNUM *ret, const BIGNUM *a, BN_MONT_CTX *mont,
     }
     retn = 1;
     bn_check_top(ret);
- err:
+err:
     BN_CTX_end(ctx);
 #endif                          /* MONT_WORD */
     return retn;
 }
 
-int bn_to_mont_fixed_top(BIGNUM *r, const BIGNUM *a, BN_MONT_CTX *mont,
-                         BN_CTX *ctx)
+int bn_to_mont_fixed_top(BIGNUM *r, const BIGNUM *a, BN_MONT_CTX *mont, BN_CTX *ctx)
 {
     return bn_mul_mont_fixed_top(r, a, &(mont->RR), mont, ctx);
 }
@@ -291,7 +286,7 @@ int BN_MONT_CTX_set(BN_MONT_CTX *mont, const BIGNUM *mod, BN_CTX *ctx)
 
         mont->ri = (BN_num_bits(mod) + (BN_BITS2 - 1)) / BN_BITS2 * BN_BITS2;
 
-# if defined(OPENSSL_BN_ASM_MONT) && (BN_BITS2<=32)
+# if defined(OPENSSL_BN_ASM_MONT) && (BN_BITS2 <= 32)
         /*
          * Only certain BN_BITS2<=32 platforms actually make use of n0[1],
          * and we could use the #else case (with a shorter R value) for the
@@ -401,7 +396,7 @@ int BN_MONT_CTX_set(BN_MONT_CTX *mont, const BIGNUM *mod, BN_CTX *ctx)
     mont->RR.flags |= BN_FLG_FIXED_TOP;
 
     ret = 1;
- err:
+err:
     BN_CTX_end(ctx);
     return ret;
 }
@@ -423,8 +418,7 @@ BN_MONT_CTX *BN_MONT_CTX_copy(BN_MONT_CTX *to, BN_MONT_CTX *from)
     return to;
 }
 
-BN_MONT_CTX *BN_MONT_CTX_set_locked(BN_MONT_CTX **pmont, CRYPTO_RWLOCK *lock,
-                                    const BIGNUM *mod, BN_CTX *ctx)
+BN_MONT_CTX *BN_MONT_CTX_set_locked(BN_MONT_CTX **pmont, CRYPTO_RWLOCK *lock, const BIGNUM *mod, BN_CTX *ctx)
 {
     BN_MONT_CTX *ret;
 
@@ -466,8 +460,8 @@ BN_MONT_CTX *BN_MONT_CTX_set_locked(BN_MONT_CTX **pmont, CRYPTO_RWLOCK *lock,
     return ret;
 }
 
-int ossl_bn_mont_ctx_set(BN_MONT_CTX *ctx, const BIGNUM *modulus, int ri, const unsigned char *rr,
-                         size_t rrlen, uint32_t nlo, uint32_t nhi)
+int ossl_bn_mont_ctx_set(BN_MONT_CTX *ctx, const BIGNUM *modulus, int ri, const unsigned char *rr, size_t rrlen,
+                         uint32_t nlo, uint32_t nhi)
 {
     if (BN_copy(&ctx->N, modulus) == NULL)
         return 0;
@@ -481,7 +475,7 @@ int ossl_bn_mont_ctx_set(BN_MONT_CTX *ctx, const BIGNUM *modulus, int ri, const 
     ctx->n0[0] = nlo;
     ctx->n0[1] = 0;
 #else
-    ctx->n0[0] = ((BN_ULONG)nhi << 32)| nlo;
+    ctx->n0[0] = ((BN_ULONG)nhi << 32) | nlo;
     ctx->n0[1] = 0;
 #endif
 

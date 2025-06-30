@@ -31,8 +31,7 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
         for (i = 0; i < sk_PKCS7_SIGNER_INFO_num(p7si); i++) {
             STACK_OF(X509_ALGOR) *algs;
 
-            PKCS7_cert_from_signer_info(p7,
-                                        sk_PKCS7_SIGNER_INFO_value(p7si, i));
+            PKCS7_cert_from_signer_info(p7, sk_PKCS7_SIGNER_INFO_value(p7si, i));
             algs = PKCS7_get_smimecap(sk_PKCS7_SIGNER_INFO_value(p7si, i));
             sk_X509_ALGOR_pop_free(algs, X509_ALGOR_free);
         }

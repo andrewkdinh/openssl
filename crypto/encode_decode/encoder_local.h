@@ -110,7 +110,7 @@ struct ossl_decoder_instance_st {
     const char *input_structure; /* May be NULL */
     int input_type_id;
 
-    unsigned int flag_input_structure_was_set : 1;
+    unsigned int flag_input_structure_was_set:1;
 };
 
 DEFINE_STACK_OF(OSSL_DECODER_INSTANCE)
@@ -162,10 +162,7 @@ struct ossl_decoder_ctx_st {
     int harderr;
 };
 
-const OSSL_PROPERTY_LIST *
-ossl_decoder_parsed_properties(const OSSL_DECODER *decoder);
-const OSSL_PROPERTY_LIST *
-ossl_encoder_parsed_properties(const OSSL_ENCODER *encoder);
+const OSSL_PROPERTY_LIST *ossl_decoder_parsed_properties(const OSSL_DECODER *decoder);
+const OSSL_PROPERTY_LIST *ossl_encoder_parsed_properties(const OSSL_ENCODER *encoder);
 
-int ossl_decoder_fast_is_a(OSSL_DECODER *decoder,
-                           const char *name, int *id_cache);
+int ossl_decoder_fast_is_a(OSSL_DECODER *decoder, const char *name, int *id_cache);

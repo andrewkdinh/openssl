@@ -38,7 +38,7 @@ static void rc2_freectx(void *vctx)
     PROV_RC2_CTX *ctx = (PROV_RC2_CTX *)vctx;
 
     ossl_cipher_generic_reset_ctx((PROV_CIPHER_CTX *)vctx);
-    OPENSSL_clear_free(ctx,  sizeof(*ctx));
+    OPENSSL_clear_free(ctx, sizeof(*ctx));
 }
 
 static void *rc2_dupctx(void *ctx)
@@ -85,18 +85,16 @@ static int rc2_magic_to_keybits(int magic)
     return 0;
 }
 
-static int rc2_einit(void *ctx, const unsigned char *key, size_t keylen,
-                          const unsigned char *iv, size_t ivlen,
-                          const OSSL_PARAM params[])
+static int rc2_einit(void *ctx, const unsigned char *key, size_t keylen, const unsigned char *iv, size_t ivlen,
+                     const OSSL_PARAM params[])
 {
     if (!ossl_cipher_generic_einit(ctx, key, keylen, iv, ivlen, NULL))
         return 0;
     return rc2_set_ctx_params(ctx, params);
 }
 
-static int rc2_dinit(void *ctx, const unsigned char *key, size_t keylen,
-                          const unsigned char *iv, size_t ivlen,
-                          const OSSL_PARAM params[])
+static int rc2_dinit(void *ctx, const unsigned char *key, size_t keylen, const unsigned char *iv, size_t ivlen,
+                     const OSSL_PARAM params[])
 {
     if (!ossl_cipher_generic_dinit(ctx, key, keylen, iv, ivlen, NULL))
         return 0;
@@ -138,8 +136,7 @@ static int rc2_get_ctx_params(void *vctx, OSSL_PARAM params[])
 
         /* Is this the original IV or the running IV? */
         num = rc2_keybits_to_magic(ctx->key_bits);
-        if (!ASN1_TYPE_set_int_octetstring(type, num,
-                                           ctx->base.iv, ctx->base.ivlen)) {
+        if (!ASN1_TYPE_set_int_octetstring(type, num, ctx->base.iv, ctx->base.ivlen)) {
             ASN1_TYPE_free(type);
             ERR_raise(ERR_LIB_PROV, ERR_R_ASN1_LIB);
             return 0;
@@ -183,7 +180,7 @@ static int rc2_set_ctx_params(void *vctx, const OSSL_PARAM params[])
         return 0;
     p = OSSL_PARAM_locate_const(params, OSSL_CIPHER_PARAM_RC2_KEYBITS);
     if (p != NULL) {
-         if (!OSSL_PARAM_get_size_t(p, &ctx->key_bits)) {
+        if (!OSSL_PARAM_get_size_t(p, &ctx->key_bits)) {
             ERR_raise(ERR_LIB_PROV, PROV_R_FAILED_TO_GET_PARAMETER);
             return 0;
         }
@@ -196,12 +193,9 @@ static int rc2_set_ctx_params(void *vctx, const OSSL_PARAM params[])
         int ret = 1;
         unsigned char iv[16];
 
-        if (p->data_type != OSSL_PARAM_OCTET_STRING
-            || ctx->base.ivlen > sizeof(iv)
+        if (p->data_type != OSSL_PARAM_OCTET_STRING || ctx->base.ivlen > sizeof(iv)
             || (type = d2i_ASN1_TYPE(NULL, &d, p->data_size)) == NULL
-            || ((size_t)ASN1_TYPE_get_int_octetstring(type, &num, iv,
-                                                      ctx->base.ivlen)
-                != ctx->base.ivlen)
+            || ((size_t)ASN1_TYPE_get_int_octetstring(type, &num, iv, ctx->base.ivlen) != ctx->base.ivlen)
             || !ossl_cipher_generic_initiv(&ctx->base, iv, ctx->base.ivlen)
             || (ctx->key_bits = rc2_magic_to_keybits(num)) == 0) {
             ERR_raise(ERR_LIB_PROV, PROV_R_FAILED_TO_SET_PARAMETER);
@@ -222,17 +216,15 @@ static int rc2_set_ctx_params(void *vctx, const OSSL_PARAM params[])
 
 CIPHER_DEFAULT_GETTABLE_CTX_PARAMS_START(rc2)
 OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_RC2_KEYBITS, NULL),
-OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_ALGORITHM_ID_PARAMS, NULL, 0),
-CIPHER_DEFAULT_GETTABLE_CTX_PARAMS_END(rc2)
+    OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_ALGORITHM_ID_PARAMS, NULL, 0),
+    CIPHER_DEFAULT_GETTABLE_CTX_PARAMS_END(rc2)
 
-CIPHER_DEFAULT_SETTABLE_CTX_PARAMS_START(rc2)
-OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
-OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_RC2_KEYBITS, NULL),
-OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_ALGORITHM_ID_PARAMS, NULL, 0),
-CIPHER_DEFAULT_SETTABLE_CTX_PARAMS_END(rc2)
+        CIPHER_DEFAULT_SETTABLE_CTX_PARAMS_START(rc2) OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_KEYLEN, NULL),
+    OSSL_PARAM_size_t(OSSL_CIPHER_PARAM_RC2_KEYBITS, NULL),
+    OSSL_PARAM_octet_string(OSSL_CIPHER_PARAM_ALGORITHM_ID_PARAMS, NULL, 0),
+    CIPHER_DEFAULT_SETTABLE_CTX_PARAMS_END(rc2)
 
-#define IMPLEMENT_cipher(alg, UCALG, lcmode, UCMODE, flags, kbits, blkbits,    \
-                         ivbits, typ)                                          \
+#define IMPLEMENT_cipher(alg, UCALG, lcmode, UCMODE, flags, kbits, blkbits, ivbits, typ)                                          \
 static OSSL_FUNC_cipher_get_params_fn alg##_##kbits##_##lcmode##_get_params;   \
 static int alg##_##kbits##_##lcmode##_get_params(OSSL_PARAM params[])          \
 {                                                                              \
@@ -281,15 +273,15 @@ const OSSL_DISPATCH ossl_##alg##kbits##lcmode##_functions[] = {                \
 };
 
 /* ossl_rc2128ecb_functions */
-IMPLEMENT_cipher(rc2, RC2, ecb, ECB, RC2_FLAGS, 128, 64, 0, block)
+    IMPLEMENT_cipher(rc2, RC2, ecb, ECB, RC2_FLAGS, 128, 64, 0, block)
 /* ossl_rc2128cbc_functions */
-IMPLEMENT_cipher(rc2, RC2, cbc, CBC, RC2_FLAGS, 128, 64, 64, block)
+    IMPLEMENT_cipher(rc2, RC2, cbc, CBC, RC2_FLAGS, 128, 64, 64, block)
 /* ossl_rc240cbc_functions */
-IMPLEMENT_cipher(rc2, RC2, cbc, CBC, RC2_FLAGS, 40, 64, 64, block)
+    IMPLEMENT_cipher(rc2, RC2, cbc, CBC, RC2_FLAGS, 40, 64, 64, block)
 /* ossl_rc264cbc_functions */
-IMPLEMENT_cipher(rc2, RC2, cbc, CBC, RC2_FLAGS, 64, 64, 64, block)
+    IMPLEMENT_cipher(rc2, RC2, cbc, CBC, RC2_FLAGS, 64, 64, 64, block)
 
 /* ossl_rc2128ofb128_functions */
-IMPLEMENT_cipher(rc2, RC2, ofb128, OFB, RC2_FLAGS, 128, 8, 64, stream)
+    IMPLEMENT_cipher(rc2, RC2, ofb128, OFB, RC2_FLAGS, 128, 8, 64, stream)
 /* ossl_rc2128cfb128_functions */
-IMPLEMENT_cipher(rc2, RC2, cfb128, CFB, RC2_FLAGS, 128, 8, 64, stream)
+    IMPLEMENT_cipher(rc2, RC2, cfb128, CFB, RC2_FLAGS, 128, 8, 64, stream)

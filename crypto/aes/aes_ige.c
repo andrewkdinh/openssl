@@ -45,8 +45,7 @@ typedef struct {
 /* N.B. The IV for this mode is _twice_ the block size */
 
 /*  Use of this function is deprecated. */
-void AES_ige_encrypt(const unsigned char *in, unsigned char *out,
-                     size_t length, const AES_KEY *key,
+void AES_ige_encrypt(const unsigned char *in, unsigned char *out, size_t length, const AES_KEY *key,
                      unsigned char *ivec, const int enc)
 {
     size_t n;
@@ -60,21 +59,17 @@ void AES_ige_encrypt(const unsigned char *in, unsigned char *out,
     OPENSSL_assert((length % AES_BLOCK_SIZE) == 0);
 
     if (AES_ENCRYPT == enc) {
-        if (in != out &&
-            (UNALIGNED_MEMOPS_ARE_FAST
-             || ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(long) ==
-             0)) {
-            aes_block_t *ivp = (aes_block_t *) ivec;
-            aes_block_t *iv2p = (aes_block_t *) (ivec + AES_BLOCK_SIZE);
+        if (in != out && (UNALIGNED_MEMOPS_ARE_FAST || ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(long) == 0)) {
+            aes_block_t *ivp = (aes_block_t *)ivec;
+            aes_block_t *iv2p = (aes_block_t *)(ivec + AES_BLOCK_SIZE);
 
             while (len) {
-                aes_block_t *inp = (aes_block_t *) in;
-                aes_block_t *outp = (aes_block_t *) out;
+                aes_block_t *inp = (aes_block_t *)in;
+                aes_block_t *outp = (aes_block_t *)out;
 
                 for (n = 0; n < N_WORDS; ++n)
                     outp->data[n] = inp->data[n] ^ ivp->data[n];
-                AES_encrypt((unsigned char *)outp->data,
-                            (unsigned char *)outp->data, key);
+                AES_encrypt((unsigned char *)outp->data, (unsigned char *)outp->data, key);
                 for (n = 0; n < N_WORDS; ++n)
                     outp->data[n] ^= iv2p->data[n];
                 ivp = outp;
@@ -97,8 +92,7 @@ void AES_ige_encrypt(const unsigned char *in, unsigned char *out,
                 load_block(tmp, in);
                 for (n = 0; n < N_WORDS; ++n)
                     tmp2.data[n] = tmp.data[n] ^ iv.data[n];
-                AES_encrypt((unsigned char *)tmp2.data,
-                            (unsigned char *)tmp2.data, key);
+                AES_encrypt((unsigned char *)tmp2.data, (unsigned char *)tmp2.data, key);
                 for (n = 0; n < N_WORDS; ++n)
                     tmp2.data[n] ^= iv2.data[n];
                 store_block(out, tmp2);
@@ -112,22 +106,18 @@ void AES_ige_encrypt(const unsigned char *in, unsigned char *out,
             memcpy(ivec + AES_BLOCK_SIZE, iv2.data, AES_BLOCK_SIZE);
         }
     } else {
-        if (in != out &&
-            (UNALIGNED_MEMOPS_ARE_FAST
-             || ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(long) ==
-             0)) {
-            aes_block_t *ivp = (aes_block_t *) ivec;
-            aes_block_t *iv2p = (aes_block_t *) (ivec + AES_BLOCK_SIZE);
+        if (in != out && (UNALIGNED_MEMOPS_ARE_FAST || ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(long) == 0)) {
+            aes_block_t *ivp = (aes_block_t *)ivec;
+            aes_block_t *iv2p = (aes_block_t *)(ivec + AES_BLOCK_SIZE);
 
             while (len) {
                 aes_block_t tmp;
-                aes_block_t *inp = (aes_block_t *) in;
-                aes_block_t *outp = (aes_block_t *) out;
+                aes_block_t *inp = (aes_block_t *)in;
+                aes_block_t *outp = (aes_block_t *)out;
 
                 for (n = 0; n < N_WORDS; ++n)
                     tmp.data[n] = inp->data[n] ^ iv2p->data[n];
-                AES_decrypt((unsigned char *)tmp.data,
-                            (unsigned char *)outp->data, key);
+                AES_decrypt((unsigned char *)tmp.data, (unsigned char *)outp->data, key);
                 for (n = 0; n < N_WORDS; ++n)
                     outp->data[n] ^= ivp->data[n];
                 ivp = inp;
@@ -151,8 +141,7 @@ void AES_ige_encrypt(const unsigned char *in, unsigned char *out,
                 tmp2 = tmp;
                 for (n = 0; n < N_WORDS; ++n)
                     tmp.data[n] ^= iv2.data[n];
-                AES_decrypt((unsigned char *)tmp.data,
-                            (unsigned char *)tmp.data, key);
+                AES_decrypt((unsigned char *)tmp.data, (unsigned char *)tmp.data, key);
                 for (n = 0; n < N_WORDS; ++n)
                     tmp.data[n] ^= iv.data[n];
                 store_block(out, tmp);
@@ -183,10 +172,8 @@ void AES_ige_encrypt(const unsigned char *in, unsigned char *out,
 
 /* N.B. The IV for this mode is _four times_ the block size */
 
-void AES_bi_ige_encrypt(const unsigned char *in, unsigned char *out,
-                        size_t length, const AES_KEY *key,
-                        const AES_KEY *key2, const unsigned char *ivec,
-                        const int enc)
+void AES_bi_ige_encrypt(const unsigned char *in, unsigned char *out, size_t length, const AES_KEY *key,
+                        const AES_KEY *key2, const unsigned char *ivec, const int enc)
 {
     size_t n;
     size_t len = length;

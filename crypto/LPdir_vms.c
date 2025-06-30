@@ -102,8 +102,7 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
         }
 
         /* MUST be a VMS directory specification!  Let's estimate if it is. */
-        if (directory[filespeclen - 1] != ']'
-            && directory[filespeclen - 1] != '>'
+        if (directory[filespeclen - 1] != ']' && directory[filespeclen - 1] != '>'
             && directory[filespeclen - 1] != ':') {
             errno = EINVAL;
             return 0;
@@ -147,8 +146,7 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
     (*ctx)->result_dsc.dsc$b_class = DSC$K_CLASS_D;
     (*ctx)->result_dsc.dsc$a_pointer = 0;
 
-    status = lib$find_file(&(*ctx)->filespec_dsc, &(*ctx)->result_dsc,
-                           &(*ctx)->VMS_context, 0, 0, 0, &flags);
+    status = lib$find_file(&(*ctx)->filespec_dsc, &(*ctx)->result_dsc, &(*ctx)->VMS_context, 0, 0, 0, &flags);
 
     if (status == RMS$_NMF) {
         errno = 0;

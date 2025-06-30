@@ -24,9 +24,9 @@
 
 #if defined(OPENSSL_RAND_SEED_OS)
 # if _WRS_VXWORKS_MAJOR >= 7
-#   define RAND_SEED_VXRANDLIB
+#  define RAND_SEED_VXRANDLIB
 # else
-#   error "VxWorks <7 only support RAND_SEED_NONE"
+#  error "VxWorks <7 only support RAND_SEED_NONE"
 # endif
 #endif
 
@@ -114,8 +114,7 @@ size_t ossl_pool_acquire_entropy(RAND_POOL *pool)
         while ((result != OK) && (retryCount < 10)) {
             RANDOM_NUM_GEN_STATUS status = randStatus();
 
-            if ((status == RANDOM_NUM_GEN_ENOUGH_ENTROPY)
-                    || (status == RANDOM_NUM_GEN_MAX_ENTROPY)) {
+            if ((status == RANDOM_NUM_GEN_ENOUGH_ENTROPY) || (status == RANDOM_NUM_GEN_MAX_ENTROPY)) {
                 result = randBytes(buffer, bytes_needed);
                 if (result == OK)
                     ossl_rand_pool_add_end(pool, bytes_needed, 8 * bytes_needed);

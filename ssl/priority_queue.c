@@ -59,9 +59,8 @@ struct ossl_pqueue_st {
  * The initial and maximum number of elements in the heap.
  */
 static const size_t min_nodes = 8;
-static const size_t max_nodes =
-        SIZE_MAX / (sizeof(struct pq_heap_st) > sizeof(struct pq_elem_st)
-                    ? sizeof(struct pq_heap_st) : sizeof(struct pq_elem_st));
+static const size_t max_nodes = SIZE_MAX
+    / (sizeof(struct pq_heap_st) > sizeof(struct pq_elem_st) ? sizeof(struct pq_heap_st) : sizeof(struct pq_elem_st));
 
 #ifndef NDEBUG
 /* Some basic sanity checking of the data structure */

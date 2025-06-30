@@ -34,8 +34,7 @@
 struct pvk2key_ctx_st;            /* Forward declaration */
 typedef int check_key_fn(void *, struct pvk2key_ctx_st *ctx);
 typedef void adjust_key_fn(void *, struct pvk2key_ctx_st *ctx);
-typedef void *b2i_PVK_of_bio_pw_fn(BIO *in, pem_password_cb *cb, void *u,
-                                   OSSL_LIB_CTX *libctx, const char *propq);
+typedef void *b2i_PVK_of_bio_pw_fn(BIO *in, pem_password_cb *cb, void *u, OSSL_LIB_CTX *libctx, const char *propq);
 typedef void free_key_fn(void *);
 struct keytype_desc_st {
     int type;                 /* EVP key type */
@@ -64,8 +63,7 @@ struct pvk2key_ctx_st {
     int selection;
 };
 
-static struct pvk2key_ctx_st *
-pvk2key_newctx(void *provctx, const struct keytype_desc_st *desc)
+static struct pvk2key_ctx_st *pvk2key_newctx(void *provctx, const struct keytype_desc_st *desc)
 {
     struct pvk2key_ctx_st *ctx = OPENSSL_zalloc(sizeof(*ctx));
 
@@ -110,15 +108,14 @@ static int pvk2key_does_selection(void *provctx, int selection)
     if (selection == 0)
         return 1;
 
-    if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY)  != 0)
+    if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0)
         return 1;
 
     return 0;
 }
 
-static int pvk2key_decode(void *vctx, OSSL_CORE_BIO *cin, int selection,
-                         OSSL_CALLBACK *data_cb, void *data_cbarg,
-                         OSSL_PASSPHRASE_CALLBACK *pw_cb, void *pw_cbarg)
+static int pvk2key_decode(void *vctx, OSSL_CORE_BIO *cin, int selection, OSSL_CALLBACK *data_cb, void *data_cbarg,
+                          OSSL_PASSPHRASE_CALLBACK *pw_cb, void *pw_cbarg)
 {
     struct pvk2key_ctx_st *ctx = vctx;
     BIO *in = ossl_bio_new_from_core_bio(ctx->provctx, cin);
@@ -130,9 +127,7 @@ static int pvk2key_decode(void *vctx, OSSL_CORE_BIO *cin, int selection,
 
     ctx->selection = selection;
 
-    if ((selection == 0
-         || (selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0)
-        && ctx->desc->read_private_key != NULL) {
+    if ((selection == 0 || (selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0) && ctx->desc->read_private_key != NULL) {
         struct ossl_passphrase_data_st pwdata;
         int err, lib, reason;
 
@@ -140,9 +135,7 @@ static int pvk2key_decode(void *vctx, OSSL_CORE_BIO *cin, int selection,
         if (!ossl_pw_set_ossl_passphrase_cb(&pwdata, pw_cb, pw_cbarg))
             goto end;
 
-        key = ctx->desc->read_private_key(in, ossl_pw_pvk_password, &pwdata,
-                                          PROV_LIBCTX_OF(ctx->provctx),
-                                          ctx->propq);
+        key = ctx->desc->read_private_key(in, ossl_pw_pvk_password, &pwdata, PROV_LIBCTX_OF(ctx->provctx), ctx->propq);
 
         /*
          * Because the PVK API doesn't have a separate decrypt call, we need
@@ -153,9 +146,7 @@ static int pvk2key_decode(void *vctx, OSSL_CORE_BIO *cin, int selection,
         err = ERR_peek_last_error();
         lib = ERR_GET_LIB(err);
         reason = ERR_GET_REASON(err);
-        if (lib == ERR_LIB_PEM
-            && (reason == PEM_R_BAD_PASSWORD_READ
-                || reason == PEM_R_BAD_DECRYPT)) {
+        if (lib == ERR_LIB_PEM && (reason == PEM_R_BAD_PASSWORD_READ || reason == PEM_R_BAD_DECRYPT)) {
             ERR_clear_last_mark();
             goto end;
         }
@@ -167,7 +158,7 @@ static int pvk2key_decode(void *vctx, OSSL_CORE_BIO *cin, int selection,
     if (key != NULL && ctx->desc->adjust_key != NULL)
         ctx->desc->adjust_key(key, ctx);
 
- next:
+next:
     /*
      * Indicated that we successfully decoded something, or not at all.
      * Ending up "empty handed" is not an error.
@@ -186,34 +177,27 @@ static int pvk2key_decode(void *vctx, OSSL_CORE_BIO *cin, int selection,
         OSSL_PARAM params[4];
         int object_type = OSSL_OBJECT_PKEY;
 
-        params[0] =
-            OSSL_PARAM_construct_int(OSSL_OBJECT_PARAM_TYPE, &object_type);
-        params[1] =
-            OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_DATA_TYPE,
-                                             (char *)ctx->desc->name, 0);
+        params[0] = OSSL_PARAM_construct_int(OSSL_OBJECT_PARAM_TYPE, &object_type);
+        params[1] = OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_DATA_TYPE, (char *)ctx->desc->name, 0);
         /* The address of the key becomes the octet string */
-        params[2] =
-            OSSL_PARAM_construct_octet_string(OSSL_OBJECT_PARAM_REFERENCE,
-                                              &key, sizeof(key));
+        params[2] = OSSL_PARAM_construct_octet_string(OSSL_OBJECT_PARAM_REFERENCE, &key, sizeof(key));
         params[3] = OSSL_PARAM_construct_end();
 
         ok = data_cb(params, data_cbarg);
     }
 
- end:
+end:
     BIO_free(in);
     ctx->desc->free_key(key);
 
     return ok;
 }
 
-static int pvk2key_export_object(void *vctx,
-                                const void *reference, size_t reference_sz,
-                                OSSL_CALLBACK *export_cb, void *export_cbarg)
+static int pvk2key_export_object(void *vctx, const void *reference, size_t reference_sz, OSSL_CALLBACK *export_cb,
+                                 void *export_cbarg)
 {
     struct pvk2key_ctx_st *ctx = vctx;
-    OSSL_FUNC_keymgmt_export_fn *export =
-        ossl_prov_get_keymgmt_export(ctx->desc->fns);
+    OSSL_FUNC_keymgmt_export_fn *export = ossl_prov_get_keymgmt_export(ctx->desc->fns);
     void *keydata;
 
     if (reference_sz == sizeof(keydata) && export != NULL) {

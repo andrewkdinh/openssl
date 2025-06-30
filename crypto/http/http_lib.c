@@ -38,8 +38,7 @@ static void init_pint(int *pint)
 
 static int copy_substring(char **dest, const char *start, const char *end)
 {
-    return dest == NULL
-        || (*dest = OPENSSL_strndup(start, end - start)) != NULL;
+    return dest == NULL || (*dest = OPENSSL_strndup(start, end - start)) != NULL;
 }
 
 static void free_pstring(char **pstr)
@@ -50,8 +49,7 @@ static void free_pstring(char **pstr)
     }
 }
 
-int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
-                   char **pport, int *pport_num,
+int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost, char **pport, int *pport_num,
                    char **ppath, char **pquery, char **pfrag)
 {
     const char *p, *tmp;
@@ -155,12 +153,9 @@ int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
         frag = tmp + 1;
     }
 
-    if (!copy_substring(pscheme, scheme, scheme_end)
-            || !copy_substring(phost, host, host_end)
-            || !copy_substring(pport, port, port_end)
-            || !copy_substring(puser, user, user_end)
-            || !copy_substring(pquery, query, query_end)
-            || !copy_substring(pfrag, frag, frag_end))
+    if (!copy_substring(pscheme, scheme, scheme_end) || !copy_substring(phost, host, host_end)
+        || !copy_substring(pport, port, port_end) || !copy_substring(puser, user, user_end)
+        || !copy_substring(pquery, query, query_end) || !copy_substring(pfrag, frag, frag_end))
         goto err;
     if (pport_num != NULL)
         *pport_num = (int)portnum;
@@ -176,10 +171,10 @@ int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
     }
     return 1;
 
- parse_err:
+parse_err:
     ERR_raise(ERR_LIB_HTTP, HTTP_R_ERROR_PARSING_URL);
 
- err:
+err:
     free_pstring(pscheme);
     free_pstring(puser);
     free_pstring(phost);
@@ -192,8 +187,7 @@ int OSSL_parse_url(const char *url, char **pscheme, char **puser, char **phost,
 
 #ifndef OPENSSL_NO_HTTP
 
-int OSSL_HTTP_parse_url(const char *url, int *pssl, char **puser, char **phost,
-                        char **pport, int *pport_num,
+int OSSL_HTTP_parse_url(const char *url, int *pssl, char **puser, char **phost, char **pport, int *pport_num,
                         char **ppath, char **pquery, char **pfrag)
 {
     char *scheme, *port;
@@ -202,8 +196,7 @@ int OSSL_HTTP_parse_url(const char *url, int *pssl, char **puser, char **phost,
     init_pstring(pport);
     if (pssl != NULL)
         *pssl = 0;
-    if (!OSSL_parse_url(url, &scheme, puser, phost, &port, pport_num,
-                        ppath, pquery, pfrag))
+    if (!OSSL_parse_url(url, &scheme, puser, phost, &port, pport_num, ppath, pquery, pfrag))
         return 0;
 
     /* check for optional HTTP scheme "http[s]" */
@@ -240,7 +233,7 @@ int OSSL_HTTP_parse_url(const char *url, int *pssl, char **puser, char **phost,
     }
     return 1;
 
- err:
+err:
     free_pstring(puser);
     free_pstring(phost);
     free_pstring(ppath);
@@ -285,8 +278,7 @@ static int use_proxy(const char *no_proxy, const char *server)
 }
 
 /* Take default value from environment variable(s), respect no_proxy */
-const char *OSSL_HTTP_adapt_proxy(const char *proxy, const char *no_proxy,
-                                  const char *server, int use_ssl)
+const char *OSSL_HTTP_adapt_proxy(const char *proxy, const char *no_proxy, const char *server, int use_ssl)
 {
     /*
      * using environment variable names, both lowercase and uppercase variants,

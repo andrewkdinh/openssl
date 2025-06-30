@@ -26,7 +26,7 @@ OSSL_TIME ossl_time_now(void)
     GetSystemTime(&st);
     SystemTimeToFileTime(&st, &now.ft);
     /* re-bias to 1/1/1970 */
-# ifdef  __MINGW32__
+# ifdef __MINGW32__
     now.ul -= 116444736000000000ULL;
 # else
     now.ul -= 116444736000000000UI64;
@@ -36,8 +36,7 @@ OSSL_TIME ossl_time_now(void)
     struct timeval t;
 
     if (gettimeofday(&t, NULL) < 0) {
-        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(),
-                       "calling gettimeofday()");
+        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(), "calling gettimeofday()");
         return ossl_time_zero();
     }
     if (t.tv_sec <= 0)

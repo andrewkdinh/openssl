@@ -77,8 +77,7 @@ static int padlock_init(ENGINE *e);
 static RAND_METHOD padlock_rand;
 
 /* Cipher Stuff */
-static int padlock_ciphers(ENGINE *e, const EVP_CIPHER **cipher,
-                           const int **nids, int nid);
+static int padlock_ciphers(ENGINE *e, const EVP_CIPHER **cipher, const int **nids, int nid);
 
 /* Engine names */
 static const char *padlock_id = "padlock";
@@ -103,17 +102,13 @@ static int padlock_bind_helper(ENGINE *e)
     padlock_use_rng = 0;
 
     /* Generate a nice engine name with available features */
-    BIO_snprintf(padlock_name, sizeof(padlock_name),
-                 "VIA PadLock (%s, %s)",
-                 padlock_use_rng ? "RNG" : "no-RNG",
+    BIO_snprintf(padlock_name, sizeof(padlock_name), "VIA PadLock (%s, %s)", padlock_use_rng ? "RNG" : "no-RNG",
                  padlock_use_ace ? "ACE" : "no-ACE");
 
     /* Register everything or return with an error */
-    if (!ENGINE_set_id(e, padlock_id) ||
-        !ENGINE_set_name(e, padlock_name) ||
-        !ENGINE_set_init_function(e, padlock_init) ||
-        (padlock_use_ace && !ENGINE_set_ciphers(e, padlock_ciphers)) ||
-        (padlock_use_rng && !ENGINE_set_RAND(e, &padlock_rand))) {
+    if (!ENGINE_set_id(e, padlock_id) || !ENGINE_set_name(e, padlock_name) || !ENGINE_set_init_function(e, padlock_init)
+        || (padlock_use_ace && !ENGINE_set_ciphers(e, padlock_ciphers))
+        || (padlock_use_rng && !ENGINE_set_RAND(e, &padlock_rand))) {
         return 0;
     }
 
@@ -147,12 +142,8 @@ static int padlock_init(ENGINE *e)
 }
 
 #  ifndef AES_ASM
-static int padlock_aes_set_encrypt_key(const unsigned char *userKey,
-                                       const int bits,
-                                       AES_KEY *key);
-static int padlock_aes_set_decrypt_key(const unsigned char *userKey,
-                                       const int bits,
-                                       AES_KEY *key);
+static int padlock_aes_set_encrypt_key(const unsigned char *userKey, const int bits, AES_KEY *key);
+static int padlock_aes_set_decrypt_key(const unsigned char *userKey, const int bits, AES_KEY *key);
 #   define AES_ASM
 #   define AES_set_encrypt_key padlock_aes_set_encrypt_key
 #   define AES_set_decrypt_key padlock_aes_set_decrypt_key
@@ -218,18 +209,12 @@ unsigned int padlock_capability(void);
 void padlock_key_bswap(AES_KEY *key);
 void padlock_verify_context(struct padlock_cipher_data *ctx);
 void padlock_reload_key(void);
-void padlock_aes_block(void *out, const void *inp,
-                       struct padlock_cipher_data *ctx);
-int padlock_ecb_encrypt(void *out, const void *inp,
-                        struct padlock_cipher_data *ctx, size_t len);
-int padlock_cbc_encrypt(void *out, const void *inp,
-                        struct padlock_cipher_data *ctx, size_t len);
-int padlock_cfb_encrypt(void *out, const void *inp,
-                        struct padlock_cipher_data *ctx, size_t len);
-int padlock_ofb_encrypt(void *out, const void *inp,
-                        struct padlock_cipher_data *ctx, size_t len);
-int padlock_ctr32_encrypt(void *out, const void *inp,
-                          struct padlock_cipher_data *ctx, size_t len);
+void padlock_aes_block(void *out, const void *inp, struct padlock_cipher_data *ctx);
+int padlock_ecb_encrypt(void *out, const void *inp, struct padlock_cipher_data *ctx, size_t len);
+int padlock_cbc_encrypt(void *out, const void *inp, struct padlock_cipher_data *ctx, size_t len);
+int padlock_cfb_encrypt(void *out, const void *inp, struct padlock_cipher_data *ctx, size_t len);
+int padlock_ofb_encrypt(void *out, const void *inp, struct padlock_cipher_data *ctx, size_t len);
+int padlock_ctr32_encrypt(void *out, const void *inp, struct padlock_cipher_data *ctx, size_t len);
 int padlock_xstore(void *out, int edx);
 void padlock_sha1_oneshot(void *ctx, const void *inp, size_t len);
 void padlock_sha1(void *ctx, const void *inp, size_t len);
@@ -252,74 +237,54 @@ static int padlock_available(void)
 
 /* ===== AES encryption/decryption ===== */
 
-#  if defined(NID_aes_128_cfb128) && ! defined (NID_aes_128_cfb)
+#  if defined(NID_aes_128_cfb128) && !defined(NID_aes_128_cfb)
 #   define NID_aes_128_cfb NID_aes_128_cfb128
 #  endif
 
-#  if defined(NID_aes_128_ofb128) && ! defined (NID_aes_128_ofb)
+#  if defined(NID_aes_128_ofb128) && !defined(NID_aes_128_ofb)
 #   define NID_aes_128_ofb NID_aes_128_ofb128
 #  endif
 
-#  if defined(NID_aes_192_cfb128) && ! defined (NID_aes_192_cfb)
+#  if defined(NID_aes_192_cfb128) && !defined(NID_aes_192_cfb)
 #   define NID_aes_192_cfb NID_aes_192_cfb128
 #  endif
 
-#  if defined(NID_aes_192_ofb128) && ! defined (NID_aes_192_ofb)
+#  if defined(NID_aes_192_ofb128) && !defined(NID_aes_192_ofb)
 #   define NID_aes_192_ofb NID_aes_192_ofb128
 #  endif
 
-#  if defined(NID_aes_256_cfb128) && ! defined (NID_aes_256_cfb)
+#  if defined(NID_aes_256_cfb128) && !defined(NID_aes_256_cfb)
 #   define NID_aes_256_cfb NID_aes_256_cfb128
 #  endif
 
-#  if defined(NID_aes_256_ofb128) && ! defined (NID_aes_256_ofb)
+#  if defined(NID_aes_256_ofb128) && !defined(NID_aes_256_ofb)
 #   define NID_aes_256_ofb NID_aes_256_ofb128
 #  endif
 
 /* List of supported ciphers. */
 static const int padlock_cipher_nids[] = {
-    NID_aes_128_ecb,
-    NID_aes_128_cbc,
-    NID_aes_128_cfb,
-    NID_aes_128_ofb,
-    NID_aes_128_ctr,
+    NID_aes_128_ecb, NID_aes_128_cbc, NID_aes_128_cfb, NID_aes_128_ofb, NID_aes_128_ctr,
 
-    NID_aes_192_ecb,
-    NID_aes_192_cbc,
-    NID_aes_192_cfb,
-    NID_aes_192_ofb,
-    NID_aes_192_ctr,
+    NID_aes_192_ecb, NID_aes_192_cbc, NID_aes_192_cfb, NID_aes_192_ofb, NID_aes_192_ctr,
 
-    NID_aes_256_ecb,
-    NID_aes_256_cbc,
-    NID_aes_256_cfb,
-    NID_aes_256_ofb,
-    NID_aes_256_ctr
-};
+    NID_aes_256_ecb, NID_aes_256_cbc, NID_aes_256_cfb, NID_aes_256_ofb, NID_aes_256_ctr};
 
-static int padlock_cipher_nids_num = (sizeof(padlock_cipher_nids) /
-                                      sizeof(padlock_cipher_nids[0]));
+static int padlock_cipher_nids_num = (sizeof(padlock_cipher_nids) / sizeof(padlock_cipher_nids[0]));
 
 /* Function prototypes ... */
-static int padlock_aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                                const unsigned char *iv, int enc);
+static int padlock_aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc);
 
 #  define NEAREST_ALIGNED(ptr) ( (unsigned char *)(ptr) +         \
         ( (0x10 - ((size_t)(ptr) & 0x0F)) & 0x0F )      )
 #  define ALIGNED_CIPHER_DATA(ctx) ((struct padlock_cipher_data *)\
         NEAREST_ALIGNED(EVP_CIPHER_CTX_get_cipher_data(ctx)))
 
-static int
-padlock_ecb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
-                   const unsigned char *in_arg, size_t nbytes)
+static int padlock_ecb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg, const unsigned char *in_arg, size_t nbytes)
 {
-    return padlock_ecb_encrypt(out_arg, in_arg,
-                               ALIGNED_CIPHER_DATA(ctx), nbytes);
+    return padlock_ecb_encrypt(out_arg, in_arg, ALIGNED_CIPHER_DATA(ctx), nbytes);
 }
 
-static int
-padlock_cbc_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
-                   const unsigned char *in_arg, size_t nbytes)
+static int padlock_cbc_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg, const unsigned char *in_arg, size_t nbytes)
 {
     struct padlock_cipher_data *cdata = ALIGNED_CIPHER_DATA(ctx);
     int ret;
@@ -330,9 +295,7 @@ padlock_cbc_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
     return ret;
 }
 
-static int
-padlock_cfb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
-                   const unsigned char *in_arg, size_t nbytes)
+static int padlock_cfb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg, const unsigned char *in_arg, size_t nbytes)
 {
     struct padlock_cipher_data *cdata = ALIGNED_CIPHER_DATA(ctx);
     size_t chunk;
@@ -347,7 +310,8 @@ padlock_cfb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
             while (chunk < AES_BLOCK_SIZE && nbytes != 0) {
                 ivp[chunk] = *(out_arg++) = *(in_arg++) ^ ivp[chunk];
                 chunk++, nbytes--;
-        } else
+            }
+        else
             while (chunk < AES_BLOCK_SIZE && nbytes != 0) {
                 unsigned char c = *(in_arg++);
                 *(out_arg++) = c ^ ivp[chunk];
@@ -401,9 +365,7 @@ padlock_cfb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
     return 1;
 }
 
-static int
-padlock_ofb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
-                   const unsigned char *in_arg, size_t nbytes)
+static int padlock_ofb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg, const unsigned char *in_arg, size_t nbytes)
 {
     struct padlock_cipher_data *cdata = ALIGNED_CIPHER_DATA(ctx);
     size_t chunk;
@@ -456,18 +418,14 @@ padlock_ofb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
     return 1;
 }
 
-static void padlock_ctr32_encrypt_glue(const unsigned char *in,
-                                       unsigned char *out, size_t blocks,
-                                       struct padlock_cipher_data *ctx,
-                                       const unsigned char *ivec)
+static void padlock_ctr32_encrypt_glue(const unsigned char *in, unsigned char *out, size_t blocks,
+                                       struct padlock_cipher_data *ctx, const unsigned char *ivec)
 {
     memcpy(ctx->iv, ivec, AES_BLOCK_SIZE);
     padlock_ctr32_encrypt(out, in, ctx, AES_BLOCK_SIZE * blocks);
 }
 
-static int
-padlock_ctr_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
-                   const unsigned char *in_arg, size_t nbytes)
+static int padlock_ctr_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg, const unsigned char *in_arg, size_t nbytes)
 {
     struct padlock_cipher_data *cdata = ALIGNED_CIPHER_DATA(ctx);
     int n = EVP_CIPHER_CTX_get_num(ctx);
@@ -477,10 +435,8 @@ padlock_ctr_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
         return 0;
     num = (unsigned int)n;
 
-    CRYPTO_ctr128_encrypt_ctr32(in_arg, out_arg, nbytes,
-                                cdata, EVP_CIPHER_CTX_iv_noconst(ctx),
-                                EVP_CIPHER_CTX_buf_noconst(ctx), &num,
-                                (ctr128_f) padlock_ctr32_encrypt_glue);
+    CRYPTO_ctr128_encrypt_ctr32(in_arg, out_arg, nbytes, cdata, EVP_CIPHER_CTX_iv_noconst(ctx),
+                                EVP_CIPHER_CTX_buf_noconst(ctx), &num, (ctr128_f)padlock_ctr32_encrypt_glue);
 
     EVP_CIPHER_CTX_set_num(ctx, (size_t)num);
     return 1;
@@ -496,7 +452,7 @@ padlock_ctr_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out_arg,
  * Declaring so many ciphers by hand would be a pain. Instead introduce a bit
  * of preprocessor magic :-)
  */
-#  define DECLARE_AES_EVP(ksize,lmode,umode)      \
+#  define DECLARE_AES_EVP(ksize, lmode, umode)      \
 static EVP_CIPHER *_hidden_aes_##ksize##_##lmode = NULL; \
 static const EVP_CIPHER *padlock_aes_##ksize##_##lmode(void) \
 {                                                                       \
@@ -543,9 +499,7 @@ DECLARE_AES_EVP(256, cfb, CFB)
 DECLARE_AES_EVP(256, ofb, OFB)
 DECLARE_AES_EVP(256, ctr, CTR)
 
-static int
-padlock_ciphers(ENGINE *e, const EVP_CIPHER **cipher, const int **nids,
-                int nid)
+static int padlock_ciphers(ENGINE *e, const EVP_CIPHER **cipher, const int **nids, int nid)
 {
     /* No specific cipher => return a list of supported nids ... */
     if (!cipher) {
@@ -613,9 +567,7 @@ padlock_ciphers(ENGINE *e, const EVP_CIPHER **cipher, const int **nids,
 }
 
 /* Prepare the encryption key for PadLock usage */
-static int
-padlock_aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                     const unsigned char *iv, int enc)
+static int padlock_aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc)
 {
     struct padlock_cipher_data *cdata;
     int key_len = EVP_CIPHER_CTX_get_key_length(ctx) * 8;
@@ -654,8 +606,7 @@ padlock_aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
          * hardware errata. They most likely will fix it at some point and
          * then a check for stepping would be due here.
          */
-        if ((mode == EVP_CIPH_ECB_MODE || mode == EVP_CIPH_CBC_MODE)
-            && !enc)
+        if ((mode == EVP_CIPH_ECB_MODE || mode == EVP_CIPH_CBC_MODE) && !enc)
             AES_set_decrypt_key(key, key_len, &cdata->ks);
         else
             AES_set_encrypt_key(key, key_len, &cdata->ks);
@@ -751,9 +702,9 @@ static RAND_METHOD padlock_rand = {
 #if defined(OPENSSL_NO_PADLOCKENG) || !defined(COMPILE_PADLOCKENG)
 # ifndef OPENSSL_NO_DYNAMIC_ENGINE
 OPENSSL_EXPORT
-    int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns);
+int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns);
 OPENSSL_EXPORT
-    int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns)
+int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns)
 {
     return 0;
 }

@@ -8,14 +8,14 @@
  */
 
 #ifndef OSSL_CRYPTO_X509_H
-# define OSSL_CRYPTO_X509_H
-# pragma once
+#define OSSL_CRYPTO_X509_H
+#pragma once
 
-# include "internal/refcount.h"
-# include <openssl/asn1.h>
-# include <openssl/x509.h>
-# include <openssl/conf.h>
-# include "crypto/types.h"
+#include "internal/refcount.h"
+#include <openssl/asn1.h>
+#include <openssl/x509.h>
+#include <openssl/conf.h>
+#include "crypto/types.h"
 
 /* Internal X509 structures and functions: not for application use */
 
@@ -43,7 +43,7 @@ struct X509_name_st {
     /* canonical encoding used for rapid Name comparison */
     unsigned char *canon_enc;
     int canon_enclen;
-} /* X509_NAME */ ;
+} /* X509_NAME */;
 
 /* Signature info structure */
 
@@ -191,10 +191,10 @@ struct x509_st {
     STACK_OF(DIST_POINT) *crldp;
     STACK_OF(GENERAL_NAME) *altname;
     NAME_CONSTRAINTS *nc;
-# ifndef OPENSSL_NO_RFC3779
+#ifndef OPENSSL_NO_RFC3779
     STACK_OF(IPAddressFamily) *rfc3779_addr;
     struct ASIdentifiers_st *rfc3779_asid;
-# endif
+#endif
     unsigned char sha1_hash[SHA_DIGEST_LENGTH];
     X509_CERT_AUX *aux;
     CRYPTO_RWLOCK *lock;
@@ -205,7 +205,7 @@ struct x509_st {
 
     OSSL_LIB_CTX *libctx;
     char *propq;
-} /* X509 */ ;
+} /* X509 */;
 
 /*
  * This is a used when verifying cert chains.  Since the gathering of the
@@ -226,29 +226,27 @@ struct x509_store_ctx_st {      /* X509_STORE_CTX */
     void *other_ctx;
     /* Callbacks for various operations */
     /* called to verify a certificate */
-    int (*verify) (X509_STORE_CTX *ctx);
+    int (*verify)(X509_STORE_CTX *ctx);
     /* error callback */
-    int (*verify_cb) (int ok, X509_STORE_CTX *ctx);
+    int (*verify_cb)(int ok, X509_STORE_CTX *ctx);
     /* get issuers cert from ctx */
-    int (*get_issuer) (X509 **issuer, X509_STORE_CTX *ctx, X509 *x);
+    int (*get_issuer)(X509 **issuer, X509_STORE_CTX *ctx, X509 *x);
     /* check issued */
-    int (*check_issued) (X509_STORE_CTX *ctx, X509 *x, X509 *issuer);
+    int (*check_issued)(X509_STORE_CTX *ctx, X509 *x, X509 *issuer);
     /* Check revocation status of chain */
-    int (*check_revocation) (X509_STORE_CTX *ctx);
+    int (*check_revocation)(X509_STORE_CTX *ctx);
     /* retrieve CRL */
-    int (*get_crl) (X509_STORE_CTX *ctx, X509_CRL **crl, X509 *x);
+    int (*get_crl)(X509_STORE_CTX *ctx, X509_CRL **crl, X509 *x);
     /* Check CRL validity */
-    int (*check_crl) (X509_STORE_CTX *ctx, X509_CRL *crl);
+    int (*check_crl)(X509_STORE_CTX *ctx, X509_CRL *crl);
     /* Check certificate against CRL */
-    int (*cert_crl) (X509_STORE_CTX *ctx, X509_CRL *crl, X509 *x);
+    int (*cert_crl)(X509_STORE_CTX *ctx, X509_CRL *crl, X509 *x);
     /* Check policy status of the chain */
-    int (*check_policy) (X509_STORE_CTX *ctx);
-    STACK_OF(X509) *(*lookup_certs) (X509_STORE_CTX *ctx,
-                                     const X509_NAME *nm);
+    int (*check_policy)(X509_STORE_CTX *ctx);
+    STACK_OF(X509) *(*lookup_certs)(X509_STORE_CTX *ctx, const X509_NAME *nm);
     /* cannot constify 'ctx' param due to lookup_certs_sk() in x509_vfy.c */
-    STACK_OF(X509_CRL) *(*lookup_crls) (const X509_STORE_CTX *ctx,
-                                        const X509_NAME *nm);
-    int (*cleanup) (X509_STORE_CTX *ctx);
+    STACK_OF(X509_CRL) *(*lookup_crls)(const X509_STORE_CTX *ctx, const X509_NAME *nm);
+    int (*cleanup)(X509_STORE_CTX *ctx);
     /* The following is built up */
     /* if 0, rebuild chain */
     int valid;
@@ -316,83 +314,59 @@ int ossl_x509v3_cache_extensions(X509 *x);
 int ossl_x509_init_sig_info(X509 *x);
 
 int ossl_x509_set0_libctx(X509 *x, OSSL_LIB_CTX *libctx, const char *propq);
-int ossl_x509_crl_set0_libctx(X509_CRL *x, OSSL_LIB_CTX *libctx,
-                              const char *propq);
-int ossl_x509_req_set0_libctx(X509_REQ *x, OSSL_LIB_CTX *libctx,
-                              const char *propq);
-int ossl_asn1_item_digest_ex(const ASN1_ITEM *it, const EVP_MD *type,
-                             void *data, unsigned char *md, unsigned int *len,
+int ossl_x509_crl_set0_libctx(X509_CRL *x, OSSL_LIB_CTX *libctx, const char *propq);
+int ossl_x509_req_set0_libctx(X509_REQ *x, OSSL_LIB_CTX *libctx, const char *propq);
+int ossl_asn1_item_digest_ex(const ASN1_ITEM *it, const EVP_MD *type, void *data, unsigned char *md, unsigned int *len,
                              OSSL_LIB_CTX *libctx, const char *propq);
 int ossl_x509_add_cert_new(STACK_OF(X509) **sk, X509 *cert, int flags);
-int ossl_x509_add_certs_new(STACK_OF(X509) **p_sk, STACK_OF(X509) *certs,
-                            int flags);
+int ossl_x509_add_certs_new(STACK_OF(X509) **p_sk, STACK_OF(X509) *certs, int flags);
 
 STACK_OF(X509_ATTRIBUTE) *ossl_x509at_dup(const STACK_OF(X509_ATTRIBUTE) *x);
 
-int ossl_x509_PUBKEY_get0_libctx(OSSL_LIB_CTX **plibctx, const char **ppropq,
-                                 const X509_PUBKEY *key);
+int ossl_x509_PUBKEY_get0_libctx(OSSL_LIB_CTX **plibctx, const char **ppropq, const X509_PUBKEY *key);
 /* Calculate default key identifier according to RFC 5280 section 4.2.1.2 (1) */
 ASN1_OCTET_STRING *ossl_x509_pubkey_hash(X509_PUBKEY *pubkey);
 
-X509_PUBKEY *ossl_d2i_X509_PUBKEY_INTERNAL(const unsigned char **pp,
-                                           long len, OSSL_LIB_CTX *libctx,
-                                           const char *propq);
+X509_PUBKEY *ossl_d2i_X509_PUBKEY_INTERNAL(const unsigned char **pp, long len, OSSL_LIB_CTX *libctx, const char *propq);
 void ossl_X509_PUBKEY_INTERNAL_free(X509_PUBKEY *xpub);
 
 RSA *ossl_d2i_RSA_PSS_PUBKEY(RSA **a, const unsigned char **pp, long length);
 int ossl_i2d_RSA_PSS_PUBKEY(const RSA *a, unsigned char **pp);
-# ifndef OPENSSL_NO_DSA
+#ifndef OPENSSL_NO_DSA
 DSA *ossl_d2i_DSA_PUBKEY(DSA **a, const unsigned char **pp, long length);
-# endif /* OPENSSL_NO_DSA */
-# ifndef OPENSSL_NO_DH
+#endif /* OPENSSL_NO_DSA */
+#ifndef OPENSSL_NO_DH
 DH *ossl_d2i_DH_PUBKEY(DH **a, const unsigned char **pp, long length);
 int ossl_i2d_DH_PUBKEY(const DH *a, unsigned char **pp);
 DH *ossl_d2i_DHx_PUBKEY(DH **a, const unsigned char **pp, long length);
 int ossl_i2d_DHx_PUBKEY(const DH *a, unsigned char **pp);
-# endif /* OPENSSL_NO_DH */
-# ifndef OPENSSL_NO_EC
-ECX_KEY *ossl_d2i_ED25519_PUBKEY(ECX_KEY **a,
-                                 const unsigned char **pp, long length);
+#endif /* OPENSSL_NO_DH */
+#ifndef OPENSSL_NO_EC
+ECX_KEY *ossl_d2i_ED25519_PUBKEY(ECX_KEY **a, const unsigned char **pp, long length);
 int ossl_i2d_ED25519_PUBKEY(const ECX_KEY *a, unsigned char **pp);
-ECX_KEY *ossl_d2i_ED448_PUBKEY(ECX_KEY **a,
-                               const unsigned char **pp, long length);
+ECX_KEY *ossl_d2i_ED448_PUBKEY(ECX_KEY **a, const unsigned char **pp, long length);
 int ossl_i2d_ED448_PUBKEY(const ECX_KEY *a, unsigned char **pp);
-ECX_KEY *ossl_d2i_X25519_PUBKEY(ECX_KEY **a,
-                                const unsigned char **pp, long length);
+ECX_KEY *ossl_d2i_X25519_PUBKEY(ECX_KEY **a, const unsigned char **pp, long length);
 int ossl_i2d_X25519_PUBKEY(const ECX_KEY *a, unsigned char **pp);
-ECX_KEY *ossl_d2i_X448_PUBKEY(ECX_KEY **a,
-                              const unsigned char **pp, long length);
+ECX_KEY *ossl_d2i_X448_PUBKEY(ECX_KEY **a, const unsigned char **pp, long length);
 int ossl_i2d_X448_PUBKEY(const ECX_KEY *a, unsigned char **pp);
-# endif /* OPENSSL_NO_EC */
+#endif /* OPENSSL_NO_EC */
 
-EVP_PKEY *ossl_d2i_PUBKEY_legacy(EVP_PKEY **a, const unsigned char **pp,
-                                 long length);
+EVP_PKEY *ossl_d2i_PUBKEY_legacy(EVP_PKEY **a, const unsigned char **pp, long length);
 int ossl_x509_check_private_key(const EVP_PKEY *k, const EVP_PKEY *pkey);
 
-int x509v3_add_len_value_uchar(const char *name, const unsigned char *value,
-                               size_t vallen, STACK_OF(CONF_VALUE) **extlist);
+int x509v3_add_len_value_uchar(const char *name, const unsigned char *value, size_t vallen,
+                               STACK_OF(CONF_VALUE) **extlist);
 /* Attribute addition functions not checking for duplicate attributes */
-STACK_OF(X509_ATTRIBUTE) *ossl_x509at_add1_attr(STACK_OF(X509_ATTRIBUTE) **x,
-                                                const X509_ATTRIBUTE *attr);
-STACK_OF(X509_ATTRIBUTE) *ossl_x509at_add1_attr_by_OBJ(STACK_OF(X509_ATTRIBUTE) **x,
-                                                       const ASN1_OBJECT *obj,
-                                                       int type,
-                                                       const unsigned char *bytes,
-                                                       int len);
-STACK_OF(X509_ATTRIBUTE) *ossl_x509at_add1_attr_by_NID(STACK_OF(X509_ATTRIBUTE) **x,
-                                                       int nid, int type,
-                                                       const unsigned char *bytes,
-                                                       int len);
-STACK_OF(X509_ATTRIBUTE) *ossl_x509at_add1_attr_by_txt(STACK_OF(X509_ATTRIBUTE) **x,
-                                                       const char *attrname,
-                                                       int type,
-                                                       const unsigned char *bytes,
-                                                       int len);
-                                            
-int ossl_print_attribute_value(BIO *out,
-                               int obj_nid,
-                               const ASN1_TYPE *av,
-                               int indent);
+STACK_OF(X509_ATTRIBUTE) *ossl_x509at_add1_attr(STACK_OF(X509_ATTRIBUTE) **x, const X509_ATTRIBUTE *attr);
+STACK_OF(X509_ATTRIBUTE) *ossl_x509at_add1_attr_by_OBJ(STACK_OF(X509_ATTRIBUTE) **x, const ASN1_OBJECT *obj, int type,
+                                                       const unsigned char *bytes, int len);
+STACK_OF(X509_ATTRIBUTE) *ossl_x509at_add1_attr_by_NID(STACK_OF(X509_ATTRIBUTE) **x, int nid, int type,
+                                                       const unsigned char *bytes, int len);
+STACK_OF(X509_ATTRIBUTE) *ossl_x509at_add1_attr_by_txt(STACK_OF(X509_ATTRIBUTE) **x, const char *attrname, int type,
+                                                       const unsigned char *bytes, int len);
+
+int ossl_print_attribute_value(BIO *out, int obj_nid, const ASN1_TYPE *av, int indent);
 
 int ossl_serial_number_print(BIO *out, const ASN1_INTEGER *bs, int indent);
 int ossl_bio_print_hex(BIO *out, unsigned char *buf, int len);

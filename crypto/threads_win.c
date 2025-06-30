@@ -124,11 +124,9 @@ struct rcu_lock_st {
     CRYPTO_RWLOCK *rw_lock;
 };
 
-static struct rcu_qp *allocate_new_qp_group(struct rcu_lock_st *lock,
-                                            uint32_t count)
+static struct rcu_qp *allocate_new_qp_group(struct rcu_lock_st *lock, uint32_t count)
 {
-    struct rcu_qp *new =
-        OPENSSL_zalloc(sizeof(*new) * count);
+    struct rcu_qp *new = OPENSSL_zalloc(sizeof(*new) * count);
 
     lock->group_count = count;
     return new;
@@ -161,13 +159,8 @@ CRYPTO_RCU_LOCK *ossl_rcu_lock_new(int num_writers, OSSL_LIB_CTX *ctx)
     new->alloc_lock = ossl_crypto_mutex_new();
     new->prior_lock = ossl_crypto_mutex_new();
     new->qp_group = allocate_new_qp_group(new, num_writers);
-    if (new->qp_group == NULL
-        || new->alloc_signal == NULL
-        || new->prior_signal == NULL
-        || new->write_lock == NULL
-        || new->alloc_lock == NULL
-        || new->prior_lock == NULL
-        || new->rw_lock == NULL) {
+    if (new->qp_group == NULL || new->alloc_signal == NULL || new->prior_signal == NULL || new->write_lock == NULL
+        || new->alloc_lock == NULL || new->prior_lock == NULL || new->rw_lock == NULL) {
         CRYPTO_THREAD_lock_free(new->rw_lock);
         OPENSSL_free(new->qp_group);
         ossl_crypto_condvar_free(&new->alloc_signal);
@@ -180,7 +173,6 @@ CRYPTO_RCU_LOCK *ossl_rcu_lock_new(int num_writers, OSSL_LIB_CTX *ctx)
     }
 
     return new;
-
 }
 
 void ossl_rcu_lock_free(CRYPTO_RCU_LOCK *lock)
@@ -204,16 +196,12 @@ static ossl_inline struct rcu_qp *get_hold_current_qp(CRYPTO_RCU_LOCK *lock)
 
     /* get the current qp index */
     for (;;) {
-        CRYPTO_atomic_load_int((int *)&lock->reader_idx, (int *)&qp_idx,
-                               lock->rw_lock);
-        CRYPTO_atomic_add64(&lock->qp_group[qp_idx].users, (uint64_t)1, &tmp64,
-                            lock->rw_lock);
-        CRYPTO_atomic_load_int((int *)&lock->reader_idx, (int *)&tmp,
-                               lock->rw_lock);
+        CRYPTO_atomic_load_int((int *)&lock->reader_idx, (int *)&qp_idx, lock->rw_lock);
+        CRYPTO_atomic_add64(&lock->qp_group[qp_idx].users, (uint64_t)1, &tmp64, lock->rw_lock);
+        CRYPTO_atomic_load_int((int *)&lock->reader_idx, (int *)&tmp, lock->rw_lock);
         if (qp_idx == tmp)
             break;
-        CRYPTO_atomic_add64(&lock->qp_group[qp_idx].users, (uint64_t)-1, &tmp64,
-                            lock->rw_lock);
+        CRYPTO_atomic_add64(&lock->qp_group[qp_idx].users, (uint64_t)-1, &tmp64, lock->rw_lock);
     }
 
     return &lock->qp_group[qp_idx];
@@ -287,9 +275,7 @@ void ossl_rcu_read_unlock(CRYPTO_RCU_LOCK *lock)
         if (data->thread_qps[i].lock == lock) {
             data->thread_qps[i].depth--;
             if (data->thread_qps[i].depth == 0) {
-                CRYPTO_atomic_add64(&data->thread_qps[i].qp->users,
-                                    (uint64_t)-1, (uint64_t *)&ret,
-                                    lock->rw_lock);
+                CRYPTO_atomic_add64(&data->thread_qps[i].qp->users, (uint64_t)-1, (uint64_t *)&ret, lock->rw_lock);
                 OPENSSL_assert(ret >= 0);
                 data->thread_qps[i].qp = NULL;
                 data->thread_qps[i].lock = NULL;
@@ -324,8 +310,7 @@ static struct rcu_qp *update_qp(CRYPTO_RCU_LOCK *lock, uint32_t *curr_id)
     lock->writers_alloced++;
 
     /* increment the allocation index */
-    lock->current_alloc_idx =
-        (lock->current_alloc_idx + 1) % lock->group_count;
+    lock->current_alloc_idx = (lock->current_alloc_idx + 1) % lock->group_count;
 
     /* get and insert a new id */
     *curr_id = lock->id_ctr;
@@ -347,15 +332,13 @@ static struct rcu_qp *update_qp(CRYPTO_RCU_LOCK *lock, uint32_t *curr_id)
     return &lock->qp_group[current_idx];
 }
 
-static void retire_qp(CRYPTO_RCU_LOCK *lock,
-                      struct rcu_qp *qp)
+static void retire_qp(CRYPTO_RCU_LOCK *lock, struct rcu_qp *qp)
 {
     ossl_crypto_mutex_lock(lock->alloc_lock);
     lock->writers_alloced--;
     ossl_crypto_condvar_broadcast(lock->alloc_signal);
     ossl_crypto_mutex_unlock(lock->alloc_lock);
 }
-
 
 void ossl_synchronize_rcu(CRYPTO_RCU_LOCK *lock)
 {
@@ -398,7 +381,6 @@ void ossl_synchronize_rcu(CRYPTO_RCU_LOCK *lock)
 
     /* and we're done */
     return;
-
 }
 
 /*
@@ -427,9 +409,8 @@ void *ossl_rcu_uptr_deref(void **p)
 
 void ossl_rcu_assign_uptr(void **p, void **v)
 {
-    InterlockedExchangePointer((void * volatile *)p, (void *)*v);
+    InterlockedExchangePointer((void *volatile *)p, (void *)*v);
 }
-
 
 CRYPTO_RWLOCK *CRYPTO_THREAD_lock_new(void)
 {
@@ -617,14 +598,12 @@ int CRYPTO_atomic_add(int *val, int amount, int *ret, CRYPTO_RWLOCK *lock)
 
     return 1;
 # else
-    *ret = (int)InterlockedExchangeAdd((LONG volatile *)val, (LONG)amount)
-        + amount;
+    *ret = (int)InterlockedExchangeAdd((LONG volatile *)val, (LONG)amount) + amount;
     return 1;
 # endif
 }
 
-int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
-                        CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if (defined(NO_INTERLOCKEDOR64))
     if (lock == NULL || !CRYPTO_THREAD_write_lock(lock))
@@ -642,8 +621,7 @@ int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
 # endif
 }
 
-int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
-                      CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if (defined(NO_INTERLOCKEDOR64))
     if (lock == NULL || !CRYPTO_THREAD_write_lock(lock))
@@ -661,8 +639,7 @@ int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
 # endif
 }
 
-int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
-                     CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if (defined(NO_INTERLOCKEDOR64))
     if (lock == NULL || !CRYPTO_THREAD_write_lock(lock))

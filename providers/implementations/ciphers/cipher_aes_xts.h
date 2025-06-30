@@ -18,8 +18,7 @@
 extern const int ossl_aes_xts_allow_insecure_decrypt;
 
 PROV_CIPHER_FUNC(void, xts_stream,
-                 (const unsigned char *in, unsigned char *out, size_t len,
-                  const AES_KEY *key1, const AES_KEY *key2,
+                 (const unsigned char *in, unsigned char *out, size_t len, const AES_KEY *key1, const AES_KEY *key2,
                   const unsigned char iv[16]));
 
 #if defined(OPENSSL_CPUID_OBJ) && defined(__s390__)
@@ -50,8 +49,8 @@ typedef struct prov_aes_xts_ctx_st {
             } param;
             size_t offset;
             unsigned int fc;
-            unsigned int iv_set : 1;
-            unsigned int key_set : 1;
+            unsigned int iv_set:1;
+            unsigned int key_set:1;
         } s390x;
 #endif
     } plat;

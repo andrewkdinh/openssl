@@ -18,24 +18,24 @@
  * From RFC6962: opaque SerializedSCT<1..2^16-1>; struct { SerializedSCT
  * sct_list <1..2^16-1>; } SignedCertificateTimestampList;
  */
-# define MAX_SCT_SIZE            65535
-# define MAX_SCT_LIST_SIZE       MAX_SCT_SIZE
+#define MAX_SCT_SIZE            65535
+#define MAX_SCT_LIST_SIZE       MAX_SCT_SIZE
 
 /*
  * Macros to read and write integers in network-byte order.
  */
 
-#define n2s(c,s)        ((s=(((unsigned int)((c)[0]))<< 8)| \
+#define n2s(c, s)        ((s=(((unsigned int)((c)[0]))<< 8)| \
                             (((unsigned int)((c)[1]))    )),c+=2)
 
-#define s2n(s,c)        ((c[0]=(unsigned char)(((s)>> 8)&0xff), \
+#define s2n(s, c)        ((c[0]=(unsigned char)(((s)>> 8)&0xff), \
                           c[1]=(unsigned char)(((s)    )&0xff)),c+=2)
 
-#define l2n3(l,c)       ((c[0]=(unsigned char)(((l)>>16)&0xff), \
+#define l2n3(l, c)       ((c[0]=(unsigned char)(((l)>>16)&0xff), \
                           c[1]=(unsigned char)(((l)>> 8)&0xff), \
                           c[2]=(unsigned char)(((l)    )&0xff)),c+=3)
 
-#define n2l8(c,l)       (l =((uint64_t)(*((c)++)))<<56, \
+#define n2l8(c, l)       (l =((uint64_t)(*((c)++)))<<56, \
                          l|=((uint64_t)(*((c)++)))<<48, \
                          l|=((uint64_t)(*((c)++)))<<40, \
                          l|=((uint64_t)(*((c)++)))<<32, \
@@ -44,7 +44,7 @@
                          l|=((uint64_t)(*((c)++)))<< 8, \
                          l|=((uint64_t)(*((c)++))))
 
-#define l2n8(l,c)       (*((c)++)=(unsigned char)(((l)>>56)&0xff), \
+#define l2n8(l, c)       (*((c)++)=(unsigned char)(((l)>>56)&0xff), \
                          *((c)++)=(unsigned char)(((l)>>48)&0xff), \
                          *((c)++)=(unsigned char)(((l)>>40)&0xff), \
                          *((c)++)=(unsigned char)(((l)>>32)&0xff), \

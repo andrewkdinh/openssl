@@ -62,12 +62,9 @@ static CRYPTO_ONCE version_strings_once = CRYPTO_ONCE_STATIC_INIT;
 
 DEFINE_RUN_ONCE_STATIC(version_strings_setup)
 {
-    BIO_snprintf(openssldir, sizeof(openssldir), "OPENSSLDIR: \"%s\"",
-                 ossl_get_openssldir());
-    BIO_snprintf(enginesdir, sizeof(enginesdir), "ENGINESDIR: \"%s\"",
-                 ossl_get_enginesdir());
-    BIO_snprintf(modulesdir, sizeof(modulesdir), "MODULESDIR: \"%s\"",
-                 ossl_get_modulesdir());
+    BIO_snprintf(openssldir, sizeof(openssldir), "OPENSSLDIR: \"%s\"", ossl_get_openssldir());
+    BIO_snprintf(enginesdir, sizeof(enginesdir), "ENGINESDIR: \"%s\"", ossl_get_enginesdir());
+    BIO_snprintf(modulesdir, sizeof(modulesdir), "MODULESDIR: \"%s\"", ossl_get_modulesdir());
     return 1;
 }
 

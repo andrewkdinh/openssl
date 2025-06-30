@@ -110,9 +110,7 @@ const DH_NAMED_GROUP *ossl_ffc_uid_to_dh_named_group(int uid)
 }
 
 #ifndef OPENSSL_NO_DH
-const DH_NAMED_GROUP *ossl_ffc_numbers_to_dh_named_group(const BIGNUM *p,
-                                                         const BIGNUM *q,
-                                                         const BIGNUM *g)
+const DH_NAMED_GROUP *ossl_ffc_numbers_to_dh_named_group(const BIGNUM *p, const BIGNUM *q, const BIGNUM *g)
 {
     size_t i;
 
@@ -162,8 +160,7 @@ int ossl_ffc_named_group_set(FFC_PARAMS *ffc, const DH_NAMED_GROUP *group)
     if (ffc == NULL || group == NULL)
         return 0;
 
-    ossl_ffc_params_set0_pqg(ffc, (BIGNUM *)group->p, (BIGNUM *)group->q,
-                             (BIGNUM *)group->g);
+    ossl_ffc_params_set0_pqg(ffc, (BIGNUM *)group->p, (BIGNUM *)group->q, (BIGNUM *)group->g);
     ffc->keylength = group->keylength;
 
     /* flush the cached nid, The DH layer is responsible for caching */

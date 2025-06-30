@@ -51,8 +51,7 @@ int BN_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
     int i, bits, ret = 0;
     BIGNUM *v, *rr;
 
-    if (BN_get_flags(p, BN_FLG_CONSTTIME) != 0
-            || BN_get_flags(a, BN_FLG_CONSTTIME) != 0) {
+    if (BN_get_flags(p, BN_FLG_CONSTTIME) != 0 || BN_get_flags(a, BN_FLG_CONSTTIME) != 0) {
         /* BN_FLG_CONSTTIME only supported by BN_mod_exp_mont() */
         ERR_raise(ERR_LIB_BN, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
         return 0;
@@ -88,14 +87,13 @@ int BN_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
         goto err;
 
     ret = 1;
- err:
+err:
     BN_CTX_end(ctx);
     bn_check_top(r);
     return ret;
 }
 
-int BN_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m,
-               BN_CTX *ctx)
+int BN_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx)
 {
     int ret;
 
@@ -141,10 +139,8 @@ int BN_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m,
 #ifdef MONT_MUL_MOD
     if (BN_is_odd(m)) {
 # ifdef MONT_EXP_WORD
-        if (a->top == 1 && !a->neg
-            && (BN_get_flags(p, BN_FLG_CONSTTIME) == 0)
-            && (BN_get_flags(a, BN_FLG_CONSTTIME) == 0)
-            && (BN_get_flags(m, BN_FLG_CONSTTIME) == 0)) {
+        if (a->top == 1 && !a->neg && (BN_get_flags(p, BN_FLG_CONSTTIME) == 0)
+            && (BN_get_flags(a, BN_FLG_CONSTTIME) == 0) && (BN_get_flags(m, BN_FLG_CONSTTIME) == 0)) {
             BN_ULONG A = a->d[0];
             ret = BN_mod_exp_mont_word(r, A, p, m, ctx, NULL);
         } else
@@ -166,8 +162,7 @@ int BN_mod_exp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m,
     return ret;
 }
 
-int BN_mod_exp_recp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
-                    const BIGNUM *m, BN_CTX *ctx)
+int BN_mod_exp_recp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx)
 {
     int i, j, bits, ret = 0, wstart, wend, window;
     int start = 1;
@@ -176,9 +171,8 @@ int BN_mod_exp_recp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
     BIGNUM *val[TABLE_SIZE];
     BN_RECP_CTX recp;
 
-    if (BN_get_flags(p, BN_FLG_CONSTTIME) != 0
-            || BN_get_flags(a, BN_FLG_CONSTTIME) != 0
-            || BN_get_flags(m, BN_FLG_CONSTTIME) != 0) {
+    if (BN_get_flags(p, BN_FLG_CONSTTIME) != 0 || BN_get_flags(a, BN_FLG_CONSTTIME) != 0
+        || BN_get_flags(m, BN_FLG_CONSTTIME) != 0) {
         /* BN_FLG_CONSTTIME only supported by BN_mod_exp_mont() */
         ERR_raise(ERR_LIB_BN, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
         return 0;
@@ -230,8 +224,7 @@ int BN_mod_exp_recp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
             goto err;           /* 2 */
         j = 1 << (window - 1);
         for (i = 1; i < j; i++) {
-            if (((val[i] = BN_CTX_get(ctx)) == NULL) ||
-                !BN_mod_mul_reciprocal(val[i], val[i - 1], aa, &recp, ctx))
+            if (((val[i] = BN_CTX_get(ctx)) == NULL) || !BN_mod_mul_reciprocal(val[i], val[i - 1], aa, &recp, ctx))
                 goto err;
         }
     }
@@ -302,15 +295,14 @@ int BN_mod_exp_recp(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
             break;
     }
     ret = 1;
- err:
+err:
     BN_CTX_end(ctx);
     BN_RECP_CTX_free(&recp);
     bn_check_top(r);
     return ret;
 }
 
-int BN_mod_exp_mont(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
-                    const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *in_mont)
+int BN_mod_exp_mont(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *in_mont)
 {
     int i, j, bits, ret = 0, wstart, wend, window;
     int start = 1;
@@ -330,8 +322,7 @@ int BN_mod_exp_mont(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
     }
 
     if (m->top <= BN_CONSTTIME_SIZE_LIMIT
-        && (BN_get_flags(p, BN_FLG_CONSTTIME) != 0
-            || BN_get_flags(a, BN_FLG_CONSTTIME) != 0
+        && (BN_get_flags(p, BN_FLG_CONSTTIME) != 0 || BN_get_flags(a, BN_FLG_CONSTTIME) != 0
             || BN_get_flags(m, BN_FLG_CONSTTIME) != 0)) {
         return BN_mod_exp_mont_consttime(rr, a, p, m, ctx, in_mont);
     }
@@ -383,8 +374,7 @@ int BN_mod_exp_mont(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
             goto err;           /* 2 */
         j = 1 << (window - 1);
         for (i = 1; i < j; i++) {
-            if (((val[i] = BN_CTX_get(ctx)) == NULL) ||
-                !bn_mul_mont_fixed_top(val[i], val[i - 1], d, mont, ctx))
+            if (((val[i] = BN_CTX_get(ctx)) == NULL) || !bn_mul_mont_fixed_top(val[i], val[i - 1], d, mont, ctx))
                 goto err;
         }
     }
@@ -408,7 +398,7 @@ int BN_mod_exp_mont(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
         r->flags |= BN_FLG_FIXED_TOP;
     } else
 #endif
-    if (!bn_to_mont_fixed_top(r, BN_value_one(), mont, ctx))
+        if (!bn_to_mont_fixed_top(r, BN_value_one(), mont, ctx))
         goto err;
     for (;;) {
         int wvalue;             /* The 'value' of the window */
@@ -475,10 +465,10 @@ int BN_mod_exp_mont(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
             goto err;
     } else
 #endif
-    if (!BN_from_montgomery(rr, r, mont, ctx))
+        if (!BN_from_montgomery(rr, r, mont, ctx))
         goto err;
     ret = 1;
- err:
+err:
     if (in_mont == NULL)
         BN_MONT_CTX_free(mont);
     BN_CTX_end(ctx);
@@ -512,9 +502,7 @@ static BN_ULONG bn_get_bits(const BIGNUM *a, int bitpos)
  * used to transfer a BIGNUM from/to that table.
  */
 
-static int MOD_EXP_CTIME_COPY_TO_PREBUF(const BIGNUM *b, int top,
-                                        unsigned char *buf, int idx,
-                                        int window)
+static int MOD_EXP_CTIME_COPY_TO_PREBUF(const BIGNUM *b, int top, unsigned char *buf, int idx, int window)
 {
     int i, j;
     int width = 1 << window;
@@ -530,9 +518,7 @@ static int MOD_EXP_CTIME_COPY_TO_PREBUF(const BIGNUM *b, int top,
     return 1;
 }
 
-static int MOD_EXP_CTIME_COPY_FROM_PREBUF(BIGNUM *b, int top,
-                                          unsigned char *buf, int idx,
-                                          int window)
+static int MOD_EXP_CTIME_COPY_FROM_PREBUF(BIGNUM *b, int top, unsigned char *buf, int idx, int window)
 {
     int i, j;
     int width = 1 << window;
@@ -554,8 +540,7 @@ static int MOD_EXP_CTIME_COPY_FROM_PREBUF(BIGNUM *b, int top,
             BN_ULONG acc = 0;
 
             for (j = 0; j < width; j++) {
-                acc |= table[j] &
-                       ((BN_ULONG)0 - (constant_time_eq_int(j,idx)&1));
+                acc |= table[j] & ((BN_ULONG)0 - (constant_time_eq_int(j, idx) & 1));
             }
 
             b->d[i] = acc;
@@ -567,20 +552,18 @@ static int MOD_EXP_CTIME_COPY_FROM_PREBUF(BIGNUM *b, int top,
         i = idx >> (window - 2);        /* equivalent of idx / xstride */
         idx &= xstride - 1;             /* equivalent of idx % xstride */
 
-        y0 = (BN_ULONG)0 - (constant_time_eq_int(i,0)&1);
-        y1 = (BN_ULONG)0 - (constant_time_eq_int(i,1)&1);
-        y2 = (BN_ULONG)0 - (constant_time_eq_int(i,2)&1);
-        y3 = (BN_ULONG)0 - (constant_time_eq_int(i,3)&1);
+        y0 = (BN_ULONG)0 - (constant_time_eq_int(i, 0) & 1);
+        y1 = (BN_ULONG)0 - (constant_time_eq_int(i, 1) & 1);
+        y2 = (BN_ULONG)0 - (constant_time_eq_int(i, 2) & 1);
+        y3 = (BN_ULONG)0 - (constant_time_eq_int(i, 3) & 1);
 
         for (i = 0; i < top; i++, table += width) {
             BN_ULONG acc = 0;
 
             for (j = 0; j < xstride; j++) {
-                acc |= ( (table[j + 0 * xstride] & y0) |
-                         (table[j + 1 * xstride] & y1) |
-                         (table[j + 2 * xstride] & y2) |
-                         (table[j + 3 * xstride] & y3) )
-                       & ((BN_ULONG)0 - (constant_time_eq_int(j,idx)&1));
+                acc |= ((table[j + 0 * xstride] & y0) | (table[j + 1 * xstride] & y1) | (table[j + 2 * xstride] & y2)
+                        | (table[j + 3 * xstride] & y3))
+                    & ((BN_ULONG)0 - (constant_time_eq_int(j, idx) & 1));
             }
 
             b->d[i] = acc;
@@ -606,8 +589,7 @@ static int MOD_EXP_CTIME_COPY_FROM_PREBUF(BIGNUM *b, int top,
  * out by Colin Percival,
  * http://www.daemonology.net/hyperthreading-considered-harmful/)
  */
-int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
-                              const BIGNUM *m, BN_CTX *ctx,
+int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx,
                               BN_MONT_CTX *in_mont)
 {
     int i, bits, ret = 0, window, wvalue, wmask, window0;
@@ -668,8 +650,7 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
 
     if (a->neg || BN_ucmp(a, m) >= 0) {
         BIGNUM *reduced = BN_CTX_get(ctx);
-        if (reduced == NULL
-            || !BN_nnmod(reduced, a, m, ctx)) {
+        if (reduced == NULL || !BN_nnmod(reduced, a, m, ctx)) {
             goto err;
         }
         a = reduced;
@@ -681,12 +662,10 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
      * RSAZ exponentiation. For further information see
      * crypto/bn/rsaz_exp.c and accompanying assembly modules.
      */
-    if ((16 == a->top) && (16 == p->top) && (BN_num_bits(m) == 1024)
-        && rsaz_avx2_eligible()) {
+    if ((16 == a->top) && (16 == p->top) && (BN_num_bits(m) == 1024) && rsaz_avx2_eligible()) {
         if (NULL == bn_wexpand(rr, 16))
             goto err;
-        RSAZ_1024_mod_exp_avx2(rr->d, a->d, p->d, m->d, mont->RR.d,
-                               mont->n0[0]);
+        RSAZ_1024_mod_exp_avx2(rr->d, a->d, p->d, m->d, mont->RR.d, mont->n0[0]);
         rr->top = 16;
         rr->neg = 0;
         bn_correct_top(rr);
@@ -707,14 +686,14 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
     /* Get the window size to use with size of p. */
     window = BN_window_bits_for_ctime_exponent_size(bits);
 #if defined(SPARC_T4_MONT)
-    if (window >= 5 && (top & 15) == 0 && top <= 64 &&
-        (OPENSSL_sparcv9cap_P[1] & (CFR_MONTMUL | CFR_MONTSQR)) ==
-        (CFR_MONTMUL | CFR_MONTSQR) && (t4 = OPENSSL_sparcv9cap_P[0]))
+    if (window >= 5 && (top & 15) == 0 && top <= 64
+        && (OPENSSL_sparcv9cap_P[1] & (CFR_MONTMUL | CFR_MONTSQR)) == (CFR_MONTMUL | CFR_MONTSQR)
+        && (t4 = OPENSSL_sparcv9cap_P[0]))
         window = 5;
     else
 #endif
 #if defined(OPENSSL_BN_ASM_MONT5)
-    if (window >= 5 && top <= BN_SOFT_LIMIT) {
+        if (window >= 5 && top <= BN_SOFT_LIMIT) {
         window = 5;             /* ~5% improvement for RSA2048 sign, and even
                                  * for RSA4096 */
         /* reserve space for mont->N.d[] copy */
@@ -728,18 +707,13 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
      * of am, am itself and tmp.
      */
     numPowers = 1 << window;
-    powerbufLen += sizeof(m->d[0]) * (top * numPowers +
-                                      ((2 * top) >
-                                       numPowers ? (2 * top) : numPowers));
+    powerbufLen += sizeof(m->d[0]) * (top * numPowers + ((2 * top) > numPowers ? (2 * top) : numPowers));
 #ifdef alloca
     if (powerbufLen < 3072)
-        powerbufFree =
-            alloca(powerbufLen + MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH);
+        powerbufFree = alloca(powerbufLen + MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH);
     else
 #endif
-        if ((powerbufFree =
-             OPENSSL_malloc(powerbufLen + MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH))
-            == NULL)
+        if ((powerbufFree = OPENSSL_malloc(powerbufLen + MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH)) == NULL)
         goto err;
 
     powerbuf = MOD_EXP_CTIME_ALIGN(powerbufFree);
@@ -768,7 +742,7 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
         tmp.top = top;
     } else
 #endif
-    if (!bn_to_mont_fixed_top(&tmp, BN_value_one(), mont, ctx))
+        if (!bn_to_mont_fixed_top(&tmp, BN_value_one(), mont, ctx))
         goto err;
 
     /* prepare a^1 in Montgomery domain */
@@ -780,61 +754,42 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
 
 #if defined(SPARC_T4_MONT)
     if (t4) {
-        typedef int (*bn_pwr5_mont_f) (BN_ULONG *tp, const BN_ULONG *np,
-                                       const BN_ULONG *n0, const void *table,
-                                       int power, int bits);
-        int bn_pwr5_mont_t4_8(BN_ULONG *tp, const BN_ULONG *np,
-                              const BN_ULONG *n0, const void *table,
-                              int power, int bits);
-        int bn_pwr5_mont_t4_16(BN_ULONG *tp, const BN_ULONG *np,
-                               const BN_ULONG *n0, const void *table,
-                               int power, int bits);
-        int bn_pwr5_mont_t4_24(BN_ULONG *tp, const BN_ULONG *np,
-                               const BN_ULONG *n0, const void *table,
-                               int power, int bits);
-        int bn_pwr5_mont_t4_32(BN_ULONG *tp, const BN_ULONG *np,
-                               const BN_ULONG *n0, const void *table,
-                               int power, int bits);
-        static const bn_pwr5_mont_f pwr5_funcs[4] = {
-            bn_pwr5_mont_t4_8, bn_pwr5_mont_t4_16,
-            bn_pwr5_mont_t4_24, bn_pwr5_mont_t4_32
-        };
+        typedef int (*bn_pwr5_mont_f)(BN_ULONG *tp, const BN_ULONG *np, const BN_ULONG *n0, const void *table,
+                                      int power, int bits);
+        int bn_pwr5_mont_t4_8(BN_ULONG * tp, const BN_ULONG *np, const BN_ULONG *n0, const void *table, int power,
+                              int bits);
+        int bn_pwr5_mont_t4_16(BN_ULONG * tp, const BN_ULONG *np, const BN_ULONG *n0, const void *table, int power,
+                               int bits);
+        int bn_pwr5_mont_t4_24(BN_ULONG * tp, const BN_ULONG *np, const BN_ULONG *n0, const void *table, int power,
+                               int bits);
+        int bn_pwr5_mont_t4_32(BN_ULONG * tp, const BN_ULONG *np, const BN_ULONG *n0, const void *table, int power,
+                               int bits);
+        static const bn_pwr5_mont_f pwr5_funcs[4] = {bn_pwr5_mont_t4_8, bn_pwr5_mont_t4_16, bn_pwr5_mont_t4_24,
+                                                     bn_pwr5_mont_t4_32};
         bn_pwr5_mont_f pwr5_worker = pwr5_funcs[top / 16 - 1];
 
-        typedef int (*bn_mul_mont_f) (BN_ULONG *rp, const BN_ULONG *ap,
-                                      const void *bp, const BN_ULONG *np,
-                                      const BN_ULONG *n0);
-        int bn_mul_mont_t4_8(BN_ULONG *rp, const BN_ULONG *ap, const void *bp,
-                             const BN_ULONG *np, const BN_ULONG *n0);
-        int bn_mul_mont_t4_16(BN_ULONG *rp, const BN_ULONG *ap,
-                              const void *bp, const BN_ULONG *np,
+        typedef int (*bn_mul_mont_f)(BN_ULONG *rp, const BN_ULONG *ap, const void *bp, const BN_ULONG *np,
+                                     const BN_ULONG *n0);
+        int bn_mul_mont_t4_8(BN_ULONG * rp, const BN_ULONG *ap, const void *bp, const BN_ULONG *np, const BN_ULONG *n0);
+        int bn_mul_mont_t4_16(BN_ULONG * rp, const BN_ULONG *ap, const void *bp, const BN_ULONG *np,
                               const BN_ULONG *n0);
-        int bn_mul_mont_t4_24(BN_ULONG *rp, const BN_ULONG *ap,
-                              const void *bp, const BN_ULONG *np,
+        int bn_mul_mont_t4_24(BN_ULONG * rp, const BN_ULONG *ap, const void *bp, const BN_ULONG *np,
                               const BN_ULONG *n0);
-        int bn_mul_mont_t4_32(BN_ULONG *rp, const BN_ULONG *ap,
-                              const void *bp, const BN_ULONG *np,
+        int bn_mul_mont_t4_32(BN_ULONG * rp, const BN_ULONG *ap, const void *bp, const BN_ULONG *np,
                               const BN_ULONG *n0);
-        static const bn_mul_mont_f mul_funcs[4] = {
-            bn_mul_mont_t4_8, bn_mul_mont_t4_16,
-            bn_mul_mont_t4_24, bn_mul_mont_t4_32
-        };
+        static const bn_mul_mont_f mul_funcs[4] = {bn_mul_mont_t4_8, bn_mul_mont_t4_16, bn_mul_mont_t4_24,
+                                                   bn_mul_mont_t4_32};
         bn_mul_mont_f mul_worker = mul_funcs[top / 16 - 1];
 
-        void bn_mul_mont_vis3(BN_ULONG *rp, const BN_ULONG *ap,
-                              const void *bp, const BN_ULONG *np,
-                              const BN_ULONG *n0, int num);
-        void bn_mul_mont_t4(BN_ULONG *rp, const BN_ULONG *ap,
-                            const void *bp, const BN_ULONG *np,
-                            const BN_ULONG *n0, int num);
-        void bn_mul_mont_gather5_t4(BN_ULONG *rp, const BN_ULONG *ap,
-                                    const void *table, const BN_ULONG *np,
+        void bn_mul_mont_vis3(BN_ULONG * rp, const BN_ULONG *ap, const void *bp, const BN_ULONG *np, const BN_ULONG *n0,
+                              int num);
+        void bn_mul_mont_t4(BN_ULONG * rp, const BN_ULONG *ap, const void *bp, const BN_ULONG *np, const BN_ULONG *n0,
+                            int num);
+        void bn_mul_mont_gather5_t4(BN_ULONG * rp, const BN_ULONG *ap, const void *table, const BN_ULONG *np,
                                     const BN_ULONG *n0, int num, int power);
-        void bn_flip_n_scatter5_t4(const BN_ULONG *inp, size_t num,
-                                   void *table, size_t power);
-        void bn_gather5_t4(BN_ULONG *out, size_t num,
-                           void *table, size_t power);
-        void bn_flip_t4(BN_ULONG *dst, BN_ULONG *src, size_t num);
+        void bn_flip_n_scatter5_t4(const BN_ULONG *inp, size_t num, void *table, size_t power);
+        void bn_gather5_t4(BN_ULONG * out, size_t num, void *table, size_t power);
+        void bn_flip_t4(BN_ULONG * dst, BN_ULONG * src, size_t num);
 
         BN_ULONG *np = mont->N.d, *n0 = mont->n0;
         int stride = 5 * (6 - (top / 16 - 1)); /* multiple of 5, but less
@@ -851,15 +806,13 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
 
         bn_flip_n_scatter5_t4(tmp.d, top, powerbuf, 0);
         bn_flip_n_scatter5_t4(am.d, top, powerbuf, 1);
-        if (!(*mul_worker) (tmp.d, am.d, am.d, np, n0) &&
-            !(*mul_worker) (tmp.d, am.d, am.d, np, n0))
+        if (!(*mul_worker)(tmp.d, am.d, am.d, np, n0) && !(*mul_worker)(tmp.d, am.d, am.d, np, n0))
             bn_mul_mont_vis3(tmp.d, am.d, am.d, np, n0, top);
         bn_flip_n_scatter5_t4(tmp.d, top, powerbuf, 2);
 
         for (i = 3; i < 32; i++) {
             /* Calculate a^i = a^(i-1) * a */
-            if (!(*mul_worker) (tmp.d, tmp.d, am.d, np, n0) &&
-                !(*mul_worker) (tmp.d, tmp.d, am.d, np, n0))
+            if (!(*mul_worker)(tmp.d, tmp.d, am.d, np, n0) && !(*mul_worker)(tmp.d, tmp.d, am.d, np, n0))
                 bn_mul_mont_vis3(tmp.d, tmp.d, am.d, np, n0, top);
             bn_flip_n_scatter5_t4(tmp.d, top, powerbuf, i);
         }
@@ -891,10 +844,10 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
             bits -= stride;
             wvalue = bn_get_bits(p, bits);
 
-            if ((*pwr5_worker) (tmp.d, np, n0, powerbuf, wvalue, stride))
+            if ((*pwr5_worker)(tmp.d, np, n0, powerbuf, wvalue, stride))
                 continue;
             /* retry once and fall back */
-            if ((*pwr5_worker) (tmp.d, np, n0, powerbuf, wvalue, stride))
+            if ((*pwr5_worker)(tmp.d, np, n0, powerbuf, wvalue, stride))
                 continue;
 
             bits += stride - 5;
@@ -905,8 +858,7 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
             bn_mul_mont_t4(tmp.d, tmp.d, tmp.d, np, n0, top);
             bn_mul_mont_t4(tmp.d, tmp.d, tmp.d, np, n0, top);
             bn_mul_mont_t4(tmp.d, tmp.d, tmp.d, np, n0, top);
-            bn_mul_mont_gather5_t4(tmp.d, tmp.d, powerbuf, np, n0, top,
-                                   wvalue);
+            bn_mul_mont_gather5_t4(tmp.d, tmp.d, powerbuf, np, n0, top, wvalue);
         }
 
         bn_flip_t4(tmp.d, tmp.d, top);
@@ -918,7 +870,7 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
     } else
 #endif
 #if defined(OPENSSL_BN_ASM_MONT5)
-    if (window == 5 && top > 1) {
+        if (window == 5 && top > 1) {
         /*
          * This optimization uses ideas from https://eprint.iacr.org/2011/239,
          * specifically optimization of cache-timing attack countermeasures,
@@ -936,15 +888,12 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
          * Given those inputs, |bn_mul_mont| may not give reduced
          * output, but it will still produce "almost" reduced output.
          */
-        void bn_mul_mont_gather5(BN_ULONG *rp, const BN_ULONG *ap,
-                                 const void *table, const BN_ULONG *np,
+        void bn_mul_mont_gather5(BN_ULONG * rp, const BN_ULONG *ap, const void *table, const BN_ULONG *np,
                                  const BN_ULONG *n0, int num, int power);
-        void bn_scatter5(const BN_ULONG *inp, size_t num,
-                         void *table, size_t power);
-        void bn_gather5(BN_ULONG *out, size_t num, void *table, size_t power);
-        void bn_power5(BN_ULONG *rp, const BN_ULONG *ap,
-                       const void *table, const BN_ULONG *np,
-                       const BN_ULONG *n0, int num, int power);
+        void bn_scatter5(const BN_ULONG *inp, size_t num, void *table, size_t power);
+        void bn_gather5(BN_ULONG * out, size_t num, void *table, size_t power);
+        void bn_power5(BN_ULONG * rp, const BN_ULONG *ap, const void *table, const BN_ULONG *np, const BN_ULONG *n0,
+                       int num, int power);
         int bn_get_bits5(const BN_ULONG *ap, int off);
 
         BN_ULONG *n0 = mont->n0, *np;
@@ -1024,13 +973,11 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
                 bn_mul_mont(tmp.d, tmp.d, tmp.d, np, n0, top);
                 bn_mul_mont(tmp.d, tmp.d, tmp.d, np, n0, top);
                 bn_mul_mont(tmp.d, tmp.d, tmp.d, np, n0, top);
-                bn_mul_mont_gather5(tmp.d, tmp.d, powerbuf, np, n0, top,
-                                    bn_get_bits5(p->d, bits -= 5));
+                bn_mul_mont_gather5(tmp.d, tmp.d, powerbuf, np, n0, top, bn_get_bits5(p->d, bits -= 5));
             }
         } else {
             while (bits > 0) {
-                bn_power5(tmp.d, tmp.d, powerbuf, np, n0, top,
-                          bn_get_bits5(p->d, bits -= 5));
+                bn_power5(tmp.d, tmp.d, powerbuf, np, n0, top, bn_get_bits5(p->d, bits -= 5));
             }
         }
 
@@ -1049,7 +996,7 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
     } else
 #endif
     {
- fallback:
+fallback:
         if (!MOD_EXP_CTIME_COPY_TO_PREBUF(&tmp, top, powerbuf, 0, window))
             goto err;
         if (!MOD_EXP_CTIME_COPY_TO_PREBUF(&am, top, powerbuf, 1, window))
@@ -1064,15 +1011,13 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
         if (window > 1) {
             if (!bn_mul_mont_fixed_top(&tmp, &am, &am, mont, ctx))
                 goto err;
-            if (!MOD_EXP_CTIME_COPY_TO_PREBUF(&tmp, top, powerbuf, 2,
-                                              window))
+            if (!MOD_EXP_CTIME_COPY_TO_PREBUF(&tmp, top, powerbuf, 2, window))
                 goto err;
             for (i = 3; i < numPowers; i++) {
                 /* Calculate a^i = a^(i-1) * a */
                 if (!bn_mul_mont_fixed_top(&tmp, &am, &tmp, mont, ctx))
                     goto err;
-                if (!MOD_EXP_CTIME_COPY_TO_PREBUF(&tmp, top, powerbuf, i,
-                                                  window))
+                if (!MOD_EXP_CTIME_COPY_TO_PREBUF(&tmp, top, powerbuf, i, window))
                     goto err;
             }
         }
@@ -1087,8 +1032,7 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
         wmask = (1 << window0) - 1;
         bits -= window0;
         wvalue = bn_get_bits(p, bits) & wmask;
-        if (!MOD_EXP_CTIME_COPY_FROM_PREBUF(&tmp, top, powerbuf, wvalue,
-                                            window))
+        if (!MOD_EXP_CTIME_COPY_FROM_PREBUF(&tmp, top, powerbuf, wvalue, window))
             goto err;
 
         wmask = (1 << window) - 1;
@@ -1118,8 +1062,7 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
             /*
              * Fetch the appropriate pre-computed value from the pre-buf
              */
-            if (!MOD_EXP_CTIME_COPY_FROM_PREBUF(&am, top, powerbuf, wvalue,
-                                                window))
+            if (!MOD_EXP_CTIME_COPY_FROM_PREBUF(&am, top, powerbuf, wvalue, window))
                 goto err;
 
             /* Multiply the result into the intermediate result */
@@ -1142,10 +1085,10 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
             goto err;
     } else
 #endif
-    if (!bn_from_mont_fixed_top(rr, &tmp, mont, ctx))
+        if (!bn_from_mont_fixed_top(rr, &tmp, mont, ctx))
         goto err;
     ret = 1;
- err:
+err:
     if (in_mont == NULL)
         BN_MONT_CTX_free(mont);
     if (powerbuf != NULL) {
@@ -1156,8 +1099,7 @@ int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
     return ret;
 }
 
-int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
-                              const BIGNUM *m, BN_CTX *ctx,
+int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx,
                               BN_MONT_CTX *in_mont)
 {
     bn_check_top(a);
@@ -1169,8 +1111,7 @@ int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
     return 1;
 }
 
-int BN_mod_exp_mont_word(BIGNUM *rr, BN_ULONG a, const BIGNUM *p,
-                         const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *in_mont)
+int BN_mod_exp_mont_word(BIGNUM *rr, BN_ULONG a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *in_mont)
 {
     BN_MONT_CTX *mont = NULL;
     int b, bits, ret = 0;
@@ -1195,8 +1136,7 @@ int BN_mod_exp_mont_word(BIGNUM *rr, BN_ULONG a, const BIGNUM *p,
 #define BN_TO_MONTGOMERY_WORD(r, w, mont) \
                 (BN_set_word(r, (w)) && BN_to_montgomery(r, r, (mont), ctx))
 
-    if (BN_get_flags(p, BN_FLG_CONSTTIME) != 0
-            || BN_get_flags(m, BN_FLG_CONSTTIME) != 0) {
+    if (BN_get_flags(p, BN_FLG_CONSTTIME) != 0 || BN_get_flags(m, BN_FLG_CONSTTIME) != 0) {
         /* BN_FLG_CONSTTIME only supported by BN_mod_exp_mont() */
         ERR_raise(ERR_LIB_BN, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
         return 0;
@@ -1308,7 +1248,7 @@ int BN_mod_exp_mont_word(BIGNUM *rr, BN_ULONG a, const BIGNUM *p,
             goto err;
     }
     ret = 1;
- err:
+err:
     if (in_mont == NULL)
         BN_MONT_CTX_free(mont);
     BN_CTX_end(ctx);
@@ -1317,8 +1257,7 @@ int BN_mod_exp_mont_word(BIGNUM *rr, BN_ULONG a, const BIGNUM *p,
 }
 
 /* The old fallback, simple version :-) */
-int BN_mod_exp_simple(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
-                      const BIGNUM *m, BN_CTX *ctx)
+int BN_mod_exp_simple(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx)
 {
     int i, j, bits, ret = 0, wstart, wend, window;
     int start = 1;
@@ -1326,9 +1265,8 @@ int BN_mod_exp_simple(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
     /* Table of variables obtained from 'ctx' */
     BIGNUM *val[TABLE_SIZE];
 
-    if (BN_get_flags(p, BN_FLG_CONSTTIME) != 0
-            || BN_get_flags(a, BN_FLG_CONSTTIME) != 0
-            || BN_get_flags(m, BN_FLG_CONSTTIME) != 0) {
+    if (BN_get_flags(p, BN_FLG_CONSTTIME) != 0 || BN_get_flags(a, BN_FLG_CONSTTIME) != 0
+        || BN_get_flags(m, BN_FLG_CONSTTIME) != 0) {
         /* BN_FLG_CONSTTIME only supported by BN_mod_exp_mont() */
         ERR_raise(ERR_LIB_BN, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
         return 0;
@@ -1371,8 +1309,7 @@ int BN_mod_exp_simple(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
             goto err;           /* 2 */
         j = 1 << (window - 1);
         for (i = 1; i < j; i++) {
-            if (((val[i] = BN_CTX_get(ctx)) == NULL) ||
-                !BN_mod_mul(val[i], val[i - 1], d, m, ctx))
+            if (((val[i] = BN_CTX_get(ctx)) == NULL) || !BN_mod_mul(val[i], val[i - 1], d, m, ctx))
                 goto err;
         }
     }
@@ -1443,7 +1380,7 @@ int BN_mod_exp_simple(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
             break;
     }
     ret = 1;
- err:
+err:
     BN_CTX_end(ctx);
     bn_check_top(r);
     return ret;
@@ -1456,11 +1393,9 @@ int BN_mod_exp_simple(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
  * If such instructions are not available, or input data size is not supported,
  * it falls back to two BN_mod_exp_mont_consttime() calls.
  */
-int BN_mod_exp_mont_consttime_x2(BIGNUM *rr1, const BIGNUM *a1, const BIGNUM *p1,
-                                 const BIGNUM *m1, BN_MONT_CTX *in_mont1,
-                                 BIGNUM *rr2, const BIGNUM *a2, const BIGNUM *p2,
-                                 const BIGNUM *m2, BN_MONT_CTX *in_mont2,
-                                 BN_CTX *ctx)
+int BN_mod_exp_mont_consttime_x2(BIGNUM *rr1, const BIGNUM *a1, const BIGNUM *p1, const BIGNUM *m1,
+                                 BN_MONT_CTX *in_mont1, BIGNUM *rr2, const BIGNUM *a2, const BIGNUM *p2,
+                                 const BIGNUM *m2, BN_MONT_CTX *in_mont2, BN_CTX *ctx)
 {
     int ret = 0;
 
@@ -1468,13 +1403,13 @@ int BN_mod_exp_mont_consttime_x2(BIGNUM *rr1, const BIGNUM *a1, const BIGNUM *p1
     BN_MONT_CTX *mont1 = NULL;
     BN_MONT_CTX *mont2 = NULL;
 
-    if ((ossl_rsaz_avx512ifma_eligible() || ossl_rsaz_avxifma_eligible()) &&
-        (((a1->top == 16) && (p1->top == 16) && (BN_num_bits(m1) == 1024) &&
-          (a2->top == 16) && (p2->top == 16) && (BN_num_bits(m2) == 1024)) ||
-         ((a1->top == 24) && (p1->top == 24) && (BN_num_bits(m1) == 1536) &&
-          (a2->top == 24) && (p2->top == 24) && (BN_num_bits(m2) == 1536)) ||
-         ((a1->top == 32) && (p1->top == 32) && (BN_num_bits(m1) == 2048) &&
-          (a2->top == 32) && (p2->top == 32) && (BN_num_bits(m2) == 2048)))) {
+    if ((ossl_rsaz_avx512ifma_eligible() || ossl_rsaz_avxifma_eligible())
+        && (((a1->top == 16) && (p1->top == 16) && (BN_num_bits(m1) == 1024) && (a2->top == 16) && (p2->top == 16)
+             && (BN_num_bits(m2) == 1024))
+            || ((a1->top == 24) && (p1->top == 24) && (BN_num_bits(m1) == 1536) && (a2->top == 24) && (p2->top == 24)
+                && (BN_num_bits(m2) == 1536))
+            || ((a1->top == 32) && (p1->top == 32) && (BN_num_bits(m1) == 2048) && (a2->top == 32) && (p2->top == 32)
+                && (BN_num_bits(m2) == 2048)))) {
 
         int topn = a1->top;
         /* Modulus bits of |m1| and |m2| are equal */
@@ -1503,11 +1438,8 @@ int BN_mod_exp_mont_consttime_x2(BIGNUM *rr1, const BIGNUM *a1, const BIGNUM *p1
                 goto err;
         }
 
-        ret = ossl_rsaz_mod_exp_avx512_x2(rr1->d, a1->d, p1->d, m1->d,
-                                          mont1->RR.d, mont1->n0[0],
-                                          rr2->d, a2->d, p2->d, m2->d,
-                                          mont2->RR.d, mont2->n0[0],
-                                          mod_bits);
+        ret = ossl_rsaz_mod_exp_avx512_x2(rr1->d, a1->d, p1->d, m1->d, mont1->RR.d, mont1->n0[0], rr2->d, a2->d, p2->d,
+                                          m2->d, mont2->RR.d, mont2->n0[0], mod_bits);
 
         rr1->top = topn;
         rr1->neg = 0;

@@ -65,18 +65,15 @@ end:
     return generic;
 }
 
-static const OSSL_PARAM generic_import_params[] = {
-    OSSL_PARAM_octet_string(OSSL_SKEY_PARAM_RAW_BYTES, NULL, 0),
-    OSSL_PARAM_END
-};
+static const OSSL_PARAM generic_import_params[] = {OSSL_PARAM_octet_string(OSSL_SKEY_PARAM_RAW_BYTES, NULL, 0),
+                                                   OSSL_PARAM_END};
 
 const OSSL_PARAM *generic_imp_settable_params(void *provctx)
 {
     return generic_import_params;
 }
 
-int generic_export(void *keydata, int selection,
-                   OSSL_CALLBACK *param_callback, void *cbarg)
+int generic_export(void *keydata, int selection, OSSL_CALLBACK *param_callback, void *cbarg)
 {
     PROV_SKEY *gen = keydata;
     OSSL_PARAM params[2];
@@ -88,18 +85,15 @@ int generic_export(void *keydata, int selection,
     if ((selection & OSSL_SKEYMGMT_SELECT_SECRET_KEY) == 0)
         return 0;
 
-    params[0] = OSSL_PARAM_construct_octet_string(OSSL_SKEY_PARAM_RAW_BYTES,
-                                                  gen->data, gen->length);
+    params[0] = OSSL_PARAM_construct_octet_string(OSSL_SKEY_PARAM_RAW_BYTES, gen->data, gen->length);
     params[1] = OSSL_PARAM_construct_end();
 
     return param_callback(params, cbarg);
 }
 
 const OSSL_DISPATCH ossl_generic_skeymgmt_functions[] = {
-    { OSSL_FUNC_SKEYMGMT_FREE, (void (*)(void))generic_free },
-    { OSSL_FUNC_SKEYMGMT_IMPORT, (void (*)(void))generic_import },
-    { OSSL_FUNC_SKEYMGMT_EXPORT, (void (*)(void))generic_export },
-    { OSSL_FUNC_SKEYMGMT_IMP_SETTABLE_PARAMS,
-      (void (*)(void))generic_imp_settable_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_SKEYMGMT_FREE, (void (*)(void))generic_free},
+    {OSSL_FUNC_SKEYMGMT_IMPORT, (void (*)(void))generic_import},
+    {OSSL_FUNC_SKEYMGMT_EXPORT, (void (*)(void))generic_export},
+    {OSSL_FUNC_SKEYMGMT_IMP_SETTABLE_PARAMS, (void (*)(void))generic_imp_settable_params},
+    OSSL_DISPATCH_END};

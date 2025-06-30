@@ -27,8 +27,7 @@
  * implementations alike.
  */
 
-int ossl_dsa_key_fromdata(DSA *dsa, const OSSL_PARAM params[],
-                          int include_private)
+int ossl_dsa_key_fromdata(DSA *dsa, const OSSL_PARAM params[], int include_private)
 {
     const OSSL_PARAM *param_priv_key = NULL, *param_pub_key;
     BIGNUM *priv_key = NULL, *pub_key = NULL;
@@ -37,11 +36,9 @@ int ossl_dsa_key_fromdata(DSA *dsa, const OSSL_PARAM params[],
         return 0;
 
     if (include_private) {
-        param_priv_key =
-            OSSL_PARAM_locate_const(params, OSSL_PKEY_PARAM_PRIV_KEY);
+        param_priv_key = OSSL_PARAM_locate_const(params, OSSL_PKEY_PARAM_PRIV_KEY);
     }
-    param_pub_key =
-        OSSL_PARAM_locate_const(params, OSSL_PKEY_PARAM_PUB_KEY);
+    param_pub_key = OSSL_PARAM_locate_const(params, OSSL_PKEY_PARAM_PUB_KEY);
 
     /* It's ok if neither half is present */
     if (param_priv_key == NULL && param_pub_key == NULL)
@@ -57,7 +54,7 @@ int ossl_dsa_key_fromdata(DSA *dsa, const OSSL_PARAM params[],
 
     return 1;
 
- err:
+err:
     BN_clear_free(priv_key);
     BN_free(pub_key);
     return 0;
@@ -107,21 +104,19 @@ DSA *ossl_dsa_dup(const DSA *dsa, int selection)
         goto err;
 
 #ifndef FIPS_MODULE
-    if (!CRYPTO_dup_ex_data(CRYPTO_EX_INDEX_DSA,
-                            &dupkey->ex_data, &dsa->ex_data))
+    if (!CRYPTO_dup_ex_data(CRYPTO_EX_INDEX_DSA, &dupkey->ex_data, &dsa->ex_data))
         goto err;
 #endif
 
     return dupkey;
 
- err:
+err:
     DSA_free(dupkey);
     return NULL;
 }
 
 #ifndef FIPS_MODULE
-DSA *ossl_dsa_key_from_pkcs8(const PKCS8_PRIV_KEY_INFO *p8inf,
-                             OSSL_LIB_CTX *libctx, const char *propq)
+DSA *ossl_dsa_key_from_pkcs8(const PKCS8_PRIV_KEY_INFO *p8inf, OSSL_LIB_CTX *libctx, const char *propq)
 {
     const unsigned char *p, *pm;
     int pklen, pmlen;
@@ -151,8 +146,7 @@ DSA *ossl_dsa_key_from_pkcs8(const PKCS8_PRIV_KEY_INFO *p8inf,
     if ((dsa = d2i_DSAparams(NULL, &pm, pmlen)) == NULL)
         goto decerr;
     /* We have parameters now set private key */
-    if ((dsa_privkey = BN_secure_new()) == NULL
-        || !ASN1_INTEGER_to_BN(privkey, dsa_privkey)) {
+    if ((dsa_privkey = BN_secure_new()) == NULL || !ASN1_INTEGER_to_BN(privkey, dsa_privkey)) {
         ERR_raise(ERR_LIB_DSA, DSA_R_BN_ERROR);
         goto dsaerr;
     }
@@ -180,14 +174,14 @@ DSA *ossl_dsa_key_from_pkcs8(const PKCS8_PRIV_KEY_INFO *p8inf,
 
     goto done;
 
- decerr:
+decerr:
     ERR_raise(ERR_LIB_DSA, DSA_R_DECODE_ERROR);
- dsaerr:
+dsaerr:
     BN_free(dsa_privkey);
     BN_free(dsa_pubkey);
     DSA_free(dsa);
     dsa = NULL;
- done:
+done:
     BN_CTX_free(ctx);
     ASN1_STRING_clear_free(privkey);
     return dsa;

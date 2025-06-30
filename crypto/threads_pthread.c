@@ -93,8 +93,7 @@ __tsan_mutex_post_lock((x), 0, 0)
  */
 typedef void *pvoid;
 
-# if defined(__GNUC__) && defined(__ATOMIC_ACQUIRE) && !defined(BROKEN_CLANG_ATOMICS) \
-    && !defined(USE_ATOMIC_FALLBACKS)
+# if defined(__GNUC__) && defined(__ATOMIC_ACQUIRE) && !defined(BROKEN_CLANG_ATOMICS) && !defined(USE_ATOMIC_FALLBACKS)
 #  define ATOMIC_LOAD_N(t, p, o) __atomic_load_n(p, o)
 #  define ATOMIC_STORE_N(t, p, v, o) __atomic_store_n(p, v, o)
 #  define ATOMIC_STORE(t, p, v, o) __atomic_store(p, v, o)
@@ -113,9 +112,7 @@ static pthread_mutex_t atomic_sim_lock = PTHREAD_MUTEX_INITIALIZER;
         pthread_mutex_unlock(&atomic_sim_lock);                 \
         return ret;                                             \
     }
-IMPL_fallback_atomic_load_n(uint32_t)
-IMPL_fallback_atomic_load_n(uint64_t)
-IMPL_fallback_atomic_load_n(pvoid)
+IMPL_fallback_atomic_load_n(uint32_t) IMPL_fallback_atomic_load_n(uint64_t) IMPL_fallback_atomic_load_n(pvoid)
 
 #  define ATOMIC_LOAD_N(t, p, o) fallback_atomic_load_n_##t(p)
 
@@ -130,7 +127,7 @@ IMPL_fallback_atomic_load_n(pvoid)
         pthread_mutex_unlock(&atomic_sim_lock);                 \
         return ret;                                             \
     }
-IMPL_fallback_atomic_store_n(uint32_t)
+    IMPL_fallback_atomic_store_n(uint32_t)
 
 #  define ATOMIC_STORE_N(t, p, v, o) fallback_atomic_store_n_##t(p, v)
 
@@ -141,7 +138,7 @@ IMPL_fallback_atomic_store_n(uint32_t)
         *p = *v;                                                \
         pthread_mutex_unlock(&atomic_sim_lock);                 \
     }
-IMPL_fallback_atomic_store(pvoid)
+        IMPL_fallback_atomic_store(pvoid)
 
 #  define ATOMIC_STORE(t, p, v, o) fallback_atomic_store_##t(p, v)
 
@@ -152,7 +149,7 @@ IMPL_fallback_atomic_store(pvoid)
  * way as the fallbacks above.
  */
 
-static ossl_inline uint64_t fallback_atomic_add_fetch(uint64_t *p, uint64_t v)
+    static ossl_inline uint64_t fallback_atomic_add_fetch(uint64_t *p, uint64_t v)
 {
     uint64_t ret;
 
@@ -276,16 +273,13 @@ static struct rcu_qp *get_hold_current_qp(struct rcu_lock_st *lock)
          * updates prior to the load.  This is a non-issue on cache coherent
          * systems like x86, but is relevant on other arches
          */
-        ATOMIC_ADD_FETCH(&lock->qp_group[qp_idx].users, (uint64_t)1,
-                         __ATOMIC_ACQUIRE);
+        ATOMIC_ADD_FETCH(&lock->qp_group[qp_idx].users, (uint64_t)1, __ATOMIC_ACQUIRE);
 
         /* if the idx hasn't changed, we're good, else try again */
-        if (qp_idx == ATOMIC_LOAD_N(uint32_t, &lock->reader_idx,
-                                    __ATOMIC_RELAXED))
+        if (qp_idx == ATOMIC_LOAD_N(uint32_t, &lock->reader_idx, __ATOMIC_RELAXED))
             break;
 
-        ATOMIC_SUB_FETCH(&lock->qp_group[qp_idx].users, (uint64_t)1,
-                         __ATOMIC_RELAXED);
+        ATOMIC_SUB_FETCH(&lock->qp_group[qp_idx].users, (uint64_t)1, __ATOMIC_RELAXED);
     }
 
     return &lock->qp_group[qp_idx];
@@ -355,8 +349,7 @@ void ossl_rcu_read_unlock(CRYPTO_RCU_LOCK *lock)
              */
             data->thread_qps[i].depth--;
             if (data->thread_qps[i].depth == 0) {
-                ret = ATOMIC_SUB_FETCH(&data->thread_qps[i].qp->users,
-                                       (uint64_t)1, __ATOMIC_RELEASE);
+                ret = ATOMIC_SUB_FETCH(&data->thread_qps[i].qp->users, (uint64_t)1, __ATOMIC_RELEASE);
                 OPENSSL_assert(ret != UINT64_MAX);
                 data->thread_qps[i].qp = NULL;
                 data->thread_qps[i].lock = NULL;
@@ -396,21 +389,18 @@ static struct rcu_qp *update_qp(CRYPTO_RCU_LOCK *lock, uint32_t *curr_id)
     lock->writers_alloced++;
 
     /* increment the allocation index */
-    lock->current_alloc_idx =
-        (lock->current_alloc_idx + 1) % lock->group_count;
+    lock->current_alloc_idx = (lock->current_alloc_idx + 1) % lock->group_count;
 
     *curr_id = lock->id_ctr;
     lock->id_ctr++;
 
-    ATOMIC_STORE_N(uint32_t, &lock->reader_idx, lock->current_alloc_idx,
-                   __ATOMIC_RELAXED);
+    ATOMIC_STORE_N(uint32_t, &lock->reader_idx, lock->current_alloc_idx, __ATOMIC_RELAXED);
 
     /*
      * this should make sure that the new value of reader_idx is visible in
      * get_hold_current_qp, directly after incrementing the users count
      */
-    ATOMIC_ADD_FETCH(&lock->qp_group[current_idx].users, (uint64_t)0,
-                     __ATOMIC_RELEASE);
+    ATOMIC_ADD_FETCH(&lock->qp_group[current_idx].users, (uint64_t)0, __ATOMIC_RELEASE);
 
     /* wake up any waiters */
     pthread_cond_signal(&lock->alloc_signal);
@@ -426,11 +416,9 @@ static void retire_qp(CRYPTO_RCU_LOCK *lock, struct rcu_qp *qp)
     pthread_mutex_unlock(&lock->alloc_lock);
 }
 
-static struct rcu_qp *allocate_new_qp_group(CRYPTO_RCU_LOCK *lock,
-                                            uint32_t count)
+static struct rcu_qp *allocate_new_qp_group(CRYPTO_RCU_LOCK *lock, uint32_t count)
 {
-    struct rcu_qp *new =
-        OPENSSL_zalloc(sizeof(*new) * count);
+    struct rcu_qp *new = OPENSSL_zalloc(sizeof(*new) * count);
 
     lock->group_count = count;
     return new;
@@ -501,8 +489,7 @@ void ossl_synchronize_rcu(CRYPTO_RCU_LOCK *lock)
  */
 int ossl_rcu_call(CRYPTO_RCU_LOCK *lock, rcu_cb_fn cb, void *data)
 {
-    struct rcu_cb_item *new =
-        OPENSSL_zalloc(sizeof(*new));
+    struct rcu_cb_item *new = OPENSSL_zalloc(sizeof(*new));
 
     if (new == NULL)
         return 0;
@@ -600,7 +587,7 @@ CRYPTO_RWLOCK *CRYPTO_THREAD_lock_new(void)
      * We don't use recursive mutexes, but try to catch errors if we do.
      */
     pthread_mutexattr_init(&attr);
-#  if !defined (__TANDEM) && !defined (_SPT_MODEL_)
+#  if !defined(__TANDEM) && !defined(_SPT_MODEL_)
 #   if !defined(NDEBUG) && !defined(OPENSSL_NO_MUTEX_ERRORCHECK)
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
 #   endif
@@ -745,7 +732,7 @@ int CRYPTO_atomic_add(int *val, int amount, int *ret, CRYPTO_RWLOCK *lock)
         return 0;
 
     *val += amount;
-    *ret  = *val;
+    *ret = *val;
 
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
@@ -753,8 +740,7 @@ int CRYPTO_atomic_add(int *val, int amount, int *ret, CRYPTO_RWLOCK *lock)
     return 1;
 }
 
-int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
-                        CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if defined(__GNUC__) && defined(__ATOMIC_ACQ_REL) && !defined(BROKEN_CLANG_ATOMICS)
     if (__atomic_is_lock_free(sizeof(*val), val)) {
@@ -771,7 +757,7 @@ int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
     if (lock == NULL || !CRYPTO_THREAD_write_lock(lock))
         return 0;
     *val += op;
-    *ret  = *val;
+    *ret = *val;
 
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
@@ -779,8 +765,7 @@ int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
     return 1;
 }
 
-int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
-                      CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if defined(__GNUC__) && defined(__ATOMIC_ACQ_REL) && !defined(BROKEN_CLANG_ATOMICS)
     if (__atomic_is_lock_free(sizeof(*val), val)) {
@@ -797,7 +782,7 @@ int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
     if (lock == NULL || !CRYPTO_THREAD_write_lock(lock))
         return 0;
     *val &= op;
-    *ret  = *val;
+    *ret = *val;
 
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
@@ -805,8 +790,7 @@ int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
     return 1;
 }
 
-int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
-                     CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if defined(__GNUC__) && defined(__ATOMIC_ACQ_REL) && !defined(BROKEN_CLANG_ATOMICS)
     if (__atomic_is_lock_free(sizeof(*val), val)) {
@@ -823,7 +807,7 @@ int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
     if (lock == NULL || !CRYPTO_THREAD_write_lock(lock))
         return 0;
     *val |= op;
-    *ret  = *val;
+    *ret = *val;
 
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
@@ -847,7 +831,7 @@ int CRYPTO_atomic_load(uint64_t *val, uint64_t *ret, CRYPTO_RWLOCK *lock)
 # endif
     if (lock == NULL || !CRYPTO_THREAD_read_lock(lock))
         return 0;
-    *ret  = *val;
+    *ret = *val;
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
 
@@ -870,7 +854,7 @@ int CRYPTO_atomic_store(uint64_t *dst, uint64_t val, CRYPTO_RWLOCK *lock)
 # endif
     if (lock == NULL || !CRYPTO_THREAD_write_lock(lock))
         return 0;
-    *dst  = val;
+    *dst = val;
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
 
@@ -893,7 +877,7 @@ int CRYPTO_atomic_load_int(int *val, int *ret, CRYPTO_RWLOCK *lock)
 # endif
     if (lock == NULL || !CRYPTO_THREAD_read_lock(lock))
         return 0;
-    *ret  = *val;
+    *ret = *val;
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
 

@@ -13,8 +13,7 @@
 #include <openssl/asn1.h>
 #include "asn1_local.h"
 
-static int asn1_get_length(const unsigned char **pp, int *inf, long *rl,
-                           long max);
+static int asn1_get_length(const unsigned char **pp, int *inf, long *rl, long max);
 static void asn1_put_length(unsigned char **pp, int length);
 
 static int _asn1_check_infinite_end(const unsigned char **p, long len)
@@ -43,8 +42,7 @@ int ASN1_const_check_infinite_end(const unsigned char **p, long len)
     return _asn1_check_infinite_end(p, len);
 }
 
-int ASN1_get_object(const unsigned char **pp, long *plength, int *ptag,
-                    int *pclass, long omax)
+int ASN1_get_object(const unsigned char **pp, long *plength, int *ptag, int *pclass, long omax)
 {
     int i, ret;
     long len;
@@ -101,7 +99,7 @@ int ASN1_get_object(const unsigned char **pp, long *plength, int *ptag,
     }
     *pp = p;
     return ret | inf;
- err:
+err:
     ERR_raise(ERR_LIB_ASN1, ASN1_R_HEADER_TOO_LONG);
     return 0x80;
 }
@@ -113,8 +111,7 @@ int ASN1_get_object(const unsigned char **pp, long *plength, int *ptag,
  * the number of following octets that contain the length.  These octets
  * are stored most significant digit first.
  */
-static int asn1_get_length(const unsigned char **pp, int *inf, long *rl,
-                           long max)
+static int asn1_get_length(const unsigned char **pp, int *inf, long *rl, long max)
 {
     const unsigned char *p = *pp;
     unsigned long ret = 0;
@@ -157,8 +154,7 @@ static int asn1_get_length(const unsigned char **pp, int *inf, long *rl,
 /*
  * constructed == 2 for indefinite length constructed
  */
-void ASN1_put_object(unsigned char **pp, int constructed, int length, int tag,
-                     int xclass)
+void ASN1_put_object(unsigned char **pp, int constructed, int length, int tag, int xclass)
 {
     unsigned char *p = *pp;
     int i, ttag;
@@ -432,8 +428,7 @@ unsigned char *ASN1_STRING_data(ASN1_STRING *x)
 #endif
 
 /* |max_len| excludes NUL terminator and may be 0 to indicate no restriction */
-char *ossl_sk_ASN1_UTF8STRING2text(STACK_OF(ASN1_UTF8STRING) *text,
-                                   const char *sep, size_t max_len)
+char *ossl_sk_ASN1_UTF8STRING2text(STACK_OF(ASN1_UTF8STRING) *text, const char *sep, size_t max_len)
 {
     int i;
     ASN1_UTF8STRING *current;

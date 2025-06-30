@@ -34,8 +34,7 @@ static int test_is_fips_enabled(void)
      * on the default properties. However we only set those properties if also
      * loading the FIPS provider.
      */
-    if (!TEST_int_eq(is_fips || bad_fips, is_fips_enabled)
-            || !TEST_int_eq(is_fips && !bad_fips, is_fips_loaded))
+    if (!TEST_int_eq(is_fips || bad_fips, is_fips_enabled) || !TEST_int_eq(is_fips && !bad_fips, is_fips_loaded))
         return 0;
 
     /*
@@ -51,9 +50,7 @@ static int test_is_fips_enabled(void)
     } else {
         if (!TEST_ptr(sha256))
             return 0;
-        if (is_fips
-            && !TEST_str_eq(OSSL_PROVIDER_get0_name(EVP_MD_get0_provider(sha256)),
-                            "fips")) {
+        if (is_fips && !TEST_str_eq(OSSL_PROVIDER_get0_name(EVP_MD_get0_provider(sha256)), "fips")) {
             EVP_MD_free(sha256);
             return 0;
         }

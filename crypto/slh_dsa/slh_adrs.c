@@ -90,8 +90,7 @@ static void slh_adrs_set_keypair_address(uint8_t *adrs, uint32_t in)
 }
 static void slh_adrs_copy_keypair_address(uint8_t *dst, const uint8_t *src)
 {
-    memcpy(dst + SLH_ADRS_OFF_KEYPAIR_ADDR, src + SLH_ADRS_OFF_KEYPAIR_ADDR,
-           SLH_ADRS_SIZE_KEYPAIR_ADDR);
+    memcpy(dst + SLH_ADRS_OFF_KEYPAIR_ADDR, src + SLH_ADRS_OFF_KEYPAIR_ADDR, SLH_ADRS_SIZE_KEYPAIR_ADDR);
 }
 static void slh_adrs_set_chain_address(uint8_t *adrs, uint32_t in)
 {
@@ -130,8 +129,7 @@ static void slh_adrsc_set_keypair_address(uint8_t *adrsc, uint32_t in)
 }
 static void slh_adrsc_copy_keypair_address(uint8_t *dst, const uint8_t *src)
 {
-    memcpy(dst + SLH_ADRSC_OFF_KEYPAIR_ADDR, src + SLH_ADRSC_OFF_KEYPAIR_ADDR,
-           SLH_ADRSC_SIZE_KEYPAIR_ADDR);
+    memcpy(dst + SLH_ADRSC_OFF_KEYPAIR_ADDR, src + SLH_ADRSC_OFF_KEYPAIR_ADDR, SLH_ADRSC_SIZE_KEYPAIR_ADDR);
 }
 static void slh_adrsc_set_chain_address(uint8_t *adrsc, uint32_t in)
 {
@@ -152,33 +150,31 @@ static void slh_adrsc_copy(uint8_t *dst, const uint8_t *src)
 
 const SLH_ADRS_FUNC *ossl_slh_get_adrs_fn(int is_compressed)
 {
-    static const SLH_ADRS_FUNC methods[] = {
-        {
-            slh_adrs_set_layer_address,
-            slh_adrs_set_tree_address,
-            slh_adrs_set_type_and_clear,
-            slh_adrs_set_keypair_address,
-            slh_adrs_copy_keypair_address,
-            slh_adrs_set_chain_address,
-            slh_adrs_set_tree_height,
-            slh_adrs_set_hash_address,
-            slh_adrs_set_tree_index,
-            slh_adrs_zero,
-            slh_adrs_copy,
-        },
-        {
-            slh_adrsc_set_layer_address,
-            slh_adrsc_set_tree_address,
-            slh_adrsc_set_type_and_clear,
-            slh_adrsc_set_keypair_address,
-            slh_adrsc_copy_keypair_address,
-            slh_adrsc_set_chain_address,
-            slh_adrsc_set_tree_height,
-            slh_adrsc_set_hash_address,
-            slh_adrsc_set_tree_index,
-            slh_adrsc_zero,
-            slh_adrsc_copy,
-        }
-    };
+    static const SLH_ADRS_FUNC methods[] = {{
+                                                slh_adrs_set_layer_address,
+                                                slh_adrs_set_tree_address,
+                                                slh_adrs_set_type_and_clear,
+                                                slh_adrs_set_keypair_address,
+                                                slh_adrs_copy_keypair_address,
+                                                slh_adrs_set_chain_address,
+                                                slh_adrs_set_tree_height,
+                                                slh_adrs_set_hash_address,
+                                                slh_adrs_set_tree_index,
+                                                slh_adrs_zero,
+                                                slh_adrs_copy,
+                                            },
+                                            {
+                                                slh_adrsc_set_layer_address,
+                                                slh_adrsc_set_tree_address,
+                                                slh_adrsc_set_type_and_clear,
+                                                slh_adrsc_set_keypair_address,
+                                                slh_adrsc_copy_keypair_address,
+                                                slh_adrsc_set_chain_address,
+                                                slh_adrsc_set_tree_height,
+                                                slh_adrsc_set_hash_address,
+                                                slh_adrsc_set_tree_index,
+                                                slh_adrsc_zero,
+                                                slh_adrsc_copy,
+                                            }};
     return &methods[is_compressed == 0 ? 0 : 1];
 }

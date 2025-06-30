@@ -26,18 +26,8 @@ static int md_free(BIO *data);
 static long md_callback_ctrl(BIO *h, int cmd, BIO_info_cb *fp);
 
 static const BIO_METHOD methods_md = {
-    BIO_TYPE_MD,
-    "message digest",
-    bwrite_conv,
-    md_write,
-    bread_conv,
-    md_read,
-    NULL,                       /* md_puts, */
-    md_gets,
-    md_ctrl,
-    md_new,
-    md_free,
-    md_callback_ctrl,
+    BIO_TYPE_MD, "message digest", bwrite_conv, md_write, bread_conv,       md_read, NULL, /* md_puts, */
+    md_gets,     md_ctrl,          md_new,      md_free,  md_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_md(void)
@@ -88,8 +78,7 @@ static int md_read(BIO *b, char *out, int outl)
     ret = BIO_read(next, out, outl);
     if (BIO_get_init(b)) {
         if (ret > 0) {
-            if (EVP_DigestUpdate(ctx, (unsigned char *)out,
-                                 (unsigned int)ret) <= 0)
+            if (EVP_DigestUpdate(ctx, (unsigned char *)out, (unsigned int)ret) <= 0)
                 return -1;
         }
     }
@@ -114,8 +103,7 @@ static int md_write(BIO *b, const char *in, int inl)
 
     if (BIO_get_init(b)) {
         if (ret > 0) {
-            if (!EVP_DigestUpdate(ctx, (const unsigned char *)in,
-                                  (unsigned int)ret)) {
+            if (!EVP_DigestUpdate(ctx, (const unsigned char *)in, (unsigned int)ret)) {
                 BIO_clear_retry_flags(b);
                 return 0;
             }
@@ -135,7 +123,6 @@ static long md_ctrl(BIO *b, int cmd, long num, void *ptr)
     EVP_MD *md;
     long ret = 1;
     BIO *dbio, *next;
-
 
     ctx = BIO_get_data(b);
     next = BIO_next(b);

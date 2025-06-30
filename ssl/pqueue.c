@@ -54,8 +54,7 @@ pitem *pqueue_insert(pqueue *pq, pitem *item)
         return item;
     }
 
-    for (curr = NULL, next = pq->items;
-         next != NULL; curr = next, next = next->next) {
+    for (curr = NULL, next = pq->items; next != NULL; curr = next, next = next->next) {
         /*
          * we can compare 64-bit value in big-endian encoding with memcmp:-)
          */

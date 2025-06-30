@@ -123,7 +123,7 @@ DEFINE_SPARSE_ARRAY_OF(CTX_TABLE_ENTRY);
  *
  */
 typedef struct master_key_entry {
-    SPARSE_ARRAY_OF(CTX_TABLE_ENTRY) *ctx_table;
+    SPARSE_ARRAY_OF(CTX_TABLE_ENTRY) * ctx_table;
 } MASTER_KEY_ENTRY;
 
 /**
@@ -330,8 +330,7 @@ void *CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id, OSSL_LIB_CTX *ct
  *
  * @return 1 on success, or 0 if allocation or initialization fails.
  */
-int CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id,
-                               OSSL_LIB_CTX *ctx, void *data)
+int CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id, OSSL_LIB_CTX *ctx, void *data)
 {
     MASTER_KEY_ENTRY *mkey;
 
@@ -387,8 +386,7 @@ int CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_KEY_ID id,
      *
      * Assign to the entry in the table so that we can find it later
      */
-    return ossl_sa_CTX_TABLE_ENTRY_set(mkey[id].ctx_table,
-                                       (uintptr_t)ctx, data);
+    return ossl_sa_CTX_TABLE_ENTRY_set(mkey[id].ctx_table, (uintptr_t)ctx, data);
 }
 
 #ifdef FIPS_MODULE

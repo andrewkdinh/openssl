@@ -149,8 +149,7 @@ int BIO_sock_init(void)
          * probed at run-time with DSO_global_lookup.
          */
         if (WSAStartup(0x0202, &wsa_state) != 0) {
-            ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(),
-                           "calling wsastartup()");
+            ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(), "calling wsastartup()");
             ERR_raise(ERR_LIB_BIO, BIO_R_WSASTARTUP);
             return -1;
         }
@@ -169,17 +168,15 @@ int BIO_sock_init(void)
 
             s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
             if (s != INVALID_SOCKET) {
-                if (WSAIoctl(s, SIO_GET_EXTENSION_FUNCTION_POINTER,
-                             &id_WSARecvMsg, sizeof(id_WSARecvMsg),
-                             &bio_WSARecvMsg, sizeof(bio_WSARecvMsg),
-                             &len_out, NULL, NULL) != 0
+                if (WSAIoctl(s, SIO_GET_EXTENSION_FUNCTION_POINTER, &id_WSARecvMsg, sizeof(id_WSARecvMsg),
+                             &bio_WSARecvMsg, sizeof(bio_WSARecvMsg), &len_out, NULL, NULL)
+                        != 0
                     || len_out != sizeof(bio_WSARecvMsg))
                     bio_WSARecvMsg = NULL;
 
-                if (WSAIoctl(s, SIO_GET_EXTENSION_FUNCTION_POINTER,
-                             &id_WSASendMsg, sizeof(id_WSASendMsg),
-                             &bio_WSASendMsg, sizeof(bio_WSASendMsg),
-                             &len_out, NULL, NULL) != 0
+                if (WSAIoctl(s, SIO_GET_EXTENSION_FUNCTION_POINTER, &id_WSASendMsg, sizeof(id_WSASendMsg),
+                             &bio_WSASendMsg, sizeof(bio_WSASendMsg), &len_out, NULL, NULL)
+                        != 0
                     || len_out != sizeof(bio_WSASendMsg))
                     bio_WSASendMsg = NULL;
 
@@ -213,10 +210,10 @@ int BIO_socket_ioctl(int fd, long type, void *arg)
 {
     int i;
 
-#  ifdef __DJGPP__
+# ifdef __DJGPP__
     i = ioctlsocket(fd, type, (char *)arg);
-#  else
-#   if defined(OPENSSL_SYS_VMS)
+# else
+#  if defined(OPENSSL_SYS_VMS)
     /*-
      * 2011-02-18 SMS.
      * VMS ioctl() can't tolerate a 64-bit "void *arg", but we
@@ -224,27 +221,26 @@ int BIO_socket_ioctl(int fd, long type, void *arg)
      * so we arrange a local copy with a short pointer, and use
      * that, instead.
      */
-#    if __INITIAL_POINTER_SIZE == 64
-#     define ARG arg_32p
-#     pragma pointer_size save
-#     pragma pointer_size 32
+#   if __INITIAL_POINTER_SIZE == 64
+#    define ARG arg_32p
+#    pragma pointer_size save
+#    pragma pointer_size 32
     unsigned long arg_32;
     unsigned long *arg_32p;
-#     pragma pointer_size restore
+#    pragma pointer_size restore
     arg_32p = &arg_32;
     arg_32 = *((unsigned long *)arg);
-#    else                       /* __INITIAL_POINTER_SIZE == 64 */
-#     define ARG arg
-#    endif                      /* __INITIAL_POINTER_SIZE == 64 [else] */
-#   else                        /* defined(OPENSSL_SYS_VMS) */
+#   else                       /* __INITIAL_POINTER_SIZE == 64 */
 #    define ARG arg
-#   endif                       /* defined(OPENSSL_SYS_VMS) [else] */
+#   endif                      /* __INITIAL_POINTER_SIZE == 64 [else] */
+#  else                        /* defined(OPENSSL_SYS_VMS) */
+#   define ARG arg
+#  endif                       /* defined(OPENSSL_SYS_VMS) [else] */
 
     i = ioctlsocket(fd, type, ARG);
-#  endif                        /* __DJGPP__ */
+# endif                        /* __DJGPP__ */
     if (i < 0)
-        ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(),
-                       "calling ioctlsocket()");
+        ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(), "calling ioctlsocket()");
     return i;
 }
 
@@ -264,19 +260,18 @@ int BIO_get_accept_socket(char *host, int bind_mode)
     if (BIO_lookup(h, p, BIO_LOOKUP_SERVER, AF_UNSPEC, SOCK_STREAM, &res) != 0)
         goto err;
 
-    if ((s = BIO_socket(BIO_ADDRINFO_family(res), BIO_ADDRINFO_socktype(res),
-                        BIO_ADDRINFO_protocol(res), 0)) == INVALID_SOCKET) {
+    if ((s = BIO_socket(BIO_ADDRINFO_family(res), BIO_ADDRINFO_socktype(res), BIO_ADDRINFO_protocol(res), 0))
+        == INVALID_SOCKET) {
         s = INVALID_SOCKET;
         goto err;
     }
 
-    if (!BIO_listen(s, BIO_ADDRINFO_address(res),
-                    bind_mode ? BIO_SOCK_REUSEADDR : 0)) {
+    if (!BIO_listen(s, BIO_ADDRINFO_address(res), bind_mode ? BIO_SOCK_REUSEADDR : 0)) {
         BIO_closesocket(s);
         s = INVALID_SOCKET;
     }
 
- err:
+err:
     BIO_ADDRINFO_free(res);
     OPENSSL_free(h);
     OPENSSL_free(p);
@@ -295,8 +290,7 @@ int BIO_accept(int sock, char **ip_port)
             ret = -2;
             goto end;
         }
-        ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(),
-                       "calling accept()");
+        ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(), "calling accept()");
         ERR_raise(ERR_LIB_BIO, BIO_R_ACCEPT_ERROR);
         goto end;
     }
@@ -323,7 +317,7 @@ int BIO_accept(int sock, char **ip_port)
         OPENSSL_free(port);
     }
 
- end:
+end:
     return ret;
 }
 # endif
@@ -362,8 +356,7 @@ int BIO_socket_nbio(int s, int mode)
 
     l = fcntl(s, F_GETFL, 0);
     if (l == -1) {
-        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(),
-                       "calling fcntl()");
+        ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(), "calling fcntl()");
         ret = -1;
     } else {
 #  if defined(O_NONBLOCK)
@@ -381,8 +374,7 @@ int BIO_socket_nbio(int s, int mode)
         ret = fcntl(s, F_SETFL, l);
 
         if (ret < 0) {
-            ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(),
-                           "calling fcntl()");
+            ERR_raise_data(ERR_LIB_SYS, get_last_sys_error(), "calling fcntl()");
         }
     }
 # else
@@ -393,29 +385,24 @@ int BIO_socket_nbio(int s, int mode)
     return (ret == 0);
 }
 
-int BIO_sock_info(int sock,
-                  enum BIO_sock_info_type type, union BIO_sock_info_u *info)
+int BIO_sock_info(int sock, enum BIO_sock_info_type type, union BIO_sock_info_u *info)
 {
     switch (type) {
-    case BIO_SOCK_INFO_ADDRESS:
-        {
-            socklen_t addr_len;
-            int ret = 0;
-            addr_len = sizeof(*info->addr);
-            ret = getsockname(sock, BIO_ADDR_sockaddr_noconst(info->addr),
-                              &addr_len);
-            if (ret == -1) {
-                ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(),
-                               "calling getsockname()");
-                ERR_raise(ERR_LIB_BIO, BIO_R_GETSOCKNAME_ERROR);
-                return 0;
-            }
-            if ((size_t)addr_len > sizeof(*info->addr)) {
-                ERR_raise(ERR_LIB_BIO, BIO_R_GETSOCKNAME_TRUNCATED_ADDRESS);
-                return 0;
-            }
+    case BIO_SOCK_INFO_ADDRESS: {
+        socklen_t addr_len;
+        int ret = 0;
+        addr_len = sizeof(*info->addr);
+        ret = getsockname(sock, BIO_ADDR_sockaddr_noconst(info->addr), &addr_len);
+        if (ret == -1) {
+            ERR_raise_data(ERR_LIB_SYS, get_last_socket_error(), "calling getsockname()");
+            ERR_raise(ERR_LIB_BIO, BIO_R_GETSOCKNAME_ERROR);
+            return 0;
         }
-        break;
+        if ((size_t)addr_len > sizeof(*info->addr)) {
+            ERR_raise(ERR_LIB_BIO, BIO_R_GETSOCKNAME_TRUNCATED_ADDRESS);
+            return 0;
+        }
+    } break;
     default:
         ERR_raise(ERR_LIB_BIO, BIO_R_UNKNOWN_INFO_TYPE);
         return 0;
@@ -452,8 +439,7 @@ int BIO_socket_wait(int fd, int for_read, time_t max_time)
     openssl_fdset(fd, &confds);
     tv.tv_usec = 0;
     tv.tv_sec = (long)(max_time - now); /* might overflow */
-    return select(fd + 1, for_read ? &confds : NULL,
-                  for_read ? NULL : &confds, NULL, &tv);
+    return select(fd + 1, for_read ? &confds : NULL, for_read ? NULL : &confds, NULL, &tv);
 # else
     struct pollfd confds;
     time_t now;

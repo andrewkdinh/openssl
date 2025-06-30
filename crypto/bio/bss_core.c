@@ -37,8 +37,7 @@ static ossl_inline BIO_CORE_GLOBALS *get_globals(OSSL_LIB_CTX *libctx)
     return ossl_lib_ctx_get_data(libctx, OSSL_LIB_CTX_BIO_CORE_INDEX);
 }
 
-static int bio_core_read_ex(BIO *bio, char *data, size_t data_len,
-                            size_t *bytes_read)
+static int bio_core_read_ex(BIO *bio, char *data, size_t data_len, size_t *bytes_read)
 {
     BIO_CORE_GLOBALS *bcgbl = get_globals(bio->libctx);
 
@@ -47,8 +46,7 @@ static int bio_core_read_ex(BIO *bio, char *data, size_t data_len,
     return bcgbl->c_bio_read_ex(BIO_get_data(bio), data, data_len, bytes_read);
 }
 
-static int bio_core_write_ex(BIO *bio, const char *data, size_t data_len,
-                             size_t *written)
+static int bio_core_write_ex(BIO *bio, const char *data, size_t data_len, size_t *written)
 {
     BIO_CORE_GLOBALS *bcgbl = get_globals(bio->libctx);
 
@@ -105,18 +103,8 @@ static int bio_core_free(BIO *bio)
 }
 
 static const BIO_METHOD corebiometh = {
-    BIO_TYPE_CORE_TO_PROV,
-    "BIO to Core filter",
-    bio_core_write_ex,
-    NULL,
-    bio_core_read_ex,
-    NULL,
-    bio_core_puts,
-    bio_core_gets,
-    bio_core_ctrl,
-    bio_core_new,
-    bio_core_free,
-    NULL,
+    BIO_TYPE_CORE_TO_PROV, "BIO to Core filter", bio_core_write_ex, NULL,         bio_core_read_ex, NULL,
+    bio_core_puts,         bio_core_gets,        bio_core_ctrl,     bio_core_new, bio_core_free,    NULL,
 };
 
 const BIO_METHOD *BIO_s_core(void)
@@ -149,7 +137,7 @@ int ossl_bio_init_core(OSSL_LIB_CTX *libctx, const OSSL_DISPATCH *fns)
     BIO_CORE_GLOBALS *bcgbl = get_globals(libctx);
 
     if (bcgbl == NULL)
-	    return 0;
+        return 0;
 
     for (; fns->function_id != 0; fns++) {
         switch (fns->function_id) {

@@ -143,7 +143,7 @@ extern CRYPTO_REF_COUNT bio_type_count;
 
 void bio_sock_cleanup_int(void);
 
-#if BIO_FLAGS_UPLINK_INTERNAL==0
+#if BIO_FLAGS_UPLINK_INTERNAL == 0
 /* Shortcut UPLINK calls on most platforms... */
 # define UP_stdin        stdin
 # define UP_stdout       stdout
@@ -152,7 +152,7 @@ void bio_sock_cleanup_int(void);
 # define UP_fgets        fgets
 # define UP_fread        fread
 # define UP_fwrite       fwrite
-# undef  UP_fsetmod
+# undef UP_fsetmod
 # define UP_feof         feof
 # define UP_fclose       fclose
 
@@ -178,4 +178,3 @@ void bio_sock_cleanup_int(void);
 # endif
 
 #endif
-

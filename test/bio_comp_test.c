@@ -22,7 +22,7 @@
 
 #define BUFFER_SIZE    32 * 1024
 #define NUM_SIZES      4
-static int sizes[NUM_SIZES] = { 64, 512, 2048, 16 * 1024 };
+static int sizes[NUM_SIZES] = {64, 512, 2048, 16 * 1024};
 
 /* using global buffers */
 static unsigned char *original = NULL;
@@ -52,8 +52,7 @@ static int do_bio_comp_test(const BIO_METHOD *meth, size_t size)
         goto err;
     BIO_push(bcomp, bmem);
     osize = BIO_write(bcomp, original, size);
-    if (!TEST_int_eq(osize, size)
-        || !TEST_true(BIO_flush(bcomp)))
+    if (!TEST_int_eq(osize, size) || !TEST_true(BIO_flush(bcomp)))
         goto err;
     BIO_free(bcomp);
     bcomp = NULL;
@@ -64,12 +63,11 @@ static int do_bio_comp_test(const BIO_METHOD *meth, size_t size)
     BIO_push(bexp, bmem);
     rsize = BIO_read(bexp, result, size);
 
-    if (!TEST_int_eq(size, rsize)
-        || !TEST_mem_eq(original, osize, result, rsize))
+    if (!TEST_int_eq(size, rsize) || !TEST_mem_eq(original, osize, result, rsize))
         goto err;
 
     ret = 1;
- err:
+err:
     BIO_free(bexp);
     BIO_free(bcomp);
     BIO_free(bmem);
@@ -115,7 +113,7 @@ static int do_bio_comp(const BIO_METHOD *meth, int n)
     if (!TEST_true(do_bio_comp_test(meth, size)))
         goto err;
     success = 1;
- err:
+err:
     OPENSSL_free(original);
     OPENSSL_free(result);
     return success;

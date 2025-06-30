@@ -73,8 +73,7 @@ int ASN1_INTEGER_cmp(const ASN1_INTEGER *x, const ASN1_INTEGER *y)
  * does 0x80 followed by any number of zeros. These properties are
  * used elsewhere below...
  */
-static void twos_complement(unsigned char *dst, const unsigned char *src,
-                            size_t len, unsigned char pad)
+static void twos_complement(unsigned char *dst, const unsigned char *src, size_t len, unsigned char pad)
 {
     unsigned int carry = pad & 1;
 
@@ -94,8 +93,7 @@ static void twos_complement(unsigned char *dst, const unsigned char *src,
     }
 }
 
-static size_t i2c_ibuf(const unsigned char *b, size_t blen, int neg,
-                       unsigned char **pp)
+static size_t i2c_ibuf(const unsigned char *b, size_t blen, int neg, unsigned char **pp)
 {
     unsigned int pad = 0;
     size_t ret, i;
@@ -151,8 +149,7 @@ static size_t i2c_ibuf(const unsigned char *b, size_t blen, int neg,
  * NULL just return length.
  */
 
-static size_t c2i_ibuf(unsigned char *b, int *pneg,
-                       const unsigned char *p, size_t plen)
+static size_t c2i_ibuf(unsigned char *b, int *pneg, const unsigned char *p, size_t plen)
 {
     int neg, pad;
     /* Zero content length is illegal */
@@ -252,8 +249,7 @@ static size_t asn1_put_uint64(unsigned char b[sizeof(uint64_t)], uint64_t r)
 #define ABS_INT64_MIN ((uint64_t)INT64_MAX + (-(INT64_MIN + INT64_MAX)))
 
 /* signed version of asn1_get_uint64 */
-static int asn1_get_int64(int64_t *pr, const unsigned char *b, size_t blen,
-                          int neg)
+static int asn1_get_int64(int64_t *pr, const unsigned char *b, size_t blen, int neg)
 {
     uint64_t r;
     if (asn1_get_uint64(&r, b, blen) == 0)
@@ -287,8 +283,7 @@ static int asn1_get_int64(int64_t *pr, const unsigned char *b, size_t blen,
 }
 
 /* Convert ASN1 INTEGER content octets to ASN1_INTEGER structure */
-ASN1_INTEGER *ossl_c2i_ASN1_INTEGER(ASN1_INTEGER **a, const unsigned char **pp,
-                                    long len)
+ASN1_INTEGER *ossl_c2i_ASN1_INTEGER(ASN1_INTEGER **a, const unsigned char **pp, long len)
 {
     ASN1_INTEGER *ret = NULL;
     size_t r;
@@ -323,7 +318,7 @@ ASN1_INTEGER *ossl_c2i_ASN1_INTEGER(ASN1_INTEGER **a, const unsigned char **pp,
     if (a != NULL)
         (*a) = ret;
     return ret;
- err:
+err:
     if (a == NULL || *a != ret)
         ASN1_INTEGER_free(ret);
     return NULL;
@@ -365,8 +360,7 @@ static int asn1_string_set_int64(ASN1_STRING *a, int64_t r, int itype)
     return ASN1_STRING_set(a, tbuf + off, sizeof(tbuf) - off);
 }
 
-static int asn1_string_get_uint64(uint64_t *pr, const ASN1_STRING *a,
-                                  int itype)
+static int asn1_string_get_uint64(uint64_t *pr, const ASN1_STRING *a, int itype)
 {
     if (a == NULL) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_PASSED_NULL_PARAMETER);
@@ -399,8 +393,7 @@ static int asn1_string_set_uint64(ASN1_STRING *a, uint64_t r, int itype)
  * set as negative (it doesn't add a padding zero).
  */
 
-ASN1_INTEGER *d2i_ASN1_UINTEGER(ASN1_INTEGER **a, const unsigned char **pp,
-                                long length)
+ASN1_INTEGER *d2i_ASN1_UINTEGER(ASN1_INTEGER **a, const unsigned char **pp, long length)
 {
     ASN1_INTEGER *ret = NULL;
     const unsigned char *p;
@@ -454,7 +447,7 @@ ASN1_INTEGER *d2i_ASN1_UINTEGER(ASN1_INTEGER **a, const unsigned char **pp,
         (*a) = ret;
     *pp = p;
     return ret;
- err:
+err:
     if (i != 0)
         ERR_raise(ERR_LIB_ASN1, i);
     if ((a == NULL) || (*a != ret))
@@ -462,8 +455,7 @@ ASN1_INTEGER *d2i_ASN1_UINTEGER(ASN1_INTEGER **a, const unsigned char **pp,
     return NULL;
 }
 
-static ASN1_STRING *bn_to_asn1_string(const BIGNUM *bn, ASN1_STRING *ai,
-                                      int atype)
+static ASN1_STRING *bn_to_asn1_string(const BIGNUM *bn, ASN1_STRING *ai, int atype)
 {
     ASN1_INTEGER *ret;
     int len;
@@ -500,14 +492,13 @@ static ASN1_STRING *bn_to_asn1_string(const BIGNUM *bn, ASN1_STRING *ai,
         len = BN_bn2bin(bn, ret->data);
     ret->length = len;
     return ret;
- err:
+err:
     if (ret != ai)
         ASN1_INTEGER_free(ret);
     return NULL;
 }
 
-static BIGNUM *asn1_string_to_bn(const ASN1_INTEGER *ai, BIGNUM *bn,
-                                 int itype)
+static BIGNUM *asn1_string_to_bn(const ASN1_INTEGER *ai, BIGNUM *bn, int itype)
 {
     BIGNUM *ret;
 
@@ -619,8 +610,7 @@ BIGNUM *ASN1_ENUMERATED_to_BN(const ASN1_ENUMERATED *ai, BIGNUM *bn)
 }
 
 /* Internal functions used by x_int64.c */
-int ossl_c2i_uint64_int(uint64_t *ret, int *neg,
-                        const unsigned char **pp, long len)
+int ossl_c2i_uint64_int(uint64_t *ret, int *neg, const unsigned char **pp, long len)
 {
     unsigned char buf[sizeof(uint64_t)];
     size_t buflen;
@@ -644,4 +634,3 @@ int ossl_i2c_uint64_int(unsigned char *p, uint64_t r, int neg)
     off = asn1_put_uint64(buf, r);
     return i2c_ibuf(buf + off, sizeof(buf) - off, neg, &p);
 }
-

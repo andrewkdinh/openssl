@@ -19,7 +19,7 @@
 #define HASH_LONG               SHA_LONG
 #define HASH_CTX                SHA_CTX
 #define HASH_CBLOCK             SHA_CBLOCK
-#define HASH_MAKE_STRING(c,s)   do {    \
+#define HASH_MAKE_STRING(c, s)   do {    \
         unsigned long ll;               \
         ll=(c)->h0; (void)HOST_l2c(ll,(s));     \
         ll=(c)->h1; (void)HOST_l2c(ll,(s));     \
@@ -33,7 +33,7 @@
 #define HASH_FINAL                      SHA1_Final
 #define HASH_INIT                       SHA1_Init
 #define HASH_BLOCK_DATA_ORDER           sha1_block_data_order
-#define Xupdate(a,ix,ia,ib,ic,id)       ( (a)=(ia^ib^ic^id),    \
+#define Xupdate(a, ix, ia, ib, ic, id)       ( (a)=(ia^ib^ic^id),    \
                                           ix=(a)=ROTATE((a),1)  \
                                         )
 
@@ -75,38 +75,38 @@ int HASH_INIT(SHA_CTX *c)
  * I've just become aware of another tweak to be made, again from Wei Dai,
  * in F_40_59, (x&a)|(y&a) -> (x|y)&a
  */
-#define F_00_19(b,c,d)  ((((c) ^ (d)) & (b)) ^ (d))
-#define F_20_39(b,c,d)  ((b) ^ (c) ^ (d))
-#define F_40_59(b,c,d)  (((b) & (c)) | (((b)|(c)) & (d)))
-#define F_60_79(b,c,d)  F_20_39(b,c,d)
+#define F_00_19(b, c, d)  ((((c) ^ (d)) & (b)) ^ (d))
+#define F_20_39(b, c, d)  ((b) ^ (c) ^ (d))
+#define F_40_59(b, c, d)  (((b) & (c)) | (((b)|(c)) & (d)))
+#define F_60_79(b, c, d)  F_20_39(b,c,d)
 
 #ifndef OPENSSL_SMALL_FOOTPRINT
 
-# define BODY_00_15(i,a,b,c,d,e,f,xi) \
+# define BODY_00_15(i, a, b, c, d, e, f, xi) \
         (f)=xi+(e)+K_00_19+ROTATE((a),5)+F_00_19((b),(c),(d)); \
         (b)=ROTATE((b),30);
 
-# define BODY_16_19(i,a,b,c,d,e,f,xi,xa,xb,xc,xd) \
+# define BODY_16_19(i, a, b, c, d, e, f, xi, xa, xb, xc, xd) \
         Xupdate(f,xi,xa,xb,xc,xd); \
         (f)+=(e)+K_00_19+ROTATE((a),5)+F_00_19((b),(c),(d)); \
         (b)=ROTATE((b),30);
 
-# define BODY_20_31(i,a,b,c,d,e,f,xi,xa,xb,xc,xd) \
+# define BODY_20_31(i, a, b, c, d, e, f, xi, xa, xb, xc, xd) \
         Xupdate(f,xi,xa,xb,xc,xd); \
         (f)+=(e)+K_20_39+ROTATE((a),5)+F_20_39((b),(c),(d)); \
         (b)=ROTATE((b),30);
 
-# define BODY_32_39(i,a,b,c,d,e,f,xa,xb,xc,xd) \
+# define BODY_32_39(i, a, b, c, d, e, f, xa, xb, xc, xd) \
         Xupdate(f,xa,xa,xb,xc,xd); \
         (f)+=(e)+K_20_39+ROTATE((a),5)+F_20_39((b),(c),(d)); \
         (b)=ROTATE((b),30);
 
-# define BODY_40_59(i,a,b,c,d,e,f,xa,xb,xc,xd) \
+# define BODY_40_59(i, a, b, c, d, e, f, xa, xb, xc, xd) \
         Xupdate(f,xa,xa,xb,xc,xd); \
         (f)+=(e)+K_40_59+ROTATE((a),5)+F_40_59((b),(c),(d)); \
         (b)=ROTATE((b),30);
 
-# define BODY_60_79(i,a,b,c,d,e,f,xa,xb,xc,xd) \
+# define BODY_60_79(i, a, b, c, d, e, f, xa, xb, xc, xd) \
         Xupdate(f,xa,xa,xb,xc,xd); \
         (f)=xa+(e)+K_60_79+ROTATE((a),5)+F_60_79((b),(c),(d)); \
         (b)=ROTATE((b),30);
@@ -139,8 +139,7 @@ static void HASH_BLOCK_DATA_ORDER(SHA_CTX *c, const void *p, size_t num)
     const unsigned char *data = p;
     register unsigned MD32_REG_T A, B, C, D, E, T, l;
 #  ifndef MD32_XARRAY
-    unsigned MD32_REG_T XX0, XX1, XX2, XX3, XX4, XX5, XX6, XX7,
-        XX8, XX9, XX10, XX11, XX12, XX13, XX14, XX15;
+    unsigned MD32_REG_T XX0, XX1, XX2, XX3, XX4, XX5, XX6, XX7, XX8, XX9, XX10, XX11, XX12, XX13, XX14, XX15;
 #  else
     SHA_LONG XX[16];
 #  endif
@@ -154,8 +153,7 @@ static void HASH_BLOCK_DATA_ORDER(SHA_CTX *c, const void *p, size_t num)
     for (;;) {
         DECLARE_IS_ENDIAN;
 
-        if (!IS_LITTLE_ENDIAN && sizeof(SHA_LONG) == 4
-            && ((size_t)p % 4) == 0) {
+        if (!IS_LITTLE_ENDIAN && sizeof(SHA_LONG) == 4 && ((size_t)p % 4) == 0) {
             const SHA_LONG *W = (const SHA_LONG *)data;
 
             X(0) = W[0];
@@ -326,7 +324,6 @@ static void HASH_BLOCK_DATA_ORDER(SHA_CTX *c, const void *p, size_t num)
         C = c->h2;
         D = c->h3;
         E = c->h4;
-
     }
 }
 # endif
@@ -338,25 +335,25 @@ static void HASH_BLOCK_DATA_ORDER(SHA_CTX *c, const void *p, size_t num)
         E=D, D=C, C=ROTATE(B,30), B=A;  \
         A=ROTATE(A,5)+T+xi;         } while(0)
 
-# define BODY_16_19(xa,xb,xc,xd)  do {   \
+# define BODY_16_19(xa, xb, xc, xd)  do {   \
         Xupdate(T,xa,xa,xb,xc,xd);      \
         T+=E+K_00_19+F_00_19(B,C,D);    \
         E=D, D=C, C=ROTATE(B,30), B=A;  \
         A=ROTATE(A,5)+T;            } while(0)
 
-# define BODY_20_39(xa,xb,xc,xd)  do {   \
+# define BODY_20_39(xa, xb, xc, xd)  do {   \
         Xupdate(T,xa,xa,xb,xc,xd);      \
         T+=E+K_20_39+F_20_39(B,C,D);    \
         E=D, D=C, C=ROTATE(B,30), B=A;  \
         A=ROTATE(A,5)+T;            } while(0)
 
-# define BODY_40_59(xa,xb,xc,xd)  do {   \
+# define BODY_40_59(xa, xb, xc, xd)  do {   \
         Xupdate(T,xa,xa,xb,xc,xd);      \
         T+=E+K_40_59+F_40_59(B,C,D);    \
         E=D, D=C, C=ROTATE(B,30), B=A;  \
         A=ROTATE(A,5)+T;            } while(0)
 
-# define BODY_60_79(xa,xb,xc,xd)  do {   \
+# define BODY_60_79(xa, xb, xc, xd)  do {   \
         Xupdate(T,xa,xa,xb,xc,xd);      \
         T=E+K_60_79+F_60_79(B,C,D);     \
         E=D, D=C, C=ROTATE(B,30), B=A;  \
@@ -386,16 +383,13 @@ static void HASH_BLOCK_DATA_ORDER(SHA_CTX *c, const void *p, size_t num)
             BODY_16_19(X[i], X[i + 2], X[i + 8], X[(i + 13) & 15]);
         }
         for (; i < 24; i++) {
-            BODY_20_39(X[i & 15], X[(i + 2) & 15], X[(i + 8) & 15],
-                       X[(i + 13) & 15]);
+            BODY_20_39(X[i & 15], X[(i + 2) & 15], X[(i + 8) & 15], X[(i + 13) & 15]);
         }
         for (i = 0; i < 20; i++) {
-            BODY_40_59(X[(i + 8) & 15], X[(i + 10) & 15], X[i & 15],
-                       X[(i + 5) & 15]);
+            BODY_40_59(X[(i + 8) & 15], X[(i + 10) & 15], X[i & 15], X[(i + 5) & 15]);
         }
         for (i = 4; i < 24; i++) {
-            BODY_60_79(X[(i + 8) & 15], X[(i + 10) & 15], X[i & 15],
-                       X[(i + 5) & 15]);
+            BODY_60_79(X[(i + 8) & 15], X[(i + 10) & 15], X[i & 15], X[(i + 5) & 15]);
         }
 
         c->h0 = (c->h0 + A) & 0xffffffffL;
@@ -412,7 +406,6 @@ static void HASH_BLOCK_DATA_ORDER(SHA_CTX *c, const void *p, size_t num)
         C = c->h2;
         D = c->h3;
         E = c->h4;
-
     }
 }
 # endif

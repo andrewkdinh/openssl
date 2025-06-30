@@ -10,9 +10,8 @@
 #include "internal/e_os.h"
 #include "crypto/cryptlib.h"
 
-#if     defined(__i386)   || defined(__i386__)   || defined(_M_IX86) || \
-        defined(__x86_64) || defined(__x86_64__) || \
-        defined(_M_AMD64) || defined(_M_X64)
+#if defined(__i386) || defined(__i386__) || defined(_M_IX86) || defined(__x86_64) || defined(__x86_64__) \
+    || defined(_M_AMD64) || defined(_M_X64)
 
 extern unsigned int OPENSSL_ia32cap_P[OPENSSL_IA32CAP_P_MAX_INDEXES];
 
@@ -78,7 +77,8 @@ static uint64_t ossl_strtouint64(const variant_char *str)
 }
 
 static variant_char *ossl_strchr(const variant_char *str, char srch)
-{   variant_char c;
+{
+    variant_char c;
 
     while ((c = *str)) {
         if (c == srch)
@@ -112,7 +112,7 @@ void OPENSSL_cpuid_setup(void)
         if (off) {
             IA32CAP mask = vec;
             vec = OPENSSL_ia32_cpuid(OPENSSL_ia32cap_P) & ~mask;
-            if (mask & (1<<24)) {
+            if (mask & (1 << 24)) {
                 /*
                  * User disables FXSR bit, mask even other capabilities
                  * that operate exclusively on XMM, so we don't have to
@@ -121,7 +121,7 @@ void OPENSSL_cpuid_setup(void)
                  * do it in x86_64 case, but we can safely assume that
                  * x86_64 users won't actually flip this flag.
                  */
-                vec &= ~((IA32CAP)(1<<1|1<<11|1<<25|1<<28) << 32);
+                vec &= ~((IA32CAP)(1 << 1 | 1 << 11 | 1 << 25 | 1 << 28) << 32);
             }
         } else if (env[0] == ':') {
             vec = OPENSSL_ia32_cpuid(OPENSSL_ia32cap_P);

@@ -67,20 +67,17 @@ static void warnx(const char *fmt, ...)
  * are accepted.
  */
 static const unsigned char alpn_ossltest[] = {
-    8,  'h', 't', 't', 'p', '/', '1', '.', '0',
-    10, 'h', 'q', '-', 'i', 'n', 't', 'e', 'r', 'o', 'p',
+    8, 'h', 't', 't', 'p', '/', '1', '.', '0', 10, 'h', 'q', '-', 'i', 'n', 't', 'e', 'r', 'o', 'p',
 };
 
 /*
  * This callback validates and negotiates the desired ALPN on the server side.
  */
-static int select_alpn(SSL *ssl, const unsigned char **out,
-                       unsigned char *out_len, const unsigned char *in,
+static int select_alpn(SSL *ssl, const unsigned char **out, unsigned char *out_len, const unsigned char *in,
                        unsigned int in_len, void *arg)
 {
-    if (SSL_select_next_proto((unsigned char **)out, out_len, alpn_ossltest,
-                              sizeof(alpn_ossltest), in,
-                              in_len) == OPENSSL_NPN_NEGOTIATED)
+    if (SSL_select_next_proto((unsigned char **)out, out_len, alpn_ossltest, sizeof(alpn_ossltest), in, in_len)
+        == OPENSSL_NPN_NEGOTIATED)
         return SSL_TLSEXT_ERR_OK;
     return SSL_TLSEXT_ERR_ALERT_FATAL;
 }
@@ -325,8 +322,7 @@ static int handle_io_failure(SSL *ssl, int res)
          * information about it from SSL_get_verify_result().
          */
         if (SSL_get_verify_result(ssl) != X509_V_OK)
-            printf("Verify error: %s\n",
-                   X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
+            printf("Verify error: %s\n", X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
         return -1;
 
     default:
@@ -390,8 +386,7 @@ static int run_quic_server(SSL_CTX *ctx, int fd)
 
         /* Read from client until the client sends a end of stream packet */
         while (!eof) {
-            ret = SSL_read_ex(conn, buf + total_read, sizeof(buf) - total_read,
-                              &nread);
+            ret = SSL_read_ex(conn, buf + total_read, sizeof(buf) - total_read, &nread);
             total_read += nread;
             if (total_read >= 8192) {
                 fprintf(stderr, "Could not fit all data into buffer\n");
@@ -413,9 +408,7 @@ static int run_quic_server(SSL_CTX *ctx, int fd)
         }
 
         /* Echo client input */
-        while (!SSL_write_ex2(conn, buf,
-                              total_read,
-                              SSL_WRITE_FLAG_CONCLUDE, &total_written)) {
+        while (!SSL_write_ex2(conn, buf, total_read, SSL_WRITE_FLAG_CONCLUDE, &total_written)) {
             if (handle_io_failure(conn, 0) == 1)
                 continue;
             fprintf(stderr, "Failed to write data\n");
@@ -423,8 +416,7 @@ static int run_quic_server(SSL_CTX *ctx, int fd)
         }
 
         if (total_read != total_written)
-            fprintf(stderr, "Failed to echo data [read: %lu, written: %lu]\n",
-                    total_read, total_written);
+            fprintf(stderr, "Failed to echo data [read: %lu, written: %lu]\n", total_read, total_written);
 
         /*
          * Shut down the connection. We may need to call this multiple times

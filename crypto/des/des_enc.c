@@ -152,8 +152,7 @@ void DES_encrypt2(DES_LONG *data, DES_key_schedule *ks, int enc)
     l = r = t = u = 0;
 }
 
-void DES_encrypt3(DES_LONG *data, DES_key_schedule *ks1,
-                  DES_key_schedule *ks2, DES_key_schedule *ks3)
+void DES_encrypt3(DES_LONG *data, DES_key_schedule *ks1, DES_key_schedule *ks2, DES_key_schedule *ks3)
 {
     register DES_LONG l, r;
 
@@ -172,8 +171,7 @@ void DES_encrypt3(DES_LONG *data, DES_key_schedule *ks1,
     data[1] = r;
 }
 
-void DES_decrypt3(DES_LONG *data, DES_key_schedule *ks1,
-                  DES_key_schedule *ks2, DES_key_schedule *ks3)
+void DES_decrypt3(DES_LONG *data, DES_key_schedule *ks1, DES_key_schedule *ks2, DES_key_schedule *ks3)
 {
     register DES_LONG l, r;
 
@@ -197,10 +195,8 @@ void DES_decrypt3(DES_LONG *data, DES_key_schedule *ks1,
 # undef CBC_ENC_C__DONT_UPDATE_IV
 # include "ncbc_enc.c"          /* DES_ncbc_encrypt */
 
-void DES_ede3_cbc_encrypt(const unsigned char *input, unsigned char *output,
-                          long length, DES_key_schedule *ks1,
-                          DES_key_schedule *ks2, DES_key_schedule *ks3,
-                          DES_cblock *ivec, int enc)
+void DES_ede3_cbc_encrypt(const unsigned char *input, unsigned char *output, long length, DES_key_schedule *ks1,
+                          DES_key_schedule *ks2, DES_key_schedule *ks3, DES_cblock *ivec, int enc)
 {
     register DES_LONG tin0, tin1;
     register DES_LONG tout0, tout1, xor0, xor1;

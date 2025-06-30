@@ -58,8 +58,7 @@ int ossl_sha3_update(KECCAK1600_CTX *ctx, const void *_inp, size_t len)
     if (len == 0)
         return 1;
 
-    if (ctx->xof_state == XOF_STATE_SQUEEZE
-        || ctx->xof_state == XOF_STATE_FINAL)
+    if (ctx->xof_state == XOF_STATE_SQUEEZE || ctx->xof_state == XOF_STATE_FINAL)
         return 0;
 
     if ((num = ctx->bufsz) != 0) {      /* process intermediate buffer? */
@@ -107,8 +106,7 @@ int ossl_sha3_final(KECCAK1600_CTX *ctx, unsigned char *out, size_t outlen)
 
     if (outlen == 0)
         return 1;
-    if (ctx->xof_state == XOF_STATE_SQUEEZE
-        || ctx->xof_state == XOF_STATE_FINAL)
+    if (ctx->xof_state == XOF_STATE_SQUEEZE || ctx->xof_state == XOF_STATE_FINAL)
         return 0;
 
     /*

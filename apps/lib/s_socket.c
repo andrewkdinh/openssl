@@ -72,10 +72,8 @@ BIO_ADDR *ourpeer = NULL;
  *
  * Returns 1 on success, 0 on failure.
  */
-int init_client(int *sock, const char *host, const char *port,
-                const char *bindhost, const char *bindport,
-                int family, int type, int protocol, int tfo, int doconn,
-                BIO_ADDR **ba_ret)
+int init_client(int *sock, const char *host, const char *port, const char *bindhost, const char *bindport, int family,
+                int type, int protocol, int tfo, int doconn, BIO_ADDR **ba_ret)
 {
     BIO_ADDRINFO *res = NULL;
     BIO_ADDRINFO *bindaddr = NULL;
@@ -88,18 +86,16 @@ int init_client(int *sock, const char *host, const char *port,
     if (BIO_sock_init() != 1)
         return 0;
 
-    ret = BIO_lookup_ex(host, port, BIO_LOOKUP_CLIENT, family, type, protocol,
-                        &res);
+    ret = BIO_lookup_ex(host, port, BIO_LOOKUP_CLIENT, family, type, protocol, &res);
     if (ret == 0) {
         ERR_print_errors(bio_err);
         return 0;
     }
 
     if (bindhost != NULL || bindport != NULL) {
-        ret = BIO_lookup_ex(bindhost, bindport, BIO_LOOKUP_CLIENT,
-                            family, type, protocol, &bindaddr);
+        ret = BIO_lookup_ex(bindhost, bindport, BIO_LOOKUP_CLIENT, family, type, protocol, &bindaddr);
         if (ret == 0) {
-            ERR_print_errors (bio_err);
+            ERR_print_errors(bio_err);
             goto out;
         }
     }
@@ -109,11 +105,9 @@ int init_client(int *sock, const char *host, const char *port,
         /* Admittedly, these checks are quite paranoid, we should not get
          * anything in the BIO_ADDRINFO chain that we haven't
          * asked for. */
-        OPENSSL_assert((family == AF_UNSPEC
-                        || family == BIO_ADDRINFO_family(ai))
+        OPENSSL_assert((family == AF_UNSPEC || family == BIO_ADDRINFO_family(ai))
                        && (type == 0 || type == BIO_ADDRINFO_socktype(ai))
-                       && (protocol == 0
-                           || protocol == BIO_ADDRINFO_protocol(ai)));
+                       && (protocol == 0 || protocol == BIO_ADDRINFO_protocol(ai)));
 
         if (bindaddr != NULL) {
             for (bi = bindaddr; bi != NULL; bi = BIO_ADDRINFO_next(bi)) {
@@ -125,8 +119,7 @@ int init_client(int *sock, const char *host, const char *port,
             ++found;
         }
 
-        *sock = BIO_socket(BIO_ADDRINFO_family(ai), BIO_ADDRINFO_socktype(ai),
-                           BIO_ADDRINFO_protocol(ai), 0);
+        *sock = BIO_socket(BIO_ADDRINFO_family(ai), BIO_ADDRINFO_socktype(ai), BIO_ADDRINFO_protocol(ai), 0);
         if (*sock == INVALID_SOCKET) {
             /* Maybe the kernel doesn't support the socket family, even if
              * BIO_lookup() added it in the returned result...
@@ -135,15 +128,14 @@ int init_client(int *sock, const char *host, const char *port,
         }
 
         if (bi != NULL) {
-            if (!BIO_bind(*sock, BIO_ADDRINFO_address(bi),
-                          BIO_SOCK_REUSEADDR)) {
+            if (!BIO_bind(*sock, BIO_ADDRINFO_address(bi), BIO_SOCK_REUSEADDR)) {
                 BIO_closesocket(*sock);
                 *sock = INVALID_SOCKET;
                 break;
             }
         }
 
-#ifndef OPENSSL_NO_SCTP
+# ifndef OPENSSL_NO_SCTP
         if (protocol == IPPROTO_SCTP) {
             /*
              * For SCTP we have to set various options on the socket prior to
@@ -159,7 +151,7 @@ int init_client(int *sock, const char *host, const char *port,
             }
             BIO_free(tmpbio);
         }
-#endif
+# endif
         if (BIO_ADDRINFO_protocol(ai) == IPPROTO_TCP) {
             options |= BIO_SOCK_NODELAY;
             if (tfo)
@@ -191,14 +183,13 @@ int init_client(int *sock, const char *host, const char *port,
     if (*sock == INVALID_SOCKET) {
         if (bindaddr != NULL && !found) {
             BIO_printf(bio_err, "Can't bind %saddress for %s%s%s\n",
-#ifdef AF_INET6
+# ifdef AF_INET6
                        BIO_ADDRINFO_family(res) == AF_INET6 ? "IPv6 " :
-#endif
-                       BIO_ADDRINFO_family(res) == AF_INET ? "IPv4 " :
-                       BIO_ADDRINFO_family(res) == AF_UNIX ? "unix " : "",
-                       bindhost != NULL ? bindhost : "",
-                       bindport != NULL ? ":" : "",
-                       bindport != NULL ? bindport : "");
+# endif
+                           BIO_ADDRINFO_family(res) == AF_INET   ? "IPv4 "
+                           : BIO_ADDRINFO_family(res) == AF_UNIX ? "unix "
+                                                                 : "",
+                       bindhost != NULL ? bindhost : "", bindport != NULL ? ":" : "", bindport != NULL ? bindport : "");
             ERR_clear_error();
             ret = 0;
         }
@@ -217,7 +208,7 @@ int init_client(int *sock, const char *host, const char *port,
     }
 out:
     if (bindaddr != NULL) {
-        BIO_ADDRINFO_free (bindaddr);
+        BIO_ADDRINFO_free(bindaddr);
     }
     BIO_ADDRINFO_free(res);
     return ret;
@@ -232,8 +223,7 @@ void get_sock_info_address(int asock, char **hostname, char **service)
     if (service != NULL)
         *service = NULL;
 
-    if ((info.addr = BIO_ADDR_new()) != NULL
-            && BIO_sock_info(asock, BIO_SOCK_INFO_ADDRESS, &info)) {
+    if ((info.addr = BIO_ADDR_new()) != NULL && BIO_sock_info(asock, BIO_SOCK_INFO_ADDRESS, &info)) {
         if (hostname != NULL)
             *hostname = BIO_ADDR_hostname_string(info.addr, 1);
         if (service != NULL)
@@ -254,11 +244,9 @@ int report_server_accept(BIO *out, int asock, int with_address, int with_pid)
         get_sock_info_address(asock, &hostname, &service);
         success = hostname != NULL && service != NULL;
         if (success)
-            success = BIO_printf(out,
-                                 strchr(hostname, ':') == NULL
-                                 ? /* IPv4 */ " %s:%s"
-                                 : /* IPv6 */ " [%s]:%s",
-                                 hostname, service) > 0;
+            success = BIO_printf(out, strchr(hostname, ':') == NULL ? /* IPv4 */ " %s:%s" : /* IPv6 */ " [%s]:%s",
+                                 hostname, service)
+                > 0;
         else
             (void)BIO_printf(out, "unknown:error\n");
         OPENSSL_free(hostname);
@@ -292,10 +280,8 @@ int report_server_accept(BIO *out, int asock, int with_address, int with_pid)
  *
  * 0 on failure, something other on success.
  */
-int do_server(int *accept_sock, const char *host, const char *port,
-              int family, int type, int protocol, do_server_cb cb,
-              unsigned char *context, int naccept, BIO *bio_s_out,
-              int tfo)
+int do_server(int *accept_sock, const char *host, const char *port, int family, int type, int protocol, do_server_cb cb,
+              unsigned char *context, int naccept, BIO *bio_s_out, int tfo)
 {
     int asock = 0;
     int sock;
@@ -312,8 +298,7 @@ int do_server(int *accept_sock, const char *host, const char *port,
     if (BIO_sock_init() != 1)
         return 0;
 
-    if (!BIO_lookup_ex(host, port, BIO_LOOKUP_SERVER, family, type, protocol,
-                       &res)) {
+    if (!BIO_lookup_ex(host, port, BIO_LOOKUP_SERVER, family, type, protocol, &res)) {
         ERR_print_errors(bio_err);
         return 0;
     }
@@ -331,34 +316,29 @@ int do_server(int *accept_sock, const char *host, const char *port,
     next = BIO_ADDRINFO_next(res);
     if (tfo && sock_type == SOCK_STREAM)
         sock_options |= BIO_SOCK_TFO;
-#ifdef AF_INET6
+# ifdef AF_INET6
     if (sock_family == AF_INET6)
         sock_options |= BIO_SOCK_V6_ONLY;
-    if (next != NULL
-            && BIO_ADDRINFO_socktype(next) == sock_type
-            && BIO_ADDRINFO_protocol(next) == sock_protocol) {
-        if (sock_family == AF_INET
-                && BIO_ADDRINFO_family(next) == AF_INET6) {
+    if (next != NULL && BIO_ADDRINFO_socktype(next) == sock_type && BIO_ADDRINFO_protocol(next) == sock_protocol) {
+        if (sock_family == AF_INET && BIO_ADDRINFO_family(next) == AF_INET6) {
             /* In case AF_INET6 is returned but not supported by the
              * kernel, retry with the first detected address family */
             sock_family_fallback = sock_family;
             sock_address_fallback = sock_address;
             sock_family = AF_INET6;
             sock_address = BIO_ADDRINFO_address(next);
-        } else if (sock_family == AF_INET6
-                   && BIO_ADDRINFO_family(next) == AF_INET) {
+        } else if (sock_family == AF_INET6 && BIO_ADDRINFO_family(next) == AF_INET) {
             sock_options &= ~BIO_SOCK_V6_ONLY;
         }
     }
-#endif
+# endif
 
     asock = BIO_socket(sock_family, sock_type, sock_protocol, 0);
     if (asock == INVALID_SOCKET && sock_family_fallback != AF_UNSPEC) {
         asock = BIO_socket(sock_family_fallback, sock_type, sock_protocol, 0);
         sock_address = sock_address_fallback;
     }
-    if (asock == INVALID_SOCKET
-        || !BIO_listen(asock, sock_address, sock_options)) {
+    if (asock == INVALID_SOCKET || !BIO_listen(asock, sock_address, sock_options)) {
         BIO_ADDRINFO_free(res);
         ERR_print_errors(bio_err);
         if (asock != INVALID_SOCKET)
@@ -366,7 +346,7 @@ int do_server(int *accept_sock, const char *host, const char *port,
         goto end;
     }
 
-#ifndef OPENSSL_NO_SCTP
+# ifndef OPENSSL_NO_SCTP
     if (protocol == IPPROTO_SCTP) {
         /*
          * For SCTP we have to set various options on the socket prior to
@@ -383,7 +363,7 @@ int do_server(int *accept_sock, const char *host, const char *port,
         }
         BIO_free(tmpbio);
     }
-#endif
+# endif
 
     sock_port = BIO_ADDR_rawport(sock_address);
 
@@ -450,8 +430,7 @@ int do_server(int *accept_sock, const char *host, const char *port,
             do {
                 FD_ZERO(&readfds);
                 openssl_fdset(sock, &readfds);
-            } while (select(sock + 1, &readfds, NULL, NULL, &timeout) > 0
-                     && readsocket(sock, sink, sizeof(sink)) > 0);
+            } while (select(sock + 1, &readfds, NULL, NULL, &timeout) > 0 && readsocket(sock, sink, sizeof(sink)) > 0);
 
             BIO_closesocket(sock);
         } else {
@@ -467,7 +446,7 @@ int do_server(int *accept_sock, const char *host, const char *port,
             break;
         }
     }
- end:
+end:
 # ifdef AF_UNIX
     if (family == AF_UNIX)
         unlink(host);

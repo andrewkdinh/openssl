@@ -44,18 +44,9 @@ typedef struct b64_struct {
 } BIO_B64_CTX;
 
 static const BIO_METHOD methods_b64 = {
-    BIO_TYPE_BASE64,
-    "base64 encoding",
-    bwrite_conv,
-    b64_write,
-    bread_conv,
-    b64_read,
-    b64_puts,
-    NULL,                       /* b64_gets, */
-    b64_ctrl,
-    b64_new,
-    b64_free,
-    b64_callback_ctrl,
+    BIO_TYPE_BASE64, "base64 encoding", bwrite_conv, b64_write,
+    bread_conv,      b64_read,          b64_puts,    NULL,                       /* b64_gets, */
+    b64_ctrl,        b64_new,           b64_free,    b64_callback_ctrl,
 };
 
 const BIO_METHOD *BIO_f_base64(void)
@@ -173,8 +164,7 @@ static int b64_read(BIO *b, char *out, int outl)
         if (again <= 0)
             break;
 
-        i = BIO_read(next, &(ctx->tmp[ctx->tmp_len]),
-                     B64_BLOCK_SIZE - ctx->tmp_len);
+        i = BIO_read(next, &(ctx->tmp[ctx->tmp_len]), B64_BLOCK_SIZE - ctx->tmp_len);
 
         if (i <= 0) {
             ret_code = i;
@@ -282,8 +272,7 @@ static int b64_read(BIO *b, char *out, int outl)
             continue;
         }
 
-        i = EVP_DecodeUpdate(ctx->base64, ctx->buf, &ctx->buf_len,
-                             ctx->tmp, i);
+        i = EVP_DecodeUpdate(ctx->base64, ctx->buf, &ctx->buf_len, ctx->tmp, i);
         ctx->tmp_len = 0;
         /*
          * If eof or an error was signalled, then the condition
@@ -399,8 +388,7 @@ static int b64_write(BIO *b, const char *in, int inl)
                 ret += n;
                 if (ctx->tmp_len < 3)
                     break;
-                ctx->buf_len =
-                    EVP_EncodeBlock(ctx->buf, ctx->tmp, ctx->tmp_len);
+                ctx->buf_len = EVP_EncodeBlock(ctx->buf, ctx->tmp, ctx->tmp_len);
                 if (!ossl_assert(ctx->buf_len <= (int)sizeof(ctx->buf))) {
                     ERR_raise(ERR_LIB_BIO, ERR_R_INTERNAL_ERROR);
                     return ret == 0 ? -1 : ret;
@@ -422,8 +410,7 @@ static int b64_write(BIO *b, const char *in, int inl)
                     break;
                 }
                 n -= n % 3;
-                ctx->buf_len =
-                    EVP_EncodeBlock(ctx->buf, (unsigned char *)in, n);
+                ctx->buf_len = EVP_EncodeBlock(ctx->buf, (unsigned char *)in, n);
                 if (!ossl_assert(ctx->buf_len <= (int)sizeof(ctx->buf))) {
                     ERR_raise(ERR_LIB_BIO, ERR_R_INTERNAL_ERROR);
                     return ret == 0 ? -1 : ret;
@@ -435,8 +422,7 @@ static int b64_write(BIO *b, const char *in, int inl)
                 ret += n;
             }
         } else {
-            if (!EVP_EncodeUpdate(ctx->base64, ctx->buf, &ctx->buf_len,
-                                  (unsigned char *)in, n))
+            if (!EVP_EncodeUpdate(ctx->base64, ctx->buf, &ctx->buf_len, (unsigned char *)in, n))
                 return ret == 0 ? -1 : ret;
             if (!ossl_assert(ctx->buf_len <= (int)sizeof(ctx->buf))) {
                 ERR_raise(ERR_LIB_BIO, ERR_R_INTERNAL_ERROR);
@@ -507,8 +493,7 @@ static long b64_ctrl(BIO *b, int cmd, long num, void *ptr)
             return -1;
         }
         ret = ctx->buf_len - ctx->buf_off;
-        if (ret == 0 && ctx->encode != B64_NONE
-            && EVP_ENCODE_CTX_num(ctx->base64) != 0)
+        if (ret == 0 && ctx->encode != B64_NONE && EVP_ENCODE_CTX_num(ctx->base64) != 0)
             ret = 1;
         else if (ret <= 0)
             ret = BIO_ctrl(next, cmd, num, ptr);
@@ -524,7 +509,7 @@ static long b64_ctrl(BIO *b, int cmd, long num, void *ptr)
         break;
     case BIO_CTRL_FLUSH:
         /* do a final write */
- again:
+again:
         while (ctx->buf_len != ctx->buf_off) {
             i = b64_write(b, NULL, 0);
             if (i < 0)
@@ -532,14 +517,12 @@ static long b64_ctrl(BIO *b, int cmd, long num, void *ptr)
         }
         if (BIO_get_flags(b) & BIO_FLAGS_BASE64_NO_NL) {
             if (ctx->tmp_len != 0) {
-                ctx->buf_len = EVP_EncodeBlock(ctx->buf,
-                                               ctx->tmp, ctx->tmp_len);
+                ctx->buf_len = EVP_EncodeBlock(ctx->buf, ctx->tmp, ctx->tmp_len);
                 ctx->buf_off = 0;
                 ctx->tmp_len = 0;
                 goto again;
             }
-        } else if (ctx->encode != B64_NONE
-                   && EVP_ENCODE_CTX_num(ctx->base64) != 0) {
+        } else if (ctx->encode != B64_NONE && EVP_ENCODE_CTX_num(ctx->base64) != 0) {
             ctx->buf_off = 0;
             EVP_EncodeFinal(ctx->base64, ctx->buf, &(ctx->buf_len));
             /* push out the bytes */

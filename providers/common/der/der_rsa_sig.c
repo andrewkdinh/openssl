@@ -30,8 +30,7 @@
         var##_sz = sizeof(ossl_der_oid_##name##WithRSAEncryption);      \
         break;
 
-int ossl_DER_w_algorithmIdentifier_MDWithRSAEncryption(WPACKET *pkt, int tag,
-                                                       int mdnid)
+int ossl_DER_w_algorithmIdentifier_MDWithRSAEncryption(WPACKET *pkt, int tag, int mdnid)
 {
     const unsigned char *precompiled = NULL;
     size_t precompiled_sz = 0;
@@ -68,6 +67,5 @@ int ossl_DER_w_algorithmIdentifier_MDWithRSAEncryption(WPACKET *pkt, int tag,
         /* PARAMETERS, always NULL according to current standards */
         && ossl_DER_w_null(pkt, -1)
         /* OID */
-        && ossl_DER_w_precompiled(pkt, -1, precompiled, precompiled_sz)
-        && ossl_DER_w_end_sequence(pkt, tag);
+        && ossl_DER_w_precompiled(pkt, -1, precompiled, precompiled_sz) && ossl_DER_w_end_sequence(pkt, tag);
 }

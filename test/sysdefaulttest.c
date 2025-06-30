@@ -37,15 +37,14 @@ static int test_func(void)
         }
     }
     ret = 1;
- err:
+err:
     SSL_CTX_free(ctx);
     return ret;
 }
 
 int global_init(void)
 {
-    if (!OPENSSL_init_ssl(OPENSSL_INIT_ENGINE_ALL_BUILTIN
-                          | OPENSSL_INIT_LOAD_CONFIG, NULL))
+    if (!OPENSSL_init_ssl(OPENSSL_INIT_ENGINE_ALL_BUILTIN | OPENSSL_INIT_LOAD_CONFIG, NULL))
         return 0;
     return 1;
 }
@@ -60,10 +59,7 @@ typedef enum OPTION_choice {
 const OPTIONS *test_get_options(void)
 {
     static const OPTIONS test_options[] = {
-        OPT_TEST_OPTIONS_DEFAULT_USAGE,
-        { "f", OPT_FAIL, '-', "A failure is expected" },
-        { NULL }
-    };
+        OPT_TEST_OPTIONS_DEFAULT_USAGE, {"f", OPT_FAIL, '-', "A failure is expected"}, {NULL}};
     return test_options;
 }
 

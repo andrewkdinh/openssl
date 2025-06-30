@@ -17,8 +17,7 @@
 #include "err_local.h"
 
 #define ERR_PRINT_BUF_SIZE 4096
-void ERR_print_errors_cb(int (*cb) (const char *str, size_t len, void *u),
-                         void *u)
+void ERR_print_errors_cb(int (*cb)(const char *str, size_t len, void *u), void *u)
 {
     CRYPTO_THREAD_ID tid = CRYPTO_THREAD_get_current_id();
     unsigned long l;
@@ -38,8 +37,7 @@ void ERR_print_errors_cb(int (*cb) (const char *str, size_t len, void *u),
         offset = strlen(buf);
         ossl_err_string_int(l, func, buf + offset, sizeof(buf) - offset);
         offset += strlen(buf + offset);
-        BIO_snprintf(buf + offset, sizeof(buf) - offset, ":%s:%d:%s\n",
-                     file, line, data);
+        BIO_snprintf(buf + offset, sizeof(buf) - offset, ":%s:%d:%s\n", file, line, data);
         OPENSSL_free(hex);
         if (cb(buf, strlen(buf), u) <= 0)
             break;              /* abort outputting the error report */
@@ -47,8 +45,7 @@ void ERR_print_errors_cb(int (*cb) (const char *str, size_t len, void *u),
 }
 
 /* auxiliary function for incrementally reporting texts via the error queue */
-static void put_error(int lib, const char *func, int reason,
-                      const char *file, int line)
+static void put_error(int lib, const char *func, int reason, const char *file, int line)
 {
     ERR_new();
     ERR_set_debug(file, line, func);
@@ -86,8 +83,7 @@ void ERR_add_error_txt(const char *separator, const char *txt)
         data_len = strlen(data);
 
         /* workaround for limit of ERR_print_errors_cb() */
-        if (data_len >= MAX_DATA_LEN
-                || strlen(separator) >= (size_t)(MAX_DATA_LEN - data_len))
+        if (data_len >= MAX_DATA_LEN || strlen(separator) >= (size_t)(MAX_DATA_LEN - data_len))
             available_len = 0;
         else
             available_len = MAX_DATA_LEN - data_len - strlen(separator) - 1;

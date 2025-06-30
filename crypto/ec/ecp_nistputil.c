@@ -49,32 +49,13 @@
  * of size 'felem_size'. tmp_felems needs to point to a temporary array of
  * 'num'+1 field elements for storage of intermediate values.
  */
-void
-ossl_ec_GFp_nistp_points_make_affine_internal(size_t num, void *point_array,
-                                              size_t felem_size,
-                                              void *tmp_felems,
-                                              void (*felem_one) (void *out),
-                                              int (*felem_is_zero) (const void
-                                                                    *in),
-                                              void (*felem_assign) (void *out,
-                                                                    const void
-                                                                    *in),
-                                              void (*felem_square) (void *out,
-                                                                    const void
-                                                                    *in),
-                                              void (*felem_mul) (void *out,
-                                                                 const void
-                                                                 *in1,
-                                                                 const void
-                                                                 *in2),
-                                              void (*felem_inv) (void *out,
-                                                                 const void
-                                                                 *in),
-                                              void (*felem_contract) (void
-                                                                      *out,
-                                                                      const
-                                                                      void
-                                                                      *in))
+void ossl_ec_GFp_nistp_points_make_affine_internal(size_t num, void *point_array, size_t felem_size, void *tmp_felems,
+                                                   void (*felem_one)(void *out), int (*felem_is_zero)(const void *in),
+                                                   void (*felem_assign)(void *out, const void *in),
+                                                   void (*felem_square)(void *out, const void *in),
+                                                   void (*felem_mul)(void *out, const void *in1, const void *in2),
+                                                   void (*felem_inv)(void *out, const void *in),
+                                                   void (*felem_contract)(void *out, const void *in))
 {
     int i = 0;
 
@@ -210,8 +191,7 @@ ossl_ec_GFp_nistp_points_make_affine_internal(size_t num, void *point_array,
  * b_-1, has to be b_4 b_3 b_2 b_1 b_0 0.
  *
  */
-void ossl_ec_GFp_nistp_recode_scalar_bits(unsigned char *sign,
-                                          unsigned char *digit, unsigned char in)
+void ossl_ec_GFp_nistp_recode_scalar_bits(unsigned char *sign, unsigned char *digit, unsigned char in)
 {
     unsigned char s, d;
 

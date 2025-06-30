@@ -38,7 +38,7 @@ struct async_ctx_st {
 
 struct async_job_st {
     async_fibre fibrectx;
-    int (*func) (void *);
+    int (*func)(void *);
     void *funcargs;
     int ret;
     int status;
@@ -78,4 +78,3 @@ void async_start_func(void);
 async_ctx *async_get_ctx(void);
 
 void async_wait_ctx_reset_counts(ASYNC_WAIT_CTX *ctx);
-

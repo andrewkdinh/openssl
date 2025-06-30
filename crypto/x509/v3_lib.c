@@ -18,14 +18,12 @@
 
 static STACK_OF(X509V3_EXT_METHOD) *ext_list = NULL;
 
-static int ext_cmp(const X509V3_EXT_METHOD *const *a,
-                   const X509V3_EXT_METHOD *const *b);
+static int ext_cmp(const X509V3_EXT_METHOD *const *a, const X509V3_EXT_METHOD *const *b);
 static void ext_list_free(X509V3_EXT_METHOD *ext);
 
 int X509V3_EXT_add(X509V3_EXT_METHOD *ext)
 {
-    if (ext_list == NULL
-        && (ext_list = sk_X509V3_EXT_METHOD_new(ext_cmp)) == NULL) {
+    if (ext_list == NULL && (ext_list = sk_X509V3_EXT_METHOD_new(ext_cmp)) == NULL) {
         ERR_raise(ERR_LIB_X509V3, ERR_R_CRYPTO_LIB);
         return 0;
     }
@@ -36,23 +34,20 @@ int X509V3_EXT_add(X509V3_EXT_METHOD *ext)
     return 1;
 }
 
-static int ext_cmp(const X509V3_EXT_METHOD *const *a,
-                   const X509V3_EXT_METHOD *const *b)
+static int ext_cmp(const X509V3_EXT_METHOD *const *a, const X509V3_EXT_METHOD *const *b)
 {
     return ((*a)->ext_nid - (*b)->ext_nid);
 }
 
-DECLARE_OBJ_BSEARCH_CMP_FN(const X509V3_EXT_METHOD *,
-                           const X509V3_EXT_METHOD *, ext);
-IMPLEMENT_OBJ_BSEARCH_CMP_FN(const X509V3_EXT_METHOD *,
-                             const X509V3_EXT_METHOD *, ext);
+DECLARE_OBJ_BSEARCH_CMP_FN(const X509V3_EXT_METHOD *, const X509V3_EXT_METHOD *, ext);
+IMPLEMENT_OBJ_BSEARCH_CMP_FN(const X509V3_EXT_METHOD *, const X509V3_EXT_METHOD *, ext);
 
 #include "standard_exts.h"
 
 const X509V3_EXT_METHOD *X509V3_EXT_get_nid(int nid)
 {
     X509V3_EXT_METHOD tmp;
-    const X509V3_EXT_METHOD *t = &tmp, *const *ret;
+    const X509V3_EXT_METHOD *t = &tmp, *const * ret;
     int idx;
 
     if (nid < 0)
@@ -164,8 +159,7 @@ void *X509V3_EXT_d2i(X509_EXTENSION *ext)
  * -2 extension occurs more than once.
  */
 
-void *X509V3_get_d2i(const STACK_OF(X509_EXTENSION) *x, int nid, int *crit,
-                     int *idx)
+void *X509V3_get_d2i(const STACK_OF(X509_EXTENSION) *x, int nid, int *crit, int *idx)
 {
     int lastpos, i;
     X509_EXTENSION *ex, *found_ex = NULL;
@@ -220,8 +214,7 @@ void *X509V3_get_d2i(const STACK_OF(X509_EXTENSION) *x, int nid, int *crit,
  * 'value' arguments (if relevant) are the extensions internal structure.
  */
 
-int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value,
-                    int crit, unsigned long flags)
+int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value, int crit, unsigned long flags)
 {
     int errcode, extidx = -1;
     X509_EXTENSION *ext = NULL, *extmp;
@@ -257,8 +250,7 @@ int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value,
         /*
          * If replace existing or delete, error since extension must exist
          */
-        if ((ext_op == X509V3_ADD_REPLACE_EXISTING) ||
-            (ext_op == X509V3_ADD_DELETE)) {
+        if ((ext_op == X509V3_ADD_REPLACE_EXISTING) || (ext_op == X509V3_ADD_DELETE)) {
             errcode = X509V3_R_EXTENSION_NOT_FOUND;
             goto err;
         }
@@ -286,8 +278,7 @@ int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value,
     }
 
     ret = *x;
-    if (*x == NULL
-        && (ret = sk_X509_EXTENSION_new_null()) == NULL)
+    if (*x == NULL && (ret = sk_X509_EXTENSION_new_null()) == NULL)
         goto m_fail;
     if (!sk_X509_EXTENSION_push(ret, ext))
         goto m_fail;
@@ -295,14 +286,14 @@ int X509V3_add1_i2d(STACK_OF(X509_EXTENSION) **x, int nid, void *value,
     *x = ret;
     return 1;
 
- m_fail:
+m_fail:
     /* ERR_raise(ERR_LIB_X509V3, ERR_R_CRYPTO_LIB); */
     if (ret != *x)
         sk_X509_EXTENSION_free(ret);
     X509_EXTENSION_free(ext);
     return -1;
 
- err:
+err:
     if (!(flags & X509V3_ADD_SILENT))
         ERR_raise(ERR_LIB_X509V3, errcode);
     return 0;

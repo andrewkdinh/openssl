@@ -8,17 +8,17 @@
  */
 
 #ifndef OPENSSL_TS_H
-# define OPENSSL_TS_H
-# pragma once
+#define OPENSSL_TS_H
+#pragma once
 
-# include <openssl/macros.h>
-# ifndef OPENSSL_NO_DEPRECATED_3_0
-#  define HEADER_TS_H
-# endif
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+# define HEADER_TS_H
+#endif
 
-# include <openssl/opensslconf.h>
+#include <openssl/opensslconf.h>
 
-# ifndef OPENSSL_NO_TS
+#ifndef OPENSSL_NO_TS
 # include <openssl/symhacks.h>
 # include <openssl/buffer.h>
 # include <openssl/evp.h>
@@ -35,7 +35,7 @@
 # ifndef OPENSSL_NO_STDIO
 #  include <stdio.h>
 # endif
-# ifdef  __cplusplus
+# ifdef __cplusplus
 extern "C" {
 # endif
 
@@ -62,75 +62,65 @@ typedef struct TS_tst_info_st TS_TST_INFO;
 # define TS_INFO_ADD_INFO_NOT_AVAILABLE  17
 # define TS_INFO_SYSTEM_FAILURE          25
 
-
 typedef struct TS_status_info_st TS_STATUS_INFO;
 
 typedef struct TS_resp_st TS_RESP;
 
 DECLARE_ASN1_ALLOC_FUNCTIONS(TS_REQ)
-DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_REQ, TS_REQ)
-DECLARE_ASN1_DUP_FUNCTION(TS_REQ)
+DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_REQ, TS_REQ) DECLARE_ASN1_DUP_FUNCTION(TS_REQ)
 
-#ifndef OPENSSL_NO_STDIO
-TS_REQ *d2i_TS_REQ_fp(FILE *fp, TS_REQ **a);
+# ifndef OPENSSL_NO_STDIO
+    TS_REQ *d2i_TS_REQ_fp(FILE *fp, TS_REQ **a);
 int i2d_TS_REQ_fp(FILE *fp, const TS_REQ *a);
-#endif
+# endif
 TS_REQ *d2i_TS_REQ_bio(BIO *fp, TS_REQ **a);
 int i2d_TS_REQ_bio(BIO *fp, const TS_REQ *a);
 
 DECLARE_ASN1_ALLOC_FUNCTIONS(TS_MSG_IMPRINT)
-DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_MSG_IMPRINT, TS_MSG_IMPRINT)
-DECLARE_ASN1_DUP_FUNCTION(TS_MSG_IMPRINT)
+DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_MSG_IMPRINT, TS_MSG_IMPRINT) DECLARE_ASN1_DUP_FUNCTION(TS_MSG_IMPRINT)
 
-#ifndef OPENSSL_NO_STDIO
-TS_MSG_IMPRINT *d2i_TS_MSG_IMPRINT_fp(FILE *fp, TS_MSG_IMPRINT **a);
+# ifndef OPENSSL_NO_STDIO
+    TS_MSG_IMPRINT *d2i_TS_MSG_IMPRINT_fp(FILE *fp, TS_MSG_IMPRINT **a);
 int i2d_TS_MSG_IMPRINT_fp(FILE *fp, const TS_MSG_IMPRINT *a);
-#endif
+# endif
 TS_MSG_IMPRINT *d2i_TS_MSG_IMPRINT_bio(BIO *bio, TS_MSG_IMPRINT **a);
 int i2d_TS_MSG_IMPRINT_bio(BIO *bio, const TS_MSG_IMPRINT *a);
 
 DECLARE_ASN1_ALLOC_FUNCTIONS(TS_RESP)
-DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_RESP, TS_RESP)
-DECLARE_ASN1_DUP_FUNCTION(TS_RESP)
+DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_RESP, TS_RESP) DECLARE_ASN1_DUP_FUNCTION(TS_RESP)
 
-#ifndef OPENSSL_NO_STDIO
-TS_RESP *d2i_TS_RESP_fp(FILE *fp, TS_RESP **a);
+# ifndef OPENSSL_NO_STDIO
+    TS_RESP *d2i_TS_RESP_fp(FILE *fp, TS_RESP **a);
 int i2d_TS_RESP_fp(FILE *fp, const TS_RESP *a);
-#endif
+# endif
 TS_RESP *d2i_TS_RESP_bio(BIO *bio, TS_RESP **a);
 int i2d_TS_RESP_bio(BIO *bio, const TS_RESP *a);
 
 DECLARE_ASN1_ALLOC_FUNCTIONS(TS_STATUS_INFO)
-DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_STATUS_INFO, TS_STATUS_INFO)
-DECLARE_ASN1_DUP_FUNCTION(TS_STATUS_INFO)
+DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_STATUS_INFO, TS_STATUS_INFO) DECLARE_ASN1_DUP_FUNCTION(TS_STATUS_INFO)
 
-DECLARE_ASN1_ALLOC_FUNCTIONS(TS_TST_INFO)
-DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_TST_INFO, TS_TST_INFO)
-DECLARE_ASN1_DUP_FUNCTION(TS_TST_INFO)
-TS_TST_INFO *PKCS7_to_TS_TST_INFO(PKCS7 *token);
+    DECLARE_ASN1_ALLOC_FUNCTIONS(TS_TST_INFO) DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_TST_INFO, TS_TST_INFO)
+        DECLARE_ASN1_DUP_FUNCTION(TS_TST_INFO) TS_TST_INFO *PKCS7_to_TS_TST_INFO(PKCS7 *token);
 
-#ifndef OPENSSL_NO_STDIO
+# ifndef OPENSSL_NO_STDIO
 TS_TST_INFO *d2i_TS_TST_INFO_fp(FILE *fp, TS_TST_INFO **a);
 int i2d_TS_TST_INFO_fp(FILE *fp, const TS_TST_INFO *a);
-#endif
+# endif
 TS_TST_INFO *d2i_TS_TST_INFO_bio(BIO *bio, TS_TST_INFO **a);
 int i2d_TS_TST_INFO_bio(BIO *bio, const TS_TST_INFO *a);
 
 DECLARE_ASN1_ALLOC_FUNCTIONS(TS_ACCURACY)
-DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_ACCURACY, TS_ACCURACY)
-DECLARE_ASN1_DUP_FUNCTION(TS_ACCURACY)
+DECLARE_ASN1_ENCODE_FUNCTIONS_only(TS_ACCURACY, TS_ACCURACY) DECLARE_ASN1_DUP_FUNCTION(TS_ACCURACY)
 
-int TS_REQ_set_version(TS_REQ *a, long version);
+    int TS_REQ_set_version(TS_REQ *a, long version);
 long TS_REQ_get_version(const TS_REQ *a);
 
 int TS_STATUS_INFO_set_status(TS_STATUS_INFO *a, int i);
 const ASN1_INTEGER *TS_STATUS_INFO_get0_status(const TS_STATUS_INFO *a);
 
-const STACK_OF(ASN1_UTF8STRING) *
-TS_STATUS_INFO_get0_text(const TS_STATUS_INFO *a);
+const STACK_OF(ASN1_UTF8STRING) *TS_STATUS_INFO_get0_text(const TS_STATUS_INFO *a);
 
-const ASN1_BIT_STRING *
-TS_STATUS_INFO_get0_failure_info(const TS_STATUS_INFO *a);
+const ASN1_BIT_STRING *TS_STATUS_INFO_get0_failure_info(const TS_STATUS_INFO *a);
 
 int TS_REQ_set_msg_imprint(TS_REQ *a, TS_MSG_IMPRINT *msg_imprint);
 TS_MSG_IMPRINT *TS_REQ_get_msg_imprint(TS_REQ *a);
@@ -215,8 +205,7 @@ STACK_OF(X509_EXTENSION) *TS_TST_INFO_get_exts(TS_TST_INFO *a);
 void TS_TST_INFO_ext_free(TS_TST_INFO *a);
 int TS_TST_INFO_get_ext_count(TS_TST_INFO *a);
 int TS_TST_INFO_get_ext_by_NID(TS_TST_INFO *a, int nid, int lastpos);
-int TS_TST_INFO_get_ext_by_OBJ(TS_TST_INFO *a, const ASN1_OBJECT *obj,
-                               int lastpos);
+int TS_TST_INFO_get_ext_by_OBJ(TS_TST_INFO *a, const ASN1_OBJECT *obj, int lastpos);
 int TS_TST_INFO_get_ext_by_critical(TS_TST_INFO *a, int crit, int lastpos);
 X509_EXTENSION *TS_TST_INFO_get_ext(TS_TST_INFO *a, int loc);
 X509_EXTENSION *TS_TST_INFO_delete_ext(TS_TST_INFO *a, int loc);
@@ -246,23 +235,21 @@ void *TS_TST_INFO_get_ext_d2i(TS_TST_INFO *a, int nid, int *crit, int *idx);
 struct TS_resp_ctx;
 
 /* This must return a unique number less than 160 bits long. */
-typedef ASN1_INTEGER *(*TS_serial_cb) (struct TS_resp_ctx *, void *);
+typedef ASN1_INTEGER *(*TS_serial_cb)(struct TS_resp_ctx *, void *);
 
 /*
  * This must return the seconds and microseconds since Jan 1, 1970 in the sec
  * and usec variables allocated by the caller. Return non-zero for success
  * and zero for failure.
  */
-typedef int (*TS_time_cb) (struct TS_resp_ctx *, void *, long *sec,
-                           long *usec);
+typedef int (*TS_time_cb)(struct TS_resp_ctx *, void *, long *sec, long *usec);
 
 /*
  * This must process the given extension. It can modify the TS_TST_INFO
  * object of the context. Return values: !0 (processed), 0 (error, it must
  * set the status info/failure info of the response).
  */
-typedef int (*TS_extension_cb) (struct TS_resp_ctx *, X509_EXTENSION *,
-                                void *);
+typedef int (*TS_extension_cb)(struct TS_resp_ctx *, X509_EXTENSION *, void *);
 
 typedef struct TS_resp_ctx TS_RESP_CTX;
 
@@ -277,8 +264,7 @@ int TS_RESP_CTX_set_signer_cert(TS_RESP_CTX *ctx, X509 *signer);
 /* This parameter must be set. */
 int TS_RESP_CTX_set_signer_key(TS_RESP_CTX *ctx, EVP_PKEY *key);
 
-int TS_RESP_CTX_set_signer_digest(TS_RESP_CTX *ctx,
-                                  const EVP_MD *signer_digest);
+int TS_RESP_CTX_set_signer_digest(TS_RESP_CTX *ctx, const EVP_MD *signer_digest);
 int TS_RESP_CTX_set_ess_cert_id_digest(TS_RESP_CTX *ctx, const EVP_MD *md);
 
 /* This parameter must be set. */
@@ -300,15 +286,13 @@ int TS_RESP_CTX_add_policy(TS_RESP_CTX *ctx, const ASN1_OBJECT *policy);
 int TS_RESP_CTX_add_md(TS_RESP_CTX *ctx, const EVP_MD *md);
 
 /* Accuracy is not included by default. */
-int TS_RESP_CTX_set_accuracy(TS_RESP_CTX *ctx,
-                             int secs, int millis, int micros);
+int TS_RESP_CTX_set_accuracy(TS_RESP_CTX *ctx, int secs, int millis, int micros);
 
 /*
  * Clock precision digits, i.e. the number of decimal digits: '0' means sec,
  * '3' msec, '6' usec, and so on. Default is 0.
  */
-int TS_RESP_CTX_set_clock_precision_digits(TS_RESP_CTX *ctx,
-                                           unsigned clock_precision_digits);
+int TS_RESP_CTX_set_clock_precision_digits(TS_RESP_CTX *ctx, unsigned clock_precision_digits);
 /* At most we accept usec precision. */
 # define TS_MAX_CLOCK_PRECISION_DIGITS   6
 
@@ -329,16 +313,13 @@ void TS_RESP_CTX_set_time_cb(TS_RESP_CTX *ctx, TS_time_cb cb, void *data);
  * when the TS_TST_INFO object is already set up and not signed yet.
  */
 /* FIXME: extension handling is not tested yet. */
-void TS_RESP_CTX_set_extension_cb(TS_RESP_CTX *ctx,
-                                  TS_extension_cb cb, void *data);
+void TS_RESP_CTX_set_extension_cb(TS_RESP_CTX *ctx, TS_extension_cb cb, void *data);
 
 /* The following methods can be used in the callbacks. */
-int TS_RESP_CTX_set_status_info(TS_RESP_CTX *ctx,
-                                int status, const char *text);
+int TS_RESP_CTX_set_status_info(TS_RESP_CTX *ctx, int status, const char *text);
 
 /* Sets the status info only if it is still TS_STATUS_GRANTED. */
-int TS_RESP_CTX_set_status_info_cond(TS_RESP_CTX *ctx,
-                                     int status, const char *text);
+int TS_RESP_CTX_set_status_info_cond(TS_RESP_CTX *ctx, int status, const char *text);
 
 int TS_RESP_CTX_add_failure_info(TS_RESP_CTX *ctx, int failure);
 
@@ -359,8 +340,7 @@ TS_RESP *TS_RESP_create_response(TS_RESP_CTX *ctx, BIO *req_bio);
  * they are defined in ts/ts_resp_verify.c.
  */
 
-int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) *certs,
-                             X509_STORE *store, X509 **signer_out);
+int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) *certs, X509_STORE *store, X509 **signer_out);
 
 /* Context structure for the generic verify method. */
 
@@ -425,11 +405,9 @@ BIO *TS_VERIFY_CTX_set_data(TS_VERIFY_CTX *ctx, BIO *b);
 int TS_VERIFY_CTX_set0_data(TS_VERIFY_CTX *ctx, BIO *b);
 # ifndef OPENSSL_NO_DEPRECATED_3_4
 OSSL_DEPRECATEDIN_3_4_FOR("Unclear semantics, replace with TS_VERIFY_CTX_set0_imprint().")
-unsigned char *TS_VERIFY_CTX_set_imprint(TS_VERIFY_CTX *ctx,
-                                         unsigned char *hexstr, long len);
+unsigned char *TS_VERIFY_CTX_set_imprint(TS_VERIFY_CTX *ctx, unsigned char *hexstr, long len);
 # endif
-int TS_VERIFY_CTX_set0_imprint(TS_VERIFY_CTX *ctx,
-                               unsigned char *hexstr, long len);
+int TS_VERIFY_CTX_set0_imprint(TS_VERIFY_CTX *ctx, unsigned char *hexstr, long len);
 # ifndef OPENSSL_NO_DEPRECATED_3_4
 OSSL_DEPRECATEDIN_3_4_FOR("Unclear semantics, replace with TS_VERIFY_CTX_set0_store().")
 X509_STORE *TS_VERIFY_CTX_set_store(TS_VERIFY_CTX *ctx, X509_STORE *s);
@@ -485,38 +463,27 @@ X509 *TS_CONF_load_cert(const char *file);
 STACK_OF(X509) *TS_CONF_load_certs(const char *file);
 EVP_PKEY *TS_CONF_load_key(const char *file, const char *pass);
 const char *TS_CONF_get_tsa_section(CONF *conf, const char *section);
-int TS_CONF_set_serial(CONF *conf, const char *section, TS_serial_cb cb,
-                       TS_RESP_CTX *ctx);
-#ifndef OPENSSL_NO_ENGINE
-int TS_CONF_set_crypto_device(CONF *conf, const char *section,
-                              const char *device);
+int TS_CONF_set_serial(CONF *conf, const char *section, TS_serial_cb cb, TS_RESP_CTX *ctx);
+# ifndef OPENSSL_NO_ENGINE
+int TS_CONF_set_crypto_device(CONF *conf, const char *section, const char *device);
 int TS_CONF_set_default_engine(const char *name);
-#endif
-int TS_CONF_set_signer_cert(CONF *conf, const char *section,
-                            const char *cert, TS_RESP_CTX *ctx);
-int TS_CONF_set_certs(CONF *conf, const char *section, const char *certs,
-                      TS_RESP_CTX *ctx);
-int TS_CONF_set_signer_key(CONF *conf, const char *section,
-                           const char *key, const char *pass,
-                           TS_RESP_CTX *ctx);
-int TS_CONF_set_signer_digest(CONF *conf, const char *section,
-                               const char *md, TS_RESP_CTX *ctx);
-int TS_CONF_set_def_policy(CONF *conf, const char *section,
-                           const char *policy, TS_RESP_CTX *ctx);
+# endif
+int TS_CONF_set_signer_cert(CONF *conf, const char *section, const char *cert, TS_RESP_CTX *ctx);
+int TS_CONF_set_certs(CONF *conf, const char *section, const char *certs, TS_RESP_CTX *ctx);
+int TS_CONF_set_signer_key(CONF *conf, const char *section, const char *key, const char *pass, TS_RESP_CTX *ctx);
+int TS_CONF_set_signer_digest(CONF *conf, const char *section, const char *md, TS_RESP_CTX *ctx);
+int TS_CONF_set_def_policy(CONF *conf, const char *section, const char *policy, TS_RESP_CTX *ctx);
 int TS_CONF_set_policies(CONF *conf, const char *section, TS_RESP_CTX *ctx);
 int TS_CONF_set_digests(CONF *conf, const char *section, TS_RESP_CTX *ctx);
 int TS_CONF_set_accuracy(CONF *conf, const char *section, TS_RESP_CTX *ctx);
-int TS_CONF_set_clock_precision_digits(const CONF *conf, const char *section,
-                                       TS_RESP_CTX *ctx);
+int TS_CONF_set_clock_precision_digits(const CONF *conf, const char *section, TS_RESP_CTX *ctx);
 int TS_CONF_set_ordering(CONF *conf, const char *section, TS_RESP_CTX *ctx);
 int TS_CONF_set_tsa_name(CONF *conf, const char *section, TS_RESP_CTX *ctx);
-int TS_CONF_set_ess_cert_id_chain(CONF *conf, const char *section,
-                                  TS_RESP_CTX *ctx);
-int TS_CONF_set_ess_cert_id_digest(CONF *conf, const char *section,
-                                      TS_RESP_CTX *ctx);
+int TS_CONF_set_ess_cert_id_chain(CONF *conf, const char *section, TS_RESP_CTX *ctx);
+int TS_CONF_set_ess_cert_id_digest(CONF *conf, const char *section, TS_RESP_CTX *ctx);
 
-#  ifdef  __cplusplus
+# ifdef __cplusplus
 }
-#  endif
 # endif
+#endif
 #endif

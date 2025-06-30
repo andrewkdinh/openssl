@@ -17,11 +17,12 @@
 #include <openssl/evp.h>
 
 typedef enum bnrand_flag_e {
-    NORMAL, TESTING, PRIVATE
+    NORMAL,
+    TESTING,
+    PRIVATE
 } BNRAND_FLAG;
 
-static int bnrand(BNRAND_FLAG flag, BIGNUM *rnd, int bits, int top, int bottom,
-                  unsigned int strength, BN_CTX *ctx)
+static int bnrand(BNRAND_FLAG flag, BIGNUM *rnd, int bits, int top, int bottom, unsigned int strength, BN_CTX *ctx)
 {
     unsigned char *buf = NULL;
     int b, ret = 0, bit, bytes, mask;
@@ -45,8 +46,7 @@ static int bnrand(BNRAND_FLAG flag, BIGNUM *rnd, int bits, int top, int bottom,
         goto err;
 
     /* make a random number and set the top and bottom bits */
-    b = flag == NORMAL ? RAND_bytes_ex(libctx, buf, bytes, strength)
-                       : RAND_priv_bytes_ex(libctx, buf, bytes, strength);
+    b = flag == NORMAL ? RAND_bytes_ex(libctx, buf, bytes, strength) : RAND_priv_bytes_ex(libctx, buf, bytes, strength);
     if (b <= 0)
         goto err;
 
@@ -87,7 +87,7 @@ static int bnrand(BNRAND_FLAG flag, BIGNUM *rnd, int bits, int top, int bottom,
     if (!BN_bin2bn(buf, bytes, rnd))
         goto err;
     ret = 1;
- err:
+err:
     OPENSSL_clear_free(buf, bytes);
     bn_check_top(rnd);
     return ret;
@@ -97,8 +97,7 @@ toosmall:
     return 0;
 }
 
-int BN_rand_ex(BIGNUM *rnd, int bits, int top, int bottom,
-               unsigned int strength, BN_CTX *ctx)
+int BN_rand_ex(BIGNUM *rnd, int bits, int top, int bottom, unsigned int strength, BN_CTX *ctx)
 {
     return bnrand(NORMAL, rnd, bits, top, bottom, strength, ctx);
 }
@@ -114,8 +113,7 @@ int BN_bntest_rand(BIGNUM *rnd, int bits, int top, int bottom)
 }
 #endif
 
-int BN_priv_rand_ex(BIGNUM *rnd, int bits, int top, int bottom,
-                    unsigned int strength, BN_CTX *ctx)
+int BN_priv_rand_ex(BIGNUM *rnd, int bits, int top, int bottom, unsigned int strength, BN_CTX *ctx)
 {
     return bnrand(PRIVATE, rnd, bits, top, bottom, strength, ctx);
 }
@@ -128,8 +126,7 @@ int BN_priv_rand(BIGNUM *rnd, int bits, int top, int bottom)
 #endif
 
 /* random number r:  0 <= r < range */
-static int bnrand_range(BNRAND_FLAG flag, BIGNUM *r, const BIGNUM *range,
-                        unsigned int strength, BN_CTX *ctx)
+static int bnrand_range(BNRAND_FLAG flag, BIGNUM *r, const BIGNUM *range, unsigned int strength, BN_CTX *ctx)
 {
     int n;
     int count = 100;
@@ -156,8 +153,7 @@ static int bnrand_range(BNRAND_FLAG flag, BIGNUM *r, const BIGNUM *range,
          * than range
          */
         do {
-            if (!bnrand(flag, r, n + 1, BN_RAND_TOP_ANY, BN_RAND_BOTTOM_ANY,
-                        strength, ctx))
+            if (!bnrand(flag, r, n + 1, BN_RAND_TOP_ANY, BN_RAND_BOTTOM_ANY, strength, ctx))
                 return 0;
 
             /*
@@ -179,29 +175,25 @@ static int bnrand_range(BNRAND_FLAG flag, BIGNUM *r, const BIGNUM *range,
                 return 0;
             }
 
-        }
-        while (BN_cmp(r, range) >= 0);
+        } while (BN_cmp(r, range) >= 0);
     } else {
         do {
             /* range = 11..._2  or  range = 101..._2 */
-            if (!bnrand(flag, r, n, BN_RAND_TOP_ANY, BN_RAND_BOTTOM_ANY,
-                        strength, ctx))
+            if (!bnrand(flag, r, n, BN_RAND_TOP_ANY, BN_RAND_BOTTOM_ANY, strength, ctx))
                 return 0;
 
             if (!--count) {
                 ERR_raise(ERR_LIB_BN, BN_R_TOO_MANY_ITERATIONS);
                 return 0;
             }
-        }
-        while (BN_cmp(r, range) >= 0);
+        } while (BN_cmp(r, range) >= 0);
     }
 
     bn_check_top(r);
     return 1;
 }
 
-int BN_rand_range_ex(BIGNUM *r, const BIGNUM *range, unsigned int strength,
-                     BN_CTX *ctx)
+int BN_rand_range_ex(BIGNUM *r, const BIGNUM *range, unsigned int strength, BN_CTX *ctx)
 {
     return bnrand_range(NORMAL, r, range, strength, ctx);
 }
@@ -213,8 +205,7 @@ int BN_rand_range(BIGNUM *r, const BIGNUM *range)
 }
 #endif
 
-int BN_priv_rand_range_ex(BIGNUM *r, const BIGNUM *range, unsigned int strength,
-                          BN_CTX *ctx)
+int BN_priv_rand_range_ex(BIGNUM *r, const BIGNUM *range, unsigned int strength, BN_CTX *ctx)
 {
     return bnrand_range(PRIVATE, r, range, strength, ctx);
 }
@@ -238,8 +229,7 @@ int BN_pseudo_rand_range(BIGNUM *r, const BIGNUM *range)
 # endif
 #endif
 
-int ossl_bn_priv_rand_range_fixed_top(BIGNUM *r, const BIGNUM *range,
-                                      unsigned int strength, BN_CTX *ctx)
+int ossl_bn_priv_rand_range_fixed_top(BIGNUM *r, const BIGNUM *range, unsigned int strength, BN_CTX *ctx)
 {
     int n;
     int count = 100;
@@ -263,8 +253,7 @@ int ossl_bn_priv_rand_range_fixed_top(BIGNUM *r, const BIGNUM *range,
     } else {
         BN_set_flags(r, BN_FLG_CONSTTIME);
         do {
-            if (!bnrand(PRIVATE, r, n + 1, BN_RAND_TOP_ONE, BN_RAND_BOTTOM_ANY,
-                        strength, ctx))
+            if (!bnrand(PRIVATE, r, n + 1, BN_RAND_TOP_ONE, BN_RAND_BOTTOM_ANY, strength, ctx))
                 return 0;
 
             if (!--count) {
@@ -272,8 +261,7 @@ int ossl_bn_priv_rand_range_fixed_top(BIGNUM *r, const BIGNUM *range,
                 return 0;
             }
             ossl_bn_mask_bits_fixed_top(r, n);
-        }
-        while (BN_ucmp(r, range) >= 0);
+        } while (BN_ucmp(r, range) >= 0);
 #ifdef BN_DEBUG
         /* With BN_DEBUG on a fixed top number cannot be returned */
         bn_correct_top(r);
@@ -291,9 +279,7 @@ int ossl_bn_priv_rand_range_fixed_top(BIGNUM *r, const BIGNUM *range,
  * weakness leads directly to private key exposure unless this function is
  * used.
  */
-int ossl_bn_gen_dsa_nonce_fixed_top(BIGNUM *out, const BIGNUM *range,
-                                    const BIGNUM *priv,
-                                    const unsigned char *message,
+int ossl_bn_gen_dsa_nonce_fixed_top(BIGNUM *out, const BIGNUM *range, const BIGNUM *priv, const unsigned char *message,
                                     size_t message_len, BN_CTX *ctx)
 {
     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
@@ -343,18 +329,14 @@ int ossl_bn_gen_dsa_nonce_fixed_top(BIGNUM *out, const BIGNUM *range,
         unsigned char i = 0;
 
         for (done = 1; done < num_k_bytes;) {
-            if (RAND_priv_bytes_ex(libctx, random_bytes, sizeof(random_bytes),
-                                   0) <= 0)
+            if (RAND_priv_bytes_ex(libctx, random_bytes, sizeof(random_bytes), 0) <= 0)
                 goto end;
 
-            if (!EVP_DigestInit_ex(mdctx, md, NULL)
-                    || !EVP_DigestUpdate(mdctx, &i, sizeof(i))
-                    || !EVP_DigestUpdate(mdctx, private_bytes,
-                                         sizeof(private_bytes))
-                    || !EVP_DigestUpdate(mdctx, message, message_len)
-                    || !EVP_DigestUpdate(mdctx, random_bytes,
-                                         sizeof(random_bytes))
-                    || !EVP_DigestFinal_ex(mdctx, digest, NULL))
+            if (!EVP_DigestInit_ex(mdctx, md, NULL) || !EVP_DigestUpdate(mdctx, &i, sizeof(i))
+                || !EVP_DigestUpdate(mdctx, private_bytes, sizeof(private_bytes))
+                || !EVP_DigestUpdate(mdctx, message, message_len)
+                || !EVP_DigestUpdate(mdctx, random_bytes, sizeof(random_bytes))
+                || !EVP_DigestFinal_ex(mdctx, digest, NULL))
                 goto end;
 
             todo = num_k_bytes - done;
@@ -384,7 +366,7 @@ int ossl_bn_gen_dsa_nonce_fixed_top(BIGNUM *out, const BIGNUM *range,
     /* Failed to generate anything */
     ERR_raise(ERR_LIB_BN, ERR_R_INTERNAL_ERROR);
 
- end:
+end:
     EVP_MD_CTX_free(mdctx);
     EVP_MD_free(md);
     OPENSSL_clear_free(k_bytes, num_k_bytes);
@@ -394,14 +376,12 @@ int ossl_bn_gen_dsa_nonce_fixed_top(BIGNUM *out, const BIGNUM *range,
     return ret;
 }
 
-int BN_generate_dsa_nonce(BIGNUM *out, const BIGNUM *range,
-                          const BIGNUM *priv, const unsigned char *message,
+int BN_generate_dsa_nonce(BIGNUM *out, const BIGNUM *range, const BIGNUM *priv, const unsigned char *message,
                           size_t message_len, BN_CTX *ctx)
 {
     int ret;
 
-    ret = ossl_bn_gen_dsa_nonce_fixed_top(out, range, priv, message,
-                                          message_len, ctx);
+    ret = ossl_bn_gen_dsa_nonce_fixed_top(out, range, priv, message, message_len, ctx);
     /*
      * This call makes the BN_generate_dsa_nonce non-const-time, thus we
      * do not use it internally. But fixed_top BNs currently cannot be returned

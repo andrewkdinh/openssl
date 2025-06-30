@@ -31,9 +31,7 @@ int ENGINE_register_pkey_meths(ENGINE *e)
         const int *nids;
         int num_nids = e->pkey_meths(e, NULL, &nids, 0);
         if (num_nids > 0)
-            return engine_table_register(&pkey_meth_table,
-                                         engine_unregister_all_pkey_meths, e,
-                                         nids, num_nids, 0);
+            return engine_table_register(&pkey_meth_table, engine_unregister_all_pkey_meths, e, nids, num_nids, 0);
     }
     return 1;
 }
@@ -52,9 +50,7 @@ int ENGINE_set_default_pkey_meths(ENGINE *e)
         const int *nids;
         int num_nids = e->pkey_meths(e, NULL, &nids, 0);
         if (num_nids > 0)
-            return engine_table_register(&pkey_meth_table,
-                                         engine_unregister_all_pkey_meths, e,
-                                         nids, num_nids, 1);
+            return engine_table_register(&pkey_meth_table, engine_unregister_all_pkey_meths, e, nids, num_nids, 1);
     }
     return 1;
 }
@@ -66,8 +62,7 @@ int ENGINE_set_default_pkey_meths(ENGINE *e)
  */
 ENGINE *ENGINE_get_pkey_meth_engine(int nid)
 {
-    return ossl_engine_table_select(&pkey_meth_table, nid,
-                                    OPENSSL_FILE, OPENSSL_LINE);
+    return ossl_engine_table_select(&pkey_meth_table, nid, OPENSSL_FILE, OPENSSL_LINE);
 }
 
 /* Obtains a pkey_meth implementation from an ENGINE functional reference */

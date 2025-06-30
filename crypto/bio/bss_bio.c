@@ -36,18 +36,8 @@ static int bio_make_pair(BIO *bio1, BIO *bio2);
 static void bio_destroy_pair(BIO *bio);
 
 static const BIO_METHOD methods_biop = {
-    BIO_TYPE_BIO,
-    "BIO pair",
-    bwrite_conv,
-    bio_write,
-    bread_conv,
-    bio_read,
-    bio_puts,
-    NULL /* no bio_gets */ ,
-    bio_ctrl,
-    bio_new,
-    bio_free,
-    NULL                        /* no bio_callback_ctrl */
+    BIO_TYPE_BIO,           "BIO pair", bwrite_conv, bio_write, bread_conv, bio_read, bio_puts,
+    NULL /* no bio_gets */, bio_ctrl,   bio_new,     bio_free,  NULL                        /* no bio_callback_ctrl */
 };
 
 const BIO_METHOD *BIO_s_bio(void)
@@ -180,8 +170,7 @@ static int bio_read(BIO *bio, char *buf, int size_)
             peer_b->offset = 0;
         }
         rest -= chunk;
-    }
-    while (rest);
+    } while (rest);
 
     return size;
 }
@@ -242,7 +231,7 @@ static ossl_ssize_t bio_nread(BIO *bio, char **buf, size_t num_)
     if (num_ > OSSL_SSIZE_MAX)
         num = OSSL_SSIZE_MAX;
     else
-        num = (ossl_ssize_t) num_;
+        num = (ossl_ssize_t)num_;
 
     available = bio_nread0(bio, buf);
     if (num > available)
@@ -329,8 +318,7 @@ static int bio_write(BIO *bio, const char *buf, int num_)
 
         rest -= chunk;
         buf += chunk;
-    }
-    while (rest);
+    } while (rest);
 
     return num;
 }
@@ -398,7 +386,7 @@ static ossl_ssize_t bio_nwrite(BIO *bio, char **buf, size_t num_)
     if (num_ > OSSL_SSIZE_MAX)
         num = OSSL_SSIZE_MAX;
     else
-        num = (ossl_ssize_t) num_;
+        num = (ossl_ssize_t)num_;
 
     space = bio_nwrite0(bio, buf);
     if (num > space)
@@ -446,16 +434,14 @@ static long bio_ctrl(BIO *bio, int cmd, long num, void *ptr)
         ret = (long)b->size;
         break;
 
-    case BIO_C_MAKE_BIO_PAIR:
-        {
-            BIO *other_bio = ptr;
+    case BIO_C_MAKE_BIO_PAIR: {
+        BIO *other_bio = ptr;
 
-            if (bio_make_pair(bio, other_bio))
-                ret = 1;
-            else
-                ret = 0;
-        }
-        break;
+        if (bio_make_pair(bio, other_bio))
+            ret = 1;
+        else
+            ret = 0;
+    } break;
 
     case BIO_C_DESTROY_BIO_PAIR:
         /*
@@ -676,8 +662,7 @@ static void bio_destroy_pair(BIO *bio)
 }
 
 /* Exported convenience functions */
-int BIO_new_bio_pair(BIO **bio1_p, size_t writebuf1,
-                     BIO **bio2_p, size_t writebuf2)
+int BIO_new_bio_pair(BIO **bio1_p, size_t writebuf1, BIO **bio2_p, size_t writebuf2)
 {
     BIO *bio1 = NULL, *bio2 = NULL;
     long r;
@@ -706,7 +691,7 @@ int BIO_new_bio_pair(BIO **bio1_p, size_t writebuf1,
         goto err;
     ret = 1;
 
- err:
+err:
     if (ret == 0) {
         BIO_free(bio1);
         bio1 = NULL;

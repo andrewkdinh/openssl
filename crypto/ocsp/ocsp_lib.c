@@ -19,8 +19,7 @@
 
 /* Convert a certificate and its issuer to an OCSP_CERTID */
 
-OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject,
-                             const X509 *issuer)
+OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
 {
     const X509_NAME *iname;
     const ASN1_INTEGER *serial;
@@ -39,9 +38,7 @@ OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject,
     return OCSP_cert_id_new(dgst, iname, ikey, serial);
 }
 
-OCSP_CERTID *OCSP_cert_id_new(const EVP_MD *dgst,
-                              const X509_NAME *issuerName,
-                              const ASN1_BIT_STRING *issuerKey,
+OCSP_CERTID *OCSP_cert_id_new(const EVP_MD *dgst, const X509_NAME *issuerName, const ASN1_BIT_STRING *issuerKey,
                               const ASN1_INTEGER *serialNumber)
 {
     int nid;
@@ -82,9 +79,9 @@ OCSP_CERTID *OCSP_cert_id_new(const EVP_MD *dgst,
             goto err;
     }
     return cid;
- digerr:
+digerr:
     ERR_raise(ERR_LIB_OCSP, OCSP_R_DIGEST_ERR);
- err:
+err:
     OCSP_CERTID_free(cid);
     return NULL;
 }

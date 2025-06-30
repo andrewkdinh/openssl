@@ -21,7 +21,9 @@ typedef enum OPTION_choice {
     OPT_COMMON,
     OPT_PROV_ENUM,
     OPT_CIPHER,
-    OPT_SKEYOPT, OPT_SKEYMGMT, OPT_GENKEY
+    OPT_SKEYOPT,
+    OPT_SKEYMGMT,
+    OPT_GENKEY
 } OPTION_CHOICE;
 
 const OPTIONS skeyutl_options[] = {
@@ -32,8 +34,7 @@ const OPTIONS skeyutl_options[] = {
     {"genkey", OPT_GENKEY, '-', "Generate an opaque symmetric key"},
     {"cipher", OPT_CIPHER, 's', "The cipher to generate key for"},
     OPT_PROV_OPTIONS,
-    {NULL}
-};
+    {NULL}};
 
 int skeyutl_main(int argc, char **argv)
 {
@@ -52,7 +53,7 @@ int skeyutl_main(int argc, char **argv)
         switch (o) {
         case OPT_EOF:
         case OPT_ERR:
- opthelp:
+opthelp:
             BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);
             goto end;
         case OPT_HELP:
@@ -66,9 +67,8 @@ int skeyutl_main(int argc, char **argv)
             ciphername = opt_arg();
             break;
         case OPT_SKEYOPT:
-            if ((skeyopts == NULL &&
-                 (skeyopts = sk_OPENSSL_STRING_new_null()) == NULL) ||
-                sk_OPENSSL_STRING_push(skeyopts, opt_arg()) == 0) {
+            if ((skeyopts == NULL && (skeyopts = sk_OPENSSL_STRING_new_null()) == NULL)
+                || sk_OPENSSL_STRING_push(skeyopts, opt_arg()) == 0) {
                 BIO_printf(bio_err, "%s: out of memory\n", prog);
                 goto end;
             }
@@ -95,17 +95,13 @@ int skeyutl_main(int argc, char **argv)
     if (genkey) {
         OSSL_PARAM *params = NULL;
 
-        mgmt = EVP_SKEYMGMT_fetch(app_get0_libctx(),
-                                  skeymgmt ? skeymgmt : EVP_CIPHER_name(cipher),
-                                  app_get0_propq());
+        mgmt = EVP_SKEYMGMT_fetch(app_get0_libctx(), skeymgmt ? skeymgmt : EVP_CIPHER_name(cipher), app_get0_propq());
         if (mgmt == NULL)
             goto end;
-        params = app_params_new_from_opts(skeyopts,
-                                          EVP_SKEYMGMT_get0_gen_settable_params(mgmt));
+        params = app_params_new_from_opts(skeyopts, EVP_SKEYMGMT_get0_gen_settable_params(mgmt));
 
-        skey = EVP_SKEY_generate(app_get0_libctx(),
-                                 skeymgmt ? skeymgmt : EVP_CIPHER_name(cipher),
-                                 app_get0_propq(), params);
+        skey = EVP_SKEY_generate(app_get0_libctx(), skeymgmt ? skeymgmt : EVP_CIPHER_name(cipher), app_get0_propq(),
+                                 params);
         OSSL_PARAM_free(params);
         if (skey == NULL) {
             BIO_printf(bio_err, "Error creating opaque key for skeymgmt %s\n",
@@ -114,8 +110,7 @@ int skeyutl_main(int argc, char **argv)
         } else {
             const char *key_name = EVP_SKEY_get0_key_id(skey);
 
-            BIO_printf(bio_out, "An opaque key identified by %s is created\n",
-                       key_name ? key_name : "<unknown>");
+            BIO_printf(bio_out, "An opaque key identified by %s is created\n", key_name ? key_name : "<unknown>");
             BIO_printf(bio_out, "Provider: %s\n", EVP_SKEY_get0_provider_name(skey));
             BIO_printf(bio_out, "Key management: %s\n", EVP_SKEY_get0_skeymgmt_name(skey));
             ret = 0;
@@ -125,7 +120,7 @@ int skeyutl_main(int argc, char **argv)
         BIO_printf(bio_err, "Key generation is the only supported operation as of now\n");
     }
 
- end:
+end:
     ERR_print_errors(bio_err);
     sk_OPENSSL_STRING_free(skeyopts);
     EVP_SKEYMGMT_free(mgmt);

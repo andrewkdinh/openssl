@@ -27,7 +27,7 @@ typedef struct prov_aes_ocb_ctx_st {
     } ksdec;                    /* AES key schedule to use for decryption */
     OCB128_CONTEXT ocb;
     unsigned int iv_state;      /* set to one of IV_STATE_XXX */
-    unsigned int key_set : 1;
+    unsigned int key_set:1;
     size_t taglen;
     size_t data_buf_len;
     size_t aad_buf_len;

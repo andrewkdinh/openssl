@@ -23,12 +23,10 @@ const PROV_CIPHER_HW_AES_HMAC_SHA_ETM *ossl_prov_cipher_hw_aes_cbc_hmac_sha1_etm
 void sha1_block_data_order(void *c, const void *p, size_t len);
 
 # if defined(__aarch64__)
-int asm_aescbc_sha1_hmac(const uint8_t *csrc, uint8_t *cdst, uint64_t clen,
-                         uint8_t *dsrc, uint8_t *ddst, uint64_t dlen,
+int asm_aescbc_sha1_hmac(const uint8_t *csrc, uint8_t *cdst, uint64_t clen, uint8_t *dsrc, uint8_t *ddst, uint64_t dlen,
                          CIPH_DIGEST *arg);
-void asm_sha1_hmac_aescbc_dec(const uint8_t *csrc, uint8_t *cdst, uint64_t clen,
-                              const unsigned char *dsrc, uint8_t *ddst, size_t dlen,
-                              CIPH_DIGEST *arg);
+void asm_sha1_hmac_aescbc_dec(const uint8_t *csrc, uint8_t *cdst, uint64_t clen, const unsigned char *dsrc,
+                              uint8_t *ddst, size_t dlen, CIPH_DIGEST *arg);
 #  define HWAES128_ENC_CBC_SHA1_ETM asm_aescbc_sha1_hmac
 #  define HWAES128_DEC_CBC_SHA1_ETM asm_sha1_hmac_aescbc_dec
 # endif
@@ -38,8 +36,7 @@ int ossl_cipher_capable_aes_cbc_hmac_sha1_etm(void)
     return HWAES_CBC_HMAC_SHA1_ETM_CAPABLE;
 }
 
-static int aes_cbc_hmac_sha1_init_key(PROV_CIPHER_CTX *vctx,
-                                      const unsigned char *key, size_t keylen)
+static int aes_cbc_hmac_sha1_init_key(PROV_CIPHER_CTX *vctx, const unsigned char *key, size_t keylen)
 {
     int ret;
     PROV_AES_HMAC_SHA_ETM_CTX *ctx = (PROV_AES_HMAC_SHA_ETM_CTX *)vctx;
@@ -68,9 +65,7 @@ static void ciph_digest_arg_init(CIPH_DIGEST *arg, PROV_CIPHER_CTX *vctx)
     arg->digest.hmac.o_key_pad = (uint8_t *)&(sctx->tail);
 }
 
-static int hwaes_cbc_hmac_sha1_etm(PROV_CIPHER_CTX *vctx,
-                                   unsigned char *out,
-                                   const unsigned char *in, size_t len)
+static int hwaes_cbc_hmac_sha1_etm(PROV_CIPHER_CTX *vctx, unsigned char *out, const unsigned char *in, size_t len)
 {
     PROV_AES_HMAC_SHA_ETM_CTX *ctx = (PROV_AES_HMAC_SHA_ETM_CTX *)vctx;
     CIPH_DIGEST arg = {0};
@@ -129,8 +124,7 @@ static void sha1_update(SHA_CTX *c, const void *data, size_t len)
         SHA1_Update(c, ptr, res);
 }
 
-static void aes_cbc_hmac_sha1_set_mac_key(void *vctx,
-                                          const unsigned char *mac, size_t len)
+static void aes_cbc_hmac_sha1_set_mac_key(void *vctx, const unsigned char *mac, size_t len)
 {
     PROV_AES_HMAC_SHA1_ETM_CTX *ctx = (PROV_AES_HMAC_SHA1_ETM_CTX *)vctx;
     unsigned int i;
@@ -159,20 +153,13 @@ static void aes_cbc_hmac_sha1_set_mac_key(void *vctx,
     OPENSSL_cleanse(hmac_key, sizeof(hmac_key));
 }
 
-static int aes_cbc_hmac_sha1_cipher(PROV_CIPHER_CTX *vctx,
-                                    unsigned char *out,
-                                    const unsigned char *in, size_t len)
+static int aes_cbc_hmac_sha1_cipher(PROV_CIPHER_CTX *vctx, unsigned char *out, const unsigned char *in, size_t len)
 {
     return hwaes_cbc_hmac_sha1_etm(vctx, out, in, len);
 }
 
 static const PROV_CIPHER_HW_AES_HMAC_SHA_ETM cipher_hw_aes_hmac_sha1_etm = {
-    {
-        aes_cbc_hmac_sha1_init_key,
-        aes_cbc_hmac_sha1_cipher
-    },
-    aes_cbc_hmac_sha1_set_mac_key
-};
+    {aes_cbc_hmac_sha1_init_key, aes_cbc_hmac_sha1_cipher}, aes_cbc_hmac_sha1_set_mac_key};
 
 const PROV_CIPHER_HW_AES_HMAC_SHA_ETM *ossl_prov_cipher_hw_aes_cbc_hmac_sha1_etm(void)
 {

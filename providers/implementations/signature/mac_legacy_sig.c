@@ -75,7 +75,7 @@ static void *mac_newctx(void *provctx, const char *propq, const char *macname)
 
     return pmacctx;
 
- err:
+err:
     OPENSSL_free(pmacctx->propq);
     OPENSSL_free(pmacctx);
     EVP_MAC_free(mac);
@@ -93,14 +93,12 @@ MAC_NEWCTX(siphash, "SIPHASH")
 MAC_NEWCTX(poly1305, "POLY1305")
 MAC_NEWCTX(cmac, "CMAC")
 
-static int mac_digest_sign_init(void *vpmacctx, const char *mdname, void *vkey,
-                                const OSSL_PARAM params[])
+static int mac_digest_sign_init(void *vpmacctx, const char *mdname, void *vkey, const OSSL_PARAM params[])
 {
     PROV_MAC_CTX *pmacctx = (PROV_MAC_CTX *)vpmacctx;
     const char *ciphername = NULL, *engine = NULL;
 
-    if (!ossl_prov_is_running()
-        || pmacctx == NULL)
+    if (!ossl_prov_is_running() || pmacctx == NULL)
         return 0;
 
     if (pmacctx->key == NULL && vkey == NULL) {
@@ -122,23 +120,17 @@ static int mac_digest_sign_init(void *vpmacctx, const char *mdname, void *vkey,
         engine = (char *)ENGINE_get_id(pmacctx->key->cipher.engine);
 #endif
 
-    if (!ossl_prov_set_macctx(pmacctx->macctx, NULL,
-                              (char *)ciphername,
-                              (char *)mdname,
-                              (char *)engine,
-                              pmacctx->key->properties,
-                              NULL, 0))
+    if (!ossl_prov_set_macctx(pmacctx->macctx, NULL, (char *)ciphername, (char *)mdname, (char *)engine,
+                              pmacctx->key->properties, NULL, 0))
         return 0;
 
-    if (!EVP_MAC_init(pmacctx->macctx, pmacctx->key->priv_key,
-                      pmacctx->key->priv_key_len, params))
+    if (!EVP_MAC_init(pmacctx->macctx, pmacctx->key->priv_key, pmacctx->key->priv_key_len, params))
         return 0;
 
     return 1;
 }
 
-int mac_digest_sign_update(void *vpmacctx, const unsigned char *data,
-                           size_t datalen)
+int mac_digest_sign_update(void *vpmacctx, const unsigned char *data, size_t datalen)
 {
     PROV_MAC_CTX *pmacctx = (PROV_MAC_CTX *)vpmacctx;
 
@@ -148,8 +140,7 @@ int mac_digest_sign_update(void *vpmacctx, const unsigned char *data,
     return EVP_MAC_update(pmacctx->macctx, data, datalen);
 }
 
-int mac_digest_sign_final(void *vpmacctx, unsigned char *mac, size_t *maclen,
-                          size_t macsize)
+int mac_digest_sign_final(void *vpmacctx, unsigned char *mac, size_t *maclen, size_t macsize)
 {
     PROV_MAC_CTX *pmacctx = (PROV_MAC_CTX *)vpmacctx;
 
@@ -200,7 +191,7 @@ static void *mac_dupctx(void *vpmacctx)
     }
 
     return dstctx;
- err:
+err:
     mac_freectx(dstctx);
     return NULL;
 }
@@ -212,12 +203,9 @@ static int mac_set_ctx_params(void *vpmacctx, const OSSL_PARAM params[])
     return EVP_MAC_CTX_set_params(ctx->macctx, params);
 }
 
-static const OSSL_PARAM *mac_settable_ctx_params(ossl_unused void *ctx,
-                                                 void *provctx,
-                                                 const char *macname)
+static const OSSL_PARAM *mac_settable_ctx_params(ossl_unused void *ctx, void *provctx, const char *macname)
 {
-    EVP_MAC *mac = EVP_MAC_fetch(PROV_LIBCTX_OF(provctx), macname,
-                                 NULL);
+    EVP_MAC *mac = EVP_MAC_fetch(PROV_LIBCTX_OF(provctx), macname, NULL);
     const OSSL_PARAM *params;
 
     if (mac == NULL)

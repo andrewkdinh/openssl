@@ -38,9 +38,8 @@ static void slh_base_2b(const uint8_t *in, uint32_t b, uint32_t *out, size_t out
  * @param pk_out_len The maximum size of |pk_out|
  * @returns 1 on success, or 0 on error.
  */
-static int slh_fors_sk_gen(SLH_DSA_HASH_CTX *ctx, const uint8_t *sk_seed,
-                           const uint8_t *pk_seed, uint8_t *adrs, uint32_t id,
-                           uint8_t *pk_out, size_t pk_out_len)
+static int slh_fors_sk_gen(SLH_DSA_HASH_CTX *ctx, const uint8_t *sk_seed, const uint8_t *pk_seed, uint8_t *adrs,
+                           uint32_t id, uint8_t *pk_out, size_t pk_out_len)
 {
     const SLH_DSA_KEY *key = ctx->key;
     SLH_ADRS_DECLARE(sk_adrs);
@@ -74,9 +73,8 @@ static int slh_fors_sk_gen(SLH_DSA_HASH_CTX *ctx, const uint8_t *sk_seed,
  * @param node_len The maximum size of |node|
  * @returns 1 on success, or 0 on error.
  */
-static int slh_fors_node(SLH_DSA_HASH_CTX *ctx, const uint8_t *sk_seed,
-                         const uint8_t *pk_seed, uint8_t *adrs, uint32_t node_id,
-                         uint32_t height, uint8_t *node, size_t node_len)
+static int slh_fors_node(SLH_DSA_HASH_CTX *ctx, const uint8_t *sk_seed, const uint8_t *pk_seed, uint8_t *adrs,
+                         uint32_t node_id, uint32_t height, uint8_t *node, size_t node_len)
 {
     int ret = 0;
     const SLH_DSA_KEY *key = ctx->key;
@@ -95,10 +93,8 @@ static int slh_fors_node(SLH_DSA_HASH_CTX *ctx, const uint8_t *sk_seed,
         OPENSSL_cleanse(sk, n);
         return ret;
     } else {
-        if (!slh_fors_node(ctx, sk_seed, pk_seed, adrs, 2 * node_id, height - 1,
-                           lnode, sizeof(rnode))
-                || !slh_fors_node(ctx, sk_seed, pk_seed, adrs, 2 * node_id + 1,
-                                  height - 1, rnode, sizeof(rnode)))
+        if (!slh_fors_node(ctx, sk_seed, pk_seed, adrs, 2 * node_id, height - 1, lnode, sizeof(rnode))
+            || !slh_fors_node(ctx, sk_seed, pk_seed, adrs, 2 * node_id + 1, height - 1, rnode, sizeof(rnode)))
             return 0;
         adrsf->set_tree_height(adrs, height);
         adrsf->set_tree_index(adrs, node_id);
@@ -128,8 +124,7 @@ static int slh_fors_node(SLH_DSA_HASH_CTX *ctx, const uint8_t *sk_seed,
  * @param sig_len  The size of |sig| which is (2 * n + 3) * n + tree_height * n.
  * @returns 1 on success, or 0 on error.
  */
-int ossl_slh_fors_sign(SLH_DSA_HASH_CTX *ctx, const uint8_t *md,
-                       const uint8_t *sk_seed, const uint8_t *pk_seed,
+int ossl_slh_fors_sign(SLH_DSA_HASH_CTX *ctx, const uint8_t *md, const uint8_t *sk_seed, const uint8_t *pk_seed,
                        uint8_t *adrs, WPACKET *sig_wpkt)
 {
     const SLH_DSA_KEY *key = ctx->key;
@@ -162,9 +157,8 @@ int ossl_slh_fors_sign(SLH_DSA_HASH_CTX *ctx, const uint8_t *md,
          */
         tree_offset = tree_id_times_two_power_a;
 
-        if (!slh_fors_sk_gen(ctx, sk_seed, pk_seed, adrs,
-                             node_id + tree_id_times_two_power_a, out, sizeof(out))
-                || !WPACKET_memcpy(sig_wpkt, out, n))
+        if (!slh_fors_sk_gen(ctx, sk_seed, pk_seed, adrs, node_id + tree_id_times_two_power_a, out, sizeof(out))
+            || !WPACKET_memcpy(sig_wpkt, out, n))
             return 0;
 
         /*
@@ -176,8 +170,7 @@ int ossl_slh_fors_sign(SLH_DSA_HASH_CTX *ctx, const uint8_t *md,
          */
         for (layer = 0; layer < a; ++layer) {
             s = node_id ^ 1; /* XOR gets the index of the other child in a binary tree */
-            if (!slh_fors_node(ctx, sk_seed, pk_seed, adrs,
-                               s + tree_offset, layer, out, sizeof(out)))
+            if (!slh_fors_node(ctx, sk_seed, pk_seed, adrs, s + tree_offset, layer, out, sizeof(out)))
                 return 0;
             node_id >>= 1; /* Get the parent node id */
             tree_offset >>= 1; /* Each layer up has half as many nodes */
@@ -207,8 +200,7 @@ int ossl_slh_fors_sign(SLH_DSA_HASH_CTX *ctx, const uint8_t *md,
  * @param pk_out_len The maximum size of |pk_out|
  * @returns 1 on success, or 0 on error.
  */
-int ossl_slh_fors_pk_from_sig(SLH_DSA_HASH_CTX *ctx, PACKET *fors_sig_rpkt,
-                              const uint8_t *md, const uint8_t *pk_seed,
+int ossl_slh_fors_pk_from_sig(SLH_DSA_HASH_CTX *ctx, PACKET *fors_sig_rpkt, const uint8_t *md, const uint8_t *pk_seed,
                               uint8_t *adrs, uint8_t *pk_out, size_t pk_out_len)
 {
     const SLH_DSA_KEY *key = ctx->key;
@@ -249,9 +241,8 @@ int ossl_slh_fors_pk_from_sig(SLH_DSA_HASH_CTX *ctx, PACKET *fors_sig_rpkt,
         set_tree_index(adrs, node_id);
 
         /* Regenerate the public key of the leaf */
-        if (!PACKET_get_bytes(fors_sig_rpkt, &sk, n)
-                || !WPACKET_allocate_bytes(wroot_pkt, n, &node0)
-                || !F(ctx, pk_seed, adrs, sk, n, node0, n))
+        if (!PACKET_get_bytes(fors_sig_rpkt, &sk, n) || !WPACKET_allocate_bytes(wroot_pkt, n, &node0)
+            || !F(ctx, pk_seed, adrs, sk, n, node0, n))
             goto err;
 
         /* This omits the copying of the nodes that the FIPS 205 code does */
@@ -285,7 +276,7 @@ int ossl_slh_fors_pk_from_sig(SLH_DSA_HASH_CTX *ctx, PACKET *fors_sig_rpkt,
     adrsf->set_type_and_clear(pk_adrs, SLH_ADRS_TYPE_FORS_ROOTS);
     adrsf->copy_keypair_address(pk_adrs, adrs);
     ret = hashf->T(ctx, pk_seed, pk_adrs, roots, roots_len, pk_out, pk_out_len);
- err:
+err:
     if (!WPACKET_finish(wroot_pkt))
         ret = 0;
     return ret;
@@ -302,8 +293,7 @@ int ossl_slh_fors_pk_from_sig(SLH_DSA_HASH_CTX *ctx, PACKET *fors_sig_rpkt,
  *            |outlen|*|b| bits of |in|
  * @param out_len The size of |out|
  */
-static void slh_base_2b(const uint8_t *in, uint32_t b,
-                        uint32_t *out, size_t out_len)
+static void slh_base_2b(const uint8_t *in, uint32_t b, uint32_t *out, size_t out_len)
 {
     size_t consumed = 0;
     uint32_t bits = 0;

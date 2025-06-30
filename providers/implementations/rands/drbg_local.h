@@ -8,28 +8,28 @@
  */
 
 #ifndef OSSL_CRYPTO_PROV_LOCAL_H
-# define OSSL_CRYPTO_PROV_LOCAL_H
+#define OSSL_CRYPTO_PROV_LOCAL_H
 
-# include <openssl/evp.h>
-# include <openssl/core_dispatch.h>
-# include <openssl/core_names.h>
-# include <openssl/params.h>
-# include "internal/tsan_assist.h"
-# include "internal/nelem.h"
-# include "internal/numbers.h"
-# include "prov/provider_ctx.h"
-# include "prov/securitycheck.h"
+#include <openssl/evp.h>
+#include <openssl/core_dispatch.h>
+#include <openssl/core_names.h>
+#include <openssl/params.h>
+#include "internal/tsan_assist.h"
+#include "internal/nelem.h"
+#include "internal/numbers.h"
+#include "prov/provider_ctx.h"
+#include "prov/securitycheck.h"
 
 /* How many times to read the TSC as a randomness source. */
-# define TSC_READ_COUNT                 4
+#define TSC_READ_COUNT                 4
 
 /* Maximum reseed intervals */
-# define MAX_RESEED_INTERVAL                     (1 << 24)
-# define MAX_RESEED_TIME_INTERVAL                (1 << 20) /* approx. 12 days */
+#define MAX_RESEED_INTERVAL                     (1 << 24)
+#define MAX_RESEED_TIME_INTERVAL                (1 << 20) /* approx. 12 days */
 
 /* Default reseed intervals */
-# define RESEED_INTERVAL                         (1 << 8)
-# define TIME_INTERVAL                           (60*60)   /* 1 hour */
+#define RESEED_INTERVAL                         (1 << 8)
+#define TIME_INTERVAL                           (60*60)   /* 1 hour */
 
 /*
  * Maximum input size for the DRBG (entropy, nonce, personalization string)
@@ -38,7 +38,7 @@
  *
  * We lower it to 'only' INT32_MAX bytes, which is equivalent to 2 gigabytes.
  */
-# define DRBG_MAX_LENGTH                         INT32_MAX
+#define DRBG_MAX_LENGTH                         INT32_MAX
 
 /* The default nonce */
 /* ASCII: "OpenSSL NIST SP 800-90A DRBG", in hex for EBCDIC compatibility */
@@ -61,15 +61,12 @@ struct prov_drbg_st {
     PROV_CTX *provctx;
 
     /* Virtual functions are cached here */
-    int (*instantiate)(PROV_DRBG *drbg,
-                       const unsigned char *entropy, size_t entropylen,
-                       const unsigned char *nonce, size_t noncelen,
-                       const unsigned char *pers, size_t perslen);
+    int (*instantiate)(PROV_DRBG *drbg, const unsigned char *entropy, size_t entropylen, const unsigned char *nonce,
+                       size_t noncelen, const unsigned char *pers, size_t perslen);
     int (*uninstantiate)(PROV_DRBG *ctx);
-    int (*reseed)(PROV_DRBG *drbg, const unsigned char *ent, size_t ent_len,
-                  const unsigned char *adin, size_t adin_len);
-    int (*generate)(PROV_DRBG *, unsigned char *out, size_t outlen,
-                    const unsigned char *adin, size_t adin_len);
+    int (*reseed)(PROV_DRBG *drbg, const unsigned char *ent, size_t ent_len, const unsigned char *adin,
+                  size_t adin_len);
+    int (*generate)(PROV_DRBG *, unsigned char *out, size_t outlen, const unsigned char *adin, size_t adin_len);
 
     /* Parent PROV_RAND and its dispatch table functions */
     void *parent;
@@ -164,34 +161,28 @@ struct prov_drbg_st {
     OSSL_FIPS_IND_DECLARE
 };
 
-PROV_DRBG *ossl_rand_drbg_new
-    (void *provctx, void *parent, const OSSL_DISPATCH *parent_dispatch,
-     int (*dnew)(PROV_DRBG *ctx),
-     void (*dfree)(void *vctx),
-     int (*instantiate)(PROV_DRBG *drbg,
-                        const unsigned char *entropy, size_t entropylen,
-                        const unsigned char *nonce, size_t noncelen,
-                        const unsigned char *pers, size_t perslen),
-     int (*uninstantiate)(PROV_DRBG *ctx),
-     int (*reseed)(PROV_DRBG *drbg, const unsigned char *ent, size_t ent_len,
-                   const unsigned char *adin, size_t adin_len),
-     int (*generate)(PROV_DRBG *, unsigned char *out, size_t outlen,
-                     const unsigned char *adin, size_t adin_len));
+PROV_DRBG *ossl_rand_drbg_new(void *provctx, void *parent, const OSSL_DISPATCH *parent_dispatch,
+                              int (*dnew)(PROV_DRBG *ctx), void (*dfree)(void *vctx),
+                              int (*instantiate)(PROV_DRBG *drbg, const unsigned char *entropy, size_t entropylen,
+                                                 const unsigned char *nonce, size_t noncelen, const unsigned char *pers,
+                                                 size_t perslen),
+                              int (*uninstantiate)(PROV_DRBG *ctx),
+                              int (*reseed)(PROV_DRBG *drbg, const unsigned char *ent, size_t ent_len,
+                                            const unsigned char *adin, size_t adin_len),
+                              int (*generate)(PROV_DRBG *, unsigned char *out, size_t outlen, const unsigned char *adin,
+                                              size_t adin_len));
 void ossl_rand_drbg_free(PROV_DRBG *drbg);
 
-int ossl_prov_drbg_instantiate(PROV_DRBG *drbg, unsigned int strength,
-                               int prediction_resistance,
+int ossl_prov_drbg_instantiate(PROV_DRBG *drbg, unsigned int strength, int prediction_resistance,
                                const unsigned char *pers, size_t perslen);
 
 int ossl_prov_drbg_uninstantiate(PROV_DRBG *drbg);
 
-int ossl_prov_drbg_reseed(PROV_DRBG *drbg, int prediction_resistance,
-                          const unsigned char *ent, size_t ent_len,
+int ossl_prov_drbg_reseed(PROV_DRBG *drbg, int prediction_resistance, const unsigned char *ent, size_t ent_len,
                           const unsigned char *adin, size_t adinlen);
 
-int ossl_prov_drbg_generate(PROV_DRBG *drbg, unsigned char *out, size_t outlen,
-                            unsigned int strength, int prediction_resistance,
-                            const unsigned char *adin, size_t adinlen);
+int ossl_prov_drbg_generate(PROV_DRBG *drbg, unsigned char *out, size_t outlen, unsigned int strength,
+                            int prediction_resistance, const unsigned char *adin, size_t adinlen);
 
 /* Seeding api */
 OSSL_FUNC_rand_get_seed_fn ossl_drbg_get_seed;
@@ -214,8 +205,7 @@ OSSL_FUNC_rand_unlock_fn ossl_drbg_unlock;
 
 /* Common parameters for all of our DRBGs */
 int ossl_drbg_get_ctx_params(PROV_DRBG *drbg, OSSL_PARAM params[]);
-int ossl_drbg_get_ctx_params_no_lock(PROV_DRBG *drbg, OSSL_PARAM params[],
-                                     int *complete);
+int ossl_drbg_get_ctx_params_no_lock(PROV_DRBG *drbg, OSSL_PARAM params[], int *complete);
 int ossl_drbg_set_ctx_params(PROV_DRBG *drbg, const OSSL_PARAM params[]);
 
 #define OSSL_PARAM_DRBG_SETTABLE_CTX_COMMON                             \

@@ -52,7 +52,7 @@ typedef struct {
     const char *alg;
     /* The Algorithm Identifier of the signature algorithm */
     uint8_t aid_buf[OSSL_MAX_ALGORITHM_ID_SIZE];
-    size_t  aid_len;
+    size_t aid_len;
 } PROV_SLH_DSA_CTX;
 
 static void slh_dsa_freectx(void *vctx)
@@ -82,7 +82,7 @@ static void *slh_dsa_newctx(void *provctx, const char *alg, const char *propq)
     ctx->alg = alg;
     ctx->msg_encode = SLH_DSA_MESSAGE_ENCODE_PURE;
     return ctx;
- err:
+err:
     slh_dsa_freectx(ctx);
     return NULL;
 }
@@ -111,7 +111,7 @@ static void *slh_dsa_dupctx(void *vctx)
         goto err;
 
     return ret;
- err:
+err:
     slh_dsa_freectx(ret);
     return NULL;
 }
@@ -142,15 +142,13 @@ static int slh_dsa_set_alg_id_buffer(PROV_SLH_DSA_CTX *ctx)
     return 1;
 }
 
-static int slh_dsa_signverify_msg_init(void *vctx, void *vkey,
-                                       const OSSL_PARAM params[], int operation,
+static int slh_dsa_signverify_msg_init(void *vctx, void *vkey, const OSSL_PARAM params[], int operation,
                                        const char *desc)
 {
     PROV_SLH_DSA_CTX *ctx = (PROV_SLH_DSA_CTX *)vctx;
     SLH_DSA_KEY *key = vkey;
 
-    if (!ossl_prov_is_running()
-            || ctx == NULL)
+    if (!ossl_prov_is_running() || ctx == NULL)
         return 0;
 
     if (vkey == NULL && ctx->key == NULL) {
@@ -175,30 +173,26 @@ static int slh_dsa_signverify_msg_init(void *vctx, void *vkey,
 
 static int slh_dsa_sign_msg_init(void *vctx, void *vkey, const OSSL_PARAM params[])
 {
-    return slh_dsa_signverify_msg_init(vctx, vkey, params,
-                                       EVP_PKEY_OP_SIGN, "SLH_DSA Sign Init");
+    return slh_dsa_signverify_msg_init(vctx, vkey, params, EVP_PKEY_OP_SIGN, "SLH_DSA Sign Init");
 }
 
-static int slh_dsa_digest_signverify_init(void *vctx, const char *mdname,
-                                          void *vkey, const OSSL_PARAM params[])
+static int slh_dsa_digest_signverify_init(void *vctx, const char *mdname, void *vkey, const OSSL_PARAM params[])
 {
     PROV_SLH_DSA_CTX *ctx = (PROV_SLH_DSA_CTX *)vctx;
 
     if (mdname != NULL && mdname[0] != '\0') {
-        ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_DIGEST,
-                       "Explicit digest not supported for SLH-DSA operations");
+        ERR_raise_data(ERR_LIB_PROV, PROV_R_INVALID_DIGEST, "Explicit digest not supported for SLH-DSA operations");
         return 0;
     }
 
     if (vkey == NULL && ctx->key != NULL)
         return slh_dsa_set_ctx_params(ctx, params);
 
-    return slh_dsa_signverify_msg_init(vctx, vkey, params,
-                                       EVP_PKEY_OP_SIGN, "SLH_DSA Sign Init");
+    return slh_dsa_signverify_msg_init(vctx, vkey, params, EVP_PKEY_OP_SIGN, "SLH_DSA Sign Init");
 }
 
-static int slh_dsa_sign(void *vctx, unsigned char *sig, size_t *siglen,
-                        size_t sigsize, const unsigned char *msg, size_t msg_len)
+static int slh_dsa_sign(void *vctx, unsigned char *sig, size_t *siglen, size_t sigsize, const unsigned char *msg,
+                        size_t msg_len)
 {
     int ret = 0;
     PROV_SLH_DSA_CTX *ctx = (PROV_SLH_DSA_CTX *)vctx;
@@ -218,40 +212,34 @@ static int slh_dsa_sign(void *vctx, unsigned char *sig, size_t *siglen,
             opt_rand = add_rand;
         }
     }
-    ret = ossl_slh_dsa_sign(ctx->hash_ctx, msg, msg_len,
-                            ctx->context_string, ctx->context_string_len,
-                            opt_rand, ctx->msg_encode,
-                            sig, siglen, sigsize);
+    ret = ossl_slh_dsa_sign(ctx->hash_ctx, msg, msg_len, ctx->context_string, ctx->context_string_len, opt_rand,
+                            ctx->msg_encode, sig, siglen, sigsize);
     if (opt_rand != add_rand)
         OPENSSL_cleanse(opt_rand, n);
     return ret;
 }
 
-static int slh_dsa_digest_sign(void *vctx, uint8_t *sig, size_t *siglen, size_t sigsize,
-                               const uint8_t *tbs, size_t tbslen)
+static int slh_dsa_digest_sign(void *vctx, uint8_t *sig, size_t *siglen, size_t sigsize, const uint8_t *tbs,
+                               size_t tbslen)
 {
     return slh_dsa_sign(vctx, sig, siglen, sigsize, tbs, tbslen);
 }
 
 static int slh_dsa_verify_msg_init(void *vctx, void *vkey, const OSSL_PARAM params[])
 {
-    return slh_dsa_signverify_msg_init(vctx, vkey, params, EVP_PKEY_OP_VERIFY,
-                                       "SLH_DSA Verify Init");
+    return slh_dsa_signverify_msg_init(vctx, vkey, params, EVP_PKEY_OP_VERIFY, "SLH_DSA Verify Init");
 }
 
-static int slh_dsa_verify(void *vctx, const uint8_t *sig, size_t siglen,
-                          const uint8_t *msg, size_t msg_len)
+static int slh_dsa_verify(void *vctx, const uint8_t *sig, size_t siglen, const uint8_t *msg, size_t msg_len)
 {
     PROV_SLH_DSA_CTX *ctx = (PROV_SLH_DSA_CTX *)vctx;
 
     if (!ossl_prov_is_running())
         return 0;
-    return ossl_slh_dsa_verify(ctx->hash_ctx, msg, msg_len,
-                               ctx->context_string, ctx->context_string_len,
+    return ossl_slh_dsa_verify(ctx->hash_ctx, msg, msg_len, ctx->context_string, ctx->context_string_len,
                                ctx->msg_encode, sig, siglen);
 }
-static int slh_dsa_digest_verify(void *vctx, const uint8_t *sig, size_t siglen,
-                                 const uint8_t *tbs, size_t tbslen)
+static int slh_dsa_digest_verify(void *vctx, const uint8_t *sig, size_t siglen, const uint8_t *tbs, size_t tbslen)
 {
     return slh_dsa_verify(vctx, sig, siglen, tbs, tbslen);
 }
@@ -270,8 +258,7 @@ static int slh_dsa_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     if (p != NULL) {
         void *vp = pctx->context_string;
 
-        if (!OSSL_PARAM_get_octet_string(p, &vp, sizeof(pctx->context_string),
-                                         &(pctx->context_string_len))) {
+        if (!OSSL_PARAM_get_octet_string(p, &vp, sizeof(pctx->context_string), &(pctx->context_string_len))) {
             pctx->context_string_len = 0;
             return 0;
         }
@@ -281,8 +268,7 @@ static int slh_dsa_set_ctx_params(void *vctx, const OSSL_PARAM params[])
         void *vp = pctx->add_random;
         size_t n = ossl_slh_dsa_key_get_n(pctx->key);
 
-        if (!OSSL_PARAM_get_octet_string(p, &vp, n, &(pctx->add_random_len))
-                || pctx->add_random_len != n) {
+        if (!OSSL_PARAM_get_octet_string(p, &vp, n, &(pctx->add_random_len)) || pctx->add_random_len != n) {
             pctx->add_random_len = 0;
             return 0;
         }
@@ -297,27 +283,21 @@ static int slh_dsa_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     return 1;
 }
 
-static const OSSL_PARAM *slh_dsa_settable_ctx_params(void *vctx,
-                                                     ossl_unused void *provctx)
+static const OSSL_PARAM *slh_dsa_settable_ctx_params(void *vctx, ossl_unused void *provctx)
 {
     static const OSSL_PARAM settable_ctx_params[] = {
         OSSL_PARAM_octet_string(OSSL_SIGNATURE_PARAM_CONTEXT_STRING, NULL, 0),
         OSSL_PARAM_octet_string(OSSL_SIGNATURE_PARAM_TEST_ENTROPY, NULL, 0),
-        OSSL_PARAM_int(OSSL_SIGNATURE_PARAM_DETERMINISTIC, 0),
-        OSSL_PARAM_int(OSSL_SIGNATURE_PARAM_MESSAGE_ENCODING, 0),
-        OSSL_PARAM_END
-    };
+        OSSL_PARAM_int(OSSL_SIGNATURE_PARAM_DETERMINISTIC, 0), OSSL_PARAM_int(OSSL_SIGNATURE_PARAM_MESSAGE_ENCODING, 0),
+        OSSL_PARAM_END};
 
     return settable_ctx_params;
 }
 
 static const OSSL_PARAM known_gettable_ctx_params[] = {
-    OSSL_PARAM_octet_string(OSSL_SIGNATURE_PARAM_ALGORITHM_ID, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_octet_string(OSSL_SIGNATURE_PARAM_ALGORITHM_ID, NULL, 0), OSSL_PARAM_END};
 
-static const OSSL_PARAM *slh_dsa_gettable_ctx_params(ossl_unused void *vctx,
-                                                     ossl_unused void *provctx)
+static const OSSL_PARAM *slh_dsa_gettable_ctx_params(ossl_unused void *vctx, ossl_unused void *provctx)
 {
     return known_gettable_ctx_params;
 }
@@ -331,10 +311,7 @@ static int slh_dsa_get_ctx_params(void *vctx, OSSL_PARAM *params)
         return 0;
 
     p = OSSL_PARAM_locate(params, OSSL_SIGNATURE_PARAM_ALGORITHM_ID);
-    if (p != NULL
-        && !OSSL_PARAM_set_octet_string(p,
-                                        ctx->aid_len == 0 ? NULL : ctx->aid_buf,
-                                        ctx->aid_len))
+    if (p != NULL && !OSSL_PARAM_set_octet_string(p, ctx->aid_len == 0 ? NULL : ctx->aid_buf, ctx->aid_len))
         return 0;
 
     return 1;

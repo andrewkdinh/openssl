@@ -65,8 +65,7 @@ static int describe_param_type(char *buf, size_t bufsz, const OSSL_PARAM *param)
     if (param->data_size == 0)
         printed_len = BIO_snprintf(buf, bufsz, " (arbitrary size)");
     else
-        printed_len = BIO_snprintf(buf, bufsz, " (max %zu bytes large)",
-                                   param->data_size);
+        printed_len = BIO_snprintf(buf, bufsz, " (max %zu bytes large)", param->data_size);
     if (printed_len > 0) {
         buf += printed_len;
         bufsz -= printed_len;
@@ -179,9 +178,7 @@ void print_param_value(const OSSL_PARAM *p, int indent)
         print_param_octet((const unsigned char **)&p->data, p->return_size);
         break;
     default:
-        BIO_printf(bio_out, "unknown type (%u) of %zu bytes\n",
-                   p->data_type, p->return_size);
+        BIO_printf(bio_out, "unknown type (%u) of %zu bytes\n", p->data_type, p->return_size);
         break;
     }
 }
-

@@ -37,7 +37,7 @@ char *BN_bn2hex(const BIGNUM *a)
         }
     }
     *p = '\0';
- err:
+err:
     return buf;
 }
 
@@ -106,7 +106,7 @@ char *BN_bn2dec(const BIGNUM *a)
         }
     }
     ok = 1;
- err:
+err:
     OPENSSL_free(bn_data);
     BN_free(t);
     if (ok)
@@ -187,7 +187,7 @@ int BN_hex2bn(BIGNUM **bn, const char *a)
     if (ret->top != 0)
         ret->neg = neg;
     return num;
- err:
+err:
     if (*bn == NULL)
         BN_free(ret);
     return 0;
@@ -242,8 +242,7 @@ int BN_dec2bn(BIGNUM **bn, const char *a)
         l += *a - '0';
         a++;
         if (++j == BN_DEC_NUM) {
-            if (!BN_mul_word(ret, BN_DEC_CONV)
-                || !BN_add_word(ret, l))
+            if (!BN_mul_word(ret, BN_DEC_CONV) || !BN_add_word(ret, l))
                 goto err;
             l = 0;
             j = 0;
@@ -257,7 +256,7 @@ int BN_dec2bn(BIGNUM **bn, const char *a)
     if (ret->top != 0)
         ret->neg = neg;
     return num;
- err:
+err:
     if (*bn == NULL)
         BN_free(ret);
     return 0;

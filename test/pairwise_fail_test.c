@@ -29,19 +29,16 @@ struct self_test_arg {
 static OSSL_LIB_CTX *libctx = NULL;
 static char *pairwise_name = NULL;
 static char *dsaparam_file = NULL;
-static struct self_test_arg self_test_args = { 0 };
+static struct self_test_arg self_test_args = {0};
 
 const OPTIONS *test_get_options(void)
 {
     static const OPTIONS test_options[] = {
         OPT_TEST_OPTIONS_DEFAULT_USAGE,
-        { "config", OPT_CONFIG_FILE, '<',
-          "The configuration file to use for the libctx" },
-        { "pairwise", OPT_PAIRWISETEST, 's',
-          "Test keygen pairwise test failures" },
-        { "dsaparam", OPT_DSAPARAM, 's', "DSA param file" },
-        { NULL }
-    };
+        {"config", OPT_CONFIG_FILE, '<', "The configuration file to use for the libctx"},
+        {"pairwise", OPT_PAIRWISETEST, 's', "Test keygen pairwise test failures"},
+        {"dsaparam", OPT_DSAPARAM, 's', "DSA param file"},
+        {NULL}};
     return test_options;
 }
 
@@ -193,7 +190,7 @@ int setup_tests(void)
             dsaparam_file = opt_arg();
             break;
         case OPT_TEST_CASES:
-           break;
+            break;
         default:
         case OPT_ERR:
             return 0;

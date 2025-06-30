@@ -102,11 +102,9 @@ static uint64_t u64_max(uint64_t x, uint64_t y)
  * Returns 1 if there exists an integer x which falls within both ranges a and
  * b.
  */
-static int uint_range_overlaps(const UINT_RANGE *a,
-                               const UINT_RANGE *b)
+static int uint_range_overlaps(const UINT_RANGE *a, const UINT_RANGE *b)
 {
-    return u64_min(a->end, b->end)
-        >= u64_max(a->start, b->start);
+    return u64_min(a->end, b->end) >= u64_max(a->start, b->start);
 }
 
 static UINT_SET_ITEM *create_set_item(uint64_t start, uint64_t end)
@@ -118,7 +116,7 @@ static UINT_SET_ITEM *create_set_item(uint64_t start, uint64_t end)
 
     ossl_list_uint_set_init_elem(x);
     x->range.start = start;
-    x->range.end   = end;
+    x->range.end = end;
     return x;
 }
 
@@ -218,8 +216,7 @@ int ossl_uint_set_insert(UINT_SET *s, const UINT_RANGE *range)
                 OPENSSL_free(x);
             }
             break;
-        } else if (end < z->range.start
-                    && (zprev == NULL || start > zprev->range.end)) {
+        } else if (end < z->range.start && (zprev == NULL || start > zprev->range.end)) {
             if (z->range.start == end + 1) {
                 /* We can extend the following range backwards. */
                 z->range.start = start;

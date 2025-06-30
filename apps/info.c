@@ -13,8 +13,15 @@
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_CONFIGDIR, OPT_ENGINESDIR, OPT_MODULESDIR, OPT_DSOEXT, OPT_DIRNAMESEP,
-    OPT_LISTSEP, OPT_SEEDS, OPT_CPUSETTINGS, OPT_WINDOWSCONTEXT
+    OPT_CONFIGDIR,
+    OPT_ENGINESDIR,
+    OPT_MODULESDIR,
+    OPT_DSOEXT,
+    OPT_DIRNAMESEP,
+    OPT_LISTSEP,
+    OPT_SEEDS,
+    OPT_CPUSETTINGS,
+    OPT_WINDOWSCONTEXT
 } OPTION_CHOICE;
 
 const OPTIONS info_options[] = {
@@ -25,16 +32,14 @@ const OPTIONS info_options[] = {
     OPT_SECTION("Output"),
     {"configdir", OPT_CONFIGDIR, '-', "Default configuration file directory"},
     {"enginesdir", OPT_ENGINESDIR, '-', "Default engine module directory"},
-    {"modulesdir", OPT_MODULESDIR, '-',
-     "Default module directory (other than engine modules)"},
+    {"modulesdir", OPT_MODULESDIR, '-', "Default module directory (other than engine modules)"},
     {"dsoext", OPT_DSOEXT, '-', "Configured extension for modules"},
     {"dirnamesep", OPT_DIRNAMESEP, '-', "Directory-filename separator"},
     {"listsep", OPT_LISTSEP, '-', "List separator character"},
     {"seeds", OPT_SEEDS, '-', "Seed sources"},
     {"cpusettings", OPT_CPUSETTINGS, '-', "CPU settings info"},
     {"windowscontext", OPT_WINDOWSCONTEXT, '-', "Windows install context"},
-    {NULL}
-};
+    {NULL}};
 
 int info_main(int argc, char **argv)
 {
@@ -106,6 +111,6 @@ opthelp:
     typedata = OPENSSL_info(type);
     BIO_printf(bio_out, "%s\n", typedata == NULL ? "Undefined" : typedata);
     ret = 0;
- end:
+end:
     return ret;
 }

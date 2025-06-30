@@ -19,21 +19,15 @@
 
 static int v3_check_critical(const char **value);
 static int v3_check_generic(const char **value);
-static X509_EXTENSION *do_ext_nconf(CONF *conf, X509V3_CTX *ctx, int ext_nid,
-                                    int crit, const char *value);
-static X509_EXTENSION *v3_generic_extension(const char *ext, const char *value,
-                                            int crit, int type,
-                                            X509V3_CTX *ctx);
+static X509_EXTENSION *do_ext_nconf(CONF *conf, X509V3_CTX *ctx, int ext_nid, int crit, const char *value);
+static X509_EXTENSION *v3_generic_extension(const char *ext, const char *value, int crit, int type, X509V3_CTX *ctx);
 static char *conf_lhash_get_string(void *db, const char *section, const char *value);
 static STACK_OF(CONF_VALUE) *conf_lhash_get_section(void *db, const char *section);
-static X509_EXTENSION *do_ext_i2d(const X509V3_EXT_METHOD *method,
-                                  int ext_nid, int crit, void *ext_struc);
-static unsigned char *generic_asn1(const char *value, X509V3_CTX *ctx,
-                                   long *ext_len);
+static X509_EXTENSION *do_ext_i2d(const X509V3_EXT_METHOD *method, int ext_nid, int crit, void *ext_struc);
+static unsigned char *generic_asn1(const char *value, X509V3_CTX *ctx, long *ext_len);
 
-static X509_EXTENSION *X509V3_EXT_nconf_int(CONF *conf, X509V3_CTX *ctx,
-                                            const char *section,
-                                            const char *name, const char *value)
+static X509_EXTENSION *X509V3_EXT_nconf_int(CONF *conf, X509V3_CTX *ctx, const char *section, const char *name,
+                                            const char *value)
 {
     int crit;
     int ext_type;
@@ -45,39 +39,33 @@ static X509_EXTENSION *X509V3_EXT_nconf_int(CONF *conf, X509V3_CTX *ctx,
     ret = do_ext_nconf(conf, ctx, OBJ_sn2nid(name), crit, value);
     if (!ret) {
         if (section != NULL)
-            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_ERROR_IN_EXTENSION,
-                           "section=%s, name=%s, value=%s",
-                           section, name, value);
+            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_ERROR_IN_EXTENSION, "section=%s, name=%s, value=%s", section, name,
+                           value);
         else
-            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_ERROR_IN_EXTENSION,
-                           "name=%s, value=%s", name, value);
+            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_ERROR_IN_EXTENSION, "name=%s, value=%s", name, value);
     }
     return ret;
 }
 
-X509_EXTENSION *X509V3_EXT_nconf(CONF *conf, X509V3_CTX *ctx, const char *name,
-                                 const char *value)
+X509_EXTENSION *X509V3_EXT_nconf(CONF *conf, X509V3_CTX *ctx, const char *name, const char *value)
 {
     return X509V3_EXT_nconf_int(conf, ctx, NULL, name, value);
 }
 
-X509_EXTENSION *X509V3_EXT_nconf_nid(CONF *conf, X509V3_CTX *ctx, int ext_nid,
-                                     const char *value)
+X509_EXTENSION *X509V3_EXT_nconf_nid(CONF *conf, X509V3_CTX *ctx, int ext_nid, const char *value)
 {
     int crit;
     int ext_type;
 
     crit = v3_check_critical(&value);
     if ((ext_type = v3_check_generic(&value)))
-        return v3_generic_extension(OBJ_nid2sn(ext_nid),
-                                    value, crit, ext_type, ctx);
+        return v3_generic_extension(OBJ_nid2sn(ext_nid), value, crit, ext_type, ctx);
     return do_ext_nconf(conf, ctx, ext_nid, crit, value);
 }
 
 /* CONF *conf:  Config file    */
 /* char *value:  Value    */
-static X509_EXTENSION *do_ext_nconf(CONF *conf, X509V3_CTX *ctx, int ext_nid,
-                                    int crit, const char *value)
+static X509_EXTENSION *do_ext_nconf(CONF *conf, X509V3_CTX *ctx, int ext_nid, int crit, const char *value)
 {
     const X509V3_EXT_METHOD *method;
     X509_EXTENSION *ext;
@@ -99,8 +87,8 @@ static X509_EXTENSION *do_ext_nconf(CONF *conf, X509V3_CTX *ctx, int ext_nid,
         else
             nval = X509V3_parse_list(value);
         if (nval == NULL || sk_CONF_VALUE_num(nval) <= 0) {
-            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_INVALID_EXTENSION_STRING,
-                           "name=%s,section=%s", OBJ_nid2sn(ext_nid), value);
+            ERR_raise_data(ERR_LIB_X509V3, X509V3_R_INVALID_EXTENSION_STRING, "name=%s,section=%s", OBJ_nid2sn(ext_nid),
+                           value);
             if (*value != '@')
                 sk_CONF_VALUE_pop_free(nval, X509V3_conf_free);
             return NULL;
@@ -121,8 +109,7 @@ static X509_EXTENSION *do_ext_nconf(CONF *conf, X509V3_CTX *ctx, int ext_nid,
         if ((ext_struc = method->r2i(method, ctx, value)) == NULL)
             return NULL;
     } else {
-        ERR_raise_data(ERR_LIB_X509V3, X509V3_R_EXTENSION_SETTING_NOT_SUPPORTED,
-                       "name=%s", OBJ_nid2sn(ext_nid));
+        ERR_raise_data(ERR_LIB_X509V3, X509V3_R_EXTENSION_SETTING_NOT_SUPPORTED, "name=%s", OBJ_nid2sn(ext_nid));
         return NULL;
     }
 
@@ -132,11 +119,9 @@ static X509_EXTENSION *do_ext_nconf(CONF *conf, X509V3_CTX *ctx, int ext_nid,
     else
         method->ext_free(ext_struc);
     return ext;
-
 }
 
-static X509_EXTENSION *do_ext_i2d(const X509V3_EXT_METHOD *method,
-                                  int ext_nid, int crit, void *ext_struc)
+static X509_EXTENSION *do_ext_i2d(const X509V3_EXT_METHOD *method, int ext_nid, int crit, void *ext_struc)
 {
     unsigned char *ext_der = NULL;
     int ext_len;
@@ -146,8 +131,7 @@ static X509_EXTENSION *do_ext_i2d(const X509V3_EXT_METHOD *method,
     /* Convert internal representation to DER */
     if (method->it) {
         ext_der = NULL;
-        ext_len =
-            ASN1_item_i2d(ext_struc, &ext_der, ASN1_ITEM_ptr(method->it));
+        ext_len = ASN1_item_i2d(ext_struc, &ext_der, ASN1_ITEM_ptr(method->it));
         if (ext_len < 0) {
             ERR_raise(ERR_LIB_X509V3, ERR_R_ASN1_LIB);
             goto err;
@@ -182,11 +166,10 @@ static X509_EXTENSION *do_ext_i2d(const X509V3_EXT_METHOD *method,
 
     return ext;
 
- err:
+err:
     OPENSSL_free(ext_der);
     ASN1_OCTET_STRING_free(ext_oct);
     return NULL;
-
 }
 
 /* Given an internal structure, nid and critical flag create an extension */
@@ -235,9 +218,7 @@ static int v3_check_generic(const char **value)
 }
 
 /* Create a generic extension: for now just handle DER type */
-static X509_EXTENSION *v3_generic_extension(const char *ext, const char *value,
-                                            int crit, int gen_type,
-                                            X509V3_CTX *ctx)
+static X509_EXTENSION *v3_generic_extension(const char *ext, const char *value, int crit, int gen_type, X509V3_CTX *ctx)
 {
     unsigned char *ext_der = NULL;
     long ext_len = 0;
@@ -246,8 +227,7 @@ static X509_EXTENSION *v3_generic_extension(const char *ext, const char *value,
     X509_EXTENSION *extension = NULL;
 
     if ((obj = OBJ_txt2obj(ext, 0)) == NULL) {
-        ERR_raise_data(ERR_LIB_X509V3, X509V3_R_EXTENSION_NAME_ERROR,
-                       "name=%s", ext);
+        ERR_raise_data(ERR_LIB_X509V3, X509V3_R_EXTENSION_NAME_ERROR, "name=%s", ext);
         goto err;
     }
 
@@ -257,8 +237,7 @@ static X509_EXTENSION *v3_generic_extension(const char *ext, const char *value,
         ext_der = generic_asn1(value, ctx, &ext_len);
 
     if (ext_der == NULL) {
-        ERR_raise_data(ERR_LIB_X509V3, X509V3_R_EXTENSION_VALUE_ERROR,
-                       "value=%s", value);
+        ERR_raise_data(ERR_LIB_X509V3, X509V3_R_EXTENSION_VALUE_ERROR, "value=%s", value);
         goto err;
     }
 
@@ -273,16 +252,14 @@ static X509_EXTENSION *v3_generic_extension(const char *ext, const char *value,
 
     extension = X509_EXTENSION_create_by_OBJ(NULL, obj, crit, oct);
 
- err:
+err:
     ASN1_OBJECT_free(obj);
     ASN1_OCTET_STRING_free(oct);
     OPENSSL_free(ext_der);
     return extension;
-
 }
 
-static unsigned char *generic_asn1(const char *value, X509V3_CTX *ctx,
-                                   long *ext_len)
+static unsigned char *generic_asn1(const char *value, X509V3_CTX *ctx, long *ext_len)
 {
     ASN1_TYPE *typ;
     unsigned char *ext_der = NULL;
@@ -310,8 +287,7 @@ static void delete_ext(STACK_OF(X509_EXTENSION) *sk, X509_EXTENSION *dext)
  * file section to an extension STACK. Just check in case sk == NULL.
  * Note that on error new elements may have been added to *sk if sk != NULL.
  */
-int X509V3_EXT_add_nconf_sk(CONF *conf, X509V3_CTX *ctx, const char *section,
-                            STACK_OF(X509_EXTENSION) **sk)
+int X509V3_EXT_add_nconf_sk(CONF *conf, X509V3_CTX *ctx, const char *section, STACK_OF(X509_EXTENSION) **sk)
 {
     X509_EXTENSION *ext;
     STACK_OF(CONF_VALUE) *nval;
@@ -336,8 +312,7 @@ int X509V3_EXT_add_nconf_sk(CONF *conf, X509V3_CTX *ctx, const char *section,
             else if (i == skid)
                 val = sk_CONF_VALUE_value(nval, akid);
         }
-        if ((ext = X509V3_EXT_nconf_int(conf, ctx, val->section,
-                                        val->name, val->value)) == NULL)
+        if ((ext = X509V3_EXT_nconf_int(conf, ctx, val->section, val->name, val->value)) == NULL)
             return 0;
         if (sk != NULL) {
             if (ctx->flags == X509V3_CTX_REPLACE)
@@ -356,8 +331,7 @@ int X509V3_EXT_add_nconf_sk(CONF *conf, X509V3_CTX *ctx, const char *section,
  * Add extensions to a certificate. Just check in case cert == NULL.
  * Note that on error new elements may remain added to cert if cert != NULL.
  */
-int X509V3_EXT_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
-                         X509 *cert)
+int X509V3_EXT_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section, X509 *cert)
 {
     STACK_OF(X509_EXTENSION) **sk = NULL;
     if (cert != NULL)
@@ -369,8 +343,7 @@ int X509V3_EXT_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
  * Add extensions to a CRL. Just check in case crl == NULL.
  * Note that on error new elements may remain added to crl if crl != NULL.
  */
-int X509V3_EXT_CRL_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
-                             X509_CRL *crl)
+int X509V3_EXT_CRL_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section, X509_CRL *crl)
 {
     STACK_OF(X509_EXTENSION) **sk = NULL;
     if (crl != NULL)
@@ -382,8 +355,7 @@ int X509V3_EXT_CRL_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
  * Add extensions to certificate request. Just check in case req is NULL.
  * Note that on error new elements may remain added to req if req != NULL.
  */
-int X509V3_EXT_REQ_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section,
-                             X509_REQ *req)
+int X509V3_EXT_REQ_add_nconf(CONF *conf, X509V3_CTX *ctx, const char *section, X509_REQ *req)
 {
     STACK_OF(X509_EXTENSION) *exts = NULL;
     int ret = X509V3_EXT_add_nconf_sk(conf, ctx, section, &exts);
@@ -444,12 +416,7 @@ static STACK_OF(CONF_VALUE) *nconf_get_section(void *db, const char *section)
     return NCONF_get_section(db, section);
 }
 
-static X509V3_CONF_METHOD nconf_method = {
-    nconf_get_string,
-    nconf_get_section,
-    NULL,
-    NULL
-};
+static X509V3_CONF_METHOD nconf_method = {nconf_get_string, nconf_get_section, NULL, NULL};
 
 void X509V3_set_nconf(X509V3_CTX *ctx, CONF *conf)
 {
@@ -461,8 +428,7 @@ void X509V3_set_nconf(X509V3_CTX *ctx, CONF *conf)
     ctx->db = conf;
 }
 
-void X509V3_set_ctx(X509V3_CTX *ctx, X509 *issuer, X509 *subj, X509_REQ *req,
-                    X509_CRL *crl, int flags)
+void X509V3_set_ctx(X509V3_CTX *ctx, X509 *issuer, X509 *subj, X509_REQ *req, X509_CRL *crl, int flags)
 {
     if (ctx == NULL) {
         ERR_raise(ERR_LIB_X509V3, ERR_R_PASSED_NULL_PARAMETER);
@@ -495,8 +461,7 @@ int X509V3_set_issuer_pkey(X509V3_CTX *ctx, EVP_PKEY *pkey)
 
 /* Old conf compatibility functions */
 
-X509_EXTENSION *X509V3_EXT_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
-                                const char *name, const char *value)
+X509_EXTENSION *X509V3_EXT_conf(LHASH_OF(CONF_VALUE) * conf, X509V3_CTX *ctx, const char *name, const char *value)
 {
     CONF *ctmp;
     X509_EXTENSION *ret;
@@ -510,8 +475,7 @@ X509_EXTENSION *X509V3_EXT_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
     return ret;
 }
 
-X509_EXTENSION *X509V3_EXT_conf_nid(LHASH_OF(CONF_VALUE) *conf,
-                                    X509V3_CTX *ctx, int ext_nid, const char *value)
+X509_EXTENSION *X509V3_EXT_conf_nid(LHASH_OF(CONF_VALUE) * conf, X509V3_CTX *ctx, int ext_nid, const char *value)
 {
     CONF *ctmp;
     X509_EXTENSION *ret;
@@ -535,14 +499,9 @@ static STACK_OF(CONF_VALUE) *conf_lhash_get_section(void *db, const char *sectio
     return CONF_get_section(db, section);
 }
 
-static X509V3_CONF_METHOD conf_lhash_method = {
-    conf_lhash_get_string,
-    conf_lhash_get_section,
-    NULL,
-    NULL
-};
+static X509V3_CONF_METHOD conf_lhash_method = {conf_lhash_get_string, conf_lhash_get_section, NULL, NULL};
 
-void X509V3_set_conf_lhash(X509V3_CTX *ctx, LHASH_OF(CONF_VALUE) *lhash)
+void X509V3_set_conf_lhash(X509V3_CTX *ctx, LHASH_OF(CONF_VALUE) * lhash)
 {
     if (ctx == NULL) {
         ERR_raise(ERR_LIB_X509V3, ERR_R_PASSED_NULL_PARAMETER);
@@ -552,8 +511,7 @@ void X509V3_set_conf_lhash(X509V3_CTX *ctx, LHASH_OF(CONF_VALUE) *lhash)
     ctx->db = lhash;
 }
 
-int X509V3_EXT_add_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
-                        const char *section, X509 *cert)
+int X509V3_EXT_add_conf(LHASH_OF(CONF_VALUE) * conf, X509V3_CTX *ctx, const char *section, X509 *cert)
 {
     CONF *ctmp;
     int ret;
@@ -569,8 +527,7 @@ int X509V3_EXT_add_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
 
 /* Same as above but for a CRL */
 
-int X509V3_EXT_CRL_add_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
-                            const char *section, X509_CRL *crl)
+int X509V3_EXT_CRL_add_conf(LHASH_OF(CONF_VALUE) * conf, X509V3_CTX *ctx, const char *section, X509_CRL *crl)
 {
     CONF *ctmp;
     int ret;
@@ -586,8 +543,7 @@ int X509V3_EXT_CRL_add_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
 
 /* Add extensions to certificate request */
 
-int X509V3_EXT_REQ_add_conf(LHASH_OF(CONF_VALUE) *conf, X509V3_CTX *ctx,
-                            const char *section, X509_REQ *req)
+int X509V3_EXT_REQ_add_conf(LHASH_OF(CONF_VALUE) * conf, X509V3_CTX *ctx, const char *section, X509_REQ *req)
 {
     CONF *ctmp;
     int ret;

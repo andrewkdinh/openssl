@@ -98,8 +98,7 @@ const OPTIONS configutl_options[] = {
     OPT_SECTION("Output"),
     {"out", OPT_OUT, '>', "Output to filename rather than stdout"},
     {"noheader", OPT_NOHEADER, '-', "Don't print the information about original config"},
-    {NULL}
-};
+    {NULL}};
 
 /**
  * Parse the passed OpenSSL configuration file (or the default one/specified in the
@@ -173,8 +172,7 @@ int configutl_main(int argc, char *argv[])
         goto end;
 
     if (no_header == 0)
-        BIO_printf(out, "# This configuration file was linearized and expanded from %s\n",
-                   configfile);
+        BIO_printf(out, "# This configuration file was linearized and expanded from %s\n", configfile);
 
     default_section_idx = sk_OPENSSL_CSTRING_find(sections, "default");
     if (default_section_idx != -1)

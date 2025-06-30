@@ -227,9 +227,7 @@ int get_conn_fd(APP_CONN *conn)
 int get_conn_pending_tx(APP_CONN *conn)
 {
 #ifdef USE_QUIC
-    return (SSL_net_read_desired(conn->ssl) ? POLLIN : 0)
-           | (SSL_net_write_desired(conn->ssl) ? POLLOUT : 0)
-           | POLLERR;
+    return (SSL_net_read_desired(conn->ssl) ? POLLIN : 0) | (SSL_net_write_desired(conn->ssl) ? POLLOUT : 0) | POLLERR;
 #else
     return (conn->tx_need_rx ? POLLIN : 0) | POLLOUT | POLLERR;
 #endif
@@ -302,13 +300,13 @@ void teardown_ctx(SSL_CTX *ctx)
 
 static inline void ms_to_timeval(struct timeval *t, int ms)
 {
-    t->tv_sec   = ms < 0 ? -1 : ms/1000;
-    t->tv_usec  = ms < 0 ? 0 : (ms%1000)*1000;
+    t->tv_sec = ms < 0 ? -1 : ms / 1000;
+    t->tv_usec = ms < 0 ? 0 : (ms % 1000) * 1000;
 }
 
 static inline int timeval_to_ms(const struct timeval *t)
 {
-    return t->tv_sec*1000 + t->tv_usec/1000;
+    return t->tv_sec * 1000 + t->tv_usec / 1000;
 }
 
 int main(int argc, char **argv)
@@ -335,8 +333,7 @@ int main(int argc, char **argv)
     }
 
     snprintf(host_port, sizeof(host_port), "%s:%s", argv[1], argv[2]);
-    tx_len = snprintf(tx_msg, sizeof(tx_msg),
-                      "GET / HTTP/1.0\r\nHost: %s\r\n\r\n", argv[1]);
+    tx_len = snprintf(tx_msg, sizeof(tx_msg), "GET / HTTP/1.0\r\nHost: %s\r\n\r\n", argv[1]);
 
     ctx = create_ssl_ctx();
     if (ctx == NULL) {

@@ -22,8 +22,7 @@ struct bn_blinding_st {
     int counter;
     unsigned long flags;
     BN_MONT_CTX *m_ctx;
-    int (*bn_mod_exp) (BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
-                       const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *m_ctx);
+    int (*bn_mod_exp)(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *m_ctx);
     CRYPTO_RWLOCK *lock;
 };
 
@@ -71,7 +70,7 @@ BN_BLINDING *BN_BLINDING_new(const BIGNUM *A, const BIGNUM *Ai, BIGNUM *mod)
 
     return ret;
 
- err:
+err:
     BN_BLINDING_free(ret);
     return NULL;
 }
@@ -100,8 +99,7 @@ int BN_BLINDING_update(BN_BLINDING *b, BN_CTX *ctx)
     if (b->counter == -1)
         b->counter = 0;
 
-    if (++b->counter == BN_BLINDING_COUNTER && b->e != NULL &&
-        !(b->flags & BN_BLINDING_NO_RECREATE)) {
+    if (++b->counter == BN_BLINDING_COUNTER && b->e != NULL && !(b->flags & BN_BLINDING_NO_RECREATE)) {
         /* re-create blinding parameters */
         if (!BN_BLINDING_create_param(b, NULL, NULL, ctx, NULL, NULL))
             goto err;
@@ -111,14 +109,13 @@ int BN_BLINDING_update(BN_BLINDING *b, BN_CTX *ctx)
                 || !bn_mul_mont_fixed_top(b->A, b->A, b->A, b->m_ctx, ctx))
                 goto err;
         } else {
-            if (!BN_mod_mul(b->Ai, b->Ai, b->Ai, b->mod, ctx)
-                || !BN_mod_mul(b->A, b->A, b->A, b->mod, ctx))
+            if (!BN_mod_mul(b->Ai, b->Ai, b->Ai, b->mod, ctx) || !BN_mod_mul(b->A, b->A, b->A, b->mod, ctx))
                 goto err;
         }
     }
 
     ret = 1;
- err:
+err:
     if (b->counter == BN_BLINDING_COUNTER)
         b->counter = 0;
     return ret;
@@ -162,8 +159,7 @@ int BN_BLINDING_invert(BIGNUM *n, BN_BLINDING *b, BN_CTX *ctx)
     return BN_BLINDING_invert_ex(n, NULL, b, ctx);
 }
 
-int BN_BLINDING_invert_ex(BIGNUM *n, const BIGNUM *r, BN_BLINDING *b,
-                          BN_CTX *ctx)
+int BN_BLINDING_invert_ex(BIGNUM *n, const BIGNUM *r, BN_BLINDING *b, BN_CTX *ctx)
 {
     int ret;
 
@@ -229,14 +225,9 @@ void BN_BLINDING_set_flags(BN_BLINDING *b, unsigned long flags)
     b->flags = flags;
 }
 
-BN_BLINDING *BN_BLINDING_create_param(BN_BLINDING *b,
-                                      const BIGNUM *e, BIGNUM *m, BN_CTX *ctx,
-                                      int (*bn_mod_exp) (BIGNUM *r,
-                                                         const BIGNUM *a,
-                                                         const BIGNUM *p,
-                                                         const BIGNUM *m,
-                                                         BN_CTX *ctx,
-                                                         BN_MONT_CTX *m_ctx),
+BN_BLINDING *BN_BLINDING_create_param(BN_BLINDING *b, const BIGNUM *e, BIGNUM *m, BN_CTX *ctx,
+                                      int (*bn_mod_exp)(BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m,
+                                                        BN_CTX *ctx, BN_MONT_CTX *m_ctx),
                                       BN_MONT_CTX *m_ctx)
 {
     int retry_counter = 32;
@@ -301,7 +292,7 @@ BN_BLINDING *BN_BLINDING_create_param(BN_BLINDING *b,
     }
 
     return ret;
- err:
+err:
     if (b == NULL) {
         BN_BLINDING_free(ret);
         ret = NULL;

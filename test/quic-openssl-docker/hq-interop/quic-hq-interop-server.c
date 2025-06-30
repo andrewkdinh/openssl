@@ -123,8 +123,7 @@ static char *fileprefix = NULL;
  * Note:
  * - The predefined protocol is specified in the `alpn_ossltest` array.
  */
-static int select_alpn(SSL *ssl, const unsigned char **out,
-                       unsigned char *out_len, const unsigned char *in,
+static int select_alpn(SSL *ssl, const unsigned char **out, unsigned char *out_len, const unsigned char *in,
                        unsigned int in_len, void *arg)
 {
     /*
@@ -132,9 +131,8 @@ static int select_alpn(SSL *ssl, const unsigned char **out,
      * This scans the list of alpns we support and matches against
      * what the client is requesting
      */
-    if (SSL_select_next_proto((unsigned char **)out, out_len, alpn_ossltest,
-                              sizeof(alpn_ossltest), in,
-                              in_len) == OPENSSL_NPN_NEGOTIATED)
+    if (SSL_select_next_proto((unsigned char **)out, out_len, alpn_ossltest, sizeof(alpn_ossltest), in, in_len)
+        == OPENSSL_NPN_NEGOTIATED)
         return SSL_TLSEXT_ERR_OK;
     return SSL_TLSEXT_ERR_ALERT_FATAL;
 }
@@ -406,8 +404,7 @@ static int handle_io_failure(SSL *ssl, int res)
          * information about it from SSL_get_verify_result().
          */
         if (SSL_get_verify_result(ssl) != X509_V_OK)
-            fprintf(stderr, "Verify error: %s\n",
-                    X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
+            fprintf(stderr, "Verify error: %s\n", X509_verify_cert_error_string(SSL_get_verify_result(ssl)));
         return -1;
 
     default:
@@ -464,8 +461,7 @@ static void process_new_stream(SSL *stream)
     memset(buf, 0, BUF_SIZE);
     for (;;) {
         nread = 0;
-        ret = SSL_read_ex(stream, &buf[total_read],
-                          sizeof(buf) - total_read - 1, &nread);
+        ret = SSL_read_ex(stream, &buf[total_read], sizeof(buf) - total_read - 1, &nread);
         total_read += nread;
         if (ret <= 0) {
             ret = handle_io_failure(stream, ret);
@@ -640,9 +636,7 @@ static int run_quic_server(SSL_CTX *ctx, BIO *sock)
          * are using the default stream mode, as would be specified by
          * a call to SSL_set_default_stream_mode
          */
-        if (!SSL_set_incoming_stream_policy(conn,
-                                            SSL_INCOMING_STREAM_POLICY_ACCEPT,
-                                            0)) {
+        if (!SSL_set_incoming_stream_policy(conn, SSL_INCOMING_STREAM_POLICY_ACCEPT, 0)) {
             fprintf(stderr, "Failed to set incomming stream policy\n");
             goto close_conn;
         }
@@ -673,8 +667,7 @@ static int run_quic_server(SSL_CTX *ctx, BIO *sock)
                 ERR_print_errors_fp(stderr);
                 errcode = ERR_get_error();
                 if (ERR_GET_REASON(errcode) != SSL_R_PROTOCOL_IS_SHUTDOWN)
-                    fprintf(stderr, "Failure in accept stream, error %s\n",
-                            ERR_reason_error_string(errcode));
+                    fprintf(stderr, "Failure in accept stream, error %s\n", ERR_reason_error_string(errcode));
                 break;
             }
             process_new_stream(stream);

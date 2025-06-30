@@ -17,19 +17,19 @@
 #include <openssl/ssl.h>
 
 typedef enum OPTION_choice {
-    OPT_ERR = -1, OPT_EOF = 0, OPT_HELP
+    OPT_ERR = -1,
+    OPT_EOF = 0,
+    OPT_HELP
 } OPTION_CHOICE;
 
-const OPTIONS errstr_options[] = {
-    {OPT_HELP_STR, 1, '-', "Usage: %s [options] errnum...\n"},
+const OPTIONS errstr_options[] = {{OPT_HELP_STR, 1, '-', "Usage: %s [options] errnum...\n"},
 
-    OPT_SECTION("General"),
-    {"help", OPT_HELP, '-', "Display this summary"},
+                                  OPT_SECTION("General"),
+                                  {"help", OPT_HELP, '-', "Display this summary"},
 
-    OPT_PARAMETERS(),
-    {"errnum", 0, 0, "Error number(s) to decode"},
-    {NULL}
-};
+                                  OPT_PARAMETERS(),
+                                  {"errnum", 0, 0, "Error number(s) to decode"},
+                                  {NULL}};
 
 int errstr_main(int argc, char **argv)
 {
@@ -56,8 +56,7 @@ int errstr_main(int argc, char **argv)
      * We're not really an SSL application so this won't auto-init, but
      * we're still interested in SSL error strings
      */
-    OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS
-                    | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
+    OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
 
     /* All remaining arg are error code. */
     ret = 0;
@@ -69,6 +68,6 @@ int errstr_main(int argc, char **argv)
             BIO_printf(bio_out, "%s\n", buf);
         }
     }
- end:
+end:
     return ret;
 }

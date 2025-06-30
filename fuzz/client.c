@@ -36,7 +36,7 @@ static int idx;
 time_t time(time_t *t) TIME_IMPL(t)
 #endif
 
-int FuzzerInitialize(int *argc, char ***argv)
+    int FuzzerInitialize(int *argc, char ***argv)
 {
     STACK_OF(SSL_COMP) *comp_methods;
 
@@ -94,7 +94,7 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
             }
         }
     }
- end:
+end:
     SSL_free(client);
     ERR_clear_error();
     SSL_CTX_free(ctx);

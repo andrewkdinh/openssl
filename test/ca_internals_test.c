@@ -41,8 +41,7 @@ static int test_do_updatedb(void)
     need64bit = (int)strtol(test_get_argument(3), NULL, 0);
     have64bit = sizeof(time_t) > sizeof(uint32_t);
     if (need64bit && !have64bit) {
-        BIO_printf(bio_out, "skipping test (need64bit: %i, have64bit: %i)",
-            need64bit, have64bit);
+        BIO_printf(bio_out, "skipping test (need64bit: %i, have64bit: %i)", need64bit, have64bit);
         return 1;
     }
 
@@ -90,4 +89,3 @@ int setup_tests(void)
     TEST_error("%s: command '%s' is not supported for testing\n", binname, command);
     return 0;
 }
-

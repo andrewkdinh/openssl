@@ -8,15 +8,15 @@
  */
 
 #ifndef OSSL_INTERNAL_PRIORITY_QUEUE_H
-# define OSSL_INTERNAL_PRIORITY_QUEUE_H
-# pragma once
+#define OSSL_INTERNAL_PRIORITY_QUEUE_H
+#pragma once
 
-# include <stdlib.h>
-# include <openssl/e_os2.h>
+#include <stdlib.h>
+#include <openssl/e_os2.h>
 
-# define PRIORITY_QUEUE_OF(type) OSSL_PRIORITY_QUEUE_ ## type
+#define PRIORITY_QUEUE_OF(type) OSSL_PRIORITY_QUEUE_ ## type
 
-# define DEFINE_PRIORITY_QUEUE_OF_INTERNAL(type, ctype)                     \
+#define DEFINE_PRIORITY_QUEUE_OF_INTERNAL(type, ctype)                     \
     typedef struct ossl_priority_queue_st_ ## type PRIORITY_QUEUE_OF(type); \
     static ossl_unused ossl_inline PRIORITY_QUEUE_OF(type) *                \
     ossl_pqueue_##type##_new(int (*compare)(const ctype *, const ctype *))  \
@@ -69,7 +69,7 @@
     }                                                                       \
     struct ossl_priority_queue_st_ ## type
 
-# define DEFINE_PRIORITY_QUEUE_OF(type) \
+#define DEFINE_PRIORITY_QUEUE_OF(type) \
     DEFINE_PRIORITY_QUEUE_OF_INTERNAL(type, type)
 
 typedef struct ossl_pqueue_st OSSL_PQUEUE;

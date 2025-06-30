@@ -79,8 +79,7 @@ int ossl_prov_seeding_from_dispatch(const OSSL_DISPATCH *fns)
     return 1;
 }
 
-size_t ossl_prov_get_entropy(PROV_CTX *prov_ctx, unsigned char **pout,
-                             int entropy, size_t min_len, size_t max_len)
+size_t ossl_prov_get_entropy(PROV_CTX *prov_ctx, unsigned char **pout, int entropy, size_t min_len, size_t max_len)
 {
     const OSSL_CORE_HANDLE *handle = CORE_HANDLE(prov_ctx);
 
@@ -91,8 +90,7 @@ size_t ossl_prov_get_entropy(PROV_CTX *prov_ctx, unsigned char **pout,
     return 0;
 }
 
-void ossl_prov_cleanup_entropy(PROV_CTX *prov_ctx, unsigned char *buf,
-                               size_t len)
+void ossl_prov_cleanup_entropy(PROV_CTX *prov_ctx, unsigned char *buf, size_t len)
 {
     const OSSL_CORE_HANDLE *handle = CORE_HANDLE(prov_ctx);
 
@@ -102,9 +100,8 @@ void ossl_prov_cleanup_entropy(PROV_CTX *prov_ctx, unsigned char *buf,
         c_cleanup_entropy(handle, buf, len);
 }
 
-size_t ossl_prov_get_nonce(PROV_CTX *prov_ctx, unsigned char **pout,
-                           size_t min_len, size_t max_len,
-                           const void *salt, size_t salt_len)
+size_t ossl_prov_get_nonce(PROV_CTX *prov_ctx, unsigned char **pout, size_t min_len, size_t max_len, const void *salt,
+                           size_t salt_len)
 {
     const OSSL_CORE_HANDLE *handle = CORE_HANDLE(prov_ctx);
 

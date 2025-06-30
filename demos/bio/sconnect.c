@@ -21,9 +21,9 @@
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #if !defined(OPENSSL_SYS_WINDOWS)
-#include <unistd.h>
+# include <unistd.h>
 #else
-#include <windows.h>
+# include <windows.h>
 # define sleep(x) Sleep(x*1000)
 #endif
 
@@ -62,7 +62,6 @@ int main(int argc, char *argv[])
     /* Let's make an SSL structure */
     ssl = SSL_new(ssl_ctx);
     SSL_set_connect_state(ssl);
-
 
     /* Use it inside an SSL BIO */
     ssl_bio = BIO_new(BIO_f_ssl());
@@ -121,14 +120,14 @@ int main(int argc, char *argv[])
     ret = EXIT_SUCCESS;
     goto done;
 
- err:
+err:
     if (ERR_peek_error() == 0) { /* system call error */
         fprintf(stderr, "errno=%d ", errno);
         perror("error");
     } else {
         ERR_print_errors_fp(stderr);
     }
- done:
+done:
     BIO_free_all(out);
     SSL_CTX_free(ssl_ctx);
     return ret;

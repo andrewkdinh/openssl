@@ -47,17 +47,14 @@ static void *evp_kdf_new(void)
 {
     EVP_KDF *kdf = NULL;
 
-    if ((kdf = OPENSSL_zalloc(sizeof(*kdf))) == NULL
-        || !CRYPTO_NEW_REF(&kdf->refcnt, 1)) {
+    if ((kdf = OPENSSL_zalloc(sizeof(*kdf))) == NULL || !CRYPTO_NEW_REF(&kdf->refcnt, 1)) {
         OPENSSL_free(kdf);
         return NULL;
     }
     return kdf;
 }
 
-static void *evp_kdf_from_algorithm(int name_id,
-                                    const OSSL_ALGORITHM *algodef,
-                                    OSSL_PROVIDER *prov)
+static void *evp_kdf_from_algorithm(int name_id, const OSSL_ALGORITHM *algodef, OSSL_PROVIDER *prov)
 {
     const OSSL_DISPATCH *fns = algodef->implementation;
     EVP_KDF *kdf = NULL;
@@ -106,20 +103,17 @@ static void *evp_kdf_from_algorithm(int name_id,
         case OSSL_FUNC_KDF_GETTABLE_PARAMS:
             if (kdf->gettable_params != NULL)
                 break;
-            kdf->gettable_params =
-                OSSL_FUNC_kdf_gettable_params(fns);
+            kdf->gettable_params = OSSL_FUNC_kdf_gettable_params(fns);
             break;
         case OSSL_FUNC_KDF_GETTABLE_CTX_PARAMS:
             if (kdf->gettable_ctx_params != NULL)
                 break;
-            kdf->gettable_ctx_params =
-                OSSL_FUNC_kdf_gettable_ctx_params(fns);
+            kdf->gettable_ctx_params = OSSL_FUNC_kdf_gettable_ctx_params(fns);
             break;
         case OSSL_FUNC_KDF_SETTABLE_CTX_PARAMS:
             if (kdf->settable_ctx_params != NULL)
                 break;
-            kdf->settable_ctx_params =
-                OSSL_FUNC_kdf_settable_ctx_params(fns);
+            kdf->settable_ctx_params = OSSL_FUNC_kdf_settable_ctx_params(fns);
             break;
         case OSSL_FUNC_KDF_GET_PARAMS:
             if (kdf->get_params != NULL)
@@ -159,11 +153,9 @@ err:
     return NULL;
 }
 
-EVP_KDF *EVP_KDF_fetch(OSSL_LIB_CTX *libctx, const char *algorithm,
-                       const char *properties)
+EVP_KDF *EVP_KDF_fetch(OSSL_LIB_CTX *libctx, const char *algorithm, const char *properties)
 {
-    return evp_generic_fetch(libctx, OSSL_OP_KDF, algorithm, properties,
-                             evp_kdf_from_algorithm, evp_kdf_up_ref,
+    return evp_generic_fetch(libctx, OSSL_OP_KDF, algorithm, properties, evp_kdf_from_algorithm, evp_kdf_up_ref,
                              evp_kdf_free);
 }
 
@@ -224,11 +216,8 @@ const OSSL_PARAM *EVP_KDF_CTX_settable_params(EVP_KDF_CTX *ctx)
     return ctx->meth->settable_ctx_params(ctx->algctx, alg);
 }
 
-void EVP_KDF_do_all_provided(OSSL_LIB_CTX *libctx,
-                             void (*fn)(EVP_KDF *kdf, void *arg),
-                             void *arg)
+void EVP_KDF_do_all_provided(OSSL_LIB_CTX *libctx, void (*fn)(EVP_KDF *kdf, void *arg), void *arg)
 {
-    evp_generic_do_all(libctx, OSSL_OP_KDF,
-                       (void (*)(void *, void *))fn, arg,
-                       evp_kdf_from_algorithm, evp_kdf_up_ref, evp_kdf_free);
+    evp_generic_do_all(libctx, OSSL_OP_KDF, (void (*)(void *, void *))fn, arg, evp_kdf_from_algorithm, evp_kdf_up_ref,
+                       evp_kdf_free);
 }

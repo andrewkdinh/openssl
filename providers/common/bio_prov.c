@@ -87,16 +87,14 @@ OSSL_CORE_BIO *ossl_prov_bio_new_membuf(const char *filename, int len)
     return c_bio_new_membuf(filename, len);
 }
 
-int ossl_prov_bio_read_ex(OSSL_CORE_BIO *bio, void *data, size_t data_len,
-                          size_t *bytes_read)
+int ossl_prov_bio_read_ex(OSSL_CORE_BIO *bio, void *data, size_t data_len, size_t *bytes_read)
 {
     if (c_bio_read_ex == NULL)
         return 0;
     return c_bio_read_ex(bio, data, data_len, bytes_read);
 }
 
-int ossl_prov_bio_write_ex(OSSL_CORE_BIO *bio, const void *data, size_t data_len,
-                           size_t *written)
+int ossl_prov_bio_write_ex(OSSL_CORE_BIO *bio, const void *data, size_t data_len, size_t *written)
 {
     if (c_bio_write_ex == NULL)
         return 0;
@@ -161,14 +159,12 @@ int ossl_prov_bio_printf(OSSL_CORE_BIO *bio, const char *format, ...)
 
 /* No direct BIO support in the FIPS module */
 
-static int bio_core_read_ex(BIO *bio, char *data, size_t data_len,
-                            size_t *bytes_read)
+static int bio_core_read_ex(BIO *bio, char *data, size_t data_len, size_t *bytes_read)
 {
     return ossl_prov_bio_read_ex(BIO_get_data(bio), data, data_len, bytes_read);
 }
 
-static int bio_core_write_ex(BIO *bio, const char *data, size_t data_len,
-                             size_t *written)
+static int bio_core_write_ex(BIO *bio, const char *data, size_t data_len, size_t *written)
 {
     return ossl_prov_bio_write_ex(BIO_get_data(bio), data, data_len, written);
 }
@@ -208,14 +204,10 @@ BIO_METHOD *ossl_bio_prov_init_bio_method(void)
     BIO_METHOD *corebiometh = NULL;
 
     corebiometh = BIO_meth_new(BIO_TYPE_CORE_TO_PROV, "BIO to Core filter");
-    if (corebiometh == NULL
-            || !BIO_meth_set_write_ex(corebiometh, bio_core_write_ex)
-            || !BIO_meth_set_read_ex(corebiometh, bio_core_read_ex)
-            || !BIO_meth_set_puts(corebiometh, bio_core_puts)
-            || !BIO_meth_set_gets(corebiometh, bio_core_gets)
-            || !BIO_meth_set_ctrl(corebiometh, bio_core_ctrl)
-            || !BIO_meth_set_create(corebiometh, bio_core_new)
-            || !BIO_meth_set_destroy(corebiometh, bio_core_free)) {
+    if (corebiometh == NULL || !BIO_meth_set_write_ex(corebiometh, bio_core_write_ex)
+        || !BIO_meth_set_read_ex(corebiometh, bio_core_read_ex) || !BIO_meth_set_puts(corebiometh, bio_core_puts)
+        || !BIO_meth_set_gets(corebiometh, bio_core_gets) || !BIO_meth_set_ctrl(corebiometh, bio_core_ctrl)
+        || !BIO_meth_set_create(corebiometh, bio_core_new) || !BIO_meth_set_destroy(corebiometh, bio_core_free)) {
         BIO_meth_free(corebiometh);
         return NULL;
     }

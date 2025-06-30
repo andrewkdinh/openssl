@@ -20,8 +20,7 @@ ASN1_TYPE *PKCS12_get_attr(const PKCS12_SAFEBAG *bag, int attr_nid)
 }
 #endif
 
-const ASN1_TYPE *PKCS12_SAFEBAG_get0_attr(const PKCS12_SAFEBAG *bag,
-                                          int attr_nid)
+const ASN1_TYPE *PKCS12_SAFEBAG_get0_attr(const PKCS12_SAFEBAG *bag, int attr_nid)
 {
     return PKCS12_get_attr_gen(bag->attrib, attr_nid);
 }
@@ -45,8 +44,7 @@ const X509_SIG *PKCS12_SAFEBAG_get0_pkcs8(const PKCS12_SAFEBAG *bag)
     return bag->value.shkeybag;
 }
 
-const STACK_OF(PKCS12_SAFEBAG) *
-PKCS12_SAFEBAG_get0_safes(const PKCS12_SAFEBAG *bag)
+const STACK_OF(PKCS12_SAFEBAG) *PKCS12_SAFEBAG_get0_safes(const PKCS12_SAFEBAG *bag)
 {
     if (OBJ_obj2nid(bag->type) != NID_safeContentsBag)
         return NULL;
@@ -88,8 +86,7 @@ X509 *PKCS12_SAFEBAG_get1_cert(const PKCS12_SAFEBAG *bag)
         return NULL;
     if (OBJ_obj2nid(bag->value.bag->type) != NID_x509Certificate)
         return NULL;
-    return ASN1_item_unpack(bag->value.bag->value.octet,
-                            ASN1_ITEM_rptr(X509));
+    return ASN1_item_unpack(bag->value.bag->value.octet, ASN1_ITEM_rptr(X509));
 }
 
 X509_CRL *PKCS12_SAFEBAG_get1_crl(const PKCS12_SAFEBAG *bag)
@@ -98,12 +95,10 @@ X509_CRL *PKCS12_SAFEBAG_get1_crl(const PKCS12_SAFEBAG *bag)
         return NULL;
     if (OBJ_obj2nid(bag->value.bag->type) != NID_x509Crl)
         return NULL;
-    return ASN1_item_unpack(bag->value.bag->value.octet,
-                            ASN1_ITEM_rptr(X509_CRL));
+    return ASN1_item_unpack(bag->value.bag->value.octet, ASN1_ITEM_rptr(X509_CRL));
 }
 
-X509 *PKCS12_SAFEBAG_get1_cert_ex(const PKCS12_SAFEBAG *bag,
-                                  OSSL_LIB_CTX *libctx, const char *propq)
+X509 *PKCS12_SAFEBAG_get1_cert_ex(const PKCS12_SAFEBAG *bag, OSSL_LIB_CTX *libctx, const char *propq)
 {
     X509 *ret = NULL;
 
@@ -111,8 +106,7 @@ X509 *PKCS12_SAFEBAG_get1_cert_ex(const PKCS12_SAFEBAG *bag,
         return NULL;
     if (OBJ_obj2nid(bag->value.bag->type) != NID_x509Certificate)
         return NULL;
-    ret = ASN1_item_unpack_ex(bag->value.bag->value.octet,
-                              ASN1_ITEM_rptr(X509), libctx, propq);
+    ret = ASN1_item_unpack_ex(bag->value.bag->value.octet, ASN1_ITEM_rptr(X509), libctx, propq);
     if (!ossl_x509_set0_libctx(ret, libctx, propq)) {
         X509_free(ret);
         return NULL;
@@ -120,8 +114,7 @@ X509 *PKCS12_SAFEBAG_get1_cert_ex(const PKCS12_SAFEBAG *bag,
     return ret;
 }
 
-X509_CRL *PKCS12_SAFEBAG_get1_crl_ex(const PKCS12_SAFEBAG *bag,
-                                     OSSL_LIB_CTX *libctx, const char *propq)
+X509_CRL *PKCS12_SAFEBAG_get1_crl_ex(const PKCS12_SAFEBAG *bag, OSSL_LIB_CTX *libctx, const char *propq)
 {
     X509_CRL *ret = NULL;
 
@@ -129,8 +122,7 @@ X509_CRL *PKCS12_SAFEBAG_get1_crl_ex(const PKCS12_SAFEBAG *bag,
         return NULL;
     if (OBJ_obj2nid(bag->value.bag->type) != NID_x509Crl)
         return NULL;
-    ret = ASN1_item_unpack_ex(bag->value.bag->value.octet,
-                              ASN1_ITEM_rptr(X509_CRL), libctx, propq);
+    ret = ASN1_item_unpack_ex(bag->value.bag->value.octet, ASN1_ITEM_rptr(X509_CRL), libctx, propq);
     if (!ossl_x509_crl_set0_libctx(ret, libctx, propq)) {
         X509_CRL_free(ret);
         return NULL;
@@ -140,14 +132,12 @@ X509_CRL *PKCS12_SAFEBAG_get1_crl_ex(const PKCS12_SAFEBAG *bag,
 
 PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_cert(X509 *x509)
 {
-    return PKCS12_item_pack_safebag(x509, ASN1_ITEM_rptr(X509),
-                                    NID_x509Certificate, NID_certBag);
+    return PKCS12_item_pack_safebag(x509, ASN1_ITEM_rptr(X509), NID_x509Certificate, NID_certBag);
 }
 
 PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_crl(X509_CRL *crl)
 {
-    return PKCS12_item_pack_safebag(crl, ASN1_ITEM_rptr(X509_CRL),
-                                    NID_x509Crl, NID_crlBag);
+    return PKCS12_item_pack_safebag(crl, ASN1_ITEM_rptr(X509_CRL), NID_x509Crl, NID_crlBag);
 }
 
 PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_secret(int type, int vtype, const unsigned char *value, int len)
@@ -162,29 +152,27 @@ PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_secret(int type, int vtype, const unsigned
     bag->type = OBJ_nid2obj(type);
 
     switch (vtype) {
-    case V_ASN1_OCTET_STRING:
-        {
-            ASN1_OCTET_STRING *strtmp = ASN1_OCTET_STRING_new();
+    case V_ASN1_OCTET_STRING: {
+        ASN1_OCTET_STRING *strtmp = ASN1_OCTET_STRING_new();
 
-            if (strtmp == NULL) {
-                ERR_raise(ERR_LIB_PKCS12, ERR_R_ASN1_LIB);
-                goto err;
-            }
-            /* Pack data into an octet string */
-            if (!ASN1_OCTET_STRING_set(strtmp, value, len)) {
-                ASN1_OCTET_STRING_free(strtmp);
-                ERR_raise(ERR_LIB_PKCS12, PKCS12_R_ENCODE_ERROR);
-                goto err;
-            }
-            bag->value.other = ASN1_TYPE_new();
-            if (bag->value.other == NULL) {
-                ASN1_OCTET_STRING_free(strtmp);
-                ERR_raise(ERR_LIB_PKCS12, ERR_R_ASN1_LIB);
-                goto err;
-            }
-            ASN1_TYPE_set(bag->value.other, vtype, strtmp);
+        if (strtmp == NULL) {
+            ERR_raise(ERR_LIB_PKCS12, ERR_R_ASN1_LIB);
+            goto err;
         }
-        break;
+            /* Pack data into an octet string */
+        if (!ASN1_OCTET_STRING_set(strtmp, value, len)) {
+            ASN1_OCTET_STRING_free(strtmp);
+            ERR_raise(ERR_LIB_PKCS12, PKCS12_R_ENCODE_ERROR);
+            goto err;
+        }
+        bag->value.other = ASN1_TYPE_new();
+        if (bag->value.other == NULL) {
+            ASN1_OCTET_STRING_free(strtmp);
+            ERR_raise(ERR_LIB_PKCS12, ERR_R_ASN1_LIB);
+            goto err;
+        }
+        ASN1_TYPE_set(bag->value.other, vtype, strtmp);
+    } break;
 
     default:
         ERR_raise(ERR_LIB_PKCS12, PKCS12_R_INVALID_TYPE);
@@ -199,7 +187,7 @@ PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_secret(int type, int vtype, const unsigned
     safebag->type = OBJ_nid2obj(NID_secretBag);
     return safebag;
 
- err:
+err:
     PKCS12_BAGS_free(bag);
     return NULL;
 }
@@ -235,14 +223,9 @@ PKCS12_SAFEBAG *PKCS12_SAFEBAG_create0_pkcs8(X509_SIG *p8)
     return bag;
 }
 
-PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_pkcs8_encrypt_ex(int pbe_nid,
-                                                       const char *pass,
-                                                       int passlen,
-                                                       unsigned char *salt,
-                                                       int saltlen, int iter,
-                                                       PKCS8_PRIV_KEY_INFO *p8inf,
-                                                       OSSL_LIB_CTX *ctx,
-                                                       const char *propq)
+PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_pkcs8_encrypt_ex(int pbe_nid, const char *pass, int passlen, unsigned char *salt,
+                                                       int saltlen, int iter, PKCS8_PRIV_KEY_INFO *p8inf,
+                                                       OSSL_LIB_CTX *ctx, const char *propq)
 {
     PKCS12_SAFEBAG *bag = NULL;
     const EVP_CIPHER *pbe_ciph = NULL;
@@ -258,8 +241,7 @@ PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_pkcs8_encrypt_ex(int pbe_nid,
     if (pbe_ciph != NULL)
         pbe_nid = -1;
 
-    p8 = PKCS8_encrypt_ex(pbe_nid, pbe_ciph, pass, passlen, salt, saltlen, iter,
-                          p8inf, ctx, propq);
+    p8 = PKCS8_encrypt_ex(pbe_nid, pbe_ciph, pass, passlen, salt, saltlen, iter, p8inf, ctx, propq);
     if (p8 == NULL)
         goto err;
 
@@ -272,14 +254,8 @@ err:
     return bag;
 }
 
-PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_pkcs8_encrypt(int pbe_nid,
-                                                    const char *pass,
-                                                    int passlen,
-                                                    unsigned char *salt,
-                                                    int saltlen, int iter,
-                                                    PKCS8_PRIV_KEY_INFO *p8inf)
+PKCS12_SAFEBAG *PKCS12_SAFEBAG_create_pkcs8_encrypt(int pbe_nid, const char *pass, int passlen, unsigned char *salt,
+                                                    int saltlen, int iter, PKCS8_PRIV_KEY_INFO *p8inf)
 {
-    return PKCS12_SAFEBAG_create_pkcs8_encrypt_ex(pbe_nid, pass, passlen,
-                                                  salt, saltlen, iter, p8inf,
-                                                  NULL, NULL);
+    return PKCS12_SAFEBAG_create_pkcs8_encrypt_ex(pbe_nid, pass, passlen, salt, saltlen, iter, p8inf, NULL, NULL);
 }

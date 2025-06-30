@@ -20,8 +20,7 @@ static int cipher_enabled(const SSL_CIPHER *ciph)
     if ((ciph->algorithm_mac & SSL_AEAD) != 0)
         return 1;
 
-    if (ciph->algorithm_enc != SSL_eNULL
-            && EVP_get_cipherbynid(SSL_CIPHER_get_cipher_nid(ciph)) == NULL)
+    if (ciph->algorithm_enc != SSL_eNULL && EVP_get_cipherbynid(SSL_CIPHER_get_cipher_nid(ciph)) == NULL)
         return 0;
 
     if (EVP_get_digestbynid(SSL_CIPHER_get_digest_nid(ciph)) == NULL)
@@ -48,8 +47,7 @@ static int cipher_overhead(void)
             TEST_info("Failed getting %s", ciph->name);
             ret = 0;
         } else {
-            TEST_info("Cipher %s: %zu %zu %zu %zu",
-                      ciph->name, mac, in, blk, ex);
+            TEST_info("Cipher %s: %zu %zu %zu %zu", ciph->name, mac, in, blk, ex);
         }
     }
     return ret;

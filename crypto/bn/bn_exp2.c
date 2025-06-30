@@ -13,12 +13,10 @@
 
 #define TABLE_SIZE      32
 
-int BN_mod_exp2_mont(BIGNUM *rr, const BIGNUM *a1, const BIGNUM *p1,
-                     const BIGNUM *a2, const BIGNUM *p2, const BIGNUM *m,
-                     BN_CTX *ctx, BN_MONT_CTX *in_mont)
+int BN_mod_exp2_mont(BIGNUM *rr, const BIGNUM *a1, const BIGNUM *p1, const BIGNUM *a2, const BIGNUM *p2,
+                     const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *in_mont)
 {
-    int i, j, bits, b, bits1, bits2, ret =
-        0, wpos1, wpos2, window1, window2, wvalue1, wvalue2;
+    int i, j, bits, b, bits1, bits2, ret = 0, wpos1, wpos2, window1, window2, wvalue1, wvalue2;
     int r_is_one = 1;
     BIGNUM *d, *r;
     const BIGNUM *a_mod_m;
@@ -88,8 +86,7 @@ int BN_mod_exp2_mont(BIGNUM *rr, const BIGNUM *a1, const BIGNUM *p1,
 
         j = 1 << (window1 - 1);
         for (i = 1; i < j; i++) {
-            if (((val1[i] = BN_CTX_get(ctx)) == NULL) ||
-                !BN_mod_mul_montgomery(val1[i], val1[i - 1], d, mont, ctx))
+            if (((val1[i] = BN_CTX_get(ctx)) == NULL) || !BN_mod_mul_montgomery(val1[i], val1[i - 1], d, mont, ctx))
                 goto err;
         }
     }
@@ -116,8 +113,7 @@ int BN_mod_exp2_mont(BIGNUM *rr, const BIGNUM *a1, const BIGNUM *p1,
 
         j = 1 << (window2 - 1);
         for (i = 1; i < j; i++) {
-            if (((val2[i] = BN_CTX_get(ctx)) == NULL) ||
-                !BN_mod_mul_montgomery(val2[i], val2[i - 1], d, mont, ctx))
+            if (((val2[i] = BN_CTX_get(ctx)) == NULL) || !BN_mod_mul_montgomery(val2[i], val2[i - 1], d, mont, ctx))
                 goto err;
         }
     }
@@ -192,7 +188,7 @@ int BN_mod_exp2_mont(BIGNUM *rr, const BIGNUM *a1, const BIGNUM *p1,
     if (!BN_from_montgomery(rr, r, mont, ctx))
         goto err;
     ret = 1;
- err:
+err:
     if (in_mont == NULL)
         BN_MONT_CTX_free(mont);
     BN_CTX_end(ctx);

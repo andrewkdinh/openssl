@@ -8,15 +8,15 @@
 */
 
 #ifndef OSSL_INTERNAL_QUIC_SRT_GEN_H
-# define OSSL_INTERNAL_QUIC_SRT_GEN_H
-# pragma once
+#define OSSL_INTERNAL_QUIC_SRT_GEN_H
+#pragma once
 
-# include "internal/e_os.h"
-# include "internal/time.h"
-# include "internal/quic_types.h"
-# include "internal/quic_wire.h"
+#include "internal/e_os.h"
+#include "internal/time.h"
+#include "internal/quic_types.h"
+#include "internal/quic_wire.h"
 
-# ifndef OPENSSL_NO_QUIC
+#ifndef OPENSSL_NO_QUIC
 
 /*
  * QUIC Stateless Reset Token Generator
@@ -39,8 +39,7 @@ typedef struct quic_srt_gen_st QUIC_SRT_GEN;
  * the key; i.e., the caller is responsible for ensuring the key is never used
  * in any other context.
  */
-QUIC_SRT_GEN *ossl_quic_srt_gen_new(OSSL_LIB_CTX *libctx, const char *propq,
-                                    const unsigned char *key, size_t key_len);
+QUIC_SRT_GEN *ossl_quic_srt_gen_new(OSSL_LIB_CTX *libctx, const char *propq, const unsigned char *key, size_t key_len);
 
 /* Free the stateless reset token generator. No-op if srt_gen is NULL. */
 void ossl_quic_srt_gen_free(QUIC_SRT_GEN *srt_gen);
@@ -49,9 +48,8 @@ void ossl_quic_srt_gen_free(QUIC_SRT_GEN *srt_gen);
  * Calculates a token using the given DCID and writes it to *token. Returns 0 on
  * failure.
  */
-int ossl_quic_srt_gen_calculate_token(QUIC_SRT_GEN *srt_gen,
-                                      const QUIC_CONN_ID *dcid,
+int ossl_quic_srt_gen_calculate_token(QUIC_SRT_GEN *srt_gen, const QUIC_CONN_ID *dcid,
                                       QUIC_STATELESS_RESET_TOKEN *token);
 
-# endif
+#endif
 #endif

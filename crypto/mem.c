@@ -55,9 +55,7 @@ static int shouldfail(void);
 # define FAILTEST() /* empty */
 #endif
 
-int CRYPTO_set_mem_functions(CRYPTO_malloc_fn malloc_fn,
-                             CRYPTO_realloc_fn realloc_fn,
-                             CRYPTO_free_fn free_fn)
+int CRYPTO_set_mem_functions(CRYPTO_malloc_fn malloc_fn, CRYPTO_realloc_fn realloc_fn, CRYPTO_free_fn free_fn)
 {
     if (!allow_customize)
         return 0;
@@ -70,9 +68,7 @@ int CRYPTO_set_mem_functions(CRYPTO_malloc_fn malloc_fn,
     return 1;
 }
 
-void CRYPTO_get_mem_functions(CRYPTO_malloc_fn *malloc_fn,
-                              CRYPTO_realloc_fn *realloc_fn,
-                              CRYPTO_free_fn *free_fn)
+void CRYPTO_get_mem_functions(CRYPTO_malloc_fn *malloc_fn, CRYPTO_realloc_fn *realloc_fn, CRYPTO_free_fn *free_fn)
 {
     if (malloc_fn != NULL)
         *malloc_fn = malloc_impl;
@@ -144,9 +140,8 @@ static int shouldfail(void)
     char buff[80];
 
     if (md_tracefd > 0) {
-        BIO_snprintf(buff, sizeof(buff),
-                     "%c C%ld %%%d R%d\n",
-                     shoulditfail ? '-' : '+', md_count, md_fail_percent, roll);
+        BIO_snprintf(buff, sizeof(buff), "%c C%ld %%%d R%d\n", shoulditfail ? '-' : '+', md_count, md_fail_percent,
+                     roll);
         len = strlen(buff);
         if (write(md_tracefd, buff, len) != len)
             perror("shouldfail write failed");
@@ -211,7 +206,7 @@ void *CRYPTO_malloc(size_t num, const char *file, int line)
     ptr = malloc(num);
     if (ptr != NULL)
         return ptr;
- err:
+err:
     /*
      * ossl_err_get_state_int() in err.c uses CRYPTO_zalloc(num, NULL, 0) for
      * ERR_STATE allocation. Prevent mem alloc error loop while reporting error.
@@ -235,8 +230,7 @@ void *CRYPTO_zalloc(size_t num, const char *file, int line)
     return ret;
 }
 
-void *CRYPTO_aligned_alloc(size_t num, size_t alignment, void **freeptr,
-                           const char *file, int line)
+void *CRYPTO_aligned_alloc(size_t num, size_t alignment, void **freeptr, const char *file, int line)
 {
     void *ret;
 
@@ -315,8 +309,7 @@ void *CRYPTO_realloc(void *str, size_t num, const char *file, int line)
     return realloc(str, num);
 }
 
-void *CRYPTO_clear_realloc(void *str, size_t old_len, size_t num,
-                           const char *file, int line)
+void *CRYPTO_clear_realloc(void *str, size_t old_len, size_t num, const char *file, int line)
 {
     void *ret = NULL;
 
@@ -330,7 +323,7 @@ void *CRYPTO_clear_realloc(void *str, size_t old_len, size_t num,
 
     /* Can't shrink the buffer since memcpy below copies |old_len| bytes. */
     if (num < old_len) {
-        OPENSSL_cleanse((char*)str + num, old_len - num);
+        OPENSSL_cleanse((char *)str + num, old_len - num);
         return str;
     }
 
@@ -379,7 +372,9 @@ int CRYPTO_set_mem_debug(int flag)
 
 int CRYPTO_mem_debug_push(const char *info, const char *file, int line)
 {
-    (void)info; (void)file; (void)line;
+    (void)info;
+    (void)file;
+    (void)line;
     return 0;
 }
 
@@ -388,22 +383,31 @@ int CRYPTO_mem_debug_pop(void)
     return 0;
 }
 
-void CRYPTO_mem_debug_malloc(void *addr, size_t num, int flag,
-                             const char *file, int line)
+void CRYPTO_mem_debug_malloc(void *addr, size_t num, int flag, const char *file, int line)
 {
-    (void)addr; (void)num; (void)flag; (void)file; (void)line;
+    (void)addr;
+    (void)num;
+    (void)flag;
+    (void)file;
+    (void)line;
 }
 
-void CRYPTO_mem_debug_realloc(void *addr1, void *addr2, size_t num, int flag,
-                              const char *file, int line)
+void CRYPTO_mem_debug_realloc(void *addr1, void *addr2, size_t num, int flag, const char *file, int line)
 {
-    (void)addr1; (void)addr2; (void)num; (void)flag; (void)file; (void)line;
+    (void)addr1;
+    (void)addr2;
+    (void)num;
+    (void)flag;
+    (void)file;
+    (void)line;
 }
 
-void CRYPTO_mem_debug_free(void *addr, int flag,
-                           const char *file, int line)
+void CRYPTO_mem_debug_free(void *addr, int flag, const char *file, int line)
 {
-    (void)addr; (void)flag; (void)file; (void)line;
+    (void)addr;
+    (void)flag;
+    (void)file;
+    (void)line;
 }
 
 int CRYPTO_mem_leaks(BIO *b)
@@ -420,10 +424,10 @@ int CRYPTO_mem_leaks_fp(FILE *fp)
 }
 #  endif
 
-int CRYPTO_mem_leaks_cb(int (*cb)(const char *str, size_t len, void *u),
-                        void *u)
+int CRYPTO_mem_leaks_cb(int (*cb)(const char *str, size_t len, void *u), void *u)
 {
-    (void)cb; (void)u;
+    (void)cb;
+    (void)u;
     return -1;
 }
 

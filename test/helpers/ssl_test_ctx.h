@@ -241,8 +241,7 @@ const char *ssl_alert_name(int alert);
 const char *ssl_protocol_name(int protocol);
 const char *ssl_verify_callback_name(ssl_verify_callback_t verify_callback);
 const char *ssl_servername_name(ssl_servername_t server);
-const char *ssl_servername_callback_name(ssl_servername_callback_t
-                                         servername_callback);
+const char *ssl_servername_callback_name(ssl_servername_callback_t servername_callback);
 const char *ssl_session_ticket_name(ssl_session_ticket_t server);
 const char *ssl_session_id_name(ssl_session_id_t server);
 const char *ssl_test_method_name(ssl_test_method_t method);
@@ -255,8 +254,7 @@ const char *ssl_max_fragment_len_name(int MFL_mode);
  * Load the test case context from |conf|.
  * See test/README.ssltest.md for details on the conf file format.
  */
-SSL_TEST_CTX *SSL_TEST_CTX_create(const CONF *conf, const char *test_section,
-                                  OSSL_LIB_CTX *libctx);
+SSL_TEST_CTX *SSL_TEST_CTX_create(const CONF *conf, const char *test_section, OSSL_LIB_CTX *libctx);
 
 SSL_TEST_CTX *SSL_TEST_CTX_new(OSSL_LIB_CTX *libctx);
 

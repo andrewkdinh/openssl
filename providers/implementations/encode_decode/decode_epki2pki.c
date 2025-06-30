@@ -56,10 +56,8 @@ static void epki2pki_freectx(void *vctx)
 
 static const OSSL_PARAM *epki2pki_settable_ctx_params(ossl_unused void *provctx)
 {
-    static const OSSL_PARAM settables[] = {
-        OSSL_PARAM_utf8_string(OSSL_DECODER_PARAM_PROPERTIES, NULL, 0),
-        OSSL_PARAM_END
-    };
+    static const OSSL_PARAM settables[] = {OSSL_PARAM_utf8_string(OSSL_DECODER_PARAM_PROPERTIES, NULL, 0),
+                                           OSSL_PARAM_END};
     return settables;
 }
 
@@ -81,8 +79,7 @@ static int epki2pki_set_ctx_params(void *vctx, const OSSL_PARAM params[])
  * because it's not relevant just to decode EncryptedPrivateKeyInfo to
  * PrivateKeyInfo.
  */
-static int epki2pki_decode(void *vctx, OSSL_CORE_BIO *cin, int selection,
-                           OSSL_CALLBACK *data_cb, void *data_cbarg,
+static int epki2pki_decode(void *vctx, OSSL_CORE_BIO *cin, int selection, OSSL_CALLBACK *data_cb, void *data_cbarg,
                            OSSL_PASSPHRASE_CALLBACK *pw_cb, void *pw_cbarg)
 {
     struct epki2pki_ctx_st *ctx = vctx;
@@ -106,17 +103,14 @@ static int epki2pki_decode(void *vctx, OSSL_CORE_BIO *cin, int selection,
     der_len = (long)mem->length;
     OPENSSL_free(mem);
 
-    ok = ossl_epki2pki_der_decode(der, der_len, selection, data_cb, data_cbarg,
-                                  pw_cb, pw_cbarg, PROV_LIBCTX_OF(ctx->provctx),
-                                  ctx->propq);
+    ok = ossl_epki2pki_der_decode(der, der_len, selection, data_cb, data_cbarg, pw_cb, pw_cbarg,
+                                  PROV_LIBCTX_OF(ctx->provctx), ctx->propq);
     OPENSSL_free(der);
     return ok;
 }
 
-int ossl_epki2pki_der_decode(unsigned char *der, long der_len, int selection,
-                             OSSL_CALLBACK *data_cb, void *data_cbarg,
-                             OSSL_PASSPHRASE_CALLBACK *pw_cb, void *pw_cbarg,
-                             OSSL_LIB_CTX *libctx, const char *propq)
+int ossl_epki2pki_der_decode(unsigned char *der, long der_len, int selection, OSSL_CALLBACK *data_cb, void *data_cbarg,
+                             OSSL_PASSPHRASE_CALLBACK *pw_cb, void *pw_cbarg, OSSL_LIB_CTX *libctx, const char *propq)
 {
     const unsigned char *pder = der;
     unsigned char *new_der = NULL;
@@ -140,10 +134,8 @@ int ossl_epki2pki_der_decode(unsigned char *der, long der_len, int selection,
             int new_der_len = 0;
 
             X509_SIG_get0(p8, &alg, &oct);
-            if (!PKCS12_pbe_crypt_ex(alg, pbuf, plen,
-                                     oct->data, oct->length,
-                                     &new_der, &new_der_len, 0,
-                                     libctx, propq)) {
+            if (!PKCS12_pbe_crypt_ex(alg, pbuf, plen, oct->data, oct->length, &new_der, &new_der_len, 0, libctx,
+                                     propq)) {
                 ok = 0;
             } else {
                 der = new_der;
@@ -172,14 +164,10 @@ int ossl_epki2pki_der_decode(unsigned char *der, long der_len, int selection,
 
         OBJ_obj2txt(keytype, sizeof(keytype), alg->algorithm, 0);
 
-        *p++ = OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_DATA_TYPE,
-                                                keytype, 0);
-        *p++ = OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_INPUT_TYPE,
-                                                "DER", 0);
-        *p++ = OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_DATA_STRUCTURE,
-                                                "PrivateKeyInfo", 0);
-        *p++ = OSSL_PARAM_construct_octet_string(OSSL_OBJECT_PARAM_DATA,
-                                                 der, der_len);
+        *p++ = OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_DATA_TYPE, keytype, 0);
+        *p++ = OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_INPUT_TYPE, "DER", 0);
+        *p++ = OSSL_PARAM_construct_utf8_string(OSSL_OBJECT_PARAM_DATA_STRUCTURE, "PrivateKeyInfo", 0);
+        *p++ = OSSL_PARAM_construct_octet_string(OSSL_OBJECT_PARAM_DATA, der, der_len);
         *p++ = OSSL_PARAM_construct_int(OSSL_OBJECT_PARAM_TYPE, &objtype);
         *p = OSSL_PARAM_construct_end();
 
@@ -191,12 +179,9 @@ int ossl_epki2pki_der_decode(unsigned char *der, long der_len, int selection,
 }
 
 const OSSL_DISPATCH ossl_EncryptedPrivateKeyInfo_der_to_der_decoder_functions[] = {
-    { OSSL_FUNC_DECODER_NEWCTX, (void (*)(void))epki2pki_newctx },
-    { OSSL_FUNC_DECODER_FREECTX, (void (*)(void))epki2pki_freectx },
-    { OSSL_FUNC_DECODER_DECODE, (void (*)(void))epki2pki_decode },
-    { OSSL_FUNC_DECODER_SETTABLE_CTX_PARAMS,
-      (void (*)(void))epki2pki_settable_ctx_params },
-    { OSSL_FUNC_DECODER_SET_CTX_PARAMS,
-      (void (*)(void))epki2pki_set_ctx_params },
-    OSSL_DISPATCH_END
-};
+    {OSSL_FUNC_DECODER_NEWCTX, (void (*)(void))epki2pki_newctx},
+    {OSSL_FUNC_DECODER_FREECTX, (void (*)(void))epki2pki_freectx},
+    {OSSL_FUNC_DECODER_DECODE, (void (*)(void))epki2pki_decode},
+    {OSSL_FUNC_DECODER_SETTABLE_CTX_PARAMS, (void (*)(void))epki2pki_settable_ctx_params},
+    {OSSL_FUNC_DECODER_SET_CTX_PARAMS, (void (*)(void))epki2pki_set_ctx_params},
+    OSSL_DISPATCH_END};

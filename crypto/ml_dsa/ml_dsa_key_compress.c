@@ -83,8 +83,7 @@ uint32_t ossl_ml_dsa_key_compress_high_bits(uint32_t r, uint32_t gamma2)
  * @param r1 The returned high order bits
  * @param r0 The returned low order bits
  */
-void ossl_ml_dsa_key_compress_decompose(uint32_t r, uint32_t gamma2,
-                                        uint32_t *r1, int32_t *r0)
+void ossl_ml_dsa_key_compress_decompose(uint32_t r, uint32_t gamma2, uint32_t *r1, int32_t *r0)
 {
     *r1 = ossl_ml_dsa_key_compress_high_bits(r, gamma2);
 
@@ -130,14 +129,12 @@ int32_t ossl_ml_dsa_key_compress_low_bits(uint32_t r, uint32_t gamma2)
  * @params w  (A * y)
  * @returns The hint bit.
  */
-int32_t ossl_ml_dsa_key_compress_make_hint(uint32_t ct0, uint32_t cs2,
-                                           uint32_t gamma2, uint32_t w)
+int32_t ossl_ml_dsa_key_compress_make_hint(uint32_t ct0, uint32_t cs2, uint32_t gamma2, uint32_t w)
 {
     uint32_t r_plus_z = mod_sub(w, cs2);
     uint32_t r = reduce_once(r_plus_z + ct0);
 
-    return  ossl_ml_dsa_key_compress_high_bits(r, gamma2)
-        !=  ossl_ml_dsa_key_compress_high_bits(r_plus_z, gamma2);
+    return ossl_ml_dsa_key_compress_high_bits(r, gamma2) != ossl_ml_dsa_key_compress_high_bits(r_plus_z, gamma2);
 }
 
 /*
@@ -151,8 +148,7 @@ int32_t ossl_ml_dsa_key_compress_make_hint(uint32_t ct0, uint32_t cs2,
  *
  * @returns The adjusted high bits or r.
  */
-uint32_t ossl_ml_dsa_key_compress_use_hint(uint32_t hint, uint32_t r,
-                                           uint32_t gamma2)
+uint32_t ossl_ml_dsa_key_compress_use_hint(uint32_t hint, uint32_t r, uint32_t gamma2)
 {
     uint32_t r1;
     int32_t r0;

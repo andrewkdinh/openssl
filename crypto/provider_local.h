@@ -26,8 +26,5 @@ typedef struct {
 extern const OSSL_PROVIDER_INFO ossl_predefined_providers[];
 
 void ossl_provider_info_clear(OSSL_PROVIDER_INFO *info);
-int ossl_provider_info_add_to_store(OSSL_LIB_CTX *libctx,
-                                    OSSL_PROVIDER_INFO *entry);
-int ossl_provider_info_add_parameter(OSSL_PROVIDER_INFO *provinfo,
-                                     const char *name,
-                                     const char *value);
+int ossl_provider_info_add_to_store(OSSL_LIB_CTX *libctx, OSSL_PROVIDER_INFO *entry);
+int ossl_provider_info_add_parameter(OSSL_PROVIDER_INFO *provinfo, const char *name, const char *value);

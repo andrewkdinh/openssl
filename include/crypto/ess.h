@@ -8,8 +8,8 @@
  */
 
 #ifndef OSSL_CRYPTO_ESS_H
-# define OSSL_CRYPTO_ESS_H
-# pragma once
+#define OSSL_CRYPTO_ESS_H
+#pragma once
 
 /*-
  * IssuerSerial ::= SEQUENCE {

@@ -23,8 +23,7 @@
 
 typedef struct prov_cipher_hw_aes_gcm_siv_st {
     int (*initkey)(void *vctx);
-    int (*cipher)(void *vctx, unsigned char *out, const unsigned char *in,
-                  size_t len);
+    int (*cipher)(void *vctx, unsigned char *out, const unsigned char *in, size_t len);
     int (*dup_ctx)(void *vdst, void *vsrc);
     void (*clean_ctx)(void *vctx);
 } PROV_CIPHER_HW_AES_GCM_SIV;
@@ -45,26 +44,23 @@ typedef struct prov_aes_gcm_siv_ctx_st {
     uint8_t user_tag[TAG_SIZE];     /* from user */
     uint8_t nonce[NONCE_SIZE];       /* from user */
     u128 Htable[16];         /* Polyval calculations via ghash */
-    unsigned int enc : 1;    /* Set to 1 if we are encrypting or 0 otherwise */
-    unsigned int have_user_tag : 1;
-    unsigned int generated_tag : 1;
-    unsigned int used_enc : 1;
-    unsigned int used_dec : 1;
-    unsigned int speed : 1;
+    unsigned int enc:1;    /* Set to 1 if we are encrypting or 0 otherwise */
+    unsigned int have_user_tag:1;
+    unsigned int generated_tag:1;
+    unsigned int used_enc:1;
+    unsigned int used_dec:1;
+    unsigned int speed:1;
 } PROV_AES_GCM_SIV_CTX;
 
 const PROV_CIPHER_HW_AES_GCM_SIV *ossl_prov_cipher_hw_aes_gcm_siv(size_t keybits);
 
 void ossl_polyval_ghash_init(u128 Htable[16], const uint64_t H[2]);
-void ossl_polyval_ghash_hash(const u128 Htable[16], uint8_t *tag,  const uint8_t *inp, size_t len);
+void ossl_polyval_ghash_hash(const u128 Htable[16], uint8_t *tag, const uint8_t *inp, size_t len);
 
 /* Define GSWAP8/GSWAP4 - used for BOTH little and big endian architectures */
 static ossl_inline uint32_t GSWAP4(uint32_t n)
 {
-    return (((n & 0x000000FF) << 24)
-            | ((n & 0x0000FF00) << 8)
-            | ((n & 0x00FF0000) >> 8)
-            | ((n & 0xFF000000) >> 24));
+    return (((n & 0x000000FF) << 24) | ((n & 0x0000FF00) << 8) | ((n & 0x00FF0000) >> 8) | ((n & 0xFF000000) >> 24));
 }
 static ossl_inline uint64_t GSWAP8(uint64_t n)
 {

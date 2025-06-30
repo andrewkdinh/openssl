@@ -104,8 +104,7 @@ signed char *bn_compute_wNAF(const BIGNUM *scalar, int w, size_t *ret_len)
              * now window_val is 0 or 2^(w+1) in standard wNAF generation;
              * for modified window NAFs, it may also be 2^w
              */
-            if (window_val != 0 && window_val != next_bit
-                && window_val != bit) {
+            if (window_val != 0 && window_val != next_bit && window_val != bit) {
                 ERR_raise(ERR_LIB_BN, ERR_R_INTERNAL_ERROR);
                 goto err;
             }
@@ -129,7 +128,7 @@ signed char *bn_compute_wNAF(const BIGNUM *scalar, int w, size_t *ret_len)
     *ret_len = j;
     return r;
 
- err:
+err:
     OPENSSL_free(r);
     return NULL;
 }

@@ -33,10 +33,9 @@ struct evp_method_data_st {
 
     OSSL_METHOD_STORE *tmp_store; /* For get_tmp_evp_method_store() */
 
-    unsigned int flag_construct_error_occurred : 1;
+    unsigned int flag_construct_error_occurred:1;
 
-    void *(*method_from_algorithm)(int name_id, const OSSL_ALGORITHM *,
-                                   OSSL_PROVIDER *);
+    void *(*method_from_algorithm)(int name_id, const OSSL_ALGORITHM *, OSSL_PROVIDER *);
     int (*refcnt_up_method)(void *method);
     void (*destruct_method)(void *method);
 };
@@ -57,7 +56,7 @@ static void *get_tmp_evp_method_store(void *data)
     return methdata->tmp_store;
 }
 
- static void dealloc_tmp_evp_method_store(void *store)
+static void dealloc_tmp_evp_method_store(void *store)
 {
     OSSL_TRACE1(QUERY, "Deallocating the tmp_store %p\n", store);
     if (store != NULL)
@@ -73,8 +72,7 @@ static int reserve_evp_method_store(void *store, void *data)
 {
     struct evp_method_data_st *methdata = data;
 
-    if (store == NULL
-        && (store = get_evp_method_store(methdata->libctx)) == NULL)
+    if (store == NULL && (store = get_evp_method_store(methdata->libctx)) == NULL)
         return 0;
 
     return ossl_method_lock_store(store);
@@ -84,8 +82,7 @@ static int unreserve_evp_method_store(void *store, void *data)
 {
     struct evp_method_data_st *methdata = data;
 
-    if (store == NULL
-        && (store = get_evp_method_store(methdata->libctx)) == NULL)
+    if (store == NULL && (store = get_evp_method_store(methdata->libctx)) == NULL)
         return 0;
 
     return ossl_method_unlock_store(store);
@@ -116,15 +113,12 @@ static int unreserve_evp_method_store(void *store, void *data)
 static uint32_t evp_method_id(int name_id, unsigned int operation_id)
 {
     if (!ossl_assert(name_id > 0 && name_id <= METHOD_ID_NAME_MAX)
-        || !ossl_assert(operation_id > 0
-                        && operation_id <= METHOD_ID_OPERATION_MAX))
+        || !ossl_assert(operation_id > 0 && operation_id <= METHOD_ID_OPERATION_MAX))
         return 0;
-    return (((name_id << METHOD_ID_NAME_OFFSET) & METHOD_ID_NAME_MASK)
-            | (operation_id & METHOD_ID_OPERATION_MASK));
+    return (((name_id << METHOD_ID_NAME_OFFSET) & METHOD_ID_NAME_MASK) | (operation_id & METHOD_ID_OPERATION_MASK));
 }
 
-static void *get_evp_method_from_store(void *store, const OSSL_PROVIDER **prov,
-                                       void *data)
+static void *get_evp_method_from_store(void *store, const OSSL_PROVIDER **prov, void *data)
 {
     struct evp_method_data_st *methdata = data;
     void *method = NULL;
@@ -147,24 +141,19 @@ static void *get_evp_method_from_store(void *store, const OSSL_PROVIDER **prov,
         name_id = ossl_namemap_name2num_n(namemap, names, l);
     }
 
-    if (name_id == 0
-        || (meth_id = evp_method_id(name_id, methdata->operation_id)) == 0)
+    if (name_id == 0 || (meth_id = evp_method_id(name_id, methdata->operation_id)) == 0)
         return NULL;
 
-    if (store == NULL
-        && (store = get_evp_method_store(methdata->libctx)) == NULL)
+    if (store == NULL && (store = get_evp_method_store(methdata->libctx)) == NULL)
         return NULL;
 
-    if (!ossl_method_store_fetch(store, meth_id, methdata->propquery, prov,
-                                 &method))
+    if (!ossl_method_store_fetch(store, meth_id, methdata->propquery, prov, &method))
         return NULL;
     return method;
 }
 
-static int put_evp_method_in_store(void *store, void *method,
-                                   const OSSL_PROVIDER *prov,
-                                   const char *names, const char *propdef,
-                                   void *data)
+static int put_evp_method_in_store(void *store, void *method, const OSSL_PROVIDER *prov, const char *names,
+                                   const char *propdef, void *data)
 {
     struct evp_method_data_st *methdata = data;
     OSSL_NAMEMAP *namemap;
@@ -190,16 +179,14 @@ static int put_evp_method_in_store(void *store, void *method,
         return 0;
 
     OSSL_TRACE1(QUERY, "put_evp_method_in_store: original store: %p\n", store);
-    if (store == NULL
-        && (store = get_evp_method_store(methdata->libctx)) == NULL)
+    if (store == NULL && (store = get_evp_method_store(methdata->libctx)) == NULL)
         return 0;
 
     OSSL_TRACE5(QUERY,
                 "put_evp_method_in_store: "
                 "store: %p, names: %s, operation_id %d, method_id: %d, properties: %s\n",
                 store, names, methdata->operation_id, meth_id, propdef ? propdef : "<null>");
-    return ossl_method_store_add(store, prov, meth_id, propdef, method,
-                                 methdata->refcnt_up_method,
+    return ossl_method_store_add(store, prov, meth_id, propdef, method, methdata->refcnt_up_method,
                                  methdata->destruct_method);
 }
 
@@ -207,8 +194,7 @@ static int put_evp_method_in_store(void *store, void *method,
  * The core fetching functionality passes the name of the implementation.
  * This function is responsible to getting an identity number for it.
  */
-static void *construct_evp_method(const OSSL_ALGORITHM *algodef,
-                                  OSSL_PROVIDER *prov, void *data)
+static void *construct_evp_method(const OSSL_ALGORITHM *algodef, OSSL_PROVIDER *prov, void *data)
 {
     /*
      * This function is only called if get_evp_method_from_store() returned
@@ -247,15 +233,11 @@ static void destruct_evp_method(void *method, void *data)
     methdata->destruct_method(method);
 }
 
-static void *
-inner_evp_generic_fetch(struct evp_method_data_st *methdata,
-                        OSSL_PROVIDER *prov, int operation_id,
-                        const char *name, ossl_unused const char *properties,
-                        void *(*new_method)(int name_id,
-                                            const OSSL_ALGORITHM *algodef,
-                                            OSSL_PROVIDER *prov),
-                        int (*up_ref_method)(void *),
-                        void (*free_method)(void *))
+static void *inner_evp_generic_fetch(struct evp_method_data_st *methdata, OSSL_PROVIDER *prov, int operation_id,
+                                     const char *name, ossl_unused const char *properties,
+                                     void *(*new_method)(int name_id, const OSSL_ALGORITHM *algodef,
+                                                         OSSL_PROVIDER *prov),
+                                     int (*up_ref_method)(void *), void (*free_method)(void *))
 {
     OSSL_METHOD_STORE *store = get_evp_method_store(methdata->libctx);
     OSSL_NAMEMAP *namemap = ossl_namemap_stored(methdata->libctx);
@@ -310,17 +292,10 @@ inner_evp_generic_fetch(struct evp_method_data_st *methdata,
      */
     unsupported = name_id == 0;
 
-    if (meth_id == 0
-        || !ossl_method_store_cache_get(store, prov, meth_id, propq, &method)) {
+    if (meth_id == 0 || !ossl_method_store_cache_get(store, prov, meth_id, propq, &method)) {
         OSSL_METHOD_CONSTRUCT_METHOD mcm = {
-            get_tmp_evp_method_store,
-            reserve_evp_method_store,
-            unreserve_evp_method_store,
-            get_evp_method_from_store,
-            put_evp_method_in_store,
-            construct_evp_method,
-            destruct_evp_method
-        };
+            get_tmp_evp_method_store, reserve_evp_method_store, unreserve_evp_method_store, get_evp_method_from_store,
+            put_evp_method_in_store,  construct_evp_method,     destruct_evp_method};
 
         methdata->operation_id = operation_id;
         methdata->name_id = name_id;
@@ -330,9 +305,9 @@ inner_evp_generic_fetch(struct evp_method_data_st *methdata,
         methdata->refcnt_up_method = up_ref_method;
         methdata->destruct_method = free_method;
         methdata->flag_construct_error_occurred = 0;
-        if ((method = ossl_method_construct(methdata->libctx, operation_id,
-                                            &prov, 0 /* !force_cache */,
-                                            &mcm, methdata)) != NULL) {
+        if ((method =
+                 ossl_method_construct(methdata->libctx, operation_id, &prov, 0 /* !force_cache */, &mcm, methdata))
+            != NULL) {
             /*
              * If construction did create a method for us, we know that
              * there is a correct name_id and meth_id, since those have
@@ -348,15 +323,13 @@ inner_evp_generic_fetch(struct evp_method_data_st *methdata,
             if (name_id == 0)
                 name_id = ossl_namemap_name2num(namemap, name);
             if (name_id == 0) {
-                ERR_raise_data(ERR_LIB_EVP, ERR_R_FETCH_FAILED,
-                               "Algorithm %s cannot be found", name);
+                ERR_raise_data(ERR_LIB_EVP, ERR_R_FETCH_FAILED, "Algorithm %s cannot be found", name);
                 free_method(method);
                 method = NULL;
             } else {
                 meth_id = evp_method_id(name_id, operation_id);
                 if (meth_id != 0)
-                    ossl_method_store_cache_set(store, prov, meth_id, propq,
-                                                method, up_ref_method, free_method);
+                    ossl_method_store_cache_set(store, prov, meth_id, propq, method, up_ref_method, free_method);
             }
         }
 
@@ -372,37 +345,28 @@ inner_evp_generic_fetch(struct evp_method_data_st *methdata,
 
         if (name == NULL)
             name = ossl_namemap_num2name(namemap, name_id, 0);
-        ERR_raise_data(ERR_LIB_EVP, code,
-                       "%s, Algorithm (%s : %d), Properties (%s)",
-                       ossl_lib_ctx_get_descriptor(methdata->libctx),
-                       name == NULL ? "<null>" : name, name_id,
+        ERR_raise_data(ERR_LIB_EVP, code, "%s, Algorithm (%s : %d), Properties (%s)",
+                       ossl_lib_ctx_get_descriptor(methdata->libctx), name == NULL ? "<null>" : name, name_id,
                        properties == NULL ? "<null>" : properties);
     } else {
-        OSSL_TRACE4(QUERY, "%s, Algorithm (%s : %d), Properties (%s)\n",
-                    ossl_lib_ctx_get_descriptor(methdata->libctx),
-                    name == NULL ? "<null>" : name, name_id,
-                    properties == NULL ? "<null>" : properties);
+        OSSL_TRACE4(QUERY, "%s, Algorithm (%s : %d), Properties (%s)\n", ossl_lib_ctx_get_descriptor(methdata->libctx),
+                    name == NULL ? "<null>" : name, name_id, properties == NULL ? "<null>" : properties);
     }
 
     return method;
 }
 
-void *evp_generic_fetch(OSSL_LIB_CTX *libctx, int operation_id,
-                        const char *name, const char *properties,
-                        void *(*new_method)(int name_id,
-                                            const OSSL_ALGORITHM *algodef,
-                                            OSSL_PROVIDER *prov),
-                        int (*up_ref_method)(void *),
-                        void (*free_method)(void *))
+void *evp_generic_fetch(OSSL_LIB_CTX *libctx, int operation_id, const char *name, const char *properties,
+                        void *(*new_method)(int name_id, const OSSL_ALGORITHM *algodef, OSSL_PROVIDER *prov),
+                        int (*up_ref_method)(void *), void (*free_method)(void *))
 {
     struct evp_method_data_st methdata;
     void *method;
 
     methdata.libctx = libctx;
     methdata.tmp_store = NULL;
-    method = inner_evp_generic_fetch(&methdata, NULL, operation_id,
-                                     name, properties,
-                                     new_method, up_ref_method, free_method);
+    method = inner_evp_generic_fetch(&methdata, NULL, operation_id, name, properties, new_method, up_ref_method,
+                                     free_method);
     dealloc_tmp_evp_method_store(methdata.tmp_store);
     return method;
 }
@@ -413,22 +377,17 @@ void *evp_generic_fetch(OSSL_LIB_CTX *libctx, int operation_id,
  * This is meant to be used when one method needs to fetch an associated
  * method.
  */
-void *evp_generic_fetch_from_prov(OSSL_PROVIDER *prov, int operation_id,
-                                  const char *name, const char *properties,
-                                  void *(*new_method)(int name_id,
-                                                      const OSSL_ALGORITHM *algodef,
-                                                      OSSL_PROVIDER *prov),
-                                  int (*up_ref_method)(void *),
-                                  void (*free_method)(void *))
+void *evp_generic_fetch_from_prov(OSSL_PROVIDER *prov, int operation_id, const char *name, const char *properties,
+                                  void *(*new_method)(int name_id, const OSSL_ALGORITHM *algodef, OSSL_PROVIDER *prov),
+                                  int (*up_ref_method)(void *), void (*free_method)(void *))
 {
     struct evp_method_data_st methdata;
     void *method;
 
     methdata.libctx = ossl_provider_libctx(prov);
     methdata.tmp_store = NULL;
-    method = inner_evp_generic_fetch(&methdata, prov, operation_id,
-                                     name, properties,
-                                     new_method, up_ref_method, free_method);
+    method = inner_evp_generic_fetch(&methdata, prov, operation_id, name, properties, new_method, up_ref_method,
+                                     free_method);
     dealloc_tmp_evp_method_store(methdata.tmp_store);
     return method;
 }
@@ -452,9 +411,7 @@ int evp_method_store_remove_all_provided(const OSSL_PROVIDER *prov)
     return 1;
 }
 
-static int evp_set_parsed_default_properties(OSSL_LIB_CTX *libctx,
-                                             OSSL_PROPERTY_LIST *def_prop,
-                                             int loadconfig,
+static int evp_set_parsed_default_properties(OSSL_LIB_CTX *libctx, OSSL_PROPERTY_LIST *def_prop, int loadconfig,
                                              int mirrored)
 {
     OSSL_METHOD_STORE *store = get_evp_method_store(libctx);
@@ -484,8 +441,7 @@ static int evp_set_parsed_default_properties(OSSL_LIB_CTX *libctx,
             ERR_raise(ERR_LIB_EVP, ERR_R_INTERNAL_ERROR);
             return 0;
         }
-        if (ossl_property_list_to_string(libctx, def_prop, propstr,
-                                         strsz) == 0) {
+        if (ossl_property_list_to_string(libctx, def_prop, propstr, strsz) == 0) {
             OPENSSL_free(propstr);
             ERR_raise(ERR_LIB_EVP, ERR_R_INTERNAL_ERROR);
             return 0;
@@ -506,8 +462,7 @@ static int evp_set_parsed_default_properties(OSSL_LIB_CTX *libctx,
     return 0;
 }
 
-int evp_set_default_properties_int(OSSL_LIB_CTX *libctx, const char *propq,
-                                   int loadconfig, int mirrored)
+int evp_set_default_properties_int(OSSL_LIB_CTX *libctx, const char *propq, int loadconfig, int mirrored)
 {
     OSSL_PROPERTY_LIST *pl = NULL;
 
@@ -527,8 +482,7 @@ int EVP_set_default_properties(OSSL_LIB_CTX *libctx, const char *propq)
     return evp_set_default_properties_int(libctx, propq, 1, 0);
 }
 
-static int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
-                                        int loadconfig)
+static int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq, int loadconfig)
 {
     OSSL_PROPERTY_LIST **plp = ossl_ctx_global_properties(libctx, loadconfig);
     OSSL_PROPERTY_LIST *pl1, *pl2;
@@ -554,8 +508,7 @@ static int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
     return 1;
 }
 
-static int evp_default_property_is_enabled(OSSL_LIB_CTX *libctx,
-                                           const char *prop_name)
+static int evp_default_property_is_enabled(OSSL_LIB_CTX *libctx, const char *prop_name)
 {
     OSSL_PROPERTY_LIST **plp = ossl_ctx_global_properties(libctx, 1);
 
@@ -567,8 +520,7 @@ int EVP_default_properties_is_fips_enabled(OSSL_LIB_CTX *libctx)
     return evp_default_property_is_enabled(libctx, "fips");
 }
 
-int evp_default_properties_enable_fips_int(OSSL_LIB_CTX *libctx, int enable,
-                                           int loadconfig)
+int evp_default_properties_enable_fips_int(OSSL_LIB_CTX *libctx, int enable, int loadconfig)
 {
     const char *query = (enable != 0) ? "fips=yes" : "-fips";
 
@@ -625,36 +577,28 @@ static void filter_on_operation_id(int id, void *method, void *arg)
         data->user_fn(method, data->user_arg);
 }
 
-void evp_generic_do_all(OSSL_LIB_CTX *libctx, int operation_id,
-                        void (*user_fn)(void *method, void *arg),
+void evp_generic_do_all(OSSL_LIB_CTX *libctx, int operation_id, void (*user_fn)(void *method, void *arg),
                         void *user_arg,
-                        void *(*new_method)(int name_id,
-                                            const OSSL_ALGORITHM *algodef,
-                                            OSSL_PROVIDER *prov),
-                        int (*up_ref_method)(void *),
-                        void (*free_method)(void *))
+                        void *(*new_method)(int name_id, const OSSL_ALGORITHM *algodef, OSSL_PROVIDER *prov),
+                        int (*up_ref_method)(void *), void (*free_method)(void *))
 {
     struct evp_method_data_st methdata;
     struct filter_data_st data;
 
     methdata.libctx = libctx;
     methdata.tmp_store = NULL;
-    (void)inner_evp_generic_fetch(&methdata, NULL, operation_id, NULL, NULL,
-                                  new_method, up_ref_method, free_method);
+    (void)inner_evp_generic_fetch(&methdata, NULL, operation_id, NULL, NULL, new_method, up_ref_method, free_method);
 
     data.operation_id = operation_id;
     data.user_fn = user_fn;
     data.user_arg = user_arg;
     if (methdata.tmp_store != NULL)
-        ossl_method_store_do_all(methdata.tmp_store, &filter_on_operation_id,
-                                 &data);
-    ossl_method_store_do_all(get_evp_method_store(libctx),
-                             &filter_on_operation_id, &data);
+        ossl_method_store_do_all(methdata.tmp_store, &filter_on_operation_id, &data);
+    ossl_method_store_do_all(get_evp_method_store(libctx), &filter_on_operation_id, &data);
     dealloc_tmp_evp_method_store(methdata.tmp_store);
 }
 
-int evp_is_a(OSSL_PROVIDER *prov, int number,
-             const char *legacy_name, const char *name)
+int evp_is_a(OSSL_PROVIDER *prov, int number, const char *legacy_name, const char *name)
 {
     /*
      * For a |prov| that is NULL, the library context will be NULL
@@ -667,9 +611,7 @@ int evp_is_a(OSSL_PROVIDER *prov, int number,
     return ossl_namemap_name2num(namemap, name) == number;
 }
 
-int evp_names_do_all(OSSL_PROVIDER *prov, int number,
-                     void (*fn)(const char *name, void *data),
-                     void *data)
+int evp_names_do_all(OSSL_PROVIDER *prov, int number, void (*fn)(const char *name, void *data), void *data)
 {
     OSSL_LIB_CTX *libctx = ossl_provider_libctx(prov);
     OSSL_NAMEMAP *namemap = ossl_namemap_stored(libctx);

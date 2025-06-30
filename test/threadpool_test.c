@@ -27,8 +27,7 @@ static int test_thread_reported_flags(void)
     if (!TEST_int_eq(flags & OSSL_THREAD_SUPPORT_FLAG_THREAD_POOL, 0))
         return 0;
 #else
-    if (!TEST_int_eq(flags & OSSL_THREAD_SUPPORT_FLAG_THREAD_POOL,
-                     OSSL_THREAD_SUPPORT_FLAG_THREAD_POOL))
+    if (!TEST_int_eq(flags & OSSL_THREAD_SUPPORT_FLAG_THREAD_POOL, OSSL_THREAD_SUPPORT_FLAG_THREAD_POOL))
         return 0;
 #endif
 
@@ -36,8 +35,7 @@ static int test_thread_reported_flags(void)
     if (!TEST_int_eq(flags & OSSL_THREAD_SUPPORT_FLAG_DEFAULT_SPAWN, 0))
         return 0;
 #else
-    if (!TEST_int_eq(flags & OSSL_THREAD_SUPPORT_FLAG_DEFAULT_SPAWN,
-                     OSSL_THREAD_SUPPORT_FLAG_DEFAULT_SPAWN))
+    if (!TEST_int_eq(flags & OSSL_THREAD_SUPPORT_FLAG_DEFAULT_SPAWN, OSSL_THREAD_SUPPORT_FLAG_DEFAULT_SPAWN))
         return 0;
 #endif
 
@@ -49,7 +47,7 @@ static int test_thread_reported_flags(void)
 # define TEST_THREAD_NATIVE_FN_SET_VALUE 1
 static uint32_t test_thread_native_fn(void *data)
 {
-    uint32_t *ldata = (uint32_t*) data;
+    uint32_t *ldata = (uint32_t *)data;
     *ldata = *ldata + 1;
     return *ldata - 1;
 }
@@ -96,7 +94,7 @@ static int test_thread_native(void)
 static int test_thread_internal(void)
 {
     uint32_t retval[3];
-    uint32_t local[3] = { 0 };
+    uint32_t local[3] = {0};
     uint32_t threads_supported;
     size_t i;
     void *t[3];

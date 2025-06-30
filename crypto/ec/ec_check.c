@@ -16,8 +16,7 @@
 #include "ec_local.h"
 #include <openssl/err.h>
 
-int EC_GROUP_check_named_curve(const EC_GROUP *group, int nist_only,
-                               BN_CTX *ctx)
+int EC_GROUP_check_named_curve(const EC_GROUP *group, int nist_only, BN_CTX *ctx)
 {
     int nid;
     BN_CTX *new_ctx = NULL;
@@ -110,7 +109,7 @@ int EC_GROUP_check(const EC_GROUP *group, BN_CTX *ctx)
 
     ret = 1;
 
- err:
+err:
     BN_CTX_free(new_ctx);
     EC_POINT_free(point);
     return ret;

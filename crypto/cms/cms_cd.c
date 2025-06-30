@@ -21,9 +21,7 @@
 
 /* CMS CompressedData Utilities */
 
-CMS_ContentInfo *ossl_cms_CompressedData_create(int comp_nid,
-                                                OSSL_LIB_CTX *libctx,
-                                                const char *propq)
+CMS_ContentInfo *ossl_cms_CompressedData_create(int comp_nid, OSSL_LIB_CTX *libctx, const char *propq)
 {
     CMS_ContentInfo *cms;
     CMS_CompressedData *cd;
@@ -50,15 +48,14 @@ CMS_ContentInfo *ossl_cms_CompressedData_create(int comp_nid,
 
     cd->version = 0;
 
-    (void)X509_ALGOR_set0(cd->compressionAlgorithm,
-                          OBJ_nid2obj(NID_zlib_compression),
-                          V_ASN1_UNDEF, NULL); /* cannot fail */
+    (void)X509_ALGOR_set0(cd->compressionAlgorithm, OBJ_nid2obj(NID_zlib_compression), V_ASN1_UNDEF,
+                          NULL); /* cannot fail */
 
     cd->encapContentInfo->eContentType = OBJ_nid2obj(NID_pkcs7_data);
 
     return cms;
 
- err:
+err:
     CMS_ContentInfo_free(cms);
     return NULL;
 }

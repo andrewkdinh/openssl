@@ -63,8 +63,7 @@ static ossl_inline int obj_sig_init(void)
     return RUN_ONCE(&sig_init, o_sig_init);
 }
 
-static int ossl_obj_find_sigid_algs(int signid, int *pdig_nid, int *ppkey_nid,
-                                    int lock)
+static int ossl_obj_find_sigid_algs(int signid, int *pdig_nid, int *ppkey_nid, int lock)
 {
     nid_triple tmp;
     const nid_triple *rv;
@@ -200,7 +199,7 @@ int OBJ_add_sigid(int signid, int dig_id, int pkey_id)
 
     ntr = NULL;
     ret = 1;
- err:
+err:
     OPENSSL_free(ntr);
     CRYPTO_THREAD_unlock(sig_lock);
     return ret;

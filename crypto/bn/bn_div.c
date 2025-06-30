@@ -95,7 +95,7 @@ BN_ULONG bn_div_3_words(const BN_ULONG *m, BN_ULONG d1, BN_ULONG d0);
  * where it can and should be made constant-time. But if you want to test it,
  * just replace 0 with 1.
  */
-#  if BN_BITS2 == 64 && defined(__SIZEOF_INT128__) && __SIZEOF_INT128__==16
+#  if BN_BITS2 == 64 && defined(__SIZEOF_INT128__) && __SIZEOF_INT128__ == 16
 #   undef BN_ULLONG
 #   define BN_ULLONG uint128_t
 #   define BN_LLONG
@@ -158,10 +158,9 @@ static int bn_left_align(BIGNUM *num)
     return lshift;
 }
 
-# if !defined(OPENSSL_NO_ASM) && !defined(OPENSSL_NO_INLINE_ASM) \
-    && !defined(PEDANTIC) && !defined(BN_DIV3W)
-#  if defined(__GNUC__) && __GNUC__>=2
-#   if defined(__i386) || defined (__i386__)
+# if !defined(OPENSSL_NO_ASM) && !defined(OPENSSL_NO_INLINE_ASM) && !defined(PEDANTIC) && !defined(BN_DIV3W)
+#  if defined(__GNUC__) && __GNUC__ >= 2
+#   if defined(__i386) || defined(__i386__)
    /*-
     * There were two reasons for implementing this template:
     * - GNU C generates a call to a function (__udivdi3 to be exact)
@@ -171,7 +170,7 @@ static int bn_left_align(BIGNUM *num)
     *   remainder in %edx which we can definitely use here:-)
     */
 #    undef bn_div_words
-#    define bn_div_words(n0,n1,d0)                \
+#    define bn_div_words(n0, n1, d0)                \
         ({  asm volatile (                      \
                 "divl   %4"                     \
                 : "=a"(q), "=d"(rem)            \
@@ -185,7 +184,7 @@ static int bn_left_align(BIGNUM *num)
     * Same story here, but it's 128-bit by 64-bit division. Wow!
     */
 #    undef bn_div_words
-#    define bn_div_words(n0,n1,d0)                \
+#    define bn_div_words(n0, n1, d0)                \
         ({  asm volatile (                      \
                 "divq   %4"                     \
                 : "=a"(q), "=d"(rem)            \
@@ -206,8 +205,7 @@ static int bn_left_align(BIGNUM *num)
  *     rm->neg == num->neg                 (unless the remainder is zero)
  * If 'dv' or 'rm' is NULL, the respective value is not returned.
  */
-int BN_div(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor,
-           BN_CTX *ctx)
+int BN_div(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor, BN_CTX *ctx)
 {
     int ret;
 
@@ -261,8 +259,7 @@ int BN_div(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor,
  *       if so required, which shouldn't be a privacy problem, because
  *       divisor's length is considered public;
  */
-int bn_div_fixed_top(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num,
-                     const BIGNUM *divisor, BN_CTX *ctx)
+int bn_div_fixed_top(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor, BN_CTX *ctx)
 {
     int norm_shift, i, j, loop;
     BIGNUM *tmp, *snum, *sdiv, *res;
@@ -357,7 +354,7 @@ int bn_div_fixed_top(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num,
             BN_ULLONG t2;
 
 #   if defined(BN_LLONG) && defined(BN_DIV2W) && !defined(bn_div_words)
-            q = (BN_ULONG)(((((BN_ULLONG) n0) << BN_BITS2) | n1) / d0);
+            q = (BN_ULONG)(((((BN_ULLONG)n0) << BN_BITS2) | n1) / d0);
 #   else
             q = bn_div_words(n0, n1, d0);
 #   endif
@@ -369,10 +366,10 @@ int bn_div_fixed_top(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num,
              */
             rem = (n1 - q * d0) & BN_MASK2;
 #   endif
-            t2 = (BN_ULLONG) d1 *q;
+            t2 = (BN_ULLONG)d1 * q;
 
             for (;;) {
-                if (t2 <= ((((BN_ULLONG) rem) << BN_BITS2) | n2))
+                if (t2 <= ((((BN_ULLONG)rem) << BN_BITS2) | n2))
                     break;
                 q--;
                 rem += d0;
@@ -452,7 +449,7 @@ int bn_div_fixed_top(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num,
 
     BN_CTX_end(ctx);
     return 1;
- err:
+err:
     bn_check_top(rm);
     BN_CTX_end(ctx);
     return 0;

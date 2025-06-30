@@ -62,12 +62,10 @@ static int print_attribute(BIO *bp, X509_ATTRIBUTE *a)
         case V_ASN1_SEQUENCE:
             if (BIO_puts(bp, "\n") <= 0)
                 goto err;
-            ASN1_parse_dump(bp, at->value.sequence->data,
-                            at->value.sequence->length, i, 1);
+            ASN1_parse_dump(bp, at->value.sequence->data, at->value.sequence->length, i, 1);
             break;
         default:
-            if (BIO_printf(bp, "unable to print attribute of type 0x%X\n",
-                           type) < 0)
+            if (BIO_printf(bp, "unable to print attribute of type 0x%X\n", type) < 0)
                 goto err;
             break;
         }
@@ -77,8 +75,7 @@ err:
     return ret;
 }
 
-int X509_ACERT_print_ex(BIO *bp, X509_ACERT *x, unsigned long nmflags,
-                        unsigned long cflag)
+int X509_ACERT_print_ex(BIO *bp, X509_ACERT *x, unsigned long nmflags, unsigned long cflag)
 {
     int i;
     char mlch = ' ';
@@ -99,8 +96,7 @@ int X509_ACERT_print_ex(BIO *bp, X509_ACERT *x, unsigned long nmflags,
 
         l = X509_ACERT_get_version(x);
         if (l == X509_ACERT_VERSION_2) {
-            if (BIO_printf(bp, "%8sVersion: %ld (0x%lx)\n", "", l + 1,
-                           (unsigned long)l) <= 0)
+            if (BIO_printf(bp, "%8sVersion: %ld (0x%lx)\n", "", l + 1, (unsigned long)l) <= 0)
                 goto err;
         } else {
             if (BIO_printf(bp, "%8sVersion: Unknown (%ld)\n", "", l) <= 0)

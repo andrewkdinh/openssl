@@ -53,8 +53,7 @@ static int test_tbl_standard(void)
 
     TEST_info("asn1 tbl_standard: out of order");
     for (tmp = tbl_standard, i = 0; i < OSSL_NELEM(tbl_standard); i++, tmp++)
-        TEST_note("asn1 tbl_standard: Index %zu, NID %d, Name=%s",
-                  i, tmp->nid, OBJ_nid2ln(tmp->nid));
+        TEST_note("asn1 tbl_standard: Index %zu, NID %d, Name=%s", i, tmp->nid, OBJ_nid2ln(tmp->nid));
 
     return 0;
 }
@@ -75,8 +74,7 @@ static int test_standard_methods(void)
     size_t i;
     int ok = 1;
 
-    for (tmp = standard_methods, i = 0; i < OSSL_NELEM(standard_methods);
-         i++, tmp++) {
+    for (tmp = standard_methods, i = 0; i < OSSL_NELEM(standard_methods); i++, tmp++) {
         if ((*tmp)->pkey_id < last_pkey_id) {
             last_pkey_id = 0;
             break;
@@ -93,8 +91,8 @@ static int test_standard_methods(void)
          */
         if (!TEST_true(((*tmp)->pem_str == NULL && ((*tmp)->pkey_flags & ASN1_PKEY_ALIAS) != 0)
                        || ((*tmp)->pem_str != NULL && ((*tmp)->pkey_flags & ASN1_PKEY_ALIAS) == 0))) {
-            TEST_note("asn1 standard methods: Index %zu, pkey ID %d, Name=%s",
-                      i, (*tmp)->pkey_id, OBJ_nid2sn((*tmp)->pkey_id));
+            TEST_note("asn1 standard methods: Index %zu, pkey ID %d, Name=%s", i, (*tmp)->pkey_id,
+                      OBJ_nid2sn((*tmp)->pkey_id));
             ok = 0;
         }
     }
@@ -105,10 +103,9 @@ static int test_standard_methods(void)
     }
 
     TEST_note("asn1 standard methods: out of order");
-    for (tmp = standard_methods, i = 0; i < OSSL_NELEM(standard_methods);
-         i++, tmp++)
-        TEST_note("asn1 standard methods: Index %zu, pkey ID %d, Name=%s",
-                  i, (*tmp)->pkey_id, OBJ_nid2sn((*tmp)->pkey_id));
+    for (tmp = standard_methods, i = 0; i < OSSL_NELEM(standard_methods); i++, tmp++)
+        TEST_note("asn1 standard methods: Index %zu, pkey ID %d, Name=%s", i, (*tmp)->pkey_id,
+                  OBJ_nid2sn((*tmp)->pkey_id));
 
     return 0;
 }
@@ -128,9 +125,7 @@ static int test_empty_nonoptional_content(void)
     BIGNUM *e = NULL;
     int ok = 0;
 
-    if (!TEST_ptr(rsa = RSA_new())
-        || !TEST_ptr(n = BN_new())
-        || !TEST_ptr(e = BN_new())
+    if (!TEST_ptr(rsa = RSA_new()) || !TEST_ptr(n = BN_new()) || !TEST_ptr(e = BN_new())
         || !TEST_true(RSA_set0_key(rsa, n, e, NULL)))
         goto end;
 
@@ -143,7 +138,7 @@ static int test_empty_nonoptional_content(void)
     if (TEST_int_le(i2d_RSAPrivateKey(rsa, NULL), 0))
         ok = 1;
 
- end:
+end:
     RSA_free(rsa);
     BN_free(n);
     BN_free(e);
@@ -162,9 +157,7 @@ static int test_unicode(const unsigned char *univ, size_t len, int expected)
     int ok = 1;
 
     for (; univ < end; univ += 4) {
-        if (!TEST_int_eq(ASN1_mbstring_copy(NULL, univ, 4, MBSTRING_UNIV,
-                                            B_ASN1_UTF8STRING),
-                         expected))
+        if (!TEST_int_eq(ASN1_mbstring_copy(NULL, univ, 4, MBSTRING_UNIV, B_ASN1_UTF8STRING), expected))
             ok = 0;
     }
     return ok;
@@ -233,22 +226,18 @@ static int test_obj_create(void)
         || !TEST_true(test_obj_create_once(NULL, NULL, ln_prefix "2"))
         || !TEST_int_ne(OBJ_ln2nid(ln_prefix "2"), NID_undef)
         || !TEST_true(test_obj_create_once(NULL, sn_prefix "3", ln_prefix "3"))
-        || !TEST_int_ne(OBJ_sn2nid(sn_prefix "3"), NID_undef)
-        || !TEST_int_ne(OBJ_ln2nid(ln_prefix "3"), NID_undef)
+        || !TEST_int_ne(OBJ_sn2nid(sn_prefix "3"), NID_undef) || !TEST_int_ne(OBJ_ln2nid(ln_prefix "3"), NID_undef)
         || !TEST_true(test_obj_create_once(arc "4", NULL, NULL))
         || !TEST_true(test_obj_create_once(arc "5", sn_prefix "5", NULL))
         || !TEST_int_ne(OBJ_sn2nid(sn_prefix "5"), NID_undef)
         || !TEST_true(test_obj_create_once(arc "6", NULL, ln_prefix "6"))
         || !TEST_int_ne(OBJ_ln2nid(ln_prefix "6"), NID_undef)
-        || !TEST_true(test_obj_create_once(arc "7",
-                                           sn_prefix "7", ln_prefix "7"))
-        || !TEST_int_ne(OBJ_sn2nid(sn_prefix "7"), NID_undef)
-        || !TEST_int_ne(OBJ_ln2nid(ln_prefix "7"), NID_undef))
+        || !TEST_true(test_obj_create_once(arc "7", sn_prefix "7", ln_prefix "7"))
+        || !TEST_int_ne(OBJ_sn2nid(sn_prefix "7"), NID_undef) || !TEST_int_ne(OBJ_ln2nid(ln_prefix "7"), NID_undef))
         return 0;
 
     if (!TEST_false(test_obj_create_once(NULL, NULL, NULL))
-        || !TEST_false(test_obj_create_once(broken_arc "8",
-                                            sn_prefix "8", ln_prefix "8")))
+        || !TEST_false(test_obj_create_once(broken_arc "8", sn_prefix "8", ln_prefix "8")))
         return 0;
 
     return 1;
@@ -256,9 +245,7 @@ static int test_obj_create(void)
 
 static int test_obj_nid_undef(void)
 {
-    if (!TEST_ptr(OBJ_nid2obj(NID_undef))
-        || !TEST_ptr(OBJ_nid2sn(NID_undef))
-        || !TEST_ptr(OBJ_nid2ln(NID_undef)))
+    if (!TEST_ptr(OBJ_nid2obj(NID_undef)) || !TEST_ptr(OBJ_nid2sn(NID_undef)) || !TEST_ptr(OBJ_nid2ln(NID_undef)))
         return 0;
 
     return 1;

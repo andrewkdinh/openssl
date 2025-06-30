@@ -21,8 +21,7 @@ OSSL_SAFE_MATH_SIGNED(int, int)
  * The initial number of nodes in the array.
  */
 static const int min_nodes = 4;
-static const int max_nodes = SIZE_MAX / sizeof(void *) < INT_MAX
-    ? (int)(SIZE_MAX / sizeof(void *)) : INT_MAX;
+static const int max_nodes = SIZE_MAX / sizeof(void *) < INT_MAX ? (int)(SIZE_MAX / sizeof(void *)) : INT_MAX;
 
 struct stack_st {
     int num;
@@ -33,8 +32,7 @@ struct stack_st {
     OPENSSL_sk_freefunc_thunk free_thunk;
 };
 
-OPENSSL_sk_compfunc OPENSSL_sk_set_cmp_func(OPENSSL_STACK *sk,
-                                            OPENSSL_sk_compfunc c)
+OPENSSL_sk_compfunc OPENSSL_sk_set_cmp_func(OPENSSL_STACK *sk, OPENSSL_sk_compfunc c)
 {
     OPENSSL_sk_compfunc old = sk->comp;
 
@@ -75,13 +73,12 @@ OPENSSL_STACK *OPENSSL_sk_dup(const OPENSSL_STACK *sk)
     memcpy(ret->data, sk->data, sizeof(void *) * sk->num);
     return ret;
 
- err:
+err:
     OPENSSL_sk_free(ret);
     return NULL;
 }
 
-OPENSSL_STACK *OPENSSL_sk_deep_copy(const OPENSSL_STACK *sk,
-                                    OPENSSL_sk_copyfunc copy_func,
+OPENSSL_STACK *OPENSSL_sk_deep_copy(const OPENSSL_STACK *sk, OPENSSL_sk_copyfunc copy_func,
                                     OPENSSL_sk_freefunc free_func)
 {
     OPENSSL_STACK *ret;
@@ -123,7 +120,7 @@ OPENSSL_STACK *OPENSSL_sk_deep_copy(const OPENSSL_STACK *sk,
     }
     return ret;
 
- err:
+err:
     OPENSSL_sk_free(ret);
     return NULL;
 }
@@ -281,8 +278,7 @@ int OPENSSL_sk_insert(OPENSSL_STACK *st, const void *data, int loc)
     if ((loc >= st->num) || (loc < 0)) {
         st->data[st->num] = data;
     } else {
-        memmove(&st->data[loc + 1], &st->data[loc],
-                sizeof(st->data[0]) * (st->num - loc));
+        memmove(&st->data[loc + 1], &st->data[loc], sizeof(st->data[0]) * (st->num - loc));
         st->data[loc] = data;
     }
     st->num++;
@@ -295,8 +291,7 @@ static ossl_inline void *internal_delete(OPENSSL_STACK *st, int loc)
     const void *ret = st->data[loc];
 
     if (loc != st->num - 1)
-        memmove(&st->data[loc], &st->data[loc + 1],
-                sizeof(st->data[0]) * (st->num - loc - 1));
+        memmove(&st->data[loc], &st->data[loc + 1], sizeof(st->data[0]) * (st->num - loc - 1));
     st->num--;
 
     return (void *)ret;
@@ -323,8 +318,7 @@ void *OPENSSL_sk_delete(OPENSSL_STACK *st, int loc)
     return internal_delete(st, loc);
 }
 
-static int internal_find(OPENSSL_STACK *st, const void *data,
-                         int ret_val_options, int *pnum_matched)
+static int internal_find(OPENSSL_STACK *st, const void *data, int ret_val_options, int *pnum_matched)
 {
     const void *r;
     int i, count = 0;
@@ -368,8 +362,7 @@ static int internal_find(OPENSSL_STACK *st, const void *data,
 
     if (pnum_matched != NULL)
         ret_val_options |= OSSL_BSEARCH_FIRST_VALUE_ON_MATCH;
-    r = ossl_bsearch(&data, st->data, st->num, sizeof(void *), st->comp,
-                     ret_val_options);
+    r = ossl_bsearch(&data, st->data, st->num, sizeof(void *), st->comp, ret_val_options);
 
     if (pnum_matched != NULL) {
         *pnum = 0;
@@ -482,8 +475,7 @@ void *OPENSSL_sk_set(OPENSSL_STACK *st, int i, const void *data)
         return NULL;
     }
     if (i < 0 || i >= st->num) {
-        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_PASSED_INVALID_ARGUMENT,
-                       "i=%d", i);
+        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_PASSED_INVALID_ARGUMENT, "i=%d", i);
         return NULL;
     }
     st->data[i] = data;

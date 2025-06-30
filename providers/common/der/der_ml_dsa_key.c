@@ -36,6 +36,5 @@ int ossl_DER_w_algorithmIdentifier_ML_DSA(WPACKET *pkt, int tag, ML_DSA_KEY *key
     }
     return ossl_DER_w_begin_sequence(pkt, tag)
         /* No parameters */
-        && ossl_DER_w_precompiled(pkt, -1, alg, len)
-        && ossl_DER_w_end_sequence(pkt, tag);
+        && ossl_DER_w_precompiled(pkt, -1, alg, len) && ossl_DER_w_end_sequence(pkt, tag);
 }

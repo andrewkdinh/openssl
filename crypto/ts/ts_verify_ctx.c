@@ -77,8 +77,7 @@ int TS_VERIFY_CTX_set0_store(TS_VERIFY_CTX *ctx, X509_STORE *s)
 }
 
 #ifndef OPENSSL_NO_DEPRECATED_3_4
-STACK_OF(X509) *TS_VERIFY_CTX_set_certs(TS_VERIFY_CTX *ctx,
-                                        STACK_OF(X509) *certs)
+STACK_OF(X509) *TS_VERIFY_CTX_set_certs(TS_VERIFY_CTX *ctx, STACK_OF(X509) *certs)
 {
     ctx->certs = certs;
     return ctx->certs;
@@ -93,8 +92,7 @@ int TS_VERIFY_CTX_set0_certs(TS_VERIFY_CTX *ctx, STACK_OF(X509) *certs)
 }
 
 #ifndef OPENSSL_NO_DEPRECATED_3_4
-unsigned char *TS_VERIFY_CTX_set_imprint(TS_VERIFY_CTX *ctx,
-                                         unsigned char *hexstr, long len)
+unsigned char *TS_VERIFY_CTX_set_imprint(TS_VERIFY_CTX *ctx, unsigned char *hexstr, long len)
 {
     OPENSSL_free(ctx->imprint);
     ctx->imprint = hexstr;
@@ -103,8 +101,7 @@ unsigned char *TS_VERIFY_CTX_set_imprint(TS_VERIFY_CTX *ctx,
 }
 #endif
 
-int TS_VERIFY_CTX_set0_imprint(TS_VERIFY_CTX *ctx,
-                              unsigned char *hexstr, long len)
+int TS_VERIFY_CTX_set0_imprint(TS_VERIFY_CTX *ctx, unsigned char *hexstr, long len)
 {
     OPENSSL_free(ctx->imprint);
     ctx->imprint = hexstr;
@@ -176,7 +173,7 @@ TS_VERIFY_CTX *TS_REQ_to_TS_VERIFY_CTX(TS_REQ *req, TS_VERIFY_CTX *ctx)
         ret->flags &= ~TS_VFY_NONCE;
 
     return ret;
- err:
+err:
     if (ctx)
         TS_VERIFY_CTX_cleanup(ctx);
     else

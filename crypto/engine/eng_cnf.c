@@ -65,8 +65,7 @@ static int int_engine_configure(const char *name, const char *value, const CONF 
         ecmd = sk_CONF_VALUE_value(ecmds, i);
         ctrlname = skip_dot(ecmd->name);
         ctrlvalue = ecmd->value;
-        OSSL_TRACE2(CONF, "ENGINE: doing ctrl(%s,%s)\n",
-                    ctrlname, ctrlvalue);
+        OSSL_TRACE2(CONF, "ENGINE: doing ctrl(%s,%s)\n", ctrlname, ctrlvalue);
 
         /* First handle some special pseudo ctrls */
 
@@ -124,20 +123,18 @@ static int int_engine_configure(const char *name, const char *value, const CONF 
             } else if (!ENGINE_ctrl_cmd_string(e, ctrlname, ctrlvalue, 0))
                 goto err;
         }
-
     }
     if (e && (do_init == -1) && !int_engine_init(e)) {
         ecmd = NULL;
         goto err;
     }
     ret = 1;
- err:
+err:
     if (ret != 1) {
         if (ecmd == NULL)
             ERR_raise(ERR_LIB_ENGINE, ENGINE_R_ENGINE_CONFIGURATION_ERROR);
         else
-            ERR_raise_data(ERR_LIB_ENGINE, ENGINE_R_ENGINE_CONFIGURATION_ERROR,
-                           "section=%s, name=%s, value=%s",
+            ERR_raise_data(ERR_LIB_ENGINE, ENGINE_R_ENGINE_CONFIGURATION_ERROR, "section=%s, name=%s, value=%s",
                            ecmd->section, ecmd->name, ecmd->value);
     }
     ENGINE_free(e);
@@ -149,8 +146,8 @@ static int int_engine_module_init(CONF_IMODULE *md, const CONF *cnf)
     STACK_OF(CONF_VALUE) *elist;
     CONF_VALUE *cval;
     int i;
-    OSSL_TRACE2(CONF, "Called engine module: name %s, value %s\n",
-                CONF_imodule_get_name(md), CONF_imodule_get_value(md));
+    OSSL_TRACE2(CONF, "Called engine module: name %s, value %s\n", CONF_imodule_get_name(md),
+                CONF_imodule_get_value(md));
     /* Value is a section containing ENGINEs to configure */
     elist = NCONF_get_section(cnf, CONF_imodule_get_value(md));
 
@@ -180,6 +177,5 @@ static void int_engine_module_finish(CONF_IMODULE *md)
 
 void ENGINE_add_conf_module(void)
 {
-    CONF_module_add("engines",
-                    int_engine_module_init, int_engine_module_finish);
+    CONF_module_add("engines", int_engine_module_init, int_engine_module_finish);
 }

@@ -22,38 +22,38 @@
 
 typedef enum OPTION_choice {
     OPT_COMMON,
-    OPT_MACOPT, OPT_BIN, OPT_IN, OPT_OUT,
-    OPT_CIPHER, OPT_DIGEST,
+    OPT_MACOPT,
+    OPT_BIN,
+    OPT_IN,
+    OPT_OUT,
+    OPT_CIPHER,
+    OPT_DIGEST,
     OPT_PROV_ENUM
 } OPTION_CHOICE;
 
-const OPTIONS mac_options[] = {
-    {OPT_HELP_STR, 1, '-', "Usage: %s [options] mac_name\n"},
+const OPTIONS mac_options[] = {{OPT_HELP_STR, 1, '-', "Usage: %s [options] mac_name\n"},
 
-    OPT_SECTION("General"),
-    {"help", OPT_HELP, '-', "Display this summary"},
-    {"macopt", OPT_MACOPT, 's', "MAC algorithm parameters in n:v form"},
-    {"cipher", OPT_CIPHER, 's', "Cipher"},
-    {"digest", OPT_DIGEST, 's', "Digest"},
-    {OPT_MORE_STR, 1, '-', "See 'PARAMETER NAMES' in the EVP_MAC_ docs"},
+                               OPT_SECTION("General"),
+                               {"help", OPT_HELP, '-', "Display this summary"},
+                               {"macopt", OPT_MACOPT, 's', "MAC algorithm parameters in n:v form"},
+                               {"cipher", OPT_CIPHER, 's', "Cipher"},
+                               {"digest", OPT_DIGEST, 's', "Digest"},
+                               {OPT_MORE_STR, 1, '-', "See 'PARAMETER NAMES' in the EVP_MAC_ docs"},
 
-    OPT_SECTION("Input"),
-    {"in", OPT_IN, '<', "Input file to MAC (default is stdin)"},
+                               OPT_SECTION("Input"),
+                               {"in", OPT_IN, '<', "Input file to MAC (default is stdin)"},
 
-    OPT_SECTION("Output"),
-    {"out", OPT_OUT, '>', "Output to filename rather than stdout"},
-    {"binary", OPT_BIN, '-',
-        "Output in binary format (default is hexadecimal)"},
+                               OPT_SECTION("Output"),
+                               {"out", OPT_OUT, '>', "Output to filename rather than stdout"},
+                               {"binary", OPT_BIN, '-', "Output in binary format (default is hexadecimal)"},
 
-    OPT_PROV_OPTIONS,
+                               OPT_PROV_OPTIONS,
 
-    OPT_PARAMETERS(),
-    {"mac_name", 0, 0, "MAC algorithm"},
-    {NULL}
-};
+                               OPT_PARAMETERS(),
+                               {"mac_name", 0, 0, "MAC algorithm"},
+                               {NULL}};
 
-static char *alloc_mac_algorithm_name(STACK_OF(OPENSSL_STRING) **optp,
-                                      const char *name, const char *arg)
+static char *alloc_mac_algorithm_name(STACK_OF(OPENSSL_STRING) **optp, const char *name, const char *arg)
 {
     size_t len = strlen(name) + strlen(arg) + 2;
     char *res;
@@ -154,8 +154,7 @@ opthelp:
     if (opts != NULL) {
         int ok = 1;
 
-        params = app_params_new_from_opts(opts,
-                                          EVP_MAC_settable_ctx_params(mac));
+        params = app_params_new_from_opts(opts, EVP_MAC_settable_ctx_params(mac));
         if (params == NULL)
             goto err;
 

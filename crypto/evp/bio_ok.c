@@ -202,8 +202,7 @@ static int ok_read(BIO *b, char *out, int outl)
                  */
                 if (ctx->buf_len_save > ctx->buf_off_save) {
                     ctx->buf_len = ctx->buf_len_save - ctx->buf_off_save;
-                    memmove(ctx->buf, &(ctx->buf[ctx->buf_off_save]),
-                            ctx->buf_len);
+                    memmove(ctx->buf, &(ctx->buf[ctx->buf_off_save]), ctx->buf_len);
                 } else {
                     ctx->buf_len = 0;
                 }
@@ -243,7 +242,6 @@ static int ok_read(BIO *b, char *out, int outl)
         /* invalid block -- cancel */
         if (ctx->cont <= 0)
             break;
-
     }
 
     BIO_clear_retry_flags(b);
@@ -295,8 +293,8 @@ static int ok_write(BIO *b, const char *in, int inl)
         if ((in == NULL) || (inl <= 0))
             return 0;
 
-        n = (inl + ctx->buf_len > OK_BLOCK_SIZE + OK_BLOCK_BLOCK) ?
-            (int)(OK_BLOCK_SIZE + OK_BLOCK_BLOCK - ctx->buf_len) : inl;
+        n = (inl + ctx->buf_len > OK_BLOCK_SIZE + OK_BLOCK_BLOCK) ? (int)(OK_BLOCK_SIZE + OK_BLOCK_BLOCK - ctx->buf_len)
+                                                                  : inl;
 
         memcpy(&ctx->buf[ctx->buf_len], in, n);
         ctx->buf_len += n;
@@ -468,7 +466,7 @@ static int sig_out(BIO *b)
     ctx->blockout = 1;
     ctx->sigio = 0;
     return 1;
- berr:
+berr:
     BIO_clear_retry_flags(b);
     return 0;
 }
@@ -509,8 +507,7 @@ static int sig_in(BIO *b)
     if (ret == 1) {
         ctx->sigio = 0;
         if (ctx->buf_len != ctx->buf_off) {
-            memmove(ctx->buf, &(ctx->buf[ctx->buf_off]),
-                    ctx->buf_len - ctx->buf_off);
+            memmove(ctx->buf, &(ctx->buf[ctx->buf_off]), ctx->buf_len - ctx->buf_off);
         }
         ctx->buf_len -= ctx->buf_off;
         ctx->buf_off = 0;
@@ -518,7 +515,7 @@ static int sig_in(BIO *b)
         ctx->cont = 0;
     }
     return 1;
- berr:
+berr:
     BIO_clear_retry_flags(b);
     return 0;
 }
@@ -543,15 +540,14 @@ static int block_out(BIO *b)
     ctx->buf[1] = (unsigned char)(tl >> 16);
     ctx->buf[2] = (unsigned char)(tl >> 8);
     ctx->buf[3] = (unsigned char)(tl);
-    if (!EVP_DigestUpdate(md,
-                          (unsigned char *)&(ctx->buf[OK_BLOCK_BLOCK]), tl))
+    if (!EVP_DigestUpdate(md, (unsigned char *)&(ctx->buf[OK_BLOCK_BLOCK]), tl))
         goto berr;
     if (!EVP_DigestFinal_ex(md, &(ctx->buf[ctx->buf_len]), NULL))
         goto berr;
     ctx->buf_len += md_size;
     ctx->blockout = 1;
     return 1;
- berr:
+berr:
     BIO_clear_retry_flags(b);
     return 0;
 }
@@ -582,8 +578,7 @@ static int block_in(BIO *b)
     if (ctx->buf_len < tl + OK_BLOCK_BLOCK + md_size)
         return 1;
 
-    if (!EVP_DigestUpdate(md,
-                          (unsigned char *)&(ctx->buf[OK_BLOCK_BLOCK]), tl))
+    if (!EVP_DigestUpdate(md, (unsigned char *)&(ctx->buf[OK_BLOCK_BLOCK]), tl))
         goto berr;
     if (!EVP_DigestFinal_ex(md, tmp, NULL))
         goto berr;
@@ -598,7 +593,7 @@ static int block_in(BIO *b)
         ctx->cont = 0;
     }
     return 1;
- berr:
+berr:
     BIO_clear_retry_flags(b);
     return 0;
 }

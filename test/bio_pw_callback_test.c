@@ -62,10 +62,8 @@ const OPTIONS *test_get_options(void)
 {
     static const OPTIONS test_options[] = {
         OPT_TEST_OPTIONS_DEFAULT_USAGE,
-        { "keyfile", OPT_KEY_FILE, '<',
-          "The PEM file with the encrypted key to load" },
-        { NULL }
-    };
+        {"keyfile", OPT_KEY_FILE, '<', "The PEM file with the encrypted key to load"},
+        {NULL}};
     return test_options;
 }
 
@@ -151,8 +149,7 @@ err:
     return ret;
 }
 
-static int re_encrypt_key(char **enc_data, int *enc_data_size,
-                          KEY_ENCODING key_encoding)
+static int re_encrypt_key(char **enc_data, int *enc_data_size, KEY_ENCODING key_encoding)
 {
     CALLBACK_DATA cb_data;
     int w_ret = 0;
@@ -170,12 +167,10 @@ static int re_encrypt_key(char **enc_data, int *enc_data_size,
     cb_data.result = 0;
     switch (key_encoding) {
     case KE_PEM:
-        w_ret = PEM_write_bio_PrivateKey(bio, original_pkey, EVP_aes_256_cbc(),
-                                         NULL, 0, write_callback, &cb_data);
+        w_ret = PEM_write_bio_PrivateKey(bio, original_pkey, EVP_aes_256_cbc(), NULL, 0, write_callback, &cb_data);
         break;
     case KE_PKCS8:
-        w_ret = i2d_PKCS8PrivateKey_bio(bio, original_pkey, EVP_aes_256_cbc(),
-                                        NULL, 0, write_callback, &cb_data);
+        w_ret = i2d_PKCS8PrivateKey_bio(bio, original_pkey, EVP_aes_256_cbc(), NULL, 0, write_callback, &cb_data);
         break;
     }
     if (!TEST_int_ne(w_ret, 0))
@@ -196,9 +191,7 @@ err:
     return ret;
 }
 
-static int decrypt_key(char *enc_data, int enc_data_size,
-                       KEY_ENCODING key_encoding,
-                       EXPECTED_RESULT expected_result)
+static int decrypt_key(char *enc_data, int enc_data_size, KEY_ENCODING key_encoding, EXPECTED_RESULT expected_result)
 {
     CALLBACK_DATA cb_data;
     EVP_PKEY *r_ret = NULL;
@@ -236,8 +229,7 @@ err:
     return ret;
 }
 
-static int full_cycle_test(KEY_ENCODING key_encoding, CALLBACK_TEST write_test,
-                           CALLBACK_TEST read_test,
+static int full_cycle_test(KEY_ENCODING key_encoding, CALLBACK_TEST write_test, CALLBACK_TEST read_test,
                            EXPECTED_RESULT expected_read_result)
 {
     char *enc_data = NULL;
@@ -248,8 +240,7 @@ static int full_cycle_test(KEY_ENCODING key_encoding, CALLBACK_TEST write_test,
     if (!re_encrypt_key(&enc_data, &enc_data_size, key_encoding))
         goto err;
     callback_test = read_test;
-    if (!decrypt_key(enc_data, enc_data_size, key_encoding,
-                     expected_read_result))
+    if (!decrypt_key(enc_data, enc_data_size, key_encoding, expected_read_result))
         goto err;
     ret = 1;
 err:
@@ -264,8 +255,7 @@ static int test_pem_negative(void)
 
 static int test_pem_zero_length(void)
 {
-    return full_cycle_test(KE_PEM, CB_TEST_ZERO_LENGTH, CB_TEST_ZERO_LENGTH,
-                           ER_SUCCESS);
+    return full_cycle_test(KE_PEM, CB_TEST_ZERO_LENGTH, CB_TEST_ZERO_LENGTH, ER_SUCCESS);
 }
 
 static int test_pem_weak(void)
@@ -290,14 +280,12 @@ static int test_pem_a0a_a0b(void)
 
 static int test_pem_match_size(void)
 {
-    return full_cycle_test(KE_PEM, CB_TEST_MATCH_SIZE, CB_TEST_MATCH_SIZE,
-                           ER_SUCCESS);
+    return full_cycle_test(KE_PEM, CB_TEST_MATCH_SIZE, CB_TEST_MATCH_SIZE, ER_SUCCESS);
 }
 
 static int test_pem_exceed_size(void)
 {
-    return full_cycle_test(KE_PEM, CB_TEST_MATCH_SIZE, CB_TEST_EXCEED_SIZE,
-                           ER_FAILURE);
+    return full_cycle_test(KE_PEM, CB_TEST_MATCH_SIZE, CB_TEST_EXCEED_SIZE, ER_FAILURE);
 }
 
 static int test_pkcs8_negative(void)
@@ -307,8 +295,7 @@ static int test_pkcs8_negative(void)
 
 static int test_pkcs8_zero_length(void)
 {
-    return full_cycle_test(KE_PKCS8, CB_TEST_ZERO_LENGTH, CB_TEST_ZERO_LENGTH,
-                           ER_SUCCESS);
+    return full_cycle_test(KE_PKCS8, CB_TEST_ZERO_LENGTH, CB_TEST_ZERO_LENGTH, ER_SUCCESS);
 }
 
 static int test_pkcs8_weak(void)
@@ -318,8 +305,7 @@ static int test_pkcs8_weak(void)
 
 static int test_pkcs8_16zero(void)
 {
-    return full_cycle_test(KE_PKCS8, CB_TEST_16ZERO, CB_TEST_16ZERO,
-                           ER_SUCCESS);
+    return full_cycle_test(KE_PKCS8, CB_TEST_16ZERO, CB_TEST_16ZERO, ER_SUCCESS);
 }
 
 static int test_pkcs8_a0a(void)
@@ -334,14 +320,12 @@ static int test_pkcs8_a0a_a0b(void)
 
 static int test_pkcs8_match_size(void)
 {
-    return full_cycle_test(KE_PKCS8, CB_TEST_MATCH_SIZE, CB_TEST_MATCH_SIZE,
-                           ER_SUCCESS);
+    return full_cycle_test(KE_PKCS8, CB_TEST_MATCH_SIZE, CB_TEST_MATCH_SIZE, ER_SUCCESS);
 }
 
 static int test_pkcs8_exceed_size(void)
 {
-    return full_cycle_test(KE_PKCS8, CB_TEST_MATCH_SIZE, CB_TEST_EXCEED_SIZE,
-                           ER_FAILURE);
+    return full_cycle_test(KE_PKCS8, CB_TEST_MATCH_SIZE, CB_TEST_EXCEED_SIZE, ER_FAILURE);
 }
 
 static int callback_original_pw(char *buf, int size, int rwflag, void *u)
@@ -371,8 +355,7 @@ int setup_tests(void)
     /* read the original key */
     if (!TEST_ptr(bio = BIO_new_file(key_file, "r")))
         return 0;
-    if (!TEST_ptr(PEM_read_bio_PrivateKey(bio, &original_pkey,
-                                          callback_original_pw, NULL)))
+    if (!TEST_ptr(PEM_read_bio_PrivateKey(bio, &original_pkey, callback_original_pw, NULL)))
         return 0;
     BIO_free(bio);
 

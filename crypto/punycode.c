@@ -41,8 +41,7 @@ static const char delimiter = '-';
  *  return k + (((base - tmin + 1) * delta) div (delta + skew))
  */
 
-static int adapt(unsigned int delta, unsigned int numpoints,
-                 unsigned int firsttime)
+static int adapt(unsigned int delta, unsigned int numpoints, unsigned int firsttime)
 {
     unsigned int k = 0;
 
@@ -116,8 +115,7 @@ static ossl_inline int digit_decoded(const unsigned char a)
  *  end
  */
 
-int ossl_punycode_decode(const char *pEncoded, const size_t enc_len,
-                         unsigned int *pDecoded, unsigned int *pout_length)
+int ossl_punycode_decode(const char *pEncoded, const size_t enc_len, unsigned int *pDecoded, unsigned int *pout_length)
 {
     unsigned int n = initial_n;
     unsigned int i = 0;
@@ -184,8 +182,7 @@ int ossl_punycode_decode(const char *pEncoded, const size_t enc_len,
         if (written_out >= max_out)
             return 0;
 
-        memmove(pDecoded + i + 1, pDecoded + i,
-                (written_out - i) * sizeof(*pDecoded));
+        memmove(pDecoded + i + 1, pDecoded + i, (written_out - i) * sizeof(*pDecoded));
         pDecoded[i] = n;
         i++;
         written_out++;
@@ -306,7 +303,7 @@ int ossl_a2ulabel(const char *in, char *out, size_t outlen)
 
     if (!WPACKET_put_bytes_u8(&pkt, '\0'))
         result = 0;
- end:
+end:
     WPACKET_cleanup(&pkt);
     return result;
 }

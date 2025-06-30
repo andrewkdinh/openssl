@@ -33,8 +33,7 @@ static OSSL_FUNC_cipher_settable_ctx_params_fn sm4_xts_settable_ctx_params;
 /*-
  * Provider dispatch functions
  */
-static int sm4_xts_init(void *vctx, const unsigned char *key, size_t keylen,
-                        const unsigned char *iv, size_t ivlen,
+static int sm4_xts_init(void *vctx, const unsigned char *key, size_t keylen, const unsigned char *iv, size_t ivlen,
                         const OSSL_PARAM params[], int enc)
 {
     PROV_SM4_XTS_CTX *xctx = (PROV_SM4_XTS_CTX *)vctx;
@@ -60,28 +59,25 @@ static int sm4_xts_init(void *vctx, const unsigned char *key, size_t keylen,
     return sm4_xts_set_ctx_params(xctx, params);
 }
 
-static int sm4_xts_einit(void *vctx, const unsigned char *key, size_t keylen,
-                         const unsigned char *iv, size_t ivlen,
+static int sm4_xts_einit(void *vctx, const unsigned char *key, size_t keylen, const unsigned char *iv, size_t ivlen,
                          const OSSL_PARAM params[])
 {
     return sm4_xts_init(vctx, key, keylen, iv, ivlen, params, 1);
 }
 
-static int sm4_xts_dinit(void *vctx, const unsigned char *key, size_t keylen,
-                         const unsigned char *iv, size_t ivlen,
+static int sm4_xts_dinit(void *vctx, const unsigned char *key, size_t keylen, const unsigned char *iv, size_t ivlen,
                          const OSSL_PARAM params[])
 {
     return sm4_xts_init(vctx, key, keylen, iv, ivlen, params, 0);
 }
 
-static void *sm4_xts_newctx(void *provctx, unsigned int mode, uint64_t flags,
-                            size_t kbits, size_t blkbits, size_t ivbits)
+static void *sm4_xts_newctx(void *provctx, unsigned int mode, uint64_t flags, size_t kbits, size_t blkbits,
+                            size_t ivbits)
 {
     PROV_SM4_XTS_CTX *ctx = OPENSSL_zalloc(sizeof(*ctx));
 
     if (ctx != NULL) {
-        ossl_cipher_generic_initkey(&ctx->base, kbits, blkbits, ivbits, mode,
-                                    flags, ossl_prov_cipher_hw_sm4_xts(kbits),
+        ossl_cipher_generic_initkey(&ctx->base, kbits, blkbits, ivbits, mode, flags, ossl_prov_cipher_hw_sm4_xts(kbits),
                                     NULL);
     }
     return ctx;
@@ -118,18 +114,13 @@ static void *sm4_xts_dupctx(void *vctx)
     return ret;
 }
 
-static int sm4_xts_cipher(void *vctx, unsigned char *out, size_t *outl,
-                          size_t outsize, const unsigned char *in, size_t inl)
+static int sm4_xts_cipher(void *vctx, unsigned char *out, size_t *outl, size_t outsize, const unsigned char *in,
+                          size_t inl)
 {
     PROV_SM4_XTS_CTX *ctx = (PROV_SM4_XTS_CTX *)vctx;
 
-    if (!ossl_prov_is_running()
-            || ctx->xts.key1 == NULL
-            || ctx->xts.key2 == NULL
-            || !ctx->base.iv_set
-            || out == NULL
-            || in == NULL
-            || inl < SM4_BLOCK_SIZE)
+    if (!ossl_prov_is_running() || ctx->xts.key1 == NULL || ctx->xts.key2 == NULL || !ctx->base.iv_set || out == NULL
+        || in == NULL || inl < SM4_BLOCK_SIZE)
         return 0;
 
     /*
@@ -144,25 +135,20 @@ static int sm4_xts_cipher(void *vctx, unsigned char *out, size_t *outl,
     }
     if (ctx->xts_standard) {
         if (ctx->stream != NULL)
-            (*ctx->stream)(in, out, inl, ctx->xts.key1, ctx->xts.key2,
-                           ctx->base.iv, ctx->base.enc);
-        else if (CRYPTO_xts128_encrypt(&ctx->xts, ctx->base.iv, in, out, inl,
-                                       ctx->base.enc))
+            (*ctx->stream)(in, out, inl, ctx->xts.key1, ctx->xts.key2, ctx->base.iv, ctx->base.enc);
+        else if (CRYPTO_xts128_encrypt(&ctx->xts, ctx->base.iv, in, out, inl, ctx->base.enc))
             return 0;
     } else {
         if (ctx->stream_gb != NULL)
-            (*ctx->stream_gb)(in, out, inl, ctx->xts.key1, ctx->xts.key2,
-                              ctx->base.iv, ctx->base.enc);
-        else if (ossl_crypto_xts128gb_encrypt(&ctx->xts, ctx->base.iv, in, out,
-                                              inl, ctx->base.enc))
+            (*ctx->stream_gb)(in, out, inl, ctx->xts.key1, ctx->xts.key2, ctx->base.iv, ctx->base.enc);
+        else if (ossl_crypto_xts128gb_encrypt(&ctx->xts, ctx->base.iv, in, out, inl, ctx->base.enc))
             return 0;
     }
     *outl = inl;
     return 1;
 }
 
-static int sm4_xts_stream_update(void *vctx, unsigned char *out, size_t *outl,
-                                 size_t outsize, const unsigned char *in,
+static int sm4_xts_stream_update(void *vctx, unsigned char *out, size_t *outl, size_t outsize, const unsigned char *in,
                                  size_t inl)
 {
     PROV_SM4_XTS_CTX *ctx = (PROV_SM4_XTS_CTX *)vctx;
@@ -180,8 +166,7 @@ static int sm4_xts_stream_update(void *vctx, unsigned char *out, size_t *outl,
     return 1;
 }
 
-static int sm4_xts_stream_final(void *vctx, unsigned char *out, size_t *outl,
-                                size_t outsize)
+static int sm4_xts_stream_final(void *vctx, unsigned char *out, size_t *outl, size_t outsize)
 {
     if (!ossl_prov_is_running())
         return 0;
@@ -190,12 +175,9 @@ static int sm4_xts_stream_final(void *vctx, unsigned char *out, size_t *outl,
 }
 
 static const OSSL_PARAM sm4_xts_known_settable_ctx_params[] = {
-    OSSL_PARAM_utf8_string(OSSL_CIPHER_PARAM_XTS_STANDARD, NULL, 0),
-    OSSL_PARAM_END
-};
+    OSSL_PARAM_utf8_string(OSSL_CIPHER_PARAM_XTS_STANDARD, NULL, 0), OSSL_PARAM_END};
 
-static const OSSL_PARAM *sm4_xts_settable_ctx_params(ossl_unused void *cctx,
-                                                     ossl_unused void *provctx)
+static const OSSL_PARAM *sm4_xts_settable_ctx_params(ossl_unused void *cctx, ossl_unused void *provctx)
 {
     return sm4_xts_known_settable_ctx_params;
 }

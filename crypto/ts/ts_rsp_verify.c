@@ -16,27 +16,20 @@
 #include "crypto/ess.h"
 #include "ts_local.h"
 
-static int ts_verify_cert(X509_STORE *store, STACK_OF(X509) *untrusted,
-                          X509 *signer, STACK_OF(X509) **chain);
-static int ts_check_signing_certs(const PKCS7_SIGNER_INFO *si,
-                                  const STACK_OF(X509) *chain);
+static int ts_verify_cert(X509_STORE *store, STACK_OF(X509) *untrusted, X509 *signer, STACK_OF(X509) **chain);
+static int ts_check_signing_certs(const PKCS7_SIGNER_INFO *si, const STACK_OF(X509) *chain);
 
-static int int_ts_RESP_verify_token(TS_VERIFY_CTX *ctx,
-                                    PKCS7 *token, TS_TST_INFO *tst_info);
+static int int_ts_RESP_verify_token(TS_VERIFY_CTX *ctx, PKCS7 *token, TS_TST_INFO *tst_info);
 static int ts_check_status_info(TS_RESP *response);
 static char *ts_get_status_text(STACK_OF(ASN1_UTF8STRING) *text);
-static int ts_check_policy(const ASN1_OBJECT *req_oid,
-                           const TS_TST_INFO *tst_info);
-static int ts_compute_imprint(BIO *data, TS_TST_INFO *tst_info,
-                              X509_ALGOR **md_alg,
-                              unsigned char **imprint, unsigned *imprint_len);
-static int ts_check_imprints(X509_ALGOR *algor_a,
-                             const unsigned char *imprint_a, unsigned len_a,
+static int ts_check_policy(const ASN1_OBJECT *req_oid, const TS_TST_INFO *tst_info);
+static int ts_compute_imprint(BIO *data, TS_TST_INFO *tst_info, X509_ALGOR **md_alg, unsigned char **imprint,
+                              unsigned *imprint_len);
+static int ts_check_imprints(X509_ALGOR *algor_a, const unsigned char *imprint_a, unsigned len_a,
                              TS_TST_INFO *tst_info);
 static int ts_check_nonces(const ASN1_INTEGER *a, TS_TST_INFO *tst_info);
 static int ts_check_signer_name(GENERAL_NAME *tsa_name, X509 *signer);
-static int ts_find_name(STACK_OF(GENERAL_NAME) *gen_names,
-                        GENERAL_NAME *name);
+static int ts_find_name(STACK_OF(GENERAL_NAME) *gen_names, GENERAL_NAME *name);
 
 /*
  * This must be large enough to hold all values in ts_status_text (with
@@ -47,31 +40,22 @@ static int ts_find_name(STACK_OF(GENERAL_NAME) *gen_names,
 /*
  * Local mapping between response codes and descriptions.
  */
-static const char *ts_status_text[] = {
-    "granted",
-    "grantedWithMods",
-    "rejection",
-    "waiting",
-    "revocationWarning",
-    "revocationNotification"
-};
+static const char *ts_status_text[] = {"granted", "grantedWithMods",   "rejection",
+                                       "waiting", "revocationWarning", "revocationNotification"};
 
 #define TS_STATUS_TEXT_SIZE     OSSL_NELEM(ts_status_text)
 
 static struct {
     int code;
     const char *text;
-} ts_failure_info[] = {
-    {TS_INFO_BAD_ALG, "badAlg"},
-    {TS_INFO_BAD_REQUEST, "badRequest"},
-    {TS_INFO_BAD_DATA_FORMAT, "badDataFormat"},
-    {TS_INFO_TIME_NOT_AVAILABLE, "timeNotAvailable"},
-    {TS_INFO_UNACCEPTED_POLICY, "unacceptedPolicy"},
-    {TS_INFO_UNACCEPTED_EXTENSION, "unacceptedExtension"},
-    {TS_INFO_ADD_INFO_NOT_AVAILABLE, "addInfoNotAvailable"},
-    {TS_INFO_SYSTEM_FAILURE, "systemFailure"}
-};
-
+} ts_failure_info[] = {{TS_INFO_BAD_ALG, "badAlg"},
+                       {TS_INFO_BAD_REQUEST, "badRequest"},
+                       {TS_INFO_BAD_DATA_FORMAT, "badDataFormat"},
+                       {TS_INFO_TIME_NOT_AVAILABLE, "timeNotAvailable"},
+                       {TS_INFO_UNACCEPTED_POLICY, "unacceptedPolicy"},
+                       {TS_INFO_UNACCEPTED_EXTENSION, "unacceptedExtension"},
+                       {TS_INFO_ADD_INFO_NOT_AVAILABLE, "addInfoNotAvailable"},
+                       {TS_INFO_SYSTEM_FAILURE, "systemFailure"}};
 
 /*-
  * This function carries out the following tasks:
@@ -85,8 +69,7 @@ static struct {
  *      - Verify the signature value.
  *      - Returns the signer certificate in 'signer', if 'signer' is not NULL.
  */
-int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) *certs,
-                             X509_STORE *store, X509 **signer_out)
+int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) *certs, X509_STORE *store, X509 **signer_out)
 {
     STACK_OF(PKCS7_SIGNER_INFO) *sinfos = NULL;
     PKCS7_SIGNER_INFO *si;
@@ -127,11 +110,8 @@ int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) *certs,
         goto err;
     signer = sk_X509_value(signers, 0);
 
-    untrusted = sk_X509_new_reserve(NULL, sk_X509_num(certs)
-                                    + sk_X509_num(token->d.sign->cert));
-    if (untrusted == NULL
-            || !X509_add_certs(untrusted, certs, 0)
-            || !X509_add_certs(untrusted, token->d.sign->cert, 0))
+    untrusted = sk_X509_new_reserve(NULL, sk_X509_num(certs) + sk_X509_num(token->d.sign->cert));
+    if (untrusted == NULL || !X509_add_certs(untrusted, certs, 0) || !X509_add_certs(untrusted, token->d.sign->cert, 0))
         goto err;
     if (!ts_verify_cert(store, untrusted, signer, &chain))
         goto err;
@@ -157,7 +137,7 @@ int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) *certs,
     }
     ret = 1;
 
- err:
+err:
     BIO_free_all(p7bio);
     sk_X509_free(untrusted);
     OSSL_STACK_OF_X509_free(chain);
@@ -170,8 +150,7 @@ int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) *certs,
  * The certificate chain is returned in chain. Caller is responsible for
  * freeing the vector.
  */
-static int ts_verify_cert(X509_STORE *store, STACK_OF(X509) *untrusted,
-                          X509 *signer, STACK_OF(X509) **chain)
+static int ts_verify_cert(X509_STORE *store, STACK_OF(X509) *untrusted, X509 *signer, STACK_OF(X509) **chain)
 {
     X509_STORE_CTX *cert_ctx = NULL;
     int i;
@@ -189,8 +168,7 @@ static int ts_verify_cert(X509_STORE *store, STACK_OF(X509) *untrusted,
     i = X509_verify_cert(cert_ctx);
     if (i <= 0) {
         int j = X509_STORE_CTX_get_error(cert_ctx);
-        ERR_raise_data(ERR_LIB_TS, TS_R_CERTIFICATE_VERIFY_ERROR,
-                       "Verify error:%s", X509_verify_cert_error_string(j));
+        ERR_raise_data(ERR_LIB_TS, TS_R_CERTIFICATE_VERIFY_ERROR, "Verify error:%s", X509_verify_cert_error_string(j));
         goto err;
     }
     *chain = X509_STORE_CTX_get1_chain(cert_ctx);
@@ -217,8 +195,7 @@ static ESS_SIGNING_CERT *ossl_ess_get_signing_cert(const PKCS7_SIGNER_INFO *si)
     return d2i_ESS_SIGNING_CERT(NULL, &p, attr->value.sequence->length);
 }
 
-static
-ESS_SIGNING_CERT_V2 *ossl_ess_get_signing_cert_v2(const PKCS7_SIGNER_INFO *si)
+static ESS_SIGNING_CERT_V2 *ossl_ess_get_signing_cert_v2(const PKCS7_SIGNER_INFO *si)
 {
     ASN1_TYPE *attr;
     const unsigned char *p;
@@ -230,8 +207,7 @@ ESS_SIGNING_CERT_V2 *ossl_ess_get_signing_cert_v2(const PKCS7_SIGNER_INFO *si)
     return d2i_ESS_SIGNING_CERT_V2(NULL, &p, attr->value.sequence->length);
 }
 
-static int ts_check_signing_certs(const PKCS7_SIGNER_INFO *si,
-                                  const STACK_OF(X509) *chain)
+static int ts_check_signing_certs(const PKCS7_SIGNER_INFO *si, const STACK_OF(X509) *chain)
 {
     ESS_SIGNING_CERT *ss = ossl_ess_get_signing_cert(si);
     ESS_SIGNING_CERT_V2 *ssv2 = ossl_ess_get_signing_cert_v2(si);
@@ -260,7 +236,7 @@ int TS_RESP_verify_response(TS_VERIFY_CTX *ctx, TS_RESP *response)
         goto err;
     ret = 1;
 
- err:
+err:
     return ret;
 }
 
@@ -291,8 +267,7 @@ int TS_RESP_verify_token(TS_VERIFY_CTX *ctx, PKCS7 *token)
  *      - Check if the TSA name matches the signer.
  *      - Check if the TSA name is the expected TSA.
  */
-static int int_ts_RESP_verify_token(TS_VERIFY_CTX *ctx,
-                                    PKCS7 *token, TS_TST_INFO *tst_info)
+static int int_ts_RESP_verify_token(TS_VERIFY_CTX *ctx, PKCS7 *token, TS_TST_INFO *tst_info)
 {
     X509 *signer = NULL;
     GENERAL_NAME *tsa_name = tst_info->tsa;
@@ -303,47 +278,37 @@ static int int_ts_RESP_verify_token(TS_VERIFY_CTX *ctx,
     int flags = ctx->flags;
 
     /* Some options require us to also check the signature */
-    if (((flags & TS_VFY_SIGNER) && tsa_name != NULL)
-            || (flags & TS_VFY_TSA_NAME)) {
+    if (((flags & TS_VFY_SIGNER) && tsa_name != NULL) || (flags & TS_VFY_TSA_NAME)) {
         flags |= TS_VFY_SIGNATURE;
     }
 
-    if ((flags & TS_VFY_SIGNATURE)
-        && !TS_RESP_verify_signature(token, ctx->certs, ctx->store, &signer))
+    if ((flags & TS_VFY_SIGNATURE) && !TS_RESP_verify_signature(token, ctx->certs, ctx->store, &signer))
         goto err;
-    if ((flags & TS_VFY_VERSION)
-        && TS_TST_INFO_get_version(tst_info) != 1) {
+    if ((flags & TS_VFY_VERSION) && TS_TST_INFO_get_version(tst_info) != 1) {
         ERR_raise(ERR_LIB_TS, TS_R_UNSUPPORTED_VERSION);
         goto err;
     }
-    if ((flags & TS_VFY_POLICY)
-        && !ts_check_policy(ctx->policy, tst_info))
+    if ((flags & TS_VFY_POLICY) && !ts_check_policy(ctx->policy, tst_info))
         goto err;
-    if ((flags & TS_VFY_IMPRINT)
-        && !ts_check_imprints(ctx->md_alg, ctx->imprint, ctx->imprint_len,
-                              tst_info))
+    if ((flags & TS_VFY_IMPRINT) && !ts_check_imprints(ctx->md_alg, ctx->imprint, ctx->imprint_len, tst_info))
         goto err;
     if ((flags & TS_VFY_DATA)
-        && (!ts_compute_imprint(ctx->data, tst_info,
-                                &md_alg, &imprint, &imprint_len)
+        && (!ts_compute_imprint(ctx->data, tst_info, &md_alg, &imprint, &imprint_len)
             || !ts_check_imprints(md_alg, imprint, imprint_len, tst_info)))
         goto err;
-    if ((flags & TS_VFY_NONCE)
-        && !ts_check_nonces(ctx->nonce, tst_info))
+    if ((flags & TS_VFY_NONCE) && !ts_check_nonces(ctx->nonce, tst_info))
         goto err;
-    if ((flags & TS_VFY_SIGNER)
-        && tsa_name && !ts_check_signer_name(tsa_name, signer)) {
+    if ((flags & TS_VFY_SIGNER) && tsa_name && !ts_check_signer_name(tsa_name, signer)) {
         ERR_raise(ERR_LIB_TS, TS_R_TSA_NAME_MISMATCH);
         goto err;
     }
-    if ((flags & TS_VFY_TSA_NAME)
-        && !ts_check_signer_name(ctx->tsa_name, signer)) {
+    if ((flags & TS_VFY_TSA_NAME) && !ts_check_signer_name(ctx->tsa_name, signer)) {
         ERR_raise(ERR_LIB_TS, TS_R_TSA_UNTRUSTED);
         goto err;
     }
     ret = 1;
 
- err:
+err:
     X509_free(signer);
     X509_ALGOR_free(md_alg);
     OPENSSL_free(imprint);
@@ -362,13 +327,12 @@ static int ts_check_status_info(TS_RESP *response)
         return 1;
 
     /* There was an error, get the description in status_text. */
-    if (0 <= status && status < (long) OSSL_NELEM(ts_status_text))
+    if (0 <= status && status < (long)OSSL_NELEM(ts_status_text))
         status_text = ts_status_text[status];
     else
         status_text = "unknown code";
 
-    if (sk_ASN1_UTF8STRING_num(info->text) > 0
-        && (embedded_status_text = ts_get_status_text(info->text)) == NULL)
+    if (sk_ASN1_UTF8STRING_num(info->text) > 0 && (embedded_status_text = ts_get_status_text(info->text)) == NULL)
         return 0;
 
     /* Fill in failure_text with the failure information. */
@@ -376,8 +340,7 @@ static int ts_check_status_info(TS_RESP *response)
         int i;
         int first = 1;
         for (i = 0; i < (int)OSSL_NELEM(ts_failure_info); ++i) {
-            if (ASN1_BIT_STRING_get_bit(info->failure_info,
-                                        ts_failure_info[i].code)) {
+            if (ASN1_BIT_STRING_get_bit(info->failure_info, ts_failure_info[i].code)) {
                 if (!first)
                     strcat(failure_text, ",");
                 else
@@ -389,11 +352,8 @@ static int ts_check_status_info(TS_RESP *response)
     if (failure_text[0] == '\0')
         strcpy(failure_text, "unspecified");
 
-    ERR_raise_data(ERR_LIB_TS, TS_R_NO_TIME_STAMP_TOKEN,
-                   "status code: %s, status text: %s, failure codes: %s",
-                   status_text,
-                   embedded_status_text ? embedded_status_text : "unspecified",
-                   failure_text);
+    ERR_raise_data(ERR_LIB_TS, TS_R_NO_TIME_STAMP_TOKEN, "status code: %s, status text: %s, failure codes: %s",
+                   status_text, embedded_status_text ? embedded_status_text : "unspecified", failure_text);
     OPENSSL_free(embedded_status_text);
 
     return 0;
@@ -404,8 +364,7 @@ static char *ts_get_status_text(STACK_OF(ASN1_UTF8STRING) *text)
     return ossl_sk_ASN1_UTF8STRING2text(text, "/", TS_MAX_STATUS_LENGTH);
 }
 
-static int ts_check_policy(const ASN1_OBJECT *req_oid,
-                           const TS_TST_INFO *tst_info)
+static int ts_check_policy(const ASN1_OBJECT *req_oid, const TS_TST_INFO *tst_info)
 {
     const ASN1_OBJECT *resp_oid = tst_info->policy_id;
 
@@ -417,9 +376,8 @@ static int ts_check_policy(const ASN1_OBJECT *req_oid,
     return 1;
 }
 
-static int ts_compute_imprint(BIO *data, TS_TST_INFO *tst_info,
-                              X509_ALGOR **md_alg,
-                              unsigned char **imprint, unsigned *imprint_len)
+static int ts_compute_imprint(BIO *data, TS_TST_INFO *tst_info, X509_ALGOR **md_alg, unsigned char **imprint,
+                              unsigned *imprint_len)
 {
     TS_MSG_IMPRINT *msg_imprint = tst_info->msg_imprint;
     X509_ALGOR *md_alg_resp = msg_imprint->hash_algo;
@@ -474,7 +432,7 @@ static int ts_compute_imprint(BIO *data, TS_TST_INFO *tst_info,
     EVP_MD_CTX_free(md_ctx);
 
     return 1;
- err:
+err:
     EVP_MD_CTX_free(md_ctx);
     EVP_MD_free(md);
     X509_ALGOR_free(*md_alg);
@@ -485,9 +443,7 @@ static int ts_compute_imprint(BIO *data, TS_TST_INFO *tst_info,
     return 0;
 }
 
-static int ts_check_imprints(X509_ALGOR *algor_a,
-                             const unsigned char *imprint_a, unsigned len_a,
-                             TS_TST_INFO *tst_info)
+static int ts_check_imprints(X509_ALGOR *algor_a, const unsigned char *imprint_a, unsigned len_a, TS_TST_INFO *tst_info)
 {
     TS_MSG_IMPRINT *b = tst_info->msg_imprint;
     X509_ALGOR *algor_b = b->hash_algo;
@@ -498,16 +454,14 @@ static int ts_check_imprints(X509_ALGOR *algor_a,
             goto err;
 
         /* The parameter must be NULL in both. */
-        if ((algor_a->parameter
-             && ASN1_TYPE_get(algor_a->parameter) != V_ASN1_NULL)
-            || (algor_b->parameter
-                && ASN1_TYPE_get(algor_b->parameter) != V_ASN1_NULL))
+        if ((algor_a->parameter && ASN1_TYPE_get(algor_a->parameter) != V_ASN1_NULL)
+            || (algor_b->parameter && ASN1_TYPE_get(algor_b->parameter) != V_ASN1_NULL))
             goto err;
     }
 
-    ret = len_a == (unsigned)ASN1_STRING_length(b->hashed_msg) &&
-        memcmp(imprint_a, ASN1_STRING_get0_data(b->hashed_msg), len_a) == 0;
- err:
+    ret = len_a == (unsigned)ASN1_STRING_length(b->hashed_msg)
+        && memcmp(imprint_a, ASN1_STRING_get0_data(b->hashed_msg), len_a) == 0;
+err:
     if (!ret)
         ERR_raise(ERR_LIB_TS, TS_R_MESSAGE_IMPRINT_MISMATCH);
     return ret;
@@ -541,8 +495,7 @@ static int ts_check_signer_name(GENERAL_NAME *tsa_name, X509 *signer)
     int idx = -1;
     int found = 0;
 
-    if (tsa_name->type == GEN_DIRNAME
-        && X509_name_cmp(tsa_name->d.dirn, X509_get_subject_name(signer)) == 0)
+    if (tsa_name->type == GEN_DIRNAME && X509_name_cmp(tsa_name->d.dirn, X509_get_subject_name(signer)) == 0)
         return 1;
     gen_names = X509_get_ext_d2i(signer, NID_subject_alt_name, NULL, &idx);
     while (gen_names != NULL) {

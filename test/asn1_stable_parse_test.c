@@ -21,15 +21,11 @@ typedef enum OPTION_choice {
 
 const OPTIONS *test_get_options(void)
 {
-    static const OPTIONS options[] = {
-        OPT_TEST_OPTIONS_DEFAULT_USAGE,
-        { "config", OPT_CONFIG_FILE, '<',
-          "The configuration file to use for the libctx" },
-        { NULL }
-    };
+    static const OPTIONS options[] = {OPT_TEST_OPTIONS_DEFAULT_USAGE,
+                                      {"config", OPT_CONFIG_FILE, '<', "The configuration file to use for the libctx"},
+                                      {NULL}};
     return options;
 }
-
 
 /*
  * Test that parsing a config file with incorrect stable settings aren't parsed

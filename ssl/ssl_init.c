@@ -24,7 +24,8 @@ static int ssl_base_inited = 0;
 DEFINE_RUN_ONCE_STATIC(ossl_init_ssl_base)
 {
 #ifndef OPENSSL_NO_COMP
-    OSSL_TRACE(INIT, "ossl_init_ssl_base: "
+    OSSL_TRACE(INIT,
+               "ossl_init_ssl_base: "
                "SSL_COMP_get_compression_methods()\n");
     /*
      * This will initialise the built-in compression algorithms. The value
@@ -60,8 +61,7 @@ int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
         return 0;
     }
 
-    opts |= OPENSSL_INIT_ADD_ALL_CIPHERS
-         |  OPENSSL_INIT_ADD_ALL_DIGESTS;
+    opts |= OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS;
 #ifndef OPENSSL_NO_AUTOLOAD_CONFIG
     if ((opts & OPENSSL_INIT_NO_LOAD_CONFIG) == 0)
         opts |= OPENSSL_INIT_LOAD_CONFIG;

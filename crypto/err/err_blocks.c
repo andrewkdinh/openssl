@@ -80,8 +80,7 @@ void ERR_vset_error(int lib, int reason, const char *fmt, va_list args)
          * Try to maximize the space available.  If that fails, we use what
          * we have.
          */
-        if (buf_size < ERR_MAX_DATA_SIZE
-            && (rbuf = OPENSSL_realloc(buf, ERR_MAX_DATA_SIZE)) != NULL) {
+        if (buf_size < ERR_MAX_DATA_SIZE && (rbuf = OPENSSL_realloc(buf, ERR_MAX_DATA_SIZE)) != NULL) {
             buf = rbuf;
             buf_size = ERR_MAX_DATA_SIZE;
         }

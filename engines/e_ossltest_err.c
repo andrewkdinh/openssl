@@ -13,10 +13,7 @@
 
 #ifndef OPENSSL_NO_ERR
 
-static ERR_STRING_DATA OSSLTEST_str_reasons[] = {
-    {ERR_PACK(0, 0, OSSLTEST_R_INIT_FAILED), "init failed"},
-    {0, NULL}
-};
+static ERR_STRING_DATA OSSLTEST_str_reasons[] = {{ERR_PACK(0, 0, OSSLTEST_R_INIT_FAILED), "init failed"}, {0, NULL}};
 
 #endif
 

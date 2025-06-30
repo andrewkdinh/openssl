@@ -22,7 +22,9 @@ DEFINE_STACK_OF(OSSL_PROVIDER)
 /*
  * See comments in opt_verify for explanation of this.
  */
-enum prov_range { OPT_PROV_ENUM };
+enum prov_range {
+    OPT_PROV_ENUM
+};
 
 static STACK_OF(OSSL_PROVIDER) *app_providers = NULL;
 
@@ -45,8 +47,7 @@ int app_provider_load(OSSL_LIB_CTX *libctx, const char *provider_name)
     }
     if (app_providers == NULL)
         app_providers = sk_OSSL_PROVIDER_new_null();
-    if (app_providers == NULL
-        || !sk_OSSL_PROVIDER_push(app_providers, prov)) {
+    if (app_providers == NULL || !sk_OSSL_PROVIDER_push(app_providers, prov)) {
         app_providers_cleanup();
         return 0;
     }
@@ -89,10 +90,8 @@ static int opt_provider_param(const char *arg)
     char *copy, *tmp;
     int ret = 0;
 
-    if ((copy = OPENSSL_strdup(arg)) == NULL
-        || (p.val = strchr(copy, '=')) == NULL) {
-        opt_printf_stderr("%s: malformed '-provparam' option value: '%s'\n",
-                          opt_getprog(), arg);
+    if ((copy = OPENSSL_strdup(arg)) == NULL || (p.val = strchr(copy, '=')) == NULL) {
+        opt_printf_stderr("%s: malformed '-provparam' option value: '%s'\n", opt_getprog(), arg);
         goto end;
     }
 
@@ -117,23 +116,20 @@ static int opt_provider_param(const char *arg)
 
     /* The key must not be empty */
     if (*p.key == '\0') {
-        opt_printf_stderr("%s: malformed '-provparam' option value: '%s'\n",
-                          opt_getprog(), arg);
+        opt_printf_stderr("%s: malformed '-provparam' option value: '%s'\n", opt_getprog(), arg);
         goto end;
     }
 
     p.found = 0;
     ret = OSSL_PROVIDER_do_all(app_get0_libctx(), set_prov_param, (void *)&p);
     if (ret == 0) {
-        opt_printf_stderr("%s: Error setting provider '%s' parameter '%s'\n",
-                          opt_getprog(), p.name, p.key);
+        opt_printf_stderr("%s: Error setting provider '%s' parameter '%s'\n", opt_getprog(), p.name, p.key);
     } else if (p.found == 0) {
-        opt_printf_stderr("%s: No provider named '%s' is loaded\n",
-                          opt_getprog(), p.name);
+        opt_printf_stderr("%s: No provider named '%s' is loaded\n", opt_getprog(), p.name);
         ret = 0;
     }
 
- end:
+end:
     OPENSSL_free(copy);
     return ret;
 }

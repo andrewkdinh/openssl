@@ -25,8 +25,7 @@ static int parse_boolean(const char *value, int *result)
     if (OPENSSL_strcasecmp(value, "Yes") == 0) {
         *result = 1;
         return 1;
-    }
-    else if (OPENSSL_strcasecmp(value, "No") == 0) {
+    } else if (OPENSSL_strcasecmp(value, "No") == 0) {
         *result = 0;
         return 1;
     }
@@ -61,9 +60,7 @@ typedef struct {
     int value;
 } test_enum;
 
-
-__owur static int parse_enum(const test_enum *enums, size_t num_enums,
-                             int *value, const char *name)
+__owur static int parse_enum(const test_enum *enums, size_t num_enums, int *value, const char *name)
 {
     size_t i;
     for (i = 0; i < num_enums; i++) {
@@ -75,8 +72,7 @@ __owur static int parse_enum(const test_enum *enums, size_t num_enums,
     return 0;
 }
 
-static const char *enum_name(const test_enum *enums, size_t num_enums,
-                             int value)
+static const char *enum_name(const test_enum *enums, size_t num_enums, int value)
 {
     size_t i;
     for (i = 0; i < num_enums; i++) {
@@ -86,7 +82,6 @@ static const char *enum_name(const test_enum *enums, size_t num_enums,
     }
     return "InvalidValue";
 }
-
 
 /* ExpectedResult */
 
@@ -101,8 +96,7 @@ static const test_enum ssl_test_results[] = {
 __owur static int parse_expected_result(SSL_TEST_CTX *test_ctx, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_test_results, OSSL_NELEM(ssl_test_results),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_test_results, OSSL_NELEM(ssl_test_results), &ret_value, value)) {
         return 0;
     }
     test_ctx->expected_result = ret_value;
@@ -149,19 +143,13 @@ const char *ssl_alert_name(int alert)
 /* ExpectedProtocol */
 
 static const test_enum ssl_protocols[] = {
-     {"TLSv1.3", TLS1_3_VERSION},
-     {"TLSv1.2", TLS1_2_VERSION},
-     {"TLSv1.1", TLS1_1_VERSION},
-     {"TLSv1", TLS1_VERSION},
-     {"SSLv3", SSL3_VERSION},
-     {"DTLSv1", DTLS1_VERSION},
-     {"DTLSv1.2", DTLS1_2_VERSION},
+    {"TLSv1.3", TLS1_3_VERSION}, {"TLSv1.2", TLS1_2_VERSION}, {"TLSv1.1", TLS1_1_VERSION},   {"TLSv1", TLS1_VERSION},
+    {"SSLv3", SSL3_VERSION},     {"DTLSv1", DTLS1_VERSION},   {"DTLSv1.2", DTLS1_2_VERSION},
 };
 
 __owur static int parse_protocol(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_enum(ssl_protocols, OSSL_NELEM(ssl_protocols),
-                      &test_ctx->expected_protocol, value);
+    return parse_enum(ssl_protocols, OSSL_NELEM(ssl_protocols), &test_ctx->expected_protocol, value);
 }
 
 const char *ssl_protocol_name(int protocol)
@@ -178,13 +166,11 @@ static const test_enum ssl_verify_callbacks[] = {
     {"RejectAll", SSL_TEST_VERIFY_REJECT_ALL},
 };
 
-__owur static int parse_client_verify_callback(SSL_TEST_CLIENT_CONF *client_conf,
-                                               const char *value)
+__owur static int parse_client_verify_callback(SSL_TEST_CLIENT_CONF *client_conf, const char *value)
 {
     int ret_value;
 
-    if (!parse_enum(ssl_verify_callbacks, OSSL_NELEM(ssl_verify_callbacks),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_verify_callbacks, OSSL_NELEM(ssl_verify_callbacks), &ret_value, value)) {
         return 0;
     }
     client_conf->verify_callback = ret_value;
@@ -193,8 +179,7 @@ __owur static int parse_client_verify_callback(SSL_TEST_CLIENT_CONF *client_conf
 
 const char *ssl_verify_callback_name(ssl_verify_callback_t callback)
 {
-    return enum_name(ssl_verify_callbacks, OSSL_NELEM(ssl_verify_callbacks),
-                     callback);
+    return enum_name(ssl_verify_callbacks, OSSL_NELEM(ssl_verify_callbacks), callback);
 }
 
 /* ServerName */
@@ -206,24 +191,20 @@ static const test_enum ssl_servername[] = {
     {"invalid", SSL_TEST_SERVERNAME_INVALID},
 };
 
-__owur static int parse_servername(SSL_TEST_CLIENT_CONF *client_conf,
-                                   const char *value)
+__owur static int parse_servername(SSL_TEST_CLIENT_CONF *client_conf, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_servername, OSSL_NELEM(ssl_servername),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_servername, OSSL_NELEM(ssl_servername), &ret_value, value)) {
         return 0;
     }
     client_conf->servername = ret_value;
     return 1;
 }
 
-__owur static int parse_expected_servername(SSL_TEST_CTX *test_ctx,
-                                            const char *value)
+__owur static int parse_expected_servername(SSL_TEST_CTX *test_ctx, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_servername, OSSL_NELEM(ssl_servername),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_servername, OSSL_NELEM(ssl_servername), &ret_value, value)) {
         return 0;
     }
     test_ctx->expected_servername = ret_value;
@@ -232,8 +213,7 @@ __owur static int parse_expected_servername(SSL_TEST_CTX *test_ctx,
 
 const char *ssl_servername_name(ssl_servername_t server)
 {
-    return enum_name(ssl_servername, OSSL_NELEM(ssl_servername),
-                     server);
+    return enum_name(ssl_servername, OSSL_NELEM(ssl_servername), server);
 }
 
 /* ServerNameCallback */
@@ -242,19 +222,15 @@ static const test_enum ssl_servername_callbacks[] = {
     {"None", SSL_TEST_SERVERNAME_CB_NONE},
     {"IgnoreMismatch", SSL_TEST_SERVERNAME_IGNORE_MISMATCH},
     {"RejectMismatch", SSL_TEST_SERVERNAME_REJECT_MISMATCH},
-    {"ClientHelloIgnoreMismatch",
-     SSL_TEST_SERVERNAME_CLIENT_HELLO_IGNORE_MISMATCH},
-    {"ClientHelloRejectMismatch",
-     SSL_TEST_SERVERNAME_CLIENT_HELLO_REJECT_MISMATCH},
+    {"ClientHelloIgnoreMismatch", SSL_TEST_SERVERNAME_CLIENT_HELLO_IGNORE_MISMATCH},
+    {"ClientHelloRejectMismatch", SSL_TEST_SERVERNAME_CLIENT_HELLO_REJECT_MISMATCH},
     {"ClientHelloNoV12", SSL_TEST_SERVERNAME_CLIENT_HELLO_NO_V12},
 };
 
-__owur static int parse_servername_callback(SSL_TEST_SERVER_CONF *server_conf,
-                                            const char *value)
+__owur static int parse_servername_callback(SSL_TEST_SERVER_CONF *server_conf, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_servername_callbacks,
-                    OSSL_NELEM(ssl_servername_callbacks), &ret_value, value)) {
+    if (!parse_enum(ssl_servername_callbacks, OSSL_NELEM(ssl_servername_callbacks), &ret_value, value)) {
         return 0;
     }
     server_conf->servername_callback = ret_value;
@@ -263,8 +239,7 @@ __owur static int parse_servername_callback(SSL_TEST_SERVER_CONF *server_conf,
 
 const char *ssl_servername_callback_name(ssl_servername_callback_t callback)
 {
-    return enum_name(ssl_servername_callbacks,
-                     OSSL_NELEM(ssl_servername_callbacks), callback);
+    return enum_name(ssl_servername_callbacks, OSSL_NELEM(ssl_servername_callbacks), callback);
 }
 
 /* SessionTicketExpected */
@@ -278,8 +253,7 @@ static const test_enum ssl_session_ticket[] = {
 __owur static int parse_session_ticket(SSL_TEST_CTX *test_ctx, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_session_ticket, OSSL_NELEM(ssl_session_ticket),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_session_ticket, OSSL_NELEM(ssl_session_ticket), &ret_value, value)) {
         return 0;
     }
     test_ctx->session_ticket_expected = ret_value;
@@ -288,9 +262,7 @@ __owur static int parse_session_ticket(SSL_TEST_CTX *test_ctx, const char *value
 
 const char *ssl_session_ticket_name(ssl_session_ticket_t server)
 {
-    return enum_name(ssl_session_ticket,
-                     OSSL_NELEM(ssl_session_ticket),
-                     server);
+    return enum_name(ssl_session_ticket, OSSL_NELEM(ssl_session_ticket), server);
 }
 
 /* CompressionExpected */
@@ -308,8 +280,7 @@ static const test_enum ssl_session_id[] = {
 __owur static int parse_session_id(SSL_TEST_CTX *test_ctx, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_session_id, OSSL_NELEM(ssl_session_id),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_session_id, OSSL_NELEM(ssl_session_id), &ret_value, value)) {
         return 0;
     }
     test_ctx->session_id_expected = ret_value;
@@ -318,24 +289,18 @@ __owur static int parse_session_id(SSL_TEST_CTX *test_ctx, const char *value)
 
 const char *ssl_session_id_name(ssl_session_id_t server)
 {
-    return enum_name(ssl_session_id,
-                     OSSL_NELEM(ssl_session_id),
-                     server);
+    return enum_name(ssl_session_id, OSSL_NELEM(ssl_session_id), server);
 }
 
 /* Method */
 
 static const test_enum ssl_test_methods[] = {
-    {"TLS", SSL_TEST_METHOD_TLS},
-    {"DTLS", SSL_TEST_METHOD_DTLS},
-    {"QUIC", SSL_TEST_METHOD_QUIC}
-};
+    {"TLS", SSL_TEST_METHOD_TLS}, {"DTLS", SSL_TEST_METHOD_DTLS}, {"QUIC", SSL_TEST_METHOD_QUIC}};
 
 __owur static int parse_test_method(SSL_TEST_CTX *test_ctx, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_test_methods, OSSL_NELEM(ssl_test_methods),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_test_methods, OSSL_NELEM(ssl_test_methods), &ret_value, value)) {
         return 0;
     }
     test_ctx->method = ret_value;
@@ -381,8 +346,7 @@ static const test_enum ssl_handshake_modes[] = {
 __owur static int parse_handshake_mode(SSL_TEST_CTX *test_ctx, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_handshake_modes, OSSL_NELEM(ssl_handshake_modes),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_handshake_modes, OSSL_NELEM(ssl_handshake_modes), &ret_value, value)) {
         return 0;
     }
     test_ctx->handshake_mode = ret_value;
@@ -391,8 +355,7 @@ __owur static int parse_handshake_mode(SSL_TEST_CTX *test_ctx, const char *value
 
 const char *ssl_handshake_mode_name(ssl_handshake_mode_t mode)
 {
-    return enum_name(ssl_handshake_modes, OSSL_NELEM(ssl_handshake_modes),
-                     mode);
+    return enum_name(ssl_handshake_modes, OSSL_NELEM(ssl_handshake_modes), mode);
 }
 
 /* Renegotiation Ciphersuites */
@@ -409,8 +372,7 @@ static const test_enum ssl_key_update_types[] = {
 __owur static int parse_key_update_type(SSL_TEST_CTX *test_ctx, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_key_update_types, OSSL_NELEM(ssl_key_update_types),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_key_update_types, OSSL_NELEM(ssl_key_update_types), &ret_value, value)) {
         return 0;
     }
     test_ctx->key_update_type = ret_value;
@@ -425,12 +387,10 @@ static const test_enum ssl_ct_validation_modes[] = {
     {"Strict", SSL_TEST_CT_VALIDATION_STRICT},
 };
 
-__owur static int parse_ct_validation(SSL_TEST_CLIENT_CONF *client_conf,
-                                      const char *value)
+__owur static int parse_ct_validation(SSL_TEST_CLIENT_CONF *client_conf, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_ct_validation_modes, OSSL_NELEM(ssl_ct_validation_modes),
-                    &ret_value, value)) {
+    if (!parse_enum(ssl_ct_validation_modes, OSSL_NELEM(ssl_ct_validation_modes), &ret_value, value)) {
         return 0;
     }
     client_conf->ct_validation = ret_value;
@@ -439,8 +399,7 @@ __owur static int parse_ct_validation(SSL_TEST_CLIENT_CONF *client_conf,
 
 const char *ssl_ct_validation_name(ssl_ct_validation_t mode)
 {
-    return enum_name(ssl_ct_validation_modes, OSSL_NELEM(ssl_ct_validation_modes),
-                     mode);
+    return enum_name(ssl_ct_validation_modes, OSSL_NELEM(ssl_ct_validation_modes), mode);
 }
 
 IMPLEMENT_SSL_TEST_BOOL_OPTION(SSL_TEST_CTX, test, resumption_expected)
@@ -452,18 +411,14 @@ IMPLEMENT_SSL_TEST_BOOL_OPTION(SSL_TEST_CTX, test, enable_server_sctp_label_bug)
 
 /* CertStatus */
 
-static const test_enum ssl_certstatus[] = {
-    {"None", SSL_TEST_CERT_STATUS_NONE},
-    {"GoodResponse", SSL_TEST_CERT_STATUS_GOOD_RESPONSE},
-    {"BadResponse", SSL_TEST_CERT_STATUS_BAD_RESPONSE}
-};
+static const test_enum ssl_certstatus[] = {{"None", SSL_TEST_CERT_STATUS_NONE},
+                                           {"GoodResponse", SSL_TEST_CERT_STATUS_GOOD_RESPONSE},
+                                           {"BadResponse", SSL_TEST_CERT_STATUS_BAD_RESPONSE}};
 
-__owur static int parse_certstatus(SSL_TEST_SERVER_CONF *server_conf,
-                                            const char *value)
+__owur static int parse_certstatus(SSL_TEST_SERVER_CONF *server_conf, const char *value)
 {
     int ret_value;
-    if (!parse_enum(ssl_certstatus, OSSL_NELEM(ssl_certstatus), &ret_value,
-                    value)) {
+    if (!parse_enum(ssl_certstatus, OSSL_NELEM(ssl_certstatus), &ret_value, value)) {
         return 0;
     }
     server_conf->cert_status = ret_value;
@@ -472,35 +427,29 @@ __owur static int parse_certstatus(SSL_TEST_SERVER_CONF *server_conf,
 
 const char *ssl_certstatus_name(ssl_cert_status_t cert_status)
 {
-    return enum_name(ssl_certstatus,
-                     OSSL_NELEM(ssl_certstatus), cert_status);
+    return enum_name(ssl_certstatus, OSSL_NELEM(ssl_certstatus), cert_status);
 }
 
 /* ApplicationData */
 
 IMPLEMENT_SSL_TEST_INT_OPTION(SSL_TEST_CTX, test, app_data_size)
 
-
 /* MaxFragmentSize */
 
 IMPLEMENT_SSL_TEST_INT_OPTION(SSL_TEST_CTX, test, max_fragment_size)
 
 /* Maximum-Fragment-Length TLS extension mode */
-static const test_enum ssl_max_fragment_len_mode[] = {
-    {"None", TLSEXT_max_fragment_length_DISABLED},
-    { "512", TLSEXT_max_fragment_length_512},
-    {"1024", TLSEXT_max_fragment_length_1024},
-    {"2048", TLSEXT_max_fragment_length_2048},
-    {"4096", TLSEXT_max_fragment_length_4096}
-};
+static const test_enum ssl_max_fragment_len_mode[] = {{"None", TLSEXT_max_fragment_length_DISABLED},
+                                                      {"512", TLSEXT_max_fragment_length_512},
+                                                      {"1024", TLSEXT_max_fragment_length_1024},
+                                                      {"2048", TLSEXT_max_fragment_length_2048},
+                                                      {"4096", TLSEXT_max_fragment_length_4096}};
 
-__owur static int parse_max_fragment_len_mode(SSL_TEST_CLIENT_CONF *client_conf,
-                                              const char *value)
+__owur static int parse_max_fragment_len_mode(SSL_TEST_CLIENT_CONF *client_conf, const char *value)
 {
     int ret_value;
 
-    if (!parse_enum(ssl_max_fragment_len_mode,
-                    OSSL_NELEM(ssl_max_fragment_len_mode), &ret_value, value)) {
+    if (!parse_enum(ssl_max_fragment_len_mode, OSSL_NELEM(ssl_max_fragment_len_mode), &ret_value, value)) {
         return 0;
     }
     client_conf->max_fragment_len_mode = ret_value;
@@ -509,10 +458,8 @@ __owur static int parse_max_fragment_len_mode(SSL_TEST_CLIENT_CONF *client_conf,
 
 const char *ssl_max_fragment_len_name(int MFL_mode)
 {
-    return enum_name(ssl_max_fragment_len_mode,
-                     OSSL_NELEM(ssl_max_fragment_len_mode), MFL_mode);
+    return enum_name(ssl_max_fragment_len_mode, OSSL_NELEM(ssl_max_fragment_len_mode), MFL_mode);
 }
-
 
 /* Expected key and signature types */
 
@@ -551,40 +498,30 @@ __owur static int parse_expected_key_type(int *ptype, const char *value)
     return 1;
 }
 
-__owur static int parse_expected_tmp_key_type(SSL_TEST_CTX *test_ctx,
-                                              const char *value)
+__owur static int parse_expected_tmp_key_type(SSL_TEST_CTX *test_ctx, const char *value)
 {
     return parse_expected_key_type(&test_ctx->expected_tmp_key_type, value);
 }
 
-__owur static int parse_expected_server_cert_type(SSL_TEST_CTX *test_ctx,
-                                                  const char *value)
+__owur static int parse_expected_server_cert_type(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_expected_key_type(&test_ctx->expected_server_cert_type,
-                                   value);
+    return parse_expected_key_type(&test_ctx->expected_server_cert_type, value);
 }
 
-__owur static int parse_expected_server_sign_type(SSL_TEST_CTX *test_ctx,
-                                                 const char *value)
+__owur static int parse_expected_server_sign_type(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_expected_key_type(&test_ctx->expected_server_sign_type,
-                                   value);
+    return parse_expected_key_type(&test_ctx->expected_server_sign_type, value);
 }
 
-__owur static int parse_expected_client_cert_type(SSL_TEST_CTX *test_ctx,
-                                                  const char *value)
+__owur static int parse_expected_client_cert_type(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_expected_key_type(&test_ctx->expected_client_cert_type,
-                                   value);
+    return parse_expected_key_type(&test_ctx->expected_client_cert_type, value);
 }
 
-__owur static int parse_expected_client_sign_type(SSL_TEST_CTX *test_ctx,
-                                                 const char *value)
+__owur static int parse_expected_client_sign_type(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_expected_key_type(&test_ctx->expected_client_sign_type,
-                                   value);
+    return parse_expected_key_type(&test_ctx->expected_client_sign_type, value);
 }
-
 
 /* Expected signing hash */
 
@@ -603,23 +540,17 @@ __owur static int parse_expected_sign_hash(int *ptype, const char *value)
     return 1;
 }
 
-__owur static int parse_expected_server_sign_hash(SSL_TEST_CTX *test_ctx,
-                                                  const char *value)
+__owur static int parse_expected_server_sign_hash(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_expected_sign_hash(&test_ctx->expected_server_sign_hash,
-                                    value);
+    return parse_expected_sign_hash(&test_ctx->expected_server_sign_hash, value);
 }
 
-__owur static int parse_expected_client_sign_hash(SSL_TEST_CTX *test_ctx,
-                                                  const char *value)
+__owur static int parse_expected_client_sign_hash(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_expected_sign_hash(&test_ctx->expected_client_sign_hash,
-                                    value);
+    return parse_expected_sign_hash(&test_ctx->expected_client_sign_hash, value);
 }
 
-__owur static int parse_expected_ca_names(STACK_OF(X509_NAME) **pnames,
-                                          const char *value,
-                                          OSSL_LIB_CTX *libctx)
+__owur static int parse_expected_ca_names(STACK_OF(X509_NAME) **pnames, const char *value, OSSL_LIB_CTX *libctx)
 {
     if (value == NULL)
         return 0;
@@ -629,17 +560,13 @@ __owur static int parse_expected_ca_names(STACK_OF(X509_NAME) **pnames,
         *pnames = SSL_load_client_CA_file_ex(value, libctx, NULL);
     return *pnames != NULL;
 }
-__owur static int parse_expected_server_ca_names(SSL_TEST_CTX *test_ctx,
-                                                 const char *value)
+__owur static int parse_expected_server_ca_names(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_expected_ca_names(&test_ctx->expected_server_ca_names, value,
-                                   test_ctx->libctx);
+    return parse_expected_ca_names(&test_ctx->expected_server_ca_names, value, test_ctx->libctx);
 }
-__owur static int parse_expected_client_ca_names(SSL_TEST_CTX *test_ctx,
-                                                 const char *value)
+__owur static int parse_expected_client_ca_names(SSL_TEST_CTX *test_ctx, const char *value)
 {
-    return parse_expected_ca_names(&test_ctx->expected_client_ca_names, value,
-                                   test_ctx->libctx);
+    return parse_expected_ca_names(&test_ctx->expected_client_ca_names, value, test_ctx->libctx);
 }
 
 /* ExpectedCipher */
@@ -664,38 +591,38 @@ typedef struct {
 } ssl_test_ctx_option;
 
 static const ssl_test_ctx_option ssl_test_ctx_options[] = {
-    { "ExpectedResult", &parse_expected_result },
-    { "ExpectedClientAlert", &parse_client_alert },
-    { "ExpectedServerAlert", &parse_server_alert },
-    { "ExpectedProtocol", &parse_protocol },
-    { "ExpectedServerName", &parse_expected_servername },
-    { "SessionTicketExpected", &parse_session_ticket },
-    { "CompressionExpected", &parse_test_compression_expected },
-    { "SessionIdExpected", &parse_session_id },
-    { "Method", &parse_test_method },
-    { "ExpectedNPNProtocol", &parse_test_expected_npn_protocol },
-    { "ExpectedALPNProtocol", &parse_test_expected_alpn_protocol },
-    { "HandshakeMode", &parse_handshake_mode },
-    { "KeyUpdateType", &parse_key_update_type },
-    { "ResumptionExpected", &parse_test_resumption_expected },
-    { "ApplicationData", &parse_test_app_data_size },
-    { "MaxFragmentSize", &parse_test_max_fragment_size },
-    { "ExpectedTmpKeyType", &parse_expected_tmp_key_type },
-    { "ExpectedServerCertType", &parse_expected_server_cert_type },
-    { "ExpectedServerSignHash", &parse_expected_server_sign_hash },
-    { "ExpectedServerSignType", &parse_expected_server_sign_type },
-    { "ExpectedServerCANames", &parse_expected_server_ca_names },
-    { "ExpectedClientCertType", &parse_expected_client_cert_type },
-    { "ExpectedClientSignHash", &parse_expected_client_sign_hash },
-    { "ExpectedClientSignType", &parse_expected_client_sign_type },
-    { "ExpectedClientCANames", &parse_expected_client_ca_names },
-    { "UseSCTP", &parse_test_use_sctp },
-    { "CompressCertificates", &parse_test_compress_certificates },
-    { "EnableClientSCTPLabelBug", &parse_test_enable_client_sctp_label_bug },
-    { "EnableServerSCTPLabelBug", &parse_test_enable_server_sctp_label_bug },
-    { "ExpectedCipher", &parse_test_expected_cipher },
-    { "ExpectedSessionTicketAppData", &parse_test_expected_session_ticket_app_data },
-    { "FIPSversion", &parse_test_fips_version },
+    {"ExpectedResult", &parse_expected_result},
+    {"ExpectedClientAlert", &parse_client_alert},
+    {"ExpectedServerAlert", &parse_server_alert},
+    {"ExpectedProtocol", &parse_protocol},
+    {"ExpectedServerName", &parse_expected_servername},
+    {"SessionTicketExpected", &parse_session_ticket},
+    {"CompressionExpected", &parse_test_compression_expected},
+    {"SessionIdExpected", &parse_session_id},
+    {"Method", &parse_test_method},
+    {"ExpectedNPNProtocol", &parse_test_expected_npn_protocol},
+    {"ExpectedALPNProtocol", &parse_test_expected_alpn_protocol},
+    {"HandshakeMode", &parse_handshake_mode},
+    {"KeyUpdateType", &parse_key_update_type},
+    {"ResumptionExpected", &parse_test_resumption_expected},
+    {"ApplicationData", &parse_test_app_data_size},
+    {"MaxFragmentSize", &parse_test_max_fragment_size},
+    {"ExpectedTmpKeyType", &parse_expected_tmp_key_type},
+    {"ExpectedServerCertType", &parse_expected_server_cert_type},
+    {"ExpectedServerSignHash", &parse_expected_server_sign_hash},
+    {"ExpectedServerSignType", &parse_expected_server_sign_type},
+    {"ExpectedServerCANames", &parse_expected_server_ca_names},
+    {"ExpectedClientCertType", &parse_expected_client_cert_type},
+    {"ExpectedClientSignHash", &parse_expected_client_sign_hash},
+    {"ExpectedClientSignType", &parse_expected_client_sign_type},
+    {"ExpectedClientCANames", &parse_expected_client_ca_names},
+    {"UseSCTP", &parse_test_use_sctp},
+    {"CompressCertificates", &parse_test_compress_certificates},
+    {"EnableClientSCTPLabelBug", &parse_test_enable_client_sctp_label_bug},
+    {"EnableServerSCTPLabelBug", &parse_test_enable_server_sctp_label_bug},
+    {"ExpectedCipher", &parse_test_expected_cipher},
+    {"ExpectedSessionTicketAppData", &parse_test_expected_session_ticket_app_data},
+    {"FIPSversion", &parse_test_fips_version},
 };
 
 /* Nested client options. */
@@ -705,17 +632,17 @@ typedef struct {
 } ssl_test_client_option;
 
 static const ssl_test_client_option ssl_test_client_options[] = {
-    { "VerifyCallback", &parse_client_verify_callback },
-    { "ServerName", &parse_servername },
-    { "NPNProtocols", &parse_client_npn_protocols },
-    { "ALPNProtocols", &parse_client_alpn_protocols },
-    { "CTValidation", &parse_ct_validation },
-    { "RenegotiateCiphers", &parse_client_reneg_ciphers},
-    { "SRPUser", &parse_client_srp_user },
-    { "SRPPassword", &parse_client_srp_password },
-    { "MaxFragmentLenExt", &parse_max_fragment_len_mode },
-    { "EnablePHA", &parse_client_enable_pha },
-    { "RenegotiateNoExtms", &parse_client_no_extms_on_reneg },
+    {"VerifyCallback", &parse_client_verify_callback},
+    {"ServerName", &parse_servername},
+    {"NPNProtocols", &parse_client_npn_protocols},
+    {"ALPNProtocols", &parse_client_alpn_protocols},
+    {"CTValidation", &parse_ct_validation},
+    {"RenegotiateCiphers", &parse_client_reneg_ciphers},
+    {"SRPUser", &parse_client_srp_user},
+    {"SRPPassword", &parse_client_srp_password},
+    {"MaxFragmentLenExt", &parse_max_fragment_len_mode},
+    {"EnablePHA", &parse_client_enable_pha},
+    {"RenegotiateNoExtms", &parse_client_no_extms_on_reneg},
 };
 
 /* Nested server options. */
@@ -725,15 +652,15 @@ typedef struct {
 } ssl_test_server_option;
 
 static const ssl_test_server_option ssl_test_server_options[] = {
-    { "ServerNameCallback", &parse_servername_callback },
-    { "NPNProtocols", &parse_server_npn_protocols },
-    { "ALPNProtocols", &parse_server_alpn_protocols },
-    { "BrokenSessionTicket", &parse_server_broken_session_ticket },
-    { "CertStatus", &parse_certstatus },
-    { "SRPUser", &parse_server_srp_user },
-    { "SRPPassword", &parse_server_srp_password },
-    { "ForcePHA", &parse_server_force_pha },
-    { "SessionTicketAppData", &parse_server_session_ticket_app_data },
+    {"ServerNameCallback", &parse_servername_callback},
+    {"NPNProtocols", &parse_server_npn_protocols},
+    {"ALPNProtocols", &parse_server_alpn_protocols},
+    {"BrokenSessionTicket", &parse_server_broken_session_ticket},
+    {"CertStatus", &parse_certstatus},
+    {"SRPUser", &parse_server_srp_user},
+    {"SRPPassword", &parse_server_srp_password},
+    {"ForcePHA", &parse_server_force_pha},
+    {"SessionTicketAppData", &parse_server_session_ticket_app_data},
 };
 
 SSL_TEST_CTX *SSL_TEST_CTX_new(OSSL_LIB_CTX *libctx)
@@ -789,8 +716,7 @@ void SSL_TEST_CTX_free(SSL_TEST_CTX *ctx)
     OPENSSL_free(ctx);
 }
 
-static int parse_client_options(SSL_TEST_CLIENT_CONF *client, const CONF *conf,
-                                const char *client_section)
+static int parse_client_options(SSL_TEST_CLIENT_CONF *client, const CONF *conf, const char *client_section)
 {
     STACK_OF(CONF_VALUE) *sk_conf;
     int i;
@@ -805,8 +731,7 @@ static int parse_client_options(SSL_TEST_CLIENT_CONF *client, const CONF *conf,
         for (j = 0; j < OSSL_NELEM(ssl_test_client_options); j++) {
             if (strcmp(option->name, ssl_test_client_options[j].name) == 0) {
                 if (!ssl_test_client_options[j].parse(client, option->value)) {
-                    TEST_info("Bad value %s for option %s",
-                              option->value, option->name);
+                    TEST_info("Bad value %s for option %s", option->value, option->name);
                     return 0;
                 }
                 found = 1;
@@ -822,8 +747,7 @@ static int parse_client_options(SSL_TEST_CLIENT_CONF *client, const CONF *conf,
     return 1;
 }
 
-static int parse_server_options(SSL_TEST_SERVER_CONF *server, const CONF *conf,
-                                const char *server_section)
+static int parse_server_options(SSL_TEST_SERVER_CONF *server, const CONF *conf, const char *server_section)
 {
     STACK_OF(CONF_VALUE) *sk_conf;
     int i;
@@ -838,8 +762,7 @@ static int parse_server_options(SSL_TEST_SERVER_CONF *server, const CONF *conf,
         for (j = 0; j < OSSL_NELEM(ssl_test_server_options); j++) {
             if (strcmp(option->name, ssl_test_server_options[j].name) == 0) {
                 if (!ssl_test_server_options[j].parse(server, option->value)) {
-                    TEST_info("Bad value %s for option %s",
-                               option->value, option->name);
+                    TEST_info("Bad value %s for option %s", option->value, option->name);
                     return 0;
                 }
                 found = 1;
@@ -855,16 +778,14 @@ static int parse_server_options(SSL_TEST_SERVER_CONF *server, const CONF *conf,
     return 1;
 }
 
-SSL_TEST_CTX *SSL_TEST_CTX_create(const CONF *conf, const char *test_section,
-                                  OSSL_LIB_CTX *libctx)
+SSL_TEST_CTX *SSL_TEST_CTX_create(const CONF *conf, const char *test_section, OSSL_LIB_CTX *libctx)
 {
     STACK_OF(CONF_VALUE) *sk_conf = NULL;
     SSL_TEST_CTX *ctx = NULL;
     int i;
     size_t j;
 
-    if (!TEST_ptr(sk_conf = NCONF_get_section(conf, test_section))
-            || !TEST_ptr(ctx = SSL_TEST_CTX_new(libctx)))
+    if (!TEST_ptr(sk_conf = NCONF_get_section(conf, test_section)) || !TEST_ptr(ctx = SSL_TEST_CTX_new(libctx)))
         goto err;
 
     for (i = 0; i < sk_CONF_VALUE_num(sk_conf); i++) {
@@ -882,23 +803,19 @@ SSL_TEST_CTX *SSL_TEST_CTX_create(const CONF *conf, const char *test_section,
             if (!parse_server_options(&ctx->extra.server2, conf, option->value))
                 goto err;
         } else if (strcmp(option->name, "resume-client") == 0) {
-            if (!parse_client_options(&ctx->resume_extra.client, conf,
-                                      option->value))
+            if (!parse_client_options(&ctx->resume_extra.client, conf, option->value))
                 goto err;
         } else if (strcmp(option->name, "resume-server") == 0) {
-            if (!parse_server_options(&ctx->resume_extra.server, conf,
-                                      option->value))
+            if (!parse_server_options(&ctx->resume_extra.server, conf, option->value))
                 goto err;
         } else if (strcmp(option->name, "resume-server2") == 0) {
-            if (!parse_server_options(&ctx->resume_extra.server2, conf,
-                                      option->value))
+            if (!parse_server_options(&ctx->resume_extra.server2, conf, option->value))
                 goto err;
         } else {
             for (j = 0; j < OSSL_NELEM(ssl_test_ctx_options); j++) {
                 if (strcmp(option->name, ssl_test_ctx_options[j].name) == 0) {
                     if (!ssl_test_ctx_options[j].parse(ctx, option->value)) {
-                        TEST_info("Bad value %s for option %s",
-                                   option->value, option->name);
+                        TEST_info("Bad value %s for option %s", option->value, option->name);
                         goto err;
                     }
                     found = 1;
@@ -914,9 +831,9 @@ SSL_TEST_CTX *SSL_TEST_CTX_create(const CONF *conf, const char *test_section,
 
     goto done;
 
- err:
+err:
     SSL_TEST_CTX_free(ctx);
     ctx = NULL;
- done:
+done:
     return ctx;
 }
