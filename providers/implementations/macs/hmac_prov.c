@@ -36,32 +36,32 @@
  * necessary for the compiler, but provides an assurance that the signatures
  * of the functions in the dispatch table are correct.
  */
-static OSSL_FUNC_mac_newctx_fn hmac_new;
-static OSSL_FUNC_mac_dupctx_fn hmac_dup;
-static OSSL_FUNC_mac_freectx_fn hmac_free;
+static OSSL_FUNC_mac_newctx_fn              hmac_new;
+static OSSL_FUNC_mac_dupctx_fn              hmac_dup;
+static OSSL_FUNC_mac_freectx_fn             hmac_free;
 static OSSL_FUNC_mac_gettable_ctx_params_fn hmac_gettable_ctx_params;
-static OSSL_FUNC_mac_get_ctx_params_fn hmac_get_ctx_params;
+static OSSL_FUNC_mac_get_ctx_params_fn      hmac_get_ctx_params;
 static OSSL_FUNC_mac_settable_ctx_params_fn hmac_settable_ctx_params;
-static OSSL_FUNC_mac_set_ctx_params_fn hmac_set_ctx_params;
-static OSSL_FUNC_mac_init_fn hmac_init;
-static OSSL_FUNC_mac_update_fn hmac_update;
-static OSSL_FUNC_mac_final_fn hmac_final;
+static OSSL_FUNC_mac_set_ctx_params_fn      hmac_set_ctx_params;
+static OSSL_FUNC_mac_init_fn                hmac_init;
+static OSSL_FUNC_mac_update_fn              hmac_update;
+static OSSL_FUNC_mac_final_fn               hmac_final;
 
 /* local HMAC context structure */
 
 /* typedef EVP_MAC_IMPL */
 struct hmac_data_st {
-    void *provctx;
-    HMAC_CTX *ctx;               /* HMAC context */
-    PROV_DIGEST digest;
+    void          *provctx;
+    HMAC_CTX      *ctx; /* HMAC context */
+    PROV_DIGEST    digest;
     unsigned char *key;
-    size_t keylen;
+    size_t         keylen;
     /* Length of full TLS record including the MAC and any padding */
-    size_t tls_data_size;
-    unsigned char tls_header[13];
-    int tls_header_set;
-    unsigned char tls_mac_out[EVP_MAX_MD_SIZE];
-    size_t tls_mac_out_size;
+    size_t         tls_data_size;
+    unsigned char  tls_header[13];
+    int            tls_header_set;
+    unsigned char  tls_mac_out[EVP_MAX_MD_SIZE];
+    size_t         tls_mac_out_size;
 #ifdef FIPS_MODULE
     /*
      * 'internal' is set to 1 if HMAC is used inside another algorithm such as a
@@ -80,8 +80,7 @@ static void *hmac_new(void *provctx)
     if (!ossl_prov_is_running())
         return NULL;
 
-    if ((macctx = OPENSSL_zalloc(sizeof(*macctx))) == NULL
-        || (macctx->ctx = HMAC_CTX_new()) == NULL) {
+    if ((macctx = OPENSSL_zalloc(sizeof(*macctx))) == NULL || (macctx->ctx = HMAC_CTX_new()) == NULL) {
         OPENSSL_free(macctx);
         return NULL;
     }
@@ -107,7 +106,7 @@ static void *hmac_dup(void *vsrc)
 {
     struct hmac_data_st *src = vsrc;
     struct hmac_data_st *dst;
-    HMAC_CTX *ctx;
+    HMAC_CTX            *ctx;
 
     if (!ossl_prov_is_running())
         return NULL;
@@ -115,14 +114,13 @@ static void *hmac_dup(void *vsrc)
     if (dst == NULL)
         return NULL;
 
-    ctx = dst->ctx;
-    *dst = *src;
+    ctx      = dst->ctx;
+    *dst     = *src;
     dst->ctx = ctx;
     dst->key = NULL;
     memset(&dst->digest, 0, sizeof(dst->digest));
 
-    if (!HMAC_CTX_copy(dst->ctx, src->ctx)
-        || !ossl_prov_digest_copy(&dst->digest, &src->digest)) {
+    if (!HMAC_CTX_copy(dst->ctx, src->ctx) || !ossl_prov_digest_copy(&dst->digest, &src->digest)) {
         hmac_free(dst);
         return NULL;
     }
@@ -152,8 +150,7 @@ static int hmac_block_size(struct hmac_data_st *macctx)
     return EVP_MD_block_size(md);
 }
 
-static int hmac_setkey(struct hmac_data_st *macctx,
-                       const unsigned char *key, size_t keylen)
+static int hmac_setkey(struct hmac_data_st *macctx, const unsigned char *key, size_t keylen)
 {
     const EVP_MD *digest;
 
@@ -163,12 +160,15 @@ static int hmac_setkey(struct hmac_data_st *macctx,
      * which is why it skips the key check unless "HMAC" is fetched directly.
      */
     if (!macctx->internal) {
-        OSSL_LIB_CTX *libctx = PROV_LIBCTX_OF(macctx->provctx);
-        int approved = ossl_mac_check_key_size(keylen);
+        OSSL_LIB_CTX *libctx   = PROV_LIBCTX_OF(macctx->provctx);
+        int           approved = ossl_mac_check_key_size(keylen);
 
         if (!approved) {
-            if (!OSSL_FIPS_IND_ON_UNAPPROVED(macctx, OSSL_FIPS_IND_SETTABLE0,
-                                             libctx, "HMAC", "keysize",
+            if (!OSSL_FIPS_IND_ON_UNAPPROVED(macctx,
+                                             OSSL_FIPS_IND_SETTABLE0,
+                                             libctx,
+                                             "HMAC",
+                                             "keysize",
                                              ossl_fips_config_hmac_key_check)) {
                 ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY_LENGTH);
                 return 0;
@@ -187,16 +187,14 @@ static int hmac_setkey(struct hmac_data_st *macctx,
     memcpy(macctx->key, key, keylen);
     macctx->keylen = keylen;
 
-    digest = ossl_prov_digest_md(&macctx->digest);
+    digest         = ossl_prov_digest_md(&macctx->digest);
     /* HMAC_Init_ex doesn't tolerate all zero params, so we must be careful */
     if (key != NULL || (macctx->tls_data_size == 0 && digest != NULL))
-        return HMAC_Init_ex(macctx->ctx, key, (int)keylen, digest,
-                            ossl_prov_digest_engine(&macctx->digest));
+        return HMAC_Init_ex(macctx->ctx, key, (int)keylen, digest, ossl_prov_digest_engine(&macctx->digest));
     return 1;
 }
 
-static int hmac_init(void *vmacctx, const unsigned char *key,
-                     size_t keylen, const OSSL_PARAM params[])
+static int hmac_init(void *vmacctx, const unsigned char *key, size_t keylen, const OSSL_PARAM params[])
 {
     struct hmac_data_st *macctx = vmacctx;
 
@@ -210,8 +208,7 @@ static int hmac_init(void *vmacctx, const unsigned char *key,
     return HMAC_Init_ex(macctx->ctx, NULL, 0, NULL, NULL);
 }
 
-static int hmac_update(void *vmacctx, const unsigned char *data,
-                       size_t datalen)
+static int hmac_update(void *vmacctx, const unsigned char *data, size_t datalen)
 {
     struct hmac_data_st *macctx = vmacctx;
 
@@ -244,10 +241,9 @@ static int hmac_update(void *vmacctx, const unsigned char *data,
     return HMAC_Update(macctx->ctx, data, datalen);
 }
 
-static int hmac_final(void *vmacctx, unsigned char *out, size_t *outl,
-                      size_t outsize)
+static int hmac_final(void *vmacctx, unsigned char *out, size_t *outl, size_t outsize)
 {
-    unsigned int hlen;
+    unsigned int         hlen;
     struct hmac_data_st *macctx = vmacctx;
 
     if (!ossl_prov_is_running())
@@ -266,14 +262,11 @@ static int hmac_final(void *vmacctx, unsigned char *out, size_t *outl,
     return 1;
 }
 
-static const OSSL_PARAM known_gettable_ctx_params[] = {
-    OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
-    OSSL_PARAM_size_t(OSSL_MAC_PARAM_BLOCK_SIZE, NULL),
-    OSSL_FIPS_IND_GETTABLE_CTX_PARAM()
-    OSSL_PARAM_END
-};
-static const OSSL_PARAM *hmac_gettable_ctx_params(ossl_unused void *ctx,
-                                                  ossl_unused void *provctx)
+static const OSSL_PARAM  known_gettable_ctx_params[] = {OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
+                                                        OSSL_PARAM_size_t(OSSL_MAC_PARAM_BLOCK_SIZE, NULL),
+                                                        OSSL_FIPS_IND_GETTABLE_CTX_PARAM() OSSL_PARAM_END};
+
+static const OSSL_PARAM *hmac_gettable_ctx_params(ossl_unused void *ctx, ossl_unused void *provctx)
 {
     return known_gettable_ctx_params;
 }
@@ -281,14 +274,13 @@ static const OSSL_PARAM *hmac_gettable_ctx_params(ossl_unused void *ctx,
 static int hmac_get_ctx_params(void *vmacctx, OSSL_PARAM params[])
 {
     struct hmac_data_st *macctx = vmacctx;
-    OSSL_PARAM *p;
+    OSSL_PARAM          *p;
 
-    if ((p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_SIZE)) != NULL
-            && !OSSL_PARAM_set_size_t(p, hmac_size(macctx)))
+    if ((p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_SIZE)) != NULL && !OSSL_PARAM_set_size_t(p, hmac_size(macctx)))
         return 0;
 
     if ((p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_BLOCK_SIZE)) != NULL
-            && !OSSL_PARAM_set_int(p, hmac_block_size(macctx)))
+        && !OSSL_PARAM_set_int(p, hmac_block_size(macctx)))
         return 0;
 
 #ifdef FIPS_MODULE
@@ -305,18 +297,16 @@ static int hmac_get_ctx_params(void *vmacctx, OSSL_PARAM params[])
     return 1;
 }
 
-static const OSSL_PARAM known_settable_ctx_params[] = {
-    OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_DIGEST, NULL, 0),
-    OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_PROPERTIES, NULL, 0),
-    OSSL_PARAM_octet_string(OSSL_MAC_PARAM_KEY, NULL, 0),
-    OSSL_PARAM_int(OSSL_MAC_PARAM_DIGEST_NOINIT, NULL),
-    OSSL_PARAM_int(OSSL_MAC_PARAM_DIGEST_ONESHOT, NULL),
-    OSSL_PARAM_size_t(OSSL_MAC_PARAM_TLS_DATA_SIZE, NULL),
-    OSSL_FIPS_IND_SETTABLE_CTX_PARAM(OSSL_MAC_PARAM_FIPS_KEY_CHECK)
-    OSSL_PARAM_END
-};
-static const OSSL_PARAM *hmac_settable_ctx_params(ossl_unused void *ctx,
-                                                  ossl_unused void *provctx)
+static const OSSL_PARAM  known_settable_ctx_params[] = {OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_DIGEST, NULL, 0),
+                                                        OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_PROPERTIES, NULL, 0),
+                                                        OSSL_PARAM_octet_string(OSSL_MAC_PARAM_KEY, NULL, 0),
+                                                        OSSL_PARAM_int(OSSL_MAC_PARAM_DIGEST_NOINIT, NULL),
+                                                        OSSL_PARAM_int(OSSL_MAC_PARAM_DIGEST_ONESHOT, NULL),
+                                                        OSSL_PARAM_size_t(OSSL_MAC_PARAM_TLS_DATA_SIZE, NULL),
+                                                        OSSL_FIPS_IND_SETTABLE_CTX_PARAM(OSSL_MAC_PARAM_FIPS_KEY_CHECK)
+                                                            OSSL_PARAM_END};
+
+static const OSSL_PARAM *hmac_settable_ctx_params(ossl_unused void *ctx, ossl_unused void *provctx)
 {
     return known_settable_ctx_params;
 }
@@ -327,14 +317,13 @@ static const OSSL_PARAM *hmac_settable_ctx_params(ossl_unused void *ctx,
 static int hmac_set_ctx_params(void *vmacctx, const OSSL_PARAM params[])
 {
     struct hmac_data_st *macctx = vmacctx;
-    OSSL_LIB_CTX *ctx = PROV_LIBCTX_OF(macctx->provctx);
-    const OSSL_PARAM *p;
+    OSSL_LIB_CTX        *ctx    = PROV_LIBCTX_OF(macctx->provctx);
+    const OSSL_PARAM    *p;
 
     if (ossl_param_is_empty(params))
         return 1;
 
-    if (!OSSL_FIPS_IND_SET_CTX_PARAM(macctx, OSSL_FIPS_IND_SETTABLE0, params,
-                                     OSSL_MAC_PARAM_FIPS_KEY_CHECK))
+    if (!OSSL_FIPS_IND_SET_CTX_PARAM(macctx, OSSL_FIPS_IND_SETTABLE0, params, OSSL_MAC_PARAM_FIPS_KEY_CHECK))
         return 0;
 
     if (!ossl_prov_digest_load_from_params(&macctx->digest, params, ctx))
@@ -348,8 +337,7 @@ static int hmac_set_ctx_params(void *vmacctx, const OSSL_PARAM params[])
             return 0;
     }
 
-    if ((p = OSSL_PARAM_locate_const(params,
-                                     OSSL_MAC_PARAM_TLS_DATA_SIZE)) != NULL) {
+    if ((p = OSSL_PARAM_locate_const(params, OSSL_MAC_PARAM_TLS_DATA_SIZE)) != NULL) {
         if (!OSSL_PARAM_get_size_t(p, &macctx->tls_data_size))
             return 0;
     }
@@ -357,25 +345,23 @@ static int hmac_set_ctx_params(void *vmacctx, const OSSL_PARAM params[])
 }
 
 const OSSL_DISPATCH ossl_hmac_functions[] = {
-    { OSSL_FUNC_MAC_NEWCTX, (void (*)(void))hmac_new },
-    { OSSL_FUNC_MAC_DUPCTX, (void (*)(void))hmac_dup },
-    { OSSL_FUNC_MAC_FREECTX, (void (*)(void))hmac_free },
-    { OSSL_FUNC_MAC_INIT, (void (*)(void))hmac_init },
-    { OSSL_FUNC_MAC_UPDATE, (void (*)(void))hmac_update },
-    { OSSL_FUNC_MAC_FINAL, (void (*)(void))hmac_final },
-    { OSSL_FUNC_MAC_GETTABLE_CTX_PARAMS,
-      (void (*)(void))hmac_gettable_ctx_params },
-    { OSSL_FUNC_MAC_GET_CTX_PARAMS, (void (*)(void))hmac_get_ctx_params },
-    { OSSL_FUNC_MAC_SETTABLE_CTX_PARAMS,
-      (void (*)(void))hmac_settable_ctx_params },
-    { OSSL_FUNC_MAC_SET_CTX_PARAMS, (void (*)(void))hmac_set_ctx_params },
+    {OSSL_FUNC_MAC_NEWCTX,              (void (*)(void))hmac_new                },
+    {OSSL_FUNC_MAC_DUPCTX,              (void (*)(void))hmac_dup                },
+    {OSSL_FUNC_MAC_FREECTX,             (void (*)(void))hmac_free               },
+    {OSSL_FUNC_MAC_INIT,                (void (*)(void))hmac_init               },
+    {OSSL_FUNC_MAC_UPDATE,              (void (*)(void))hmac_update             },
+    {OSSL_FUNC_MAC_FINAL,               (void (*)(void))hmac_final              },
+    {OSSL_FUNC_MAC_GETTABLE_CTX_PARAMS, (void (*)(void))hmac_gettable_ctx_params},
+    {OSSL_FUNC_MAC_GET_CTX_PARAMS,      (void (*)(void))hmac_get_ctx_params     },
+    {OSSL_FUNC_MAC_SETTABLE_CTX_PARAMS, (void (*)(void))hmac_settable_ctx_params},
+    {OSSL_FUNC_MAC_SET_CTX_PARAMS,      (void (*)(void))hmac_set_ctx_params     },
     OSSL_DISPATCH_END
 };
 
 #ifdef FIPS_MODULE
 static OSSL_FUNC_mac_newctx_fn hmac_internal_new;
 
-static void *hmac_internal_new(void *provctx)
+static void                   *hmac_internal_new(void *provctx)
 {
     struct hmac_data_st *macctx = hmac_new(provctx);
 
@@ -385,18 +371,16 @@ static void *hmac_internal_new(void *provctx)
 }
 
 const OSSL_DISPATCH ossl_hmac_internal_functions[] = {
-    { OSSL_FUNC_MAC_NEWCTX, (void (*)(void))hmac_internal_new },
-    { OSSL_FUNC_MAC_DUPCTX, (void (*)(void))hmac_dup },
-    { OSSL_FUNC_MAC_FREECTX, (void (*)(void))hmac_free },
-    { OSSL_FUNC_MAC_INIT, (void (*)(void))hmac_init },
-    { OSSL_FUNC_MAC_UPDATE, (void (*)(void))hmac_update },
-    { OSSL_FUNC_MAC_FINAL, (void (*)(void))hmac_final },
-    { OSSL_FUNC_MAC_GETTABLE_CTX_PARAMS,
-      (void (*)(void))hmac_gettable_ctx_params },
-    { OSSL_FUNC_MAC_GET_CTX_PARAMS, (void (*)(void))hmac_get_ctx_params },
-    { OSSL_FUNC_MAC_SETTABLE_CTX_PARAMS,
-      (void (*)(void))hmac_settable_ctx_params },
-    { OSSL_FUNC_MAC_SET_CTX_PARAMS, (void (*)(void))hmac_set_ctx_params },
+    {OSSL_FUNC_MAC_NEWCTX,              (void (*)(void))hmac_internal_new       },
+    {OSSL_FUNC_MAC_DUPCTX,              (void (*)(void))hmac_dup                },
+    {OSSL_FUNC_MAC_FREECTX,             (void (*)(void))hmac_free               },
+    {OSSL_FUNC_MAC_INIT,                (void (*)(void))hmac_init               },
+    {OSSL_FUNC_MAC_UPDATE,              (void (*)(void))hmac_update             },
+    {OSSL_FUNC_MAC_FINAL,               (void (*)(void))hmac_final              },
+    {OSSL_FUNC_MAC_GETTABLE_CTX_PARAMS, (void (*)(void))hmac_gettable_ctx_params},
+    {OSSL_FUNC_MAC_GET_CTX_PARAMS,      (void (*)(void))hmac_get_ctx_params     },
+    {OSSL_FUNC_MAC_SETTABLE_CTX_PARAMS, (void (*)(void))hmac_settable_ctx_params},
+    {OSSL_FUNC_MAC_SET_CTX_PARAMS,      (void (*)(void))hmac_set_ctx_params     },
     OSSL_DISPATCH_END
 };
 

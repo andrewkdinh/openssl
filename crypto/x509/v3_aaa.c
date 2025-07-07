@@ -13,37 +13,39 @@
 #include <crypto/x509.h>
 #include "ext_dat.h"
 
-ASN1_CHOICE(OSSL_ALLOWED_ATTRIBUTES_CHOICE) = {
-    ASN1_IMP(OSSL_ALLOWED_ATTRIBUTES_CHOICE, choice.attributeType, ASN1_OBJECT,
-             OSSL_AAA_ATTRIBUTE_TYPE),
-    ASN1_IMP(OSSL_ALLOWED_ATTRIBUTES_CHOICE, choice.attributeTypeandValues,
-             X509_ATTRIBUTE, OSSL_AAA_ATTRIBUTE_VALUES),
-} ASN1_CHOICE_END(OSSL_ALLOWED_ATTRIBUTES_CHOICE)
+ASN1_CHOICE(OSSL_ALLOWED_ATTRIBUTES_CHOICE)
+    = {
+        ASN1_IMP(OSSL_ALLOWED_ATTRIBUTES_CHOICE, choice.attributeType, ASN1_OBJECT, OSSL_AAA_ATTRIBUTE_TYPE),
+        ASN1_IMP(OSSL_ALLOWED_ATTRIBUTES_CHOICE,
+                 choice.attributeTypeandValues,
+                 X509_ATTRIBUTE,
+                 OSSL_AAA_ATTRIBUTE_VALUES),
+    }
+ASN1_CHOICE_END(OSSL_ALLOWED_ATTRIBUTES_CHOICE)
 
-ASN1_SEQUENCE(OSSL_ALLOWED_ATTRIBUTES_ITEM) = {
-    ASN1_IMP_SET_OF(OSSL_ALLOWED_ATTRIBUTES_ITEM, attributes,
-                    OSSL_ALLOWED_ATTRIBUTES_CHOICE, 0),
-    /* This MUST be EXPLICIT, because it contains a CHOICE. */
-    ASN1_EXP(OSSL_ALLOWED_ATTRIBUTES_ITEM, holderDomain, GENERAL_NAME, 1),
-} ASN1_SEQUENCE_END(OSSL_ALLOWED_ATTRIBUTES_ITEM)
+ASN1_SEQUENCE(OSSL_ALLOWED_ATTRIBUTES_ITEM)
+    = {
+        ASN1_IMP_SET_OF(OSSL_ALLOWED_ATTRIBUTES_ITEM, attributes, OSSL_ALLOWED_ATTRIBUTES_CHOICE, 0),
+        /* This MUST be EXPLICIT, because it contains a CHOICE. */
+        ASN1_EXP(OSSL_ALLOWED_ATTRIBUTES_ITEM, holderDomain, GENERAL_NAME, 1),
+    }
+ASN1_SEQUENCE_END(OSSL_ALLOWED_ATTRIBUTES_ITEM)
 
-ASN1_ITEM_TEMPLATE(OSSL_ALLOWED_ATTRIBUTES_SYNTAX) =
-    ASN1_EX_TEMPLATE_TYPE(ASN1_TFLG_SET_OF, 0, OSSL_ALLOWED_ATTRIBUTES_SYNTAX,
-                          OSSL_ALLOWED_ATTRIBUTES_ITEM)
+ASN1_ITEM_TEMPLATE(OSSL_ALLOWED_ATTRIBUTES_SYNTAX)
+    = ASN1_EX_TEMPLATE_TYPE(ASN1_TFLG_SET_OF, 0, OSSL_ALLOWED_ATTRIBUTES_SYNTAX, OSSL_ALLOWED_ATTRIBUTES_ITEM)
 ASN1_ITEM_TEMPLATE_END(OSSL_ALLOWED_ATTRIBUTES_SYNTAX)
 
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_ALLOWED_ATTRIBUTES_CHOICE)
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_ALLOWED_ATTRIBUTES_ITEM)
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_ALLOWED_ATTRIBUTES_SYNTAX)
 
-static int i2r_ALLOWED_ATTRIBUTES_CHOICE(X509V3_EXT_METHOD *method,
-                                         OSSL_ALLOWED_ATTRIBUTES_CHOICE *a,
-                                         BIO *out, int indent)
+static int
+i2r_ALLOWED_ATTRIBUTES_CHOICE(X509V3_EXT_METHOD *method, OSSL_ALLOWED_ATTRIBUTES_CHOICE *a, BIO *out, int indent)
 {
-    ASN1_OBJECT *attr_obj;
-    int attr_nid, j;
+    ASN1_OBJECT    *attr_obj;
+    int             attr_nid, j;
     X509_ATTRIBUTE *attr;
-    ASN1_TYPE *av;
+    ASN1_TYPE      *av;
 
     switch (a->type) {
     case (OSSL_AAA_ATTRIBUTE_TYPE):
@@ -53,7 +55,7 @@ static int i2r_ALLOWED_ATTRIBUTES_CHOICE(X509V3_EXT_METHOD *method,
             return 0;
         return BIO_puts(out, "\n") > 0;
     case (OSSL_AAA_ATTRIBUTE_VALUES):
-        attr = a->choice.attributeTypeandValues;
+        attr     = a->choice.attributeTypeandValues;
         attr_obj = X509_ATTRIBUTE_get0_object(attr);
         attr_nid = OBJ_obj2nid(attr_obj);
         if (BIO_printf(out, "%*sAttribute Values: ", indent, "") <= 0)
@@ -76,11 +78,10 @@ static int i2r_ALLOWED_ATTRIBUTES_CHOICE(X509V3_EXT_METHOD *method,
     return 1;
 }
 
-static int i2r_ALLOWED_ATTRIBUTES_ITEM(X509V3_EXT_METHOD *method,
-                                       OSSL_ALLOWED_ATTRIBUTES_ITEM *aai,
-                                       BIO *out, int indent)
+static int
+i2r_ALLOWED_ATTRIBUTES_ITEM(X509V3_EXT_METHOD *method, OSSL_ALLOWED_ATTRIBUTES_ITEM *aai, BIO *out, int indent)
 {
-    int i;
+    int                             i;
     OSSL_ALLOWED_ATTRIBUTES_CHOICE *a;
 
     for (i = 0; i < sk_OSSL_ALLOWED_ATTRIBUTES_CHOICE_num(aai->attributes); i++) {
@@ -99,11 +100,10 @@ static int i2r_ALLOWED_ATTRIBUTES_ITEM(X509V3_EXT_METHOD *method,
     return 1;
 }
 
-static int i2r_ALLOWED_ATTRIBUTES_SYNTAX(X509V3_EXT_METHOD *method,
-                                         OSSL_ALLOWED_ATTRIBUTES_SYNTAX *aaa,
-                                         BIO *out, int indent)
+static int
+i2r_ALLOWED_ATTRIBUTES_SYNTAX(X509V3_EXT_METHOD *method, OSSL_ALLOWED_ATTRIBUTES_SYNTAX *aaa, BIO *out, int indent)
 {
-    int i;
+    int                           i;
     OSSL_ALLOWED_ATTRIBUTES_ITEM *aai;
 
     for (i = 0; i < sk_OSSL_ALLOWED_ATTRIBUTES_ITEM_num(aaa); i++) {
@@ -116,14 +116,17 @@ static int i2r_ALLOWED_ATTRIBUTES_SYNTAX(X509V3_EXT_METHOD *method,
     return 1;
 }
 
-const X509V3_EXT_METHOD ossl_v3_allowed_attribute_assignments = {
-    NID_allowed_attribute_assignments, 0,
-    ASN1_ITEM_ref(OSSL_ALLOWED_ATTRIBUTES_SYNTAX),
-    0, 0, 0, 0,
-    0, 0,
-    0,
-    0,
-    (X509V3_EXT_I2R)i2r_ALLOWED_ATTRIBUTES_SYNTAX,
-    0,
-    NULL
-};
+const X509V3_EXT_METHOD ossl_v3_allowed_attribute_assignments = {NID_allowed_attribute_assignments,
+                                                                 0,
+                                                                 ASN1_ITEM_ref(OSSL_ALLOWED_ATTRIBUTES_SYNTAX),
+                                                                 0,
+                                                                 0,
+                                                                 0,
+                                                                 0,
+                                                                 0,
+                                                                 0,
+                                                                 0,
+                                                                 0,
+                                                                 (X509V3_EXT_I2R)i2r_ALLOWED_ATTRIBUTES_SYNTAX,
+                                                                 0,
+                                                                 NULL};

@@ -194,5 +194,4 @@ const OSSL_DISPATCH ossl_blake##variantsize##_functions[] = { \
     {0, NULL} \
 };
 
-IMPLEMENT_BLAKE_functions(2s, 2S, 2s256)
-IMPLEMENT_BLAKE_functions(2b, 2B, 2b512)
+IMPLEMENT_BLAKE_functions(2s, 2S, 2s256) IMPLEMENT_BLAKE_functions(2b, 2B, 2b512)

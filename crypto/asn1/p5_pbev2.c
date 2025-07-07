@@ -19,26 +19,24 @@
 
 /* PKCS#5 v2.0 password based encryption structures */
 
-ASN1_SEQUENCE(PBE2PARAM) = {
-        ASN1_SIMPLE(PBE2PARAM, keyfunc, X509_ALGOR),
-        ASN1_SIMPLE(PBE2PARAM, encryption, X509_ALGOR)
-} ASN1_SEQUENCE_END(PBE2PARAM)
+ASN1_SEQUENCE(PBE2PARAM)
+    = {ASN1_SIMPLE(PBE2PARAM, keyfunc, X509_ALGOR), ASN1_SIMPLE(PBE2PARAM, encryption, X509_ALGOR)}
+ASN1_SEQUENCE_END(PBE2PARAM)
 
 IMPLEMENT_ASN1_FUNCTIONS(PBE2PARAM)
 
-ASN1_SEQUENCE(PBKDF2PARAM) = {
-        ASN1_SIMPLE(PBKDF2PARAM, salt, ASN1_ANY),
-        ASN1_SIMPLE(PBKDF2PARAM, iter, ASN1_INTEGER),
-        ASN1_OPT(PBKDF2PARAM, keylength, ASN1_INTEGER),
-        ASN1_OPT(PBKDF2PARAM, prf, X509_ALGOR)
-} ASN1_SEQUENCE_END(PBKDF2PARAM)
+ASN1_SEQUENCE(PBKDF2PARAM)
+    = {ASN1_SIMPLE(PBKDF2PARAM, salt, ASN1_ANY),
+       ASN1_SIMPLE(PBKDF2PARAM, iter, ASN1_INTEGER),
+       ASN1_OPT(PBKDF2PARAM, keylength, ASN1_INTEGER),
+       ASN1_OPT(PBKDF2PARAM, prf, X509_ALGOR)}
+ASN1_SEQUENCE_END(PBKDF2PARAM)
 
 IMPLEMENT_ASN1_FUNCTIONS(PBKDF2PARAM)
 
-ASN1_SEQUENCE(PBMAC1PARAM) = {
-    ASN1_SIMPLE(PBMAC1PARAM, keyDerivationFunc, X509_ALGOR),
-    ASN1_SIMPLE(PBMAC1PARAM, messageAuthScheme, X509_ALGOR)
-} ASN1_SEQUENCE_END(PBMAC1PARAM)
+ASN1_SEQUENCE(PBMAC1PARAM)
+    = {ASN1_SIMPLE(PBMAC1PARAM, keyDerivationFunc, X509_ALGOR), ASN1_SIMPLE(PBMAC1PARAM, messageAuthScheme, X509_ALGOR)}
+ASN1_SEQUENCE_END(PBMAC1PARAM)
 
 IMPLEMENT_ASN1_FUNCTIONS(PBMAC1PARAM)
 
@@ -48,18 +46,21 @@ IMPLEMENT_ASN1_FUNCTIONS(PBMAC1PARAM)
  * and IV.
  */
 
-X509_ALGOR *PKCS5_pbe2_set_iv_ex(const EVP_CIPHER *cipher, int iter,
-                                 unsigned char *salt, int saltlen,
-                                 unsigned char *aiv, int prf_nid,
-                                 OSSL_LIB_CTX *libctx)
+X509_ALGOR *PKCS5_pbe2_set_iv_ex(const EVP_CIPHER *cipher,
+                                 int               iter,
+                                 unsigned char    *salt,
+                                 int               saltlen,
+                                 unsigned char    *aiv,
+                                 int               prf_nid,
+                                 OSSL_LIB_CTX     *libctx)
 {
-    X509_ALGOR *scheme = NULL, *ret = NULL;
-    int alg_nid, keylen, ivlen;
+    X509_ALGOR     *scheme = NULL, *ret = NULL;
+    int             alg_nid, keylen, ivlen;
     EVP_CIPHER_CTX *ctx = NULL;
-    unsigned char iv[EVP_MAX_IV_LENGTH];
-    PBE2PARAM *pbe2 = NULL;
+    unsigned char   iv[EVP_MAX_IV_LENGTH];
+    PBE2PARAM      *pbe2 = NULL;
 
-    alg_nid = EVP_CIPHER_get_type(cipher);
+    alg_nid              = EVP_CIPHER_get_type(cipher);
     if (alg_nid == NID_undef) {
         ERR_raise(ERR_LIB_ASN1, ASN1_R_CIPHER_HAS_NO_OBJECT_IDENTIFIER);
         goto err;
@@ -71,7 +72,7 @@ X509_ALGOR *PKCS5_pbe2_set_iv_ex(const EVP_CIPHER *cipher, int iter,
     }
 
     /* Setup the AlgorithmIdentifier for the encryption scheme */
-    scheme = pbe2->encryption;
+    scheme            = pbe2->encryption;
     scheme->algorithm = OBJ_nid2obj(alg_nid);
     if ((scheme->parameter = ASN1_TYPE_new()) == NULL) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_ASN1_LIB);
@@ -105,8 +106,7 @@ X509_ALGOR *PKCS5_pbe2_set_iv_ex(const EVP_CIPHER *cipher, int iter,
      * here: just means use default PRF.
      */
     ERR_set_mark();
-    if ((prf_nid == -1) &&
-        EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_PBE_PRF_NID, 0, &prf_nid) <= 0) {
+    if ((prf_nid == -1) && EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_PBE_PRF_NID, 0, &prf_nid) <= 0) {
         prf_nid = NID_hmacWithSHA256;
     }
     ERR_pop_to_mark();
@@ -124,8 +124,7 @@ X509_ALGOR *PKCS5_pbe2_set_iv_ex(const EVP_CIPHER *cipher, int iter,
 
     X509_ALGOR_free(pbe2->keyfunc);
 
-    pbe2->keyfunc = PKCS5_pbkdf2_set_ex(iter, salt, saltlen, prf_nid, keylen,
-                                        libctx);
+    pbe2->keyfunc = PKCS5_pbkdf2_set_ex(iter, salt, saltlen, prf_nid, keylen, libctx);
 
     if (pbe2->keyfunc == NULL) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_ASN1_LIB);
@@ -143,8 +142,7 @@ X509_ALGOR *PKCS5_pbe2_set_iv_ex(const EVP_CIPHER *cipher, int iter,
 
     /* Encode PBE2PARAM into parameter */
 
-    if (!ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(PBE2PARAM), pbe2,
-                                 &ret->parameter)) {
+    if (!ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(PBE2PARAM), pbe2, &ret->parameter)) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_ASN1_LIB);
         goto err;
     }
@@ -154,7 +152,7 @@ X509_ALGOR *PKCS5_pbe2_set_iv_ex(const EVP_CIPHER *cipher, int iter,
 
     return ret;
 
- err:
+err:
     EVP_CIPHER_CTX_free(ctx);
     PBE2PARAM_free(pbe2);
     /* Note 'scheme' is freed as part of pbe2 */
@@ -163,29 +161,23 @@ X509_ALGOR *PKCS5_pbe2_set_iv_ex(const EVP_CIPHER *cipher, int iter,
     return NULL;
 }
 
-X509_ALGOR *PKCS5_pbe2_set_iv(const EVP_CIPHER *cipher, int iter,
-                              unsigned char *salt, int saltlen,
-                              unsigned char *aiv, int prf_nid)
+X509_ALGOR *
+PKCS5_pbe2_set_iv(const EVP_CIPHER *cipher, int iter, unsigned char *salt, int saltlen, unsigned char *aiv, int prf_nid)
 {
-    return PKCS5_pbe2_set_iv_ex(cipher, iter, salt, saltlen, aiv, prf_nid,
-                                NULL);
+    return PKCS5_pbe2_set_iv_ex(cipher, iter, salt, saltlen, aiv, prf_nid, NULL);
 }
 
-X509_ALGOR *PKCS5_pbe2_set(const EVP_CIPHER *cipher, int iter,
-                           unsigned char *salt, int saltlen)
+X509_ALGOR *PKCS5_pbe2_set(const EVP_CIPHER *cipher, int iter, unsigned char *salt, int saltlen)
 {
-    return PKCS5_pbe2_set_iv_ex(cipher, iter, salt, saltlen, NULL, -1,
-                                NULL);
+    return PKCS5_pbe2_set_iv_ex(cipher, iter, salt, saltlen, NULL, -1, NULL);
 }
 
-
-X509_ALGOR *PKCS5_pbkdf2_set_ex(int iter, unsigned char *salt, int saltlen,
-                                int prf_nid, int keylen,
-                                OSSL_LIB_CTX *libctx)
+X509_ALGOR *
+PKCS5_pbkdf2_set_ex(int iter, unsigned char *salt, int saltlen, int prf_nid, int keylen, OSSL_LIB_CTX *libctx)
 {
-    X509_ALGOR *keyfunc = NULL;
-    PBKDF2PARAM *kdf = NULL;
-    ASN1_OCTET_STRING *osalt = NULL;
+    X509_ALGOR        *keyfunc = NULL;
+    PBKDF2PARAM       *kdf     = NULL;
+    ASN1_OCTET_STRING *osalt   = NULL;
 
     if ((kdf = PBKDF2PARAM_new()) == NULL) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_ASN1_LIB);
@@ -197,7 +189,7 @@ X509_ALGOR *PKCS5_pbkdf2_set_ex(int iter, unsigned char *salt, int saltlen,
     }
 
     kdf->salt->value.octet_string = osalt;
-    kdf->salt->type = V_ASN1_OCTET_STRING;
+    kdf->salt->type               = V_ASN1_OCTET_STRING;
 
     if (saltlen < 0) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_PASSED_INVALID_ARGUMENT);
@@ -207,7 +199,6 @@ X509_ALGOR *PKCS5_pbkdf2_set_ex(int iter, unsigned char *salt, int saltlen,
         saltlen = PKCS5_DEFAULT_PBE2_SALT_LEN;
     if ((osalt->data = OPENSSL_malloc(saltlen)) == NULL)
         goto err;
-
 
     osalt->length = saltlen;
 
@@ -260,8 +251,7 @@ X509_ALGOR *PKCS5_pbkdf2_set_ex(int iter, unsigned char *salt, int saltlen,
 
     /* Encode PBKDF2PARAM into parameter of pbe2 */
 
-    if (!ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(PBKDF2PARAM), kdf,
-                                 &keyfunc->parameter)) {
+    if (!ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(PBKDF2PARAM), kdf, &keyfunc->parameter)) {
         ERR_raise(ERR_LIB_ASN1, ERR_R_ASN1_LIB);
         goto err;
     }
@@ -269,15 +259,13 @@ X509_ALGOR *PKCS5_pbkdf2_set_ex(int iter, unsigned char *salt, int saltlen,
     PBKDF2PARAM_free(kdf);
     return keyfunc;
 
- err:
+err:
     PBKDF2PARAM_free(kdf);
     X509_ALGOR_free(keyfunc);
     return NULL;
 }
 
-X509_ALGOR *PKCS5_pbkdf2_set(int iter, unsigned char *salt, int saltlen,
-                             int prf_nid, int keylen)
+X509_ALGOR *PKCS5_pbkdf2_set(int iter, unsigned char *salt, int saltlen, int prf_nid, int keylen)
 {
     return PKCS5_pbkdf2_set_ex(iter, salt, saltlen, prf_nid, keylen, NULL);
 }
-

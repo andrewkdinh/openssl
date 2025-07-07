@@ -18,7 +18,7 @@
 #include <openssl/core_names.h>
 #include <openssl/params.h>
 #include <openssl/err.h>
-#include <openssl/pem.h>         /* Functions for writing MSBLOB and PVK */
+#include <openssl/pem.h> /* Functions for writing MSBLOB and PVK */
 #include <openssl/dsa.h>
 #include "internal/passphrase.h"
 #include "crypto/rsa.h"
@@ -28,18 +28,17 @@
 #include "endecoder_local.h"
 
 struct key2ms_ctx_st {
-    PROV_CTX *provctx;
+    PROV_CTX                      *provctx;
 
-    int pvk_encr_level;
+    int                            pvk_encr_level;
 
     struct ossl_passphrase_data_st pwdata;
 };
 
-static int write_msblob(struct key2ms_ctx_st *ctx, OSSL_CORE_BIO *cout,
-                        EVP_PKEY *pkey, int ispub)
+static int write_msblob(struct key2ms_ctx_st *ctx, OSSL_CORE_BIO *cout, EVP_PKEY *pkey, int ispub)
 {
     BIO *out = ossl_bio_new_from_core_bio(ctx->provctx, cout);
-    int ret;
+    int  ret;
 
     if (out == NULL)
         return 0;
@@ -49,31 +48,29 @@ static int write_msblob(struct key2ms_ctx_st *ctx, OSSL_CORE_BIO *cout,
     return ret;
 }
 
-static int write_pvk(struct key2ms_ctx_st *ctx, OSSL_CORE_BIO *cout,
-                     EVP_PKEY *pkey)
+static int write_pvk(struct key2ms_ctx_st *ctx, OSSL_CORE_BIO *cout, EVP_PKEY *pkey)
 {
-    BIO *out = NULL;
-    int ret;
+    BIO          *out = NULL;
+    int           ret;
     OSSL_LIB_CTX *libctx = PROV_LIBCTX_OF(ctx->provctx);
 
-    out = ossl_bio_new_from_core_bio(ctx->provctx, cout);
+    out                  = ossl_bio_new_from_core_bio(ctx->provctx, cout);
     if (out == NULL)
         return 0;
-    ret = i2b_PVK_bio_ex(out, pkey, ctx->pvk_encr_level,
-                         ossl_pw_pvk_password, &ctx->pwdata, libctx, NULL);
+    ret = i2b_PVK_bio_ex(out, pkey, ctx->pvk_encr_level, ossl_pw_pvk_password, &ctx->pwdata, libctx, NULL);
     BIO_free(out);
     return ret;
 }
 
-static OSSL_FUNC_encoder_freectx_fn key2ms_freectx;
+static OSSL_FUNC_encoder_freectx_fn        key2ms_freectx;
 static OSSL_FUNC_encoder_does_selection_fn key2ms_does_selection;
 
-static struct key2ms_ctx_st *key2ms_newctx(void *provctx)
+static struct key2ms_ctx_st               *key2ms_newctx(void *provctx)
 {
     struct key2ms_ctx_st *ctx = OPENSSL_zalloc(sizeof(*ctx));
 
     if (ctx != NULL) {
-        ctx->provctx = provctx;
+        ctx->provctx        = provctx;
         /* This is the strongest encryption level */
         ctx->pvk_encr_level = 2;
     }
@@ -101,7 +98,7 @@ static const OSSL_PARAM *key2pvk_settable_ctx_params(ossl_unused void *provctx)
 static int key2pvk_set_ctx_params(void *vctx, const OSSL_PARAM params[])
 {
     struct key2ms_ctx_st *ctx = vctx;
-    const OSSL_PARAM *p;
+    const OSSL_PARAM     *p;
 
     p = OSSL_PARAM_locate_const(params, OSSL_ENCODER_PARAM_ENCRYPT_LEVEL);
     if (p != NULL && !OSSL_PARAM_get_int(p, &ctx->pvk_encr_level))
@@ -125,21 +122,25 @@ static int key2ms_does_selection(void *vctx, int selection)
  */
 typedef int evp_pkey_set1_fn(EVP_PKEY *, const void *key);
 
-static int key2msblob_encode(void *vctx, const void *key, int selection,
-                             OSSL_CORE_BIO *cout, evp_pkey_set1_fn *set1_key,
-                             OSSL_PASSPHRASE_CALLBACK *pw_cb, void *pw_cbarg)
+static int  key2msblob_encode(void                     *vctx,
+                              const void               *key,
+                              int                       selection,
+                              OSSL_CORE_BIO            *cout,
+                              evp_pkey_set1_fn         *set1_key,
+                              OSSL_PASSPHRASE_CALLBACK *pw_cb,
+                              void                     *pw_cbarg)
 {
-    struct key2ms_ctx_st *ctx = vctx;
-    int ispub = -1;
-    EVP_PKEY *pkey = NULL;
-    int ok = 0;
+    struct key2ms_ctx_st *ctx   = vctx;
+    int                   ispub = -1;
+    EVP_PKEY             *pkey  = NULL;
+    int                   ok    = 0;
 
     if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) != 0)
         ispub = 0;
     else if ((selection & OSSL_KEYMGMT_SELECT_PUBLIC_KEY) != 0)
         ispub = 1;
     else
-        return 0;                /* Error */
+        return 0; /* Error */
 
     if ((pkey = EVP_PKEY_new()) != NULL && set1_key(pkey, key))
         ok = write_msblob(ctx, cout, pkey, ispub);
@@ -147,20 +148,23 @@ static int key2msblob_encode(void *vctx, const void *key, int selection,
     return ok;
 }
 
-static int key2pvk_encode(void *vctx, const void *key, int selection,
-                          OSSL_CORE_BIO *cout, evp_pkey_set1_fn *set1_key,
-                          OSSL_PASSPHRASE_CALLBACK *pw_cb, void *pw_cbarg)
+static int key2pvk_encode(void                     *vctx,
+                          const void               *key,
+                          int                       selection,
+                          OSSL_CORE_BIO            *cout,
+                          evp_pkey_set1_fn         *set1_key,
+                          OSSL_PASSPHRASE_CALLBACK *pw_cb,
+                          void                     *pw_cbarg)
 {
-    struct key2ms_ctx_st *ctx = vctx;
-    EVP_PKEY *pkey = NULL;
-    int ok = 0;
+    struct key2ms_ctx_st *ctx  = vctx;
+    EVP_PKEY             *pkey = NULL;
+    int                   ok   = 0;
 
     if ((selection & OSSL_KEYMGMT_SELECT_PRIVATE_KEY) == 0)
-        return 0;                /* Error */
+        return 0; /* Error */
 
     if ((pkey = EVP_PKEY_new()) != NULL && set1_key(pkey, key)
-        && (pw_cb == NULL
-            || ossl_pw_set_ossl_passphrase_cb(&ctx->pwdata, pw_cb, pw_cbarg)))
+        && (pw_cb == NULL || ossl_pw_set_ossl_passphrase_cb(&ctx->pwdata, pw_cb, pw_cbarg)))
         ok = write_pvk(ctx, cout, pkey);
     EVP_PKEY_free(pkey);
     return ok;

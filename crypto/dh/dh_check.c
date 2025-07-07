@@ -54,7 +54,7 @@ int DH_check_params(const DH *dh, int *ret)
      * SP800-56A R3 Section 5.5.2 Assurances of Domain Parameter Validity
      * (1a) The domain parameters correspond to any approved safe prime group.
      */
-    nid = DH_get_nid((DH *)dh);
+    nid  = DH_get_nid((DH *)dh);
     if (nid != NID_undef)
         return 1;
     /*
@@ -62,18 +62,17 @@ int DH_check_params(const DH *dh, int *ret)
      * (2b) FFC domain params conform to FIPS-186-4 explicit domain param
      * validity tests.
      */
-    return ossl_ffc_params_FIPS186_4_validate(dh->libctx, &dh->params,
-                                              FFC_PARAM_TYPE_DH, ret, NULL);
+    return ossl_ffc_params_FIPS186_4_validate(dh->libctx, &dh->params, FFC_PARAM_TYPE_DH, ret, NULL);
 }
 #else
 int DH_check_params(const DH *dh, int *ret)
 {
-    int ok = 0;
+    int     ok  = 0;
     BIGNUM *tmp = NULL;
     BN_CTX *ctx = NULL;
 
-    *ret = 0;
-    ctx = BN_CTX_new_ex(dh->libctx);
+    *ret        = 0;
+    ctx         = BN_CTX_new_ex(dh->libctx);
     if (ctx == NULL)
         goto err;
     BN_CTX_start(ctx);
@@ -83,9 +82,7 @@ int DH_check_params(const DH *dh, int *ret)
 
     if (!BN_is_odd(dh->params.p))
         *ret |= DH_CHECK_P_NOT_PRIME;
-    if (BN_is_negative(dh->params.g)
-        || BN_is_zero(dh->params.g)
-        || BN_is_one(dh->params.g))
+    if (BN_is_negative(dh->params.g) || BN_is_zero(dh->params.g) || BN_is_one(dh->params.g))
         *ret |= DH_NOT_SUITABLE_GENERATOR;
     if (BN_copy(tmp, dh->params.p) == NULL || !BN_sub_word(tmp, 1))
         goto err;
@@ -97,7 +94,7 @@ int DH_check_params(const DH *dh, int *ret)
         *ret |= DH_MODULUS_TOO_LARGE;
 
     ok = 1;
- err:
+err:
     BN_CTX_end(ctx);
     BN_CTX_free(ctx);
     return ok;
@@ -143,12 +140,12 @@ int DH_check(const DH *dh, int *ret)
 #ifdef FIPS_MODULE
     return DH_check_params(dh, ret);
 #else
-    int ok = 0, r, q_good = 0;
+    int     ok = 0, r, q_good = 0;
     BN_CTX *ctx = NULL;
     BIGNUM *t1 = NULL, *t2 = NULL;
-    int nid = DH_get_nid((DH *)dh);
+    int     nid = DH_get_nid((DH *)dh);
 
-    *ret = 0;
+    *ret        = 0;
     if (nid != NID_undef)
         return 1;
 
@@ -200,8 +197,7 @@ int DH_check(const DH *dh, int *ret)
             goto err;
         if (!BN_is_one(t2))
             *ret |= DH_CHECK_INVALID_Q_VALUE;
-        if (dh->params.j != NULL
-            && BN_cmp(dh->params.j, t1))
+        if (dh->params.j != NULL && BN_cmp(dh->params.j, t1))
             *ret |= DH_CHECK_INVALID_J_VALUE;
     }
 
@@ -220,7 +216,7 @@ int DH_check(const DH *dh, int *ret)
             *ret |= DH_CHECK_P_NOT_SAFE_PRIME;
     }
     ok = 1;
- err:
+err:
     BN_CTX_end(ctx);
     BN_CTX_free(ctx);
     return ok;
@@ -271,17 +267,16 @@ int DH_check_pub_key(const DH *dh, const BIGNUM *pub_key, int *ret)
  */
 int ossl_dh_check_pub_key_partial(const DH *dh, const BIGNUM *pub_key, int *ret)
 {
-    return ossl_ffc_validate_public_key_partial(&dh->params, pub_key, ret)
-           && *ret == 0;
+    return ossl_ffc_validate_public_key_partial(&dh->params, pub_key, ret) && *ret == 0;
 }
 
 int ossl_dh_check_priv_key(const DH *dh, const BIGNUM *priv_key, int *ret)
 {
-    int ok = 0;
+    int     ok       = 0;
     BIGNUM *two_powN = NULL, *upper;
 
-    *ret = 0;
-    two_powN = BN_new();
+    *ret             = 0;
+    two_powN         = BN_new();
     if (two_powN == NULL)
         return 0;
 
@@ -297,8 +292,7 @@ int ossl_dh_check_priv_key(const DH *dh, const BIGNUM *priv_key, int *ret)
 
         if (length == 0) {
             length = BN_num_bits(dh->params.p) - 1;
-            if (BN_num_bits(priv_key) <= length
-                && BN_num_bits(priv_key) > 1)
+            if (BN_num_bits(priv_key) <= length && BN_num_bits(priv_key) > 1)
                 ok = 1;
         } else if (BN_num_bits(priv_key) == length) {
             ok = 1;
@@ -331,14 +325,11 @@ end:
  */
 int ossl_dh_check_pairwise(const DH *dh)
 {
-    int ret = 0;
-    BN_CTX *ctx = NULL;
+    int     ret     = 0;
+    BN_CTX *ctx     = NULL;
     BIGNUM *pub_key = NULL;
 
-    if (dh->params.p == NULL
-        || dh->params.g == NULL
-        || dh->priv_key == NULL
-        || dh->pub_key == NULL)
+    if (dh->params.p == NULL || dh->params.g == NULL || dh->priv_key == NULL || dh->pub_key == NULL)
         return 0;
 
     ctx = BN_CTX_new_ex(dh->libctx);

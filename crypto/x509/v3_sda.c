@@ -12,19 +12,17 @@
 #include <crypto/x509.h>
 #include "ext_dat.h"
 
-ASN1_ITEM_TEMPLATE(OSSL_ATTRIBUTES_SYNTAX) =
-        ASN1_EX_TEMPLATE_TYPE(ASN1_TFLG_SEQUENCE_OF, 0, Attributes, X509_ATTRIBUTE)
+ASN1_ITEM_TEMPLATE(OSSL_ATTRIBUTES_SYNTAX)
+    = ASN1_EX_TEMPLATE_TYPE(ASN1_TFLG_SEQUENCE_OF, 0, Attributes, X509_ATTRIBUTE)
 ASN1_ITEM_TEMPLATE_END(OSSL_ATTRIBUTES_SYNTAX)
 
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_ATTRIBUTES_SYNTAX)
 
-static int i2r_ATTRIBUTES_SYNTAX(X509V3_EXT_METHOD *method,
-                                 OSSL_ATTRIBUTES_SYNTAX *attrlst,
-                                 BIO *out, int indent)
+static int i2r_ATTRIBUTES_SYNTAX(X509V3_EXT_METHOD *method, OSSL_ATTRIBUTES_SYNTAX *attrlst, BIO *out, int indent)
 {
     X509_ATTRIBUTE *attr;
-    ASN1_TYPE *av;
-    int i, j, attr_nid;
+    ASN1_TYPE      *av;
+    int             i, j, attr_nid;
 
     if (!attrlst) {
         if (BIO_printf(out, "<No Attributes>\n") <= 0)
@@ -39,7 +37,7 @@ static int i2r_ATTRIBUTES_SYNTAX(X509V3_EXT_METHOD *method,
 
     for (i = 0; i < sk_X509_ATTRIBUTE_num(attrlst); i++) {
         ASN1_OBJECT *attr_obj;
-        attr = sk_X509_ATTRIBUTE_value(attrlst, i);
+        attr     = sk_X509_ATTRIBUTE_value(attrlst, i);
         attr_obj = X509_ATTRIBUTE_get0_object(attr);
         attr_nid = OBJ_obj2nid(attr_obj);
         if (indent && BIO_printf(out, "%*s", indent, "") <= 0)
@@ -54,8 +52,7 @@ static int i2r_ATTRIBUTES_SYNTAX(X509V3_EXT_METHOD *method,
         }
 
         if (X509_ATTRIBUTE_count(attr)) {
-            for (j = 0; j < X509_ATTRIBUTE_count(attr); j++)
-            {
+            for (j = 0; j < X509_ATTRIBUTE_count(attr); j++) {
                 av = X509_ATTRIBUTE_get0_type(attr, j);
                 if (ossl_print_attribute_value(out, attr_nid, av, indent + 4) <= 0)
                     return 0;
@@ -69,22 +66,32 @@ static int i2r_ATTRIBUTES_SYNTAX(X509V3_EXT_METHOD *method,
     return 1;
 }
 
-const X509V3_EXT_METHOD ossl_v3_subj_dir_attrs = {
-    NID_subject_directory_attributes, X509V3_EXT_MULTILINE,
-    ASN1_ITEM_ref(OSSL_ATTRIBUTES_SYNTAX),
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    (X509V3_EXT_I2R)i2r_ATTRIBUTES_SYNTAX,
-    0,
-    NULL
-};
+const X509V3_EXT_METHOD ossl_v3_subj_dir_attrs  = {NID_subject_directory_attributes,
+                                                   X509V3_EXT_MULTILINE,
+                                                   ASN1_ITEM_ref(OSSL_ATTRIBUTES_SYNTAX),
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   (X509V3_EXT_I2R)i2r_ATTRIBUTES_SYNTAX,
+                                                   0,
+                                                   NULL};
 
-const X509V3_EXT_METHOD ossl_v3_associated_info = {
-    NID_associated_information, X509V3_EXT_MULTILINE,
-    ASN1_ITEM_ref(OSSL_ATTRIBUTES_SYNTAX),
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    (X509V3_EXT_I2R)i2r_ATTRIBUTES_SYNTAX,
-    0,
-    NULL
-};
+const X509V3_EXT_METHOD ossl_v3_associated_info = {NID_associated_information,
+                                                   X509V3_EXT_MULTILINE,
+                                                   ASN1_ITEM_ref(OSSL_ATTRIBUTES_SYNTAX),
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   (X509V3_EXT_I2R)i2r_ATTRIBUTES_SYNTAX,
+                                                   0,
+                                                   NULL};

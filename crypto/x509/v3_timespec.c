@@ -13,104 +13,98 @@
 #include <crypto/asn1.h>
 #include "ext_dat.h"
 
-static const char *WEEKDAY_NAMES[7] = {
-    "SUN",
-    "MON",
-    "TUE",
-    "WED",
-    "THU",
-    "FRI",
-    "SAT"
-};
+static const char *WEEKDAY_NAMES[7] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
 
-static const char *WEEK_NAMES[5] = {
-    "first",
-    "second",
-    "third",
-    "fourth",
-    "final"
-};
+static const char *WEEK_NAMES[5]    = {"first", "second", "third", "fourth", "final"};
 
-static const char *MONTH_NAMES[12] = {
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEPT",
-    "OCT",
-    "NOV",
-    "DEC"
-};
+static const char *MONTH_NAMES[12] =
+    {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"};
 
-ASN1_SEQUENCE(OSSL_TIME_SPEC_ABSOLUTE) = {
-    ASN1_EXP_OPT(OSSL_TIME_SPEC_ABSOLUTE, startTime, ASN1_GENERALIZEDTIME, 0),
-    ASN1_EXP_OPT(OSSL_TIME_SPEC_ABSOLUTE, endTime, ASN1_GENERALIZEDTIME, 1),
-} ASN1_SEQUENCE_END(OSSL_TIME_SPEC_ABSOLUTE)
+ASN1_SEQUENCE(OSSL_TIME_SPEC_ABSOLUTE)
+    = {
+        ASN1_EXP_OPT(OSSL_TIME_SPEC_ABSOLUTE, startTime, ASN1_GENERALIZEDTIME, 0),
+        ASN1_EXP_OPT(OSSL_TIME_SPEC_ABSOLUTE, endTime, ASN1_GENERALIZEDTIME, 1),
+    }
+ASN1_SEQUENCE_END(OSSL_TIME_SPEC_ABSOLUTE)
 
-ASN1_SEQUENCE(OSSL_DAY_TIME) = {
-    ASN1_EXP_OPT(OSSL_DAY_TIME, hour, ASN1_INTEGER, 0),
-    ASN1_EXP_OPT(OSSL_DAY_TIME, minute, ASN1_INTEGER, 1),
-    ASN1_EXP_OPT(OSSL_DAY_TIME, second, ASN1_INTEGER, 2),
-} ASN1_SEQUENCE_END(OSSL_DAY_TIME)
+ASN1_SEQUENCE(OSSL_DAY_TIME)
+    = {
+        ASN1_EXP_OPT(OSSL_DAY_TIME, hour, ASN1_INTEGER, 0),
+        ASN1_EXP_OPT(OSSL_DAY_TIME, minute, ASN1_INTEGER, 1),
+        ASN1_EXP_OPT(OSSL_DAY_TIME, second, ASN1_INTEGER, 2),
+    }
+ASN1_SEQUENCE_END(OSSL_DAY_TIME)
 
-ASN1_SEQUENCE(OSSL_DAY_TIME_BAND) = {
-    ASN1_EXP_OPT(OSSL_DAY_TIME_BAND, startDayTime, OSSL_DAY_TIME, 0),
-    ASN1_EXP_OPT(OSSL_DAY_TIME_BAND, endDayTime, OSSL_DAY_TIME, 1),
-} ASN1_SEQUENCE_END(OSSL_DAY_TIME_BAND)
+ASN1_SEQUENCE(OSSL_DAY_TIME_BAND)
+    = {
+        ASN1_EXP_OPT(OSSL_DAY_TIME_BAND, startDayTime, OSSL_DAY_TIME, 0),
+        ASN1_EXP_OPT(OSSL_DAY_TIME_BAND, endDayTime, OSSL_DAY_TIME, 1),
+    }
+ASN1_SEQUENCE_END(OSSL_DAY_TIME_BAND)
 
-ASN1_CHOICE(OSSL_NAMED_DAY) = {
-    ASN1_SET_OF(OSSL_NAMED_DAY, choice.intNamedDays, ASN1_ENUMERATED),
-    ASN1_SIMPLE(OSSL_NAMED_DAY, choice.bitNamedDays, ASN1_BIT_STRING),
-} ASN1_CHOICE_END(OSSL_NAMED_DAY)
+ASN1_CHOICE(OSSL_NAMED_DAY)
+    = {
+        ASN1_SET_OF(OSSL_NAMED_DAY, choice.intNamedDays, ASN1_ENUMERATED),
+        ASN1_SIMPLE(OSSL_NAMED_DAY, choice.bitNamedDays, ASN1_BIT_STRING),
+    }
+ASN1_CHOICE_END(OSSL_NAMED_DAY)
 
-ASN1_CHOICE(OSSL_TIME_SPEC_X_DAY_OF) = {
-    ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.first, OSSL_NAMED_DAY, 1),
-    ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.second, OSSL_NAMED_DAY, 2),
-    ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.third, OSSL_NAMED_DAY, 3),
-    ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.fourth, OSSL_NAMED_DAY, 4),
-    ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.fifth, OSSL_NAMED_DAY, 5),
-} ASN1_CHOICE_END(OSSL_TIME_SPEC_X_DAY_OF)
+ASN1_CHOICE(OSSL_TIME_SPEC_X_DAY_OF)
+    = {
+        ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.first, OSSL_NAMED_DAY, 1),
+        ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.second, OSSL_NAMED_DAY, 2),
+        ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.third, OSSL_NAMED_DAY, 3),
+        ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.fourth, OSSL_NAMED_DAY, 4),
+        ASN1_EXP(OSSL_TIME_SPEC_X_DAY_OF, choice.fifth, OSSL_NAMED_DAY, 5),
+    }
+ASN1_CHOICE_END(OSSL_TIME_SPEC_X_DAY_OF)
 
-ASN1_CHOICE(OSSL_TIME_SPEC_DAY) = {
-    ASN1_SET_OF(OSSL_TIME_SPEC_DAY, choice.intDay, ASN1_INTEGER),
-    ASN1_SIMPLE(OSSL_TIME_SPEC_DAY, choice.bitDay, ASN1_BIT_STRING),
-    ASN1_SIMPLE(OSSL_TIME_SPEC_DAY, choice.dayOf, OSSL_TIME_SPEC_X_DAY_OF),
-} ASN1_CHOICE_END(OSSL_TIME_SPEC_DAY)
+ASN1_CHOICE(OSSL_TIME_SPEC_DAY)
+    = {
+        ASN1_SET_OF(OSSL_TIME_SPEC_DAY, choice.intDay, ASN1_INTEGER),
+        ASN1_SIMPLE(OSSL_TIME_SPEC_DAY, choice.bitDay, ASN1_BIT_STRING),
+        ASN1_SIMPLE(OSSL_TIME_SPEC_DAY, choice.dayOf, OSSL_TIME_SPEC_X_DAY_OF),
+    }
+ASN1_CHOICE_END(OSSL_TIME_SPEC_DAY)
 
-ASN1_CHOICE(OSSL_TIME_SPEC_WEEKS) = {
-    ASN1_SIMPLE(OSSL_TIME_SPEC_WEEKS, choice.allWeeks, ASN1_NULL),
-    ASN1_SET_OF(OSSL_TIME_SPEC_WEEKS, choice.intWeek, ASN1_INTEGER),
-    ASN1_SIMPLE(OSSL_TIME_SPEC_WEEKS, choice.bitWeek, ASN1_BIT_STRING),
-} ASN1_CHOICE_END(OSSL_TIME_SPEC_WEEKS)
+ASN1_CHOICE(OSSL_TIME_SPEC_WEEKS)
+    = {
+        ASN1_SIMPLE(OSSL_TIME_SPEC_WEEKS, choice.allWeeks, ASN1_NULL),
+        ASN1_SET_OF(OSSL_TIME_SPEC_WEEKS, choice.intWeek, ASN1_INTEGER),
+        ASN1_SIMPLE(OSSL_TIME_SPEC_WEEKS, choice.bitWeek, ASN1_BIT_STRING),
+    }
+ASN1_CHOICE_END(OSSL_TIME_SPEC_WEEKS)
 
-ASN1_CHOICE(OSSL_TIME_SPEC_MONTH) = {
-    ASN1_SIMPLE(OSSL_TIME_SPEC_MONTH, choice.allMonths, ASN1_NULL),
-    ASN1_SET_OF(OSSL_TIME_SPEC_MONTH, choice.intMonth, ASN1_INTEGER),
-    ASN1_SIMPLE(OSSL_TIME_SPEC_MONTH, choice.bitMonth, ASN1_BIT_STRING),
-} ASN1_CHOICE_END(OSSL_TIME_SPEC_MONTH)
+ASN1_CHOICE(OSSL_TIME_SPEC_MONTH)
+    = {
+        ASN1_SIMPLE(OSSL_TIME_SPEC_MONTH, choice.allMonths, ASN1_NULL),
+        ASN1_SET_OF(OSSL_TIME_SPEC_MONTH, choice.intMonth, ASN1_INTEGER),
+        ASN1_SIMPLE(OSSL_TIME_SPEC_MONTH, choice.bitMonth, ASN1_BIT_STRING),
+    }
+ASN1_CHOICE_END(OSSL_TIME_SPEC_MONTH)
 
-ASN1_SEQUENCE(OSSL_TIME_PERIOD) = {
-    ASN1_EXP_SET_OF_OPT(OSSL_TIME_PERIOD, timesOfDay, OSSL_DAY_TIME_BAND, 0),
-    ASN1_EXP_OPT(OSSL_TIME_PERIOD, days, OSSL_TIME_SPEC_DAY, 1),
-    ASN1_EXP_OPT(OSSL_TIME_PERIOD, weeks, OSSL_TIME_SPEC_WEEKS, 2),
-    ASN1_EXP_OPT(OSSL_TIME_PERIOD, months, OSSL_TIME_SPEC_MONTH, 3),
-    ASN1_EXP_SET_OF_OPT(OSSL_TIME_PERIOD, years, ASN1_INTEGER, 4),
-} ASN1_SEQUENCE_END(OSSL_TIME_PERIOD)
+ASN1_SEQUENCE(OSSL_TIME_PERIOD)
+    = {
+        ASN1_EXP_SET_OF_OPT(OSSL_TIME_PERIOD, timesOfDay, OSSL_DAY_TIME_BAND, 0),
+        ASN1_EXP_OPT(OSSL_TIME_PERIOD, days, OSSL_TIME_SPEC_DAY, 1),
+        ASN1_EXP_OPT(OSSL_TIME_PERIOD, weeks, OSSL_TIME_SPEC_WEEKS, 2),
+        ASN1_EXP_OPT(OSSL_TIME_PERIOD, months, OSSL_TIME_SPEC_MONTH, 3),
+        ASN1_EXP_SET_OF_OPT(OSSL_TIME_PERIOD, years, ASN1_INTEGER, 4),
+    }
+ASN1_SEQUENCE_END(OSSL_TIME_PERIOD)
 
-ASN1_CHOICE(OSSL_TIME_SPEC_TIME) = {
-    ASN1_SIMPLE(OSSL_TIME_SPEC_TIME, choice.absolute, OSSL_TIME_SPEC_ABSOLUTE),
-    ASN1_SET_OF(OSSL_TIME_SPEC_TIME, choice.periodic, OSSL_TIME_PERIOD)
-} ASN1_CHOICE_END(OSSL_TIME_SPEC_TIME)
+ASN1_CHOICE(OSSL_TIME_SPEC_TIME)
+    = {ASN1_SIMPLE(OSSL_TIME_SPEC_TIME, choice.absolute, OSSL_TIME_SPEC_ABSOLUTE),
+       ASN1_SET_OF(OSSL_TIME_SPEC_TIME, choice.periodic, OSSL_TIME_PERIOD)}
+ASN1_CHOICE_END(OSSL_TIME_SPEC_TIME)
 
-ASN1_SEQUENCE(OSSL_TIME_SPEC) = {
-    ASN1_SIMPLE(OSSL_TIME_SPEC, time, OSSL_TIME_SPEC_TIME),
-    ASN1_OPT(OSSL_TIME_SPEC, notThisTime, ASN1_FBOOLEAN),
-    ASN1_OPT(OSSL_TIME_SPEC, timeZone, ASN1_INTEGER),
-} ASN1_SEQUENCE_END(OSSL_TIME_SPEC)
+ASN1_SEQUENCE(OSSL_TIME_SPEC)
+    = {
+        ASN1_SIMPLE(OSSL_TIME_SPEC, time, OSSL_TIME_SPEC_TIME),
+        ASN1_OPT(OSSL_TIME_SPEC, notThisTime, ASN1_FBOOLEAN),
+        ASN1_OPT(OSSL_TIME_SPEC, timeZone, ASN1_INTEGER),
+    }
+ASN1_SEQUENCE_END(OSSL_TIME_SPEC)
 
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_DAY_TIME)
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_DAY_TIME_BAND)
@@ -124,9 +118,7 @@ IMPLEMENT_ASN1_FUNCTIONS(OSSL_TIME_SPEC_TIME)
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_TIME_SPEC)
 IMPLEMENT_ASN1_FUNCTIONS(OSSL_TIME_PERIOD)
 
-static int i2r_OSSL_TIME_SPEC_ABSOLUTE(X509V3_EXT_METHOD *method,
-                                       OSSL_TIME_SPEC_ABSOLUTE *time,
-                                       BIO *out, int indent)
+static int i2r_OSSL_TIME_SPEC_ABSOLUTE(X509V3_EXT_METHOD *method, OSSL_TIME_SPEC_ABSOLUTE *time, BIO *out, int indent)
 {
     if (time->startTime != NULL && time->endTime != NULL) {
         if (!BIO_puts(out, "Any time between "))
@@ -155,9 +147,7 @@ static int i2r_OSSL_TIME_SPEC_ABSOLUTE(X509V3_EXT_METHOD *method,
     return 1;
 }
 
-static int i2r_OSSL_DAY_TIME(X509V3_EXT_METHOD *method,
-                             OSSL_DAY_TIME *dt,
-                             BIO *out, int indent)
+static int i2r_OSSL_DAY_TIME(X509V3_EXT_METHOD *method, OSSL_DAY_TIME *dt, BIO *out, int indent)
 {
     int64_t h = 0;
     int64_t m = 0;
@@ -169,13 +159,10 @@ static int i2r_OSSL_DAY_TIME(X509V3_EXT_METHOD *method,
         return 0;
     if (dt->minute && !ASN1_INTEGER_get_int64(&s, dt->second))
         return 0;
-    return BIO_printf(out, "%02lld:%02lld:%02lld",
-                      (long long int)h, (long long int)m, (long long int)s) > 0;
+    return BIO_printf(out, "%02lld:%02lld:%02lld", (long long int)h, (long long int)m, (long long int)s) > 0;
 }
 
-static int i2r_OSSL_DAY_TIME_BAND(X509V3_EXT_METHOD *method,
-                                  OSSL_DAY_TIME_BAND *band,
-                                  BIO *out, int indent)
+static int i2r_OSSL_DAY_TIME_BAND(X509V3_EXT_METHOD *method, OSSL_DAY_TIME_BAND *band, BIO *out, int indent)
 {
     if (band->startDayTime) {
         if (!i2r_OSSL_DAY_TIME(method, band->startDayTime, out, indent))
@@ -334,15 +321,13 @@ static int print_bit_named_day(BIO *out, ASN1_BIT_STRING *bs)
     return print_day_of_week(out, bs);
 }
 
-static int i2r_OSSL_PERIOD(X509V3_EXT_METHOD *method,
-                           OSSL_TIME_PERIOD *p,
-                           BIO *out, int indent)
+static int i2r_OSSL_PERIOD(X509V3_EXT_METHOD *method, OSSL_TIME_PERIOD *p, BIO *out, int indent)
 {
-    int i;
+    int                 i;
     OSSL_DAY_TIME_BAND *band;
-    ASN1_INTEGER *big_val;
-    int64_t small_val;
-    OSSL_NAMED_DAY *nd;
+    ASN1_INTEGER       *big_val;
+    int64_t             small_val;
+    OSSL_NAMED_DAY     *nd;
 
     if (BIO_printf(out, "%*sPeriod:\n", indent, "") <= 0)
         return 0;
@@ -533,12 +518,10 @@ static int i2r_OSSL_PERIOD(X509V3_EXT_METHOD *method,
     return 1;
 }
 
-static int i2r_OSSL_TIME_SPEC_TIME(X509V3_EXT_METHOD *method,
-                                   OSSL_TIME_SPEC_TIME *time,
-                                   BIO *out, int indent)
+static int i2r_OSSL_TIME_SPEC_TIME(X509V3_EXT_METHOD *method, OSSL_TIME_SPEC_TIME *time, BIO *out, int indent)
 {
     OSSL_TIME_PERIOD *tp;
-    int i;
+    int               i;
 
     switch (time->type) {
     case (OSSL_TIME_SPEC_TIME_TYPE_ABSOLUTE):
@@ -564,9 +547,7 @@ static int i2r_OSSL_TIME_SPEC_TIME(X509V3_EXT_METHOD *method,
     return 0;
 }
 
-static int i2r_OSSL_TIME_SPEC(X509V3_EXT_METHOD *method,
-                              OSSL_TIME_SPEC *time,
-                              BIO *out, int indent)
+static int i2r_OSSL_TIME_SPEC(X509V3_EXT_METHOD *method, OSSL_TIME_SPEC *time, BIO *out, int indent)
 {
     int64_t tz;
 
@@ -585,14 +566,17 @@ static int i2r_OSSL_TIME_SPEC(X509V3_EXT_METHOD *method,
     return i2r_OSSL_TIME_SPEC_TIME(method, time->time, out, indent + 4);
 }
 
-const X509V3_EXT_METHOD ossl_v3_time_specification = {
-    NID_time_specification, X509V3_EXT_MULTILINE,
-    ASN1_ITEM_ref(OSSL_TIME_SPEC),
-    0, 0, 0, 0,
-    0, 0,
-    0,
-    0,
-    (X509V3_EXT_I2R)i2r_OSSL_TIME_SPEC,
-    NULL,
-    NULL
-};
+const X509V3_EXT_METHOD ossl_v3_time_specification = {NID_time_specification,
+                                                      X509V3_EXT_MULTILINE,
+                                                      ASN1_ITEM_ref(OSSL_TIME_SPEC),
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      (X509V3_EXT_I2R)i2r_OSSL_TIME_SPEC,
+                                                      NULL,
+                                                      NULL};

@@ -93,8 +93,7 @@ __tsan_mutex_post_lock((x), 0, 0)
  */
 typedef void *pvoid;
 
-# if defined(__GNUC__) && defined(__ATOMIC_ACQUIRE) && !defined(BROKEN_CLANG_ATOMICS) \
-    && !defined(USE_ATOMIC_FALLBACKS)
+# if defined(__GNUC__) && defined(__ATOMIC_ACQUIRE) && !defined(BROKEN_CLANG_ATOMICS) && !defined(USE_ATOMIC_FALLBACKS)
 #  define ATOMIC_LOAD_N(t, p, o) __atomic_load_n(p, o)
 #  define ATOMIC_STORE_N(t, p, v, o) __atomic_store_n(p, v, o)
 #  define ATOMIC_STORE(t, p, v, o) __atomic_store(p, v, o)
@@ -113,9 +112,7 @@ static pthread_mutex_t atomic_sim_lock = PTHREAD_MUTEX_INITIALIZER;
         pthread_mutex_unlock(&atomic_sim_lock);                 \
         return ret;                                             \
     }
-IMPL_fallback_atomic_load_n(uint32_t)
-IMPL_fallback_atomic_load_n(uint64_t)
-IMPL_fallback_atomic_load_n(pvoid)
+IMPL_fallback_atomic_load_n(uint32_t) IMPL_fallback_atomic_load_n(uint64_t) IMPL_fallback_atomic_load_n(pvoid)
 
 #  define ATOMIC_LOAD_N(t, p, o) fallback_atomic_load_n_##t(p)
 
@@ -130,7 +127,7 @@ IMPL_fallback_atomic_load_n(pvoid)
         pthread_mutex_unlock(&atomic_sim_lock);                 \
         return ret;                                             \
     }
-IMPL_fallback_atomic_store_n(uint32_t)
+    IMPL_fallback_atomic_store_n(uint32_t)
 
 #  define ATOMIC_STORE_N(t, p, v, o) fallback_atomic_store_n_##t(p, v)
 
@@ -141,24 +138,24 @@ IMPL_fallback_atomic_store_n(uint32_t)
         *p = *v;                                                \
         pthread_mutex_unlock(&atomic_sim_lock);                 \
     }
-IMPL_fallback_atomic_store(pvoid)
+        IMPL_fallback_atomic_store(pvoid)
 
 #  define ATOMIC_STORE(t, p, v, o) fallback_atomic_store_##t(p, v)
 
-/*
- * The fallbacks that follow don't need any per type implementation, as
- * they are designed for uint64_t only.  If there comes a time when multiple
- * types need to be covered, it's relatively easy to refactor them the same
- * way as the fallbacks above.
- */
+    /*
+     * The fallbacks that follow don't need any per type implementation, as
+     * they are designed for uint64_t only.  If there comes a time when multiple
+     * types need to be covered, it's relatively easy to refactor them the same
+     * way as the fallbacks above.
+     */
 
-static ossl_inline uint64_t fallback_atomic_add_fetch(uint64_t *p, uint64_t v)
+    static ossl_inline uint64_t fallback_atomic_add_fetch(uint64_t *p, uint64_t v)
 {
     uint64_t ret;
 
     pthread_mutex_lock(&atomic_sim_lock);
-    *p += v;
-    ret = *p;
+    *p  += v;
+    ret  = *p;
     pthread_mutex_unlock(&atomic_sim_lock);
     return ret;
 }
@@ -170,8 +167,8 @@ static ossl_inline uint64_t fallback_atomic_sub_fetch(uint64_t *p, uint64_t v)
     uint64_t ret;
 
     pthread_mutex_lock(&atomic_sim_lock);
-    *p -= v;
-    ret = *p;
+    *p  -= v;
+    ret  = *p;
     pthread_mutex_unlock(&atomic_sim_lock);
     return ret;
 }
@@ -190,12 +187,13 @@ struct rcu_qp {
 };
 
 struct thread_qp {
-    struct rcu_qp *qp;
-    unsigned int depth;
+    struct rcu_qp   *qp;
+    unsigned int     depth;
     CRYPTO_RCU_LOCK *lock;
 };
 
 # define MAX_QPS 10
+
 /*
  * This is the per thread tracking data
  * that is assigned to each thread participating
@@ -217,43 +215,43 @@ struct rcu_lock_st {
     struct rcu_cb_item *cb_items;
 
     /* The context we are being created against */
-    OSSL_LIB_CTX *ctx;
+    OSSL_LIB_CTX       *ctx;
 
     /* Array of quiescent points for synchronization */
-    struct rcu_qp *qp_group;
+    struct rcu_qp      *qp_group;
 
     /* rcu generation counter for in-order retirement */
-    uint32_t id_ctr;
+    uint32_t            id_ctr;
 
     /* Number of elements in qp_group array */
-    uint32_t group_count;
+    uint32_t            group_count;
 
     /* Index of the current qp in the qp_group array */
-    uint32_t reader_idx;
+    uint32_t            reader_idx;
 
     /* value of the next id_ctr value to be retired */
-    uint32_t next_to_retire;
+    uint32_t            next_to_retire;
 
     /* index of the next free rcu_qp in the qp_group */
-    uint32_t current_alloc_idx;
+    uint32_t            current_alloc_idx;
 
     /* number of qp's in qp_group array currently being retired */
-    uint32_t writers_alloced;
+    uint32_t            writers_alloced;
 
     /* lock protecting write side operations */
-    pthread_mutex_t write_lock;
+    pthread_mutex_t     write_lock;
 
     /* lock protecting updates to writers_alloced/current_alloc_idx */
-    pthread_mutex_t alloc_lock;
+    pthread_mutex_t     alloc_lock;
 
     /* signal to wake threads waiting on alloc_lock */
-    pthread_cond_t alloc_signal;
+    pthread_cond_t      alloc_signal;
 
     /* lock to enforce in-order retirement */
-    pthread_mutex_t prior_lock;
+    pthread_mutex_t     prior_lock;
 
     /* signal to wake threads waiting on prior_lock */
-    pthread_cond_t prior_signal;
+    pthread_cond_t      prior_signal;
 };
 
 /* Read side acquisition of the current qp */
@@ -276,16 +274,13 @@ static struct rcu_qp *get_hold_current_qp(struct rcu_lock_st *lock)
          * updates prior to the load.  This is a non-issue on cache coherent
          * systems like x86, but is relevant on other arches
          */
-        ATOMIC_ADD_FETCH(&lock->qp_group[qp_idx].users, (uint64_t)1,
-                         __ATOMIC_ACQUIRE);
+        ATOMIC_ADD_FETCH(&lock->qp_group[qp_idx].users, (uint64_t)1, __ATOMIC_ACQUIRE);
 
         /* if the idx hasn't changed, we're good, else try again */
-        if (qp_idx == ATOMIC_LOAD_N(uint32_t, &lock->reader_idx,
-                                    __ATOMIC_RELAXED))
+        if (qp_idx == ATOMIC_LOAD_N(uint32_t, &lock->reader_idx, __ATOMIC_RELAXED))
             break;
 
-        ATOMIC_SUB_FETCH(&lock->qp_group[qp_idx].users, (uint64_t)1,
-                         __ATOMIC_RELAXED);
+        ATOMIC_SUB_FETCH(&lock->qp_group[qp_idx].users, (uint64_t)1, __ATOMIC_RELAXED);
     }
 
     return &lock->qp_group[qp_idx];
@@ -293,7 +288,7 @@ static struct rcu_qp *get_hold_current_qp(struct rcu_lock_st *lock)
 
 static void ossl_rcu_free_local_data(void *arg)
 {
-    OSSL_LIB_CTX *ctx = arg;
+    OSSL_LIB_CTX        *ctx  = arg;
     struct rcu_thr_data *data = CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, ctx);
 
     CRYPTO_THREAD_set_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, ctx, NULL);
@@ -303,7 +298,7 @@ static void ossl_rcu_free_local_data(void *arg)
 void ossl_rcu_read_lock(CRYPTO_RCU_LOCK *lock)
 {
     struct rcu_thr_data *data;
-    int i, available_qp = -1;
+    int                  i, available_qp = -1;
 
     /*
      * we're going to access current_qp here so ask the
@@ -333,16 +328,16 @@ void ossl_rcu_read_lock(CRYPTO_RCU_LOCK *lock)
      */
     assert(available_qp != -1);
 
-    data->thread_qps[available_qp].qp = get_hold_current_qp(lock);
+    data->thread_qps[available_qp].qp    = get_hold_current_qp(lock);
     data->thread_qps[available_qp].depth = 1;
-    data->thread_qps[available_qp].lock = lock;
+    data->thread_qps[available_qp].lock  = lock;
 }
 
 void ossl_rcu_read_unlock(CRYPTO_RCU_LOCK *lock)
 {
-    int i;
+    int                  i;
     struct rcu_thr_data *data = CRYPTO_THREAD_get_local_ex(CRYPTO_THREAD_LOCAL_RCU_KEY, lock->ctx);
-    uint64_t ret;
+    uint64_t             ret;
 
     assert(data != NULL);
 
@@ -355,10 +350,9 @@ void ossl_rcu_read_unlock(CRYPTO_RCU_LOCK *lock)
              */
             data->thread_qps[i].depth--;
             if (data->thread_qps[i].depth == 0) {
-                ret = ATOMIC_SUB_FETCH(&data->thread_qps[i].qp->users,
-                                       (uint64_t)1, __ATOMIC_RELEASE);
+                ret = ATOMIC_SUB_FETCH(&data->thread_qps[i].qp->users, (uint64_t)1, __ATOMIC_RELEASE);
                 OPENSSL_assert(ret != UINT64_MAX);
-                data->thread_qps[i].qp = NULL;
+                data->thread_qps[i].qp   = NULL;
                 data->thread_qps[i].lock = NULL;
             }
             return;
@@ -396,21 +390,18 @@ static struct rcu_qp *update_qp(CRYPTO_RCU_LOCK *lock, uint32_t *curr_id)
     lock->writers_alloced++;
 
     /* increment the allocation index */
-    lock->current_alloc_idx =
-        (lock->current_alloc_idx + 1) % lock->group_count;
+    lock->current_alloc_idx = (lock->current_alloc_idx + 1) % lock->group_count;
 
-    *curr_id = lock->id_ctr;
+    *curr_id                = lock->id_ctr;
     lock->id_ctr++;
 
-    ATOMIC_STORE_N(uint32_t, &lock->reader_idx, lock->current_alloc_idx,
-                   __ATOMIC_RELAXED);
+    ATOMIC_STORE_N(uint32_t, &lock->reader_idx, lock->current_alloc_idx, __ATOMIC_RELAXED);
 
     /*
      * this should make sure that the new value of reader_idx is visible in
      * get_hold_current_qp, directly after incrementing the users count
      */
-    ATOMIC_ADD_FETCH(&lock->qp_group[current_idx].users, (uint64_t)0,
-                     __ATOMIC_RELEASE);
+    ATOMIC_ADD_FETCH(&lock->qp_group[current_idx].users, (uint64_t)0, __ATOMIC_RELEASE);
 
     /* wake up any waiters */
     pthread_cond_signal(&lock->alloc_signal);
@@ -426,13 +417,11 @@ static void retire_qp(CRYPTO_RCU_LOCK *lock, struct rcu_qp *qp)
     pthread_mutex_unlock(&lock->alloc_lock);
 }
 
-static struct rcu_qp *allocate_new_qp_group(CRYPTO_RCU_LOCK *lock,
-                                            uint32_t count)
+static struct rcu_qp *allocate_new_qp_group(CRYPTO_RCU_LOCK *lock, uint32_t count)
 {
-    struct rcu_qp *new =
-        OPENSSL_zalloc(sizeof(*new) * count);
+    struct rcu_qp *new = OPENSSL_zalloc(sizeof(*new) * count);
 
-    lock->group_count = count;
+    lock->group_count  = count;
     return new;
 }
 
@@ -450,13 +439,13 @@ void ossl_rcu_write_unlock(CRYPTO_RCU_LOCK *lock)
 
 void ossl_synchronize_rcu(CRYPTO_RCU_LOCK *lock)
 {
-    struct rcu_qp *qp;
-    uint64_t count;
-    uint32_t curr_id;
+    struct rcu_qp      *qp;
+    uint64_t            count;
+    uint32_t            curr_id;
     struct rcu_cb_item *cb_items, *tmpcb;
 
     pthread_mutex_lock(&lock->write_lock);
-    cb_items = lock->cb_items;
+    cb_items       = lock->cb_items;
     lock->cb_items = NULL;
     pthread_mutex_unlock(&lock->write_lock);
 
@@ -488,7 +477,7 @@ void ossl_synchronize_rcu(CRYPTO_RCU_LOCK *lock)
 
     /* handle any callbacks that we have */
     while (cb_items != NULL) {
-        tmpcb = cb_items;
+        tmpcb    = cb_items;
         cb_items = cb_items->next;
         tmpcb->fn(tmpcb->data);
         OPENSSL_free(tmpcb);
@@ -501,16 +490,15 @@ void ossl_synchronize_rcu(CRYPTO_RCU_LOCK *lock)
  */
 int ossl_rcu_call(CRYPTO_RCU_LOCK *lock, rcu_cb_fn cb, void *data)
 {
-    struct rcu_cb_item *new =
-        OPENSSL_zalloc(sizeof(*new));
+    struct rcu_cb_item *new = OPENSSL_zalloc(sizeof(*new));
 
     if (new == NULL)
         return 0;
 
-    new->data = data;
-    new->fn = cb;
+    new->data      = data;
+    new->fn        = cb;
 
-    new->next = lock->cb_items;
+    new->next      = lock->cb_items;
     lock->cb_items = new;
 
     return 1;
@@ -590,7 +578,7 @@ CRYPTO_RWLOCK *CRYPTO_THREAD_lock_new(void)
     }
 # else
     pthread_mutexattr_t attr;
-    CRYPTO_RWLOCK *lock;
+    CRYPTO_RWLOCK      *lock;
 
     if ((lock = OPENSSL_zalloc(sizeof(pthread_mutex_t))) == NULL)
         /* Don't set error, to avoid recursion blowup. */
@@ -600,7 +588,7 @@ CRYPTO_RWLOCK *CRYPTO_THREAD_lock_new(void)
      * We don't use recursive mutexes, but try to catch errors if we do.
      */
     pthread_mutexattr_init(&attr);
-#  if !defined (__TANDEM) && !defined (_SPT_MODEL_)
+#  if !defined(__TANDEM) && !defined(_SPT_MODEL_)
 #   if !defined(NDEBUG) && !defined(OPENSSL_NO_MUTEX_ERRORCHECK)
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
 #   endif
@@ -753,8 +741,7 @@ int CRYPTO_atomic_add(int *val, int amount, int *ret, CRYPTO_RWLOCK *lock)
     return 1;
 }
 
-int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
-                        CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if defined(__GNUC__) && defined(__ATOMIC_ACQ_REL) && !defined(BROKEN_CLANG_ATOMICS)
     if (__atomic_is_lock_free(sizeof(*val), val)) {
@@ -779,8 +766,7 @@ int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
     return 1;
 }
 
-int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
-                      CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if defined(__GNUC__) && defined(__ATOMIC_ACQ_REL) && !defined(BROKEN_CLANG_ATOMICS)
     if (__atomic_is_lock_free(sizeof(*val), val)) {
@@ -805,8 +791,7 @@ int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
     return 1;
 }
 
-int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
-                     CRYPTO_RWLOCK *lock)
+int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
 # if defined(__GNUC__) && defined(__ATOMIC_ACQ_REL) && !defined(BROKEN_CLANG_ATOMICS)
     if (__atomic_is_lock_free(sizeof(*val), val)) {
@@ -847,7 +832,7 @@ int CRYPTO_atomic_load(uint64_t *val, uint64_t *ret, CRYPTO_RWLOCK *lock)
 # endif
     if (lock == NULL || !CRYPTO_THREAD_read_lock(lock))
         return 0;
-    *ret  = *val;
+    *ret = *val;
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
 
@@ -870,7 +855,7 @@ int CRYPTO_atomic_store(uint64_t *dst, uint64_t val, CRYPTO_RWLOCK *lock)
 # endif
     if (lock == NULL || !CRYPTO_THREAD_write_lock(lock))
         return 0;
-    *dst  = val;
+    *dst = val;
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
 
@@ -893,7 +878,7 @@ int CRYPTO_atomic_load_int(int *val, int *ret, CRYPTO_RWLOCK *lock)
 # endif
     if (lock == NULL || !CRYPTO_THREAD_read_lock(lock))
         return 0;
-    *ret  = *val;
+    *ret = *val;
     if (!CRYPTO_THREAD_unlock(lock))
         return 0;
 
