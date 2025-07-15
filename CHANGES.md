@@ -89,6 +89,11 @@ OpenSSL 3.6
 
 ### Changes between 3.5 and 3.6.0 [1 Oct 2025]
 
+ * Support for SSLv3 was removed. SSLv3 has been deprecated since
+   2015, and OpenSSL had it disabled by default since 1.1.0 (2016).
+
+   *Kurt Roeckx*
+
  * Added support for `EVP_SKEY` opaque symmetric key objects to the key
    derivation and key exchange provider methods.  Added
    `EVP_KDF_CTX_set_SKEY()`, `EVP_KDF_derive_SKEY()`,
