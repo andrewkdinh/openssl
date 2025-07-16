@@ -1,4 +1,4 @@
-name: "Build openssl interop container from master"
+name: "Build openssl interop containers"
 
 on:
   schedule:

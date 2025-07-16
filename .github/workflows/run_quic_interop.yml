@@ -2,7 +2,7 @@ name: "Run openssl quic interop testing"
 
 on:
   workflow_run:
-    workflows: ["Build openssl interop container from master"]
+    workflows: ["Build openssl interop containers"]
     types: [completed]
   workflow_dispatch:
 
