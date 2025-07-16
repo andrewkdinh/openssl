@@ -7,7 +7,7 @@ on:
 
 jobs:
   update_quay_container:
-    if: github.repository == 'openssl/openssl'
+    if: github.repository == 'andrewkdinh/openssl'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
           docker push quay.io/openssl-ci/openssl-quic-interop:latest
 
   update_msqic_quay_container:
-    if: github.repository == 'openssl/openssl'
+    if: github.repository == 'andrewkdinh/openssl'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
