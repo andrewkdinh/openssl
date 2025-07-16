@@ -41,7 +41,7 @@ jobs:
           sed 's/RUN     cmake -DQUIC_BUILD_TOOLS=on -DQUIC_ENABLE_LOGGING=on ../RUN     cmake -DQUIC_BUILD_TOOLS=on -DQUIC_ENABLE_LOGGING=on -DQUIC_TLS_LIB=openssl ../' ./scripts/qns.Dockerfile
       - name: "Build container"
         run: |
-          docker build -t quay.io/openssl-ci/msquic-openssl:latest .
+          docker build -f qns.Dockerfile -t quay.io/openssl-ci/msquic-openssl:latest .
       - name: "Push to quay"
         run: |
           docker push quay.io/openssl-ci/msquic-openssl:latest
