@@ -1,0 +1,618 @@
+name: "Andrew CI"
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  run-all-0:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-1:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-2:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-3:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-4:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-5:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-6:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-7:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-8:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-9:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-10:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-11:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-12:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-13:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-14:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-15:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
+
+  run-all-16:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: ./source
+    - name: checkout fuzz/corpora submodule
+      run: git submodule update --init --depth 1 fuzz/corpora
+      working-directory: ./source
+    - name: make source read-only
+      run: chmod -R a-w ./source
+    - name: create build and install directories
+      run: |
+        mkdir ./build
+        mkdir ./install
+    - name: config
+      run: |
+        ../source/config --banner=Configured enable-fips enable-lms enable-demos enable-h3demo enable-quic enable-acvp-tests --strict-warnings --prefix=$(cd ../install; pwd)
+        perl configdata.pm --dump
+      working-directory: ./build
+    - name: make
+      run: make -s -j4
+      working-directory: ./build
+    - name: get cpu info
+      run: |
+        sysctl machdep.cpu
+        ./util/opensslwrap.sh version -c
+      working-directory: ./build
+    - name: make test
+      run: ../source/.github/workflows/make-test
+      working-directory: ./build
