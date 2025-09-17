@@ -113,32 +113,37 @@ jobs:
           #         the build.
           #     `extra_config` adds extra config build option for the branch.
           {
-            name: openssl-3.0,
-            dir: branch-3.0,
-            tgz: branch-3.0.tar.gz,
-            extra_config: "",
-          }, {
-            name: openssl-3.2,
-            dir: branch-3.2,
-            tgz: branch-3.2.tar.gz,
-            extra_config: "",
-          }, {
-            name: openssl-3.3,
-            dir: branch-3.3,
-            tgz: branch-3.3.tar.gz,
-            extra_config: "",
-          }, {
-            name: openssl-3.4,
-            dir: branch-3.4,
-            tgz: branch-3.4.tar.gz,
-            extra_config: "",
-          }, {
-            name: openssl-3.5,
-            dir: branch-3.5,
-            tgz: branch-3.5.tar.gz,
-            extra_config: "",
-          }, {
-            name: openssl-3.6,
+            # name: openssl-3.0,
+            # dir: branch-3.0,
+            # tgz: branch-3.0.tar.gz,
+            # extra_config: "",
+          # }, {
+            # name: openssl-3.2,
+            # dir: branch-3.2,
+            # tgz: branch-3.2.tar.gz,
+            # extra_config: "",
+          # }, {
+            # name: openssl-3.3,
+            # dir: branch-3.3,
+            # tgz: branch-3.3.tar.gz,
+            # extra_config: "",
+          # }, {
+            # name: openssl-3.4,
+            # dir: branch-3.4,
+            # tgz: branch-3.4.tar.gz,
+            # extra_config: "",
+          # }, {
+            # name: openssl-3.5,
+            # dir: branch-3.5,
+            # tgz: branch-3.5.tar.gz,
+            # extra_config: "",
+          # }, {
+          #   name: openssl-3.6,
+          #   dir: branch-3.6,
+          #   tgz: branch-3.6.tar.gz,
+          #   extra_config: "",
+          # }, {
+            name: lms-compat,
             dir: branch-3.6,
             tgz: branch-3.6.tar.gz,
             extra_config: "",
@@ -155,7 +160,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: ${{ matrix.branch.dir }}
-          repository: openssl/openssl
+          repository: andrewkdinh/openssl
           ref: ${{ matrix.branch.name }}
       - name: localegen
         run: sudo locale-gen tr_TR.UTF-8
