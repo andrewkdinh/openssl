@@ -571,6 +571,11 @@ int setup_tests(void)
     if (!test_get_libctx(&libctx, &nullprov, config_file, &libprov, NULL))
         return 0;
 
+    if (EVP_PKEY_CTX_new_from_name(libctx, "LMS", propq) == NULL) {
+        TEST_note("LMS algorithm is not available in provider");
+        return 1;
+    }
+
     ADD_TEST(lms_bad_pub_len_test);
     ADD_TEST(lms_key_validate_test);
     ADD_TEST(lms_key_eq_test);
