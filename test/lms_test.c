@@ -551,6 +551,7 @@ int setup_tests(void)
 {
     OPTION_CHOICE o;
     char *config_file = NULL;
+    EVP_PKEY_CTX *ctx = NULL;
 
     /* Swap the libctx to test non-default context only */
     propq = "provider=default";
@@ -571,10 +572,12 @@ int setup_tests(void)
     if (!test_get_libctx(&libctx, &nullprov, config_file, &libprov, NULL))
         return 0;
 
-    if (EVP_PKEY_CTX_new_from_name(libctx, "LMS", propq) == NULL) {
+    ctx = EVP_PKEY_CTX_new_from_name(libctx, "LMS", propq);
+    if (ctx == NULL && ERR_get_error() == EVP_R_UNSUPPORTED_ALGORITHM) {
         TEST_note("LMS algorithm is not available in provider");
         return 1;
     }
+    EVP_PKEY_CTX_free(ctx);
 
     ADD_TEST(lms_bad_pub_len_test);
     ADD_TEST(lms_key_validate_test);
