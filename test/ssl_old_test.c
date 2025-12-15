@@ -1247,7 +1247,7 @@ int main(int argc, char *argv[])
     }
 
 #ifdef OPENSSL_NO_TLS1
-        if (tls1)
+    if (tls1)
         no_protocol = 1;
     else
 #endif

@@ -1824,7 +1824,7 @@ static const version_info tls_version_table[] = {
 #else
     { TLS1_VERSION, NULL, NULL },
 #endif
-    {0, NULL, NULL},
+    { 0, NULL, NULL },
 };
 
 #if DTLS_MAX_VERSION_INTERNAL != DTLS1_2_VERSION
