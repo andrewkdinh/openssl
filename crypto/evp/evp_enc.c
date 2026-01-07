@@ -1992,7 +1992,13 @@ static void evp_cipher_free(void *cipher)
 EVP_CIPHER *EVP_CIPHER_fetch(OSSL_LIB_CTX *ctx, const char *algorithm,
     const char *properties)
 {
-    EVP_CIPHER *cipher = evp_generic_fetch(ctx, OSSL_OP_CIPHER, algorithm, properties,
+    EVP_CIPHER *cipher = NULL;
+
+    if (evp_generic_fetch_frozen(ctx, OSSL_OP_CIPHER, algorithm, properties,
+            NULL, (void **)&cipher))
+        return cipher;
+
+    cipher = evp_generic_fetch(ctx, OSSL_OP_CIPHER, algorithm, properties,
         evp_cipher_from_algorithm, evp_cipher_up_ref,
         evp_cipher_free);
 
