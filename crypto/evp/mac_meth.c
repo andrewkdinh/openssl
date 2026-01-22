@@ -30,7 +30,7 @@ static void evp_mac_free(void *vmac)
     EVP_MAC *mac = vmac;
     int ref = 0;
 
-    if (mac == NULL)
+    if (mac == NULL || mac->origin != EVP_ORIG_METH)
         return;
 
     CRYPTO_DOWN_REF(&mac->refcnt, &ref);
@@ -51,6 +51,7 @@ static void *evp_mac_new(void)
         evp_mac_free(mac);
         return NULL;
     }
+    mac->origin = EVP_ORIG_METH;
     return mac;
 }
 

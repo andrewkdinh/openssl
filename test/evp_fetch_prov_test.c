@@ -413,6 +413,47 @@ end:
     return ret;
 }
 
+static int test_EVP_MAC_fetch_freeze(void)
+{
+    EVP_MAC *mac = NULL;
+    int ret = 0;
+    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
+
+    if (!TEST_ptr(ctx)
+        || !TEST_ptr(mac = EVP_MAC_fetch(ctx, "HMAC", NULL))
+        || !TEST_int_ne(mac->origin, EVP_ORIG_FROZEN))
+        goto err;
+    EVP_MAC_free(mac);
+    mac = NULL;
+
+    if (!TEST_int_eq(OSSL_LIB_CTX_freeze(ctx, "?fips=true"), 1)
+        || !TEST_ptr(mac = EVP_MAC_fetch(ctx, "HMAC", NULL))
+        || !TEST_int_eq(mac->origin, EVP_ORIG_FROZEN))
+        goto err;
+    /* Technically, frozen version doesn't need to be freed */
+    EVP_MAC_free(mac);
+
+    if (!TEST_ptr(mac = EVP_MAC_fetch(ctx, "HMAC", "?fips=true"))
+        || !TEST_int_eq(mac->origin, EVP_ORIG_FROZEN))
+        goto err;
+    EVP_MAC_free(mac);
+
+    if (!TEST_ptr(mac = EVP_MAC_fetch(ctx, "HMAC", "?provider=default"))
+        || !TEST_int_ne(mac->origin, EVP_ORIG_FROZEN))
+        goto err;
+    EVP_MAC_free(mac);
+
+    if (!TEST_ptr(mac = EVP_MAC_fetch(NULL, "HMAC", NULL))
+        || !TEST_int_ne(mac->origin, EVP_ORIG_FROZEN))
+        goto err;
+
+    ret = 1;
+err:
+    OSSL_LIB_CTX_free(ctx);
+    EVP_MAC_free(mac);
+    return ret;
+}
+
 int setup_tests(void)
 {
     OPTION_CHOICE o;
@@ -447,10 +488,15 @@ int setup_tests(void)
         ADD_TEST(test_implicit_EVP_MD_fetch);
         ADD_TEST(test_explicit_EVP_MD_fetch_by_name);
         ADD_ALL_TESTS_NOSUBTEST(test_explicit_EVP_MD_fetch_by_X509_ALGOR, 2);
-    } else {
+    } else if (strcmp(alg, "cipher")) {
         ADD_TEST(test_implicit_EVP_CIPHER_fetch);
         ADD_TEST(test_explicit_EVP_CIPHER_fetch_by_name);
         ADD_ALL_TESTS_NOSUBTEST(test_explicit_EVP_CIPHER_fetch_by_X509_ALGOR, 2);
+    } else if (strcmp(alg, "mac")) {
+        ADD_TEST(test_EVP_MAC_fetch_freeze);
+    } else {
+        TEST_info("Invalid type");
+        return 0;
     }
     return 1;
 }

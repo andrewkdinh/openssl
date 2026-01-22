@@ -209,6 +209,7 @@ struct evp_mac_st {
     int name_id;
     char *type_name;
     const char *description;
+    int origin;
 
     CRYPTO_REF_COUNT refcnt;
 
