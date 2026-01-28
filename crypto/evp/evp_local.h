@@ -246,6 +246,7 @@ struct evp_kem_st {
     const char *description;
     OSSL_PROVIDER *prov;
     CRYPTO_REF_COUNT refcnt;
+    int origin;
 
     OSSL_FUNC_kem_newctx_fn *newctx;
     OSSL_FUNC_kem_encapsulate_init_fn *encapsulate_init;

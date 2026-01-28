@@ -294,6 +294,7 @@ static EVP_KEM *evp_kem_new(OSSL_PROVIDER *prov)
         return NULL;
     }
     kem->prov = prov;
+    kem->origin = EVP_ORIG_METH;
 
     return kem;
 }
@@ -432,7 +433,7 @@ void EVP_KEM_free(EVP_KEM *kem)
 {
     int i;
 
-    if (kem == NULL)
+    if (kem == NULL || kem->origin != EVP_ORIG_METH)
         return;
 
     CRYPTO_DOWN_REF(&kem->refcnt, &i);

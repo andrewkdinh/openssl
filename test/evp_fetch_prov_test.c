@@ -21,6 +21,7 @@
 #include "internal/sizes.h"
 #include "testutil.h"
 #include "crypto/evp.h"
+#include "../crypto/evp/evp_local.h"
 
 static char *config_file = NULL;
 static char *alg = "digest";
@@ -413,6 +414,42 @@ end:
     return ret;
 }
 
+static int test_EVP_KEM_fetch_freeze(void)
+{
+    EVP_KEM *kem = NULL;
+    int ret = 0;
+    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
+
+    if (!TEST_ptr(ctx)
+        || !TEST_ptr(kem = EVP_KEM_fetch(ctx, "X25519", NULL))
+        || !TEST_int_ne(kem->origin, EVP_ORIG_FROZEN))
+        goto err;
+    EVP_KEM_free(kem);
+    kem = NULL;
+
+    if (!TEST_int_eq(OSSL_LIB_CTX_freeze(ctx, "?fips=true"), 1)
+        || !TEST_ptr(kem = EVP_KEM_fetch(ctx, "X25519", NULL))
+        || !TEST_int_eq(kem->origin, EVP_ORIG_FROZEN))
+        goto err;
+    /* Technically, frozen version doesn't need to be freed */
+    EVP_KEM_free(kem);
+
+    if (!TEST_ptr(kem = EVP_KEM_fetch(ctx, "X25519", "?fips=true"))
+        || !TEST_int_eq(kem->origin, EVP_ORIG_FROZEN))
+        goto err;
+    EVP_KEM_free(kem);
+
+    if (!TEST_ptr(kem = EVP_KEM_fetch(ctx, "X25519", "?provider=default"))
+        || !TEST_int_ne(kem->origin, EVP_ORIG_FROZEN))
+        goto err;
+
+    ret = 1;
+err:
+    OSSL_LIB_CTX_free(ctx);
+    EVP_KEM_free(kem);
+    return ret;
+}
+
 int setup_tests(void)
 {
     OPTION_CHOICE o;
@@ -447,10 +484,15 @@ int setup_tests(void)
         ADD_TEST(test_implicit_EVP_MD_fetch);
         ADD_TEST(test_explicit_EVP_MD_fetch_by_name);
         ADD_ALL_TESTS_NOSUBTEST(test_explicit_EVP_MD_fetch_by_X509_ALGOR, 2);
-    } else {
+    } else if (strcmp(alg, "cipher")) {
         ADD_TEST(test_implicit_EVP_CIPHER_fetch);
         ADD_TEST(test_explicit_EVP_CIPHER_fetch_by_name);
         ADD_ALL_TESTS_NOSUBTEST(test_explicit_EVP_CIPHER_fetch_by_X509_ALGOR, 2);
+    } else if (strcmp(alg, "kem")) {
+        ADD_TEST(test_EVP_KEM_fetch_freeze);
+    } else {
+        TEST_info("Invalid type");
+        return 0;
     }
     return 1;
 }
