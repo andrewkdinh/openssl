@@ -31,7 +31,7 @@ static void evp_kdf_free(void *vkdf)
     EVP_KDF *kdf = (EVP_KDF *)vkdf;
     int ref = 0;
 
-    if (kdf == NULL)
+    if (kdf == NULL || kdf->origin != EVP_ORIG_METH)
         return;
 
     CRYPTO_DOWN_REF(&kdf->refcnt, &ref);
@@ -52,6 +52,7 @@ static void *evp_kdf_new(void)
         OPENSSL_free(kdf);
         return NULL;
     }
+    kdf->origin = EVP_ORIG_METH;
     return kdf;
 }
 
