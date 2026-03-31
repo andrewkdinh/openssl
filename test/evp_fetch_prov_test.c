@@ -1693,6 +1693,156 @@ static int test_explicit_EVP_KEYEXCH_fetch_by_name(void)
     return test_explicit_EVP_KEYEXCH_fetch("DH");
 }
 
+static int test_rsa_sign_verify(OSSL_LIB_CTX *libctx, const char *propq)
+{
+    EVP_PKEY *pkey = NULL;
+    EVP_MD_CTX *mdctx = NULL;
+    const unsigned char msg[] = "Hello world";
+    unsigned char *sig = NULL;
+    size_t siglen = 0;
+    int ret = 0;
+
+    if (!TEST_ptr(pkey = EVP_PKEY_Q_keygen(libctx, propq, "RSA", 2048))
+        || !TEST_ptr(mdctx = EVP_MD_CTX_new())
+        || !TEST_int_eq(EVP_DigestSignInit_ex(mdctx, NULL, "SHA256", libctx, propq,
+                            pkey, NULL),
+            1)
+        || !TEST_int_eq(EVP_DigestSign(mdctx, NULL, &siglen, msg, sizeof(msg)),
+            1)
+        || !TEST_ptr(sig = OPENSSL_malloc(siglen))
+        || !TEST_int_eq(EVP_DigestSign(mdctx, sig, &siglen, msg, sizeof(msg)),
+            1)
+        || !TEST_int_eq(EVP_DigestVerifyInit_ex(mdctx, NULL, "SHA256", libctx,
+                            propq, pkey, NULL),
+            1)
+        || !TEST_int_eq(EVP_DigestVerify(mdctx, sig, siglen, msg, sizeof(msg)),
+            1))
+        goto err;
+
+    ret = 1;
+err:
+    EVP_PKEY_free(pkey);
+    EVP_MD_CTX_free(mdctx);
+    OPENSSL_free(sig);
+    return ret;
+}
+
+static int test_signature(OSSL_LIB_CTX *libctx, const char *propq,
+    EVP_SIGNATURE *sig, const char *name)
+{
+    return TEST_ptr(sig)
+        && TEST_ptr(EVP_SIGNATURE_get0_provider(sig))
+        && TEST_true(EVP_SIGNATURE_is_a(sig, name))
+        && TEST_true(test_rsa_sign_verify(libctx, propq));
+}
+
+static int test_EVP_SIGNATURE_fetch_freeze(void)
+{
+#if defined(OPENSSL_NO_CACHED_FETCH)
+    /*
+     * Test does not make sense if cached fetch is disabled.
+     * There's nothing to freeze, and test will fail.
+     */
+    return 1;
+#endif
+
+    EVP_SIGNATURE *sig = NULL;
+    int ret = 0;
+    OSSL_LIB_CTX *ctx = NULL;
+    OSSL_PROVIDER *prov[] = { NULL, NULL };
+
+    if (use_default_ctx == 0 && !load_providers(&ctx, prov))
+        goto err;
+
+    if (!TEST_ptr(sig = EVP_SIGNATURE_fetch(ctx, "RSA", NULL))
+        || !TEST_true(test_signature(ctx, NULL, sig, "RSA"))
+        || !TEST_int_ne(sig->origin, EVP_ORIG_FROZEN))
+        goto err;
+    EVP_SIGNATURE_free(sig);
+    sig = NULL;
+
+    if (!TEST_int_eq(OSSL_LIB_CTX_freeze(ctx, "?fips=true"), 1)
+        || !TEST_ptr(sig = EVP_SIGNATURE_fetch(ctx, "RSA", NULL))
+        || !TEST_true(test_signature(ctx, NULL, sig, "RSA"))
+        || !TEST_int_eq(sig->origin, EVP_ORIG_FROZEN))
+        goto err;
+    /* Technically, frozen version doesn't need to be freed */
+    EVP_SIGNATURE_free(sig);
+
+    if (!TEST_ptr(sig = EVP_SIGNATURE_fetch(ctx, "RSA", "?fips=true"))
+        || !TEST_true(test_signature(ctx, "?fips=true", sig, "RSA"))
+        || !TEST_int_eq(sig->origin, EVP_ORIG_FROZEN))
+        goto err;
+    EVP_SIGNATURE_free(sig);
+
+    /*
+     * A mismatched propq should use the regular fetch path rather than the
+     * frozen fast path.
+     */
+    if (!TEST_ptr(sig = EVP_SIGNATURE_fetch(ctx, "RSA", "?provider=default"))
+        || !TEST_true(test_signature(ctx, "?provider=default", sig, "RSA"))
+        || !TEST_int_ne(sig->origin, EVP_ORIG_FROZEN))
+        goto err;
+
+    ret = 1;
+err:
+    EVP_SIGNATURE_free(sig);
+    unload_providers(&ctx, prov);
+    return ret;
+}
+
+static int test_implicit_EVP_SIGNATURE_fetch(void)
+{
+    OSSL_LIB_CTX *ctx = NULL;
+    OSSL_PROVIDER *prov[] = { NULL, NULL };
+    EVP_SIGNATURE *sig = NULL;
+    int ret = 0;
+
+    if (use_default_ctx == 0 && !TEST_true(load_providers(&ctx, prov)))
+        goto err;
+
+    if (!TEST_ptr(sig = EVP_SIGNATURE_fetch(ctx, "RSA", NULL)))
+        goto err;
+
+    ret = 1;
+err:
+    EVP_SIGNATURE_free(sig);
+    unload_providers(&ctx, prov);
+    return ret;
+}
+
+static int test_explicit_EVP_SIGNATURE_fetch(const char *id)
+{
+    OSSL_LIB_CTX *ctx = NULL;
+    EVP_SIGNATURE *sig = NULL;
+    OSSL_PROVIDER *prov[] = { NULL, NULL };
+    int ret = 0;
+
+    if (use_default_ctx == 0 && !TEST_true(load_providers(&ctx, prov)))
+        goto err;
+
+    sig = EVP_SIGNATURE_fetch(ctx, id, fetch_property);
+    if (expected_fetch_result != 0) {
+        if (!TEST_true(EVP_SIGNATURE_up_ref(sig)))
+            goto err;
+        /* Ref count should now be 2. Release first one here */
+        EVP_SIGNATURE_free(sig);
+    } else {
+        if (!TEST_ptr_null(sig))
+            goto err;
+    }
+    ret = 1;
+err:
+    EVP_SIGNATURE_free(sig);
+    unload_providers(&ctx, prov);
+    return ret;
+}
+
+static int test_explicit_EVP_SIGNATURE_fetch_by_name(void)
+{
+    return test_explicit_EVP_SIGNATURE_fetch("RSA");
+}
+
 int setup_tests(void)
 {
     OPTION_CHOICE o;
@@ -1761,6 +1911,10 @@ int setup_tests(void)
         ADD_TEST(test_EVP_KEYEXCH_fetch_freeze);
         ADD_TEST(test_implicit_EVP_KEYEXCH_fetch);
         ADD_TEST(test_explicit_EVP_KEYEXCH_fetch_by_name);
+    } else if (strcmp(alg, "signature") == 0) {
+        ADD_TEST(test_EVP_SIGNATURE_fetch_freeze);
+        ADD_TEST(test_implicit_EVP_SIGNATURE_fetch);
+        ADD_TEST(test_explicit_EVP_SIGNATURE_fetch_by_name);
     } else {
         TEST_error("Unknown fetch type: %s", alg);
         return 0;
