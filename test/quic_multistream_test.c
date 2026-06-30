@@ -356,30 +356,12 @@ static OSSL_TIME get_time(void *arg)
     return t;
 }
 
-static int skip_time_ms(struct helper *h, struct helper_local *hl)
-{
-    if (!TEST_true(CRYPTO_THREAD_write_lock(h->time_lock)))
-        return 0;
-
-    h->time_slip = ossl_time_add(h->time_slip, ossl_ms2time(hl->check_op->arg2));
-
-    CRYPTO_THREAD_unlock(h->time_lock);
-    return 1;
-}
-
 static QUIC_TSERVER *s_lock(struct helper *h, struct helper_local *hl);
 static void s_unlock(struct helper *h, struct helper_local *hl);
 
 #define ACQUIRE_S() s_lock(h, hl)
 #define ACQUIRE_S_NOHL() s_lock(h, NULL)
 
-static int override_key_update(struct helper *h, struct helper_local *hl)
-{
-    QUIC_CHANNEL *ch = ossl_quic_conn_get_channel(h->c_conn);
-
-    ossl_quic_channel_set_txku_threshold_override(ch, hl->check_op->arg2);
-    return 1;
-}
 
 static int trigger_key_update(struct helper *h, struct helper_local *hl)
 {
@@ -2245,42 +2227,7 @@ static const struct script_op script_17[] = {
 
 /* 18. Key update test - RTT-bounded */
 static const struct script_op script_18[] = {
-    OP_C_SET_ALPN("ossltest"),
-    OP_C_CONNECT_WAIT(),
-
-    OP_C_WRITE(DEFAULT, "apple", 5),
-
-    OP_S_BIND_STREAM_ID(a, C_BIDI_ID(0)),
-    OP_S_READ_EXPECT(a, "apple", 5),
-
-    OP_CHECK(override_key_update, 1),
-
-    OP_BEGIN_REPEAT(200),
-
-    OP_C_WRITE(DEFAULT, "apple", 5),
-    OP_S_READ_EXPECT(a, "apple", 5),
-    OP_CHECK(skip_time_ms, 8),
-
-    OP_END_REPEAT(),
-
-    /*
-     * This time we simulate far less time passing between writes, so there are
-     * fewer opportunities to initiate TXKUs. Note that we ask for a TXKU every
-     * 1 packet above, which is absurd; thus this ensures we only actually
-     * generate TXKUs when we are allowed to.
-     */
-    OP_CHECK(check_key_update_lt, 240),
-
-    /*
-     * Prove the connection is still healthy by sending something in both
-     * directions.
-     */
-    OP_C_WRITE(DEFAULT, "xyzzy", 5),
-    OP_S_READ_EXPECT(a, "xyzzy", 5),
-
-    OP_S_WRITE(a, "plugh", 5),
-    OP_C_READ_EXPECT(DEFAULT, "plugh", 5),
-
+    /* test moved to test/radix/quic_tests.c */
     OP_END
 };
 
