@@ -363,47 +363,6 @@ static void s_unlock(struct helper *h, struct helper_local *hl);
 #define ACQUIRE_S_NOHL() s_lock(h, NULL)
 
 
-static int trigger_key_update(struct helper *h, struct helper_local *hl)
-{
-    if (!TEST_true(SSL_key_update(h->c_conn, SSL_KEY_UPDATE_REQUESTED)))
-        return 0;
-
-    return 1;
-}
-
-static int check_key_update_ge(struct helper *h, struct helper_local *hl)
-{
-    QUIC_CHANNEL *ch = ossl_quic_conn_get_channel(h->c_conn);
-    int64_t txke = (int64_t)ossl_quic_channel_get_tx_key_epoch(ch);
-    int64_t rxke = (int64_t)ossl_quic_channel_get_rx_key_epoch(ch);
-    int64_t diff = txke - rxke;
-
-    /*
-     * TXKE must always be equal to or ahead of RXKE.
-     * It can be ahead of RXKE by at most 1.
-     */
-    if (!TEST_int64_t_ge(diff, 0) || !TEST_int64_t_le(diff, 1))
-        return 0;
-
-    /* Caller specifies a minimum number of RXKEs which must have happened. */
-    if (!TEST_uint64_t_ge((uint64_t)rxke, hl->check_op->arg2))
-        return 0;
-
-    return 1;
-}
-
-static int check_key_update_lt(struct helper *h, struct helper_local *hl)
-{
-    QUIC_CHANNEL *ch = ossl_quic_conn_get_channel(h->c_conn);
-    uint64_t txke = ossl_quic_channel_get_tx_key_epoch(ch);
-
-    /* Caller specifies a maximum number of TXKEs which must have happened. */
-    if (!TEST_uint64_t_lt(txke, hl->check_op->arg2))
-        return 0;
-
-    return 1;
-}
-
 static unsigned long stream_info_hash(const STREAM_INFO *info)
 {
     return OPENSSL_LH_strhash(info->name);
@@ -2233,30 +2192,7 @@ static const struct script_op script_18[] = {
 
 /* 19. Key update test - artificially triggered */
 static const struct script_op script_19[] = {
-    OP_C_SET_ALPN("ossltest"),
-    OP_C_CONNECT_WAIT(),
-
-    OP_C_WRITE(DEFAULT, "apple", 5),
-
-    OP_S_BIND_STREAM_ID(a, C_BIDI_ID(0)),
-    OP_S_READ_EXPECT(a, "apple", 5),
-
-    OP_C_WRITE(DEFAULT, "orange", 6),
-    OP_S_READ_EXPECT(a, "orange", 6),
-
-    OP_S_WRITE(a, "strawberry", 10),
-    OP_C_READ_EXPECT(DEFAULT, "strawberry", 10),
-
-    OP_CHECK(check_key_update_lt, 1),
-    OP_CHECK(trigger_key_update, 0),
-
-    OP_C_WRITE(DEFAULT, "orange", 6),
-    OP_S_READ_EXPECT(a, "orange", 6),
-    OP_S_WRITE(a, "ok", 2),
-
-    OP_C_READ_EXPECT(DEFAULT, "ok", 2),
-    OP_CHECK(check_key_update_ge, 1),
-
+    /* test moved to test/radix/quic_tests.c */
     OP_END
 };
 
