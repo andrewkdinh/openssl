@@ -921,7 +921,7 @@ DEF_SCRIPT(script_14, "place holder for multistrem script_14")
 }
 
 /* 15. Client sending large number of streams, MAX_STREAMS test */
-DEF_SCRIPT(script_15, "client sends many streams, MAX_STREAMS test")
+DEF_SCRIPT(script_15, "Client sending large number of streams, MAX_STREAMS test")
 {
     size_t i;
 
@@ -961,7 +961,7 @@ DEF_SCRIPT(script_15, "client sends many streams, MAX_STREAMS test")
 }
 
 /* 16. Server sending large number of streams, MAX_STREAMS test */
-DEF_SCRIPT(script_16, "server sends many streams, MAX_STREAMS test")
+DEF_SCRIPT(script_16, "Server sending large number of streams, MAX_STREAMS test")
 {
     size_t i;
 
@@ -998,7 +998,7 @@ DEF_SCRIPT(script_16, "server sends many streams, MAX_STREAMS test")
 }
 
 /* 17. Key update test - unlimited */
-DEF_SCRIPT(script_17, "key update test, unlimited")
+DEF_SCRIPT(script_17, "Key update test - unlimited")
 {
     size_t i;
 
@@ -1037,7 +1037,7 @@ DEF_SCRIPT(script_17, "key update test, unlimited")
 }
 
 /* 18. Key update test - RTT-bounded */
-DEF_SCRIPT(script_18, "key update test, RTT-bounded")
+DEF_SCRIPT(script_18, "Key update test - RTT-bounded")
 {
     size_t i;
 
@@ -1074,7 +1074,7 @@ DEF_SCRIPT(script_18, "key update test, RTT-bounded")
 }
 
 /* 19. Key update test - artificially triggered */
-DEF_SCRIPT(script_19, "key update test, artificially triggered")
+DEF_SCRIPT(script_19, "Key update test - artificially triggered")
 {
     OP_SIMPLE_PAIR_CONN();
     OP_ACCEPT_CONN_WAIT(L, S, 0);
