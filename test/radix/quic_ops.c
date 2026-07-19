@@ -1299,6 +1299,20 @@ err:
     return ok;
 }
 
+DEF_FUNC(hf_push_stream_id_plus_one)
+{
+    int ok = 0;
+    SSL *ssl;
+    uint64_t stream_id_plus_one;
+
+    REQUIRE_SSL(ssl);
+    stream_id_plus_one = SSL_get_stream_id(ssl) + 1;
+    F_PUSH(stream_id_plus_one);
+    ok = 1;
+err:
+    return ok;
+}
+
 #define OP_UNBIND(name) \
     (OP_PUSH_PZ(#name), \
         OP_FUNC(hf_unbind))
@@ -1568,3 +1582,7 @@ err:
     (OP_PUSH_U64(word0),                 \
         OP_PUSH_U64(word1),              \
         OP_FUNC(hf_set_inject_word))
+
+#define OP_PUSH_STREAM_ID_PLUS_ONE(name) \
+    (OP_SELECT_SSL(0, name),             \
+        OP_FUNC(hf_push_stream_id_plus_one))
