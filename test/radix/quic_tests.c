@@ -2280,8 +2280,27 @@ DEF_SCRIPT(script_34, "Fault injection - STREAM frame which exceeds FC")
     OP_EXPECT_CONN_CLOSE_INFO(C, OSSL_QUIC_ERR_FLOW_CONTROL_ERROR, 0, 0);
 }
 
-DEF_SCRIPT(script_35, "place holder for multistrem script_35")
+/* 35. Fault injection - MAX_STREAM_DATA for receive-only stream */
+DEF_SCRIPT(script_35, "Fault injection - MAX_STREAM_DATA for receive-only stream")
 {
+    OP_SIMPLE_PAIR_CONN_ND();
+    OP_ACCEPT_CONN_WAIT_ND(L, S, 0);
+
+    OP_SET_INJECT_PLAIN(S, inject_stream_frame_plain);
+
+    OP_NEW_STREAM(S, Sa, SSL_STREAM_FLAG_UNI);
+    OP_WRITE(Sa, "apple", 5);
+
+    OP_ACCEPT_STREAM_WAIT(C, Ca, 0);
+    OP_READ_EXPECT(Ca, "apple", 5);
+
+    OP_PUSH_STREAM_ID_PLUS_ONE(Sa);
+    OP_PUSH_U64(OSSL_QUIC_FRAME_TYPE_MAX_STREAM_DATA);
+    OP_FUNC(hf_set_inject_word);
+
+    OP_WRITE(Sa, "orange", 6);
+
+    OP_EXPECT_CONN_CLOSE_INFO(C, OSSL_QUIC_ERR_STREAM_STATE_ERROR, 0, 0);
 }
 
 DEF_SCRIPT(script_36, "place holder for multistrem script_36")
