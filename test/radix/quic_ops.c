@@ -7,6 +7,7 @@
  * https://www.openssl.org/source/license.html
  */
 #include "internal/sockets.h"
+#include "internal/statem.h"
 #include <openssl/rand.h>
 
 static const unsigned char alpn_ossltest[] = {
@@ -730,6 +731,45 @@ err:
     return ok;
 }
 
+/*
+ * Like hf_connect_wait, but tolerates the connection attempt itself failing
+ * (rather than the connection later closing after a successful handshake),
+ * for scripts where fault injection is expected to prevent the handshake
+ * from completing at all.
+ */
+DEF_FUNC(hf_connect_wait_or_fail)
+{
+    int ok = 0, ret;
+    SSL *ssl;
+
+    REQUIRE_SSL(ssl);
+
+    /* if not started */
+    if (RT()->scratch0 == 0) {
+        if (!TEST_true(SSL_set_blocking_mode(ssl, 0)))
+            return 0;
+
+        /* 0 is the success case for SSL_set_alpn_protos(). */
+        if (!TEST_false(SSL_set_alpn_protos(ssl, alpn_ossltest,
+                sizeof(alpn_ossltest))))
+            goto err;
+    }
+
+    RT()->scratch0 = 1; /* connect started */
+    ret = SSL_connect(ssl);
+    radix_activate_slot(0);
+    if (!TEST_true(check_consistent_want(ssl, ret)))
+        goto err;
+
+    if (ret != 1 && is_want(ssl, ret))
+        F_SPIN_AGAIN();
+
+    ok = 1;
+err:
+    RT()->scratch0 = 0;
+    return ok;
+}
+
 DEF_FUNC(hf_expect_fin)
 {
     int ok = 0, ret;
@@ -1138,6 +1178,38 @@ static ossl_inline radix_fault_plain_cb radix_fault_ptr_to_plain_cb(void *ptr)
     return u.cb;
 }
 
+/*
+ * Handshake (crypto stream) message mutator, used to tamper with a QUIC
+ * connection's outgoing TLS handshake messages before they are queued for
+ * transmission.
+ */
+typedef int (*radix_fault_handshake_cb)(RADIX_FAULT *fault,
+    unsigned char *buf, size_t len);
+
+static ossl_inline void *
+radix_fault_handshake_cb_to_ptr(radix_fault_handshake_cb cb)
+{
+    union {
+        radix_fault_handshake_cb cb;
+        void *ptr;
+    } u;
+
+    u.cb = cb;
+    return u.ptr;
+}
+
+static ossl_inline radix_fault_handshake_cb
+radix_fault_ptr_to_handshake_cb(void *ptr)
+{
+    union {
+        radix_fault_handshake_cb cb;
+        void *ptr;
+    } u;
+
+    u.ptr = ptr;
+    return u.cb;
+}
+
 struct radix_fault_st {
     QUIC_PKT_HDR hdr;
     OSSL_QTX_IOVEC io;
@@ -1145,6 +1217,10 @@ struct radix_fault_st {
     radix_fault_plain_cb cb;
     QUIC_CHANNEL *ch;
     uint64_t word0, word1;
+    /* Handshake message mutator state. */
+    unsigned char *handbuf;
+    size_t handbuflen;
+    radix_fault_handshake_cb hcb;
 };
 
 /* Fault injection against one channel at a time. */
@@ -1301,6 +1377,71 @@ err:
     return ok;
 }
 
+/*
+ * ossl_statem_mutate_handshake_cb: intercepts an outgoing TLS handshake
+ * message on the crypto stream before it is queued for transmission.
+ */
+static int radix_fault_handshake_mutate(const unsigned char *msgin,
+    size_t msginlen,
+    unsigned char **msgout,
+    size_t *msgoutlen,
+    void *arg)
+{
+    RADIX_FAULT *fault = arg;
+    unsigned char *buf;
+
+    buf = OPENSSL_malloc(msginlen);
+    if (buf == NULL)
+        return 0;
+
+    OPENSSL_free(fault->handbuf);
+    fault->handbuf = buf;
+    fault->handbuflen = msginlen;
+    memcpy(buf, msgin, msginlen);
+
+    if (fault->hcb != NULL && !fault->hcb(fault, buf, fault->handbuflen))
+        return 0;
+
+    *msgout = buf;
+    *msgoutlen = fault->handbuflen;
+
+    return 1;
+}
+
+static void radix_fault_handshake_finish(void *arg)
+{
+    RADIX_FAULT *fault = arg;
+
+    OPENSSL_free(fault->handbuf);
+    fault->handbuf = NULL;
+}
+
+/*
+ * Arms the handshake mutator callback without attaching it to any
+ * connection yet. Used by scripts that need to intercept a server's very
+ * first handshake flight: the corresponding connection does not exist until
+ * a client's Initial packet is accepted, by which point that first flight
+ * has typically already been generated, so the mutator must instead be
+ * installed from a SSL_CTX client_hello callback (see script_54 for an
+ * example) armed with this callback beforehand.
+ */
+DEF_FUNC(hf_set_inject_handshake_cb)
+{
+    int ok = 0;
+    void *cbptr;
+
+    F_POP(cbptr);
+
+    OPENSSL_free(radix_fault.handbuf);
+    radix_fault.handbuf = NULL;
+    radix_fault.handbuflen = 0;
+    radix_fault.hcb = radix_fault_ptr_to_handshake_cb(cbptr);
+
+    ok = 1;
+err:
+    return ok;
+}
+
 DEF_FUNC(hf_push_stream_id_plus_one)
 {
     int ok = 0;
@@ -1371,6 +1512,10 @@ err:
 #define OP_CONNECT_WAIT(name) \
     (OP_SELECT_SSL(0, name),  \
         OP_FUNC(hf_connect_wait))
+
+#define OP_CONNECT_WAIT_OR_FAIL(name) \
+    (OP_SELECT_SSL(0, name),          \
+        OP_FUNC(hf_connect_wait_or_fail))
 
 #define OP_LISTEN(name)      \
     (OP_SELECT_SSL(0, name), \
@@ -1620,6 +1765,10 @@ err:
     (OP_PUSH_U64(word0),                 \
         OP_PUSH_U64(word1),              \
         OP_FUNC(hf_set_inject_word))
+
+#define OP_SET_INJECT_HANDSHAKE_CB(cb)               \
+    (OP_PUSH_P(radix_fault_handshake_cb_to_ptr(cb)), \
+        OP_FUNC(hf_set_inject_handshake_cb))
 
 #define OP_PUSH_STREAM_ID_PLUS_ONE(name) \
     (OP_SELECT_SSL(0, name),             \
