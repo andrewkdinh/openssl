@@ -729,7 +729,8 @@ err:
     return ok;
 }
 
-DEF_FUNC(hf_connect_wait)
+/* or_fail: don't fail if the connect attempt itself errors out */
+static int hf_connect_wait_impl(FUNC_CTX *fctx, int or_fail)
 {
     int ok = 0, ret;
     SSL *ssl;
@@ -757,7 +758,7 @@ DEF_FUNC(hf_connect_wait)
         if (is_want(ssl, ret))
             F_SPIN_AGAIN();
 
-        if (!TEST_int_eq(ret, 1))
+        if (!or_fail && !TEST_int_eq(ret, 1))
             goto err;
     }
 
@@ -765,6 +766,11 @@ DEF_FUNC(hf_connect_wait)
 err:
     RT()->scratch0 = 0;
     return ok;
+}
+
+DEF_FUNC(hf_connect_wait)
+{
+    return hf_connect_wait_impl(fctx, 0);
 }
 
 DEF_FUNC(hf_expect_fin)
@@ -1731,6 +1737,11 @@ err:
     return ok;
 }
 
+DEF_FUNC(hf_connect_wait_or_fail)
+{
+    return hf_connect_wait_impl(fctx, 1);
+}
+
 #define OP_UNBIND(name) \
     (OP_PUSH_PZ(#name), \
         OP_FUNC(hf_unbind))
@@ -2085,3 +2096,7 @@ err:
         OP_PUSH_U64(count),                                      \
         OP_PUSH_U64(min_fail),                                   \
         OP_FUNC(hf_stream_limit_probe))
+
+#define OP_CONNECT_WAIT_OR_FAIL(name) \
+    (OP_SELECT_SSL(0, name),          \
+        OP_FUNC(hf_connect_wait_or_fail))
