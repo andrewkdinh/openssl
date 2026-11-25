@@ -10,7 +10,9 @@
 #include <string.h>
 #include <openssl/ssl.h>
 #include "helpers/quictestlib.h"
+#include "internal/quic_channel.h"
 #include "internal/quic_error.h"
+#include "internal/quic_ssl.h"
 #include "testutil.h"
 
 static char *cert = NULL;
@@ -25,7 +27,7 @@ static int add_ncid_frame_cb(QTEST_FAULT *fault, QUIC_PKT_HDR *hdr,
 {
     /*
      * We inject NEW_CONNECTION_ID frame to trigger change of the DCID.
-     * The connection id length must be 8, otherwise the tserver won't be
+     * The connection id length must be 8, otherwise the server won't be
      * able to receive packets with this new id.
      */
     static unsigned char new_conn_id_frame[] = {
@@ -50,8 +52,7 @@ static int test_ncid_frame(int fail)
 {
     int testresult = 0;
     SSL_CTX *cctx = SSL_CTX_new(OSSL_QUIC_client_method());
-    QUIC_TSERVER *qtserv = NULL;
-    SSL *cssl = NULL;
+    SSL *cssl = NULL, *listener = NULL, *sconn = NULL;
     char *msg = "Hello World!";
     size_t msglen = strlen(msg);
     unsigned char buf[80];
@@ -67,19 +68,17 @@ static int test_ncid_frame(int fail)
     if (!TEST_ptr(cctx))
         goto err;
 
-    if (!TEST_true(qtest_create_quic_objects(NULL, cctx, NULL, cert, privkey, 0,
-            &qtserv, &cssl, &fault, NULL)))
+    if (!TEST_true(qtest_create_quic_objects_ex(NULL, cctx, NULL, cert, privkey,
+            0, &listener, &cssl, &fault, NULL)))
         goto err;
 
-    if (!TEST_true(qtest_create_quic_connection(qtserv, cssl)))
+    if (!TEST_true(qtest_create_quic_connection_ssl(listener, cssl, &sconn)))
         goto err;
 
     if (!TEST_int_eq(SSL_write(cssl, msg, (int)msglen), (int)msglen))
         goto err;
 
-    ossl_quic_tserver_tick(qtserv);
-    if (!TEST_true(ossl_quic_tserver_read(qtserv, 0, buf, sizeof(buf),
-            &bytesread)))
+    if (!TEST_true(SSL_read_ex(sconn, buf, sizeof(buf), &bytesread)))
         goto err;
 
     /*
@@ -98,11 +97,11 @@ static int test_ncid_frame(int fail)
             add_ncid_frame_cb,
             NULL)))
         goto err;
-    if (!fail && !TEST_true(ossl_quic_tserver_set_new_local_cid(qtserv, &conn_id)))
+    if (!fail
+        && !TEST_true(ossl_quic_channel_replace_local_cid(ossl_quic_conn_get_channel(sconn),
+            &conn_id)))
         goto err;
-    if (!TEST_true(ossl_quic_tserver_write(qtserv, 0,
-            (unsigned char *)msg, msglen,
-            &byteswritten)))
+    if (!TEST_true(SSL_write_ex(sconn, msg, msglen, &byteswritten)))
         goto err;
 
     if (!TEST_true(ncid_injected))
@@ -111,7 +110,6 @@ static int test_ncid_frame(int fail)
     if (!TEST_size_t_eq(msglen, byteswritten))
         goto err;
 
-    ossl_quic_tserver_tick(qtserv);
     if (!TEST_true(SSL_handle_events(cssl)))
         goto err;
 
@@ -124,15 +122,14 @@ static int test_ncid_frame(int fail)
     if (!TEST_int_eq(SSL_write(cssl, msg, (int)msglen), (int)msglen))
         goto err;
 
-    ossl_quic_tserver_tick(qtserv);
-    if (!TEST_true(ossl_quic_tserver_read(qtserv, 0, buf, sizeof(buf),
-            &bytesread)))
-        goto err;
-
     if (fail) {
-        if (!TEST_size_t_eq(bytesread, 0))
+        if (!TEST_false(SSL_read_ex(sconn, buf, sizeof(buf), &bytesread))
+            || !TEST_int_eq(SSL_get_error(sconn, 0), SSL_ERROR_WANT_READ))
             goto err;
     } else {
+        if (!TEST_true(SSL_read_ex(sconn, buf, sizeof(buf), &bytesread)))
+            goto err;
+
         if (!TEST_mem_eq(msg, msglen, buf, bytesread))
             goto err;
     }
@@ -141,7 +138,8 @@ static int test_ncid_frame(int fail)
 err:
     qtest_fault_free(fault);
     SSL_free(cssl);
-    ossl_quic_tserver_free(qtserv);
+    SSL_free(sconn);
+    SSL_free(listener);
     SSL_CTX_free(cctx);
     return testresult;
 }
