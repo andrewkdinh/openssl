@@ -24,8 +24,7 @@ static int test_basic(void)
 {
     int testresult = 0;
     SSL_CTX *cctx = SSL_CTX_new(OSSL_QUIC_client_method());
-    QUIC_TSERVER *qtserv = NULL;
-    SSL *cssl = NULL;
+    SSL *cssl = NULL, *listener = NULL, *sconn = NULL;
     char *msg = "Hello World!";
     size_t msglen = strlen(msg);
     unsigned char buf[80];
@@ -34,18 +33,17 @@ static int test_basic(void)
     if (!TEST_ptr(cctx))
         goto err;
 
-    if (!TEST_true(qtest_create_quic_objects(NULL, cctx, NULL, cert, privkey, 0,
-            &qtserv, &cssl, NULL, NULL)))
+    if (!TEST_true(qtest_create_quic_objects_ex(NULL, cctx, NULL, cert, privkey,
+            0, &listener, &cssl, NULL, NULL)))
         goto err;
 
-    if (!TEST_true(qtest_create_quic_connection(qtserv, cssl)))
+    if (!TEST_true(qtest_create_quic_connection_ssl(listener, cssl, &sconn)))
         goto err;
 
     if (!TEST_int_eq(SSL_write(cssl, msg, (int)msglen), (int)msglen))
         goto err;
 
-    ossl_quic_tserver_tick(qtserv);
-    if (!TEST_true(ossl_quic_tserver_read(qtserv, 0, buf, sizeof(buf), &bytesread)))
+    if (!TEST_true(SSL_read_ex(sconn, buf, sizeof(buf), &bytesread)))
         goto err;
 
     /*
@@ -59,7 +57,8 @@ static int test_basic(void)
     testresult = 1;
 err:
     SSL_free(cssl);
-    ossl_quic_tserver_free(qtserv);
+    SSL_free(sconn);
+    SSL_free(listener);
     SSL_CTX_free(cctx);
     return testresult;
 }
@@ -92,23 +91,21 @@ static int test_unknown_frame(void)
 {
     int testresult = 0, ret;
     SSL_CTX *cctx = SSL_CTX_new(OSSL_QUIC_client_method());
-    QUIC_TSERVER *qtserv = NULL;
-    SSL *cssl = NULL;
+    SSL *cssl = NULL, *listener = NULL, *sconn = NULL, *sstream = NULL;
     char *msg = "Hello World!";
     size_t msglen = strlen(msg);
     unsigned char buf[80];
     size_t byteswritten;
     QTEST_FAULT *fault = NULL;
-    uint64_t sid = UINT64_MAX;
 
     if (!TEST_ptr(cctx))
         goto err;
 
-    if (!TEST_true(qtest_create_quic_objects(NULL, cctx, NULL, cert, privkey, 0,
-            &qtserv, &cssl, &fault, NULL)))
+    if (!TEST_true(qtest_create_quic_objects_ex(NULL, cctx, NULL, cert, privkey,
+            0, &listener, &cssl, &fault, NULL)))
         goto err;
 
-    if (!TEST_true(qtest_create_quic_connection(qtserv, cssl)))
+    if (!TEST_true(qtest_create_quic_connection_ssl(listener, cssl, &sconn)))
         goto err;
 
     /*
@@ -120,18 +117,16 @@ static int test_unknown_frame(void)
             NULL)))
         goto err;
 
-    if (!TEST_true(ossl_quic_tserver_stream_new(qtserv, /*is_uni=*/0, &sid))
-        || !TEST_uint64_t_eq(sid, 1))
+    if (!TEST_ptr(sstream = SSL_new_stream(sconn, 0))
+        || !TEST_uint64_t_eq(SSL_get_stream_id(sstream), 1))
         goto err;
 
-    if (!TEST_true(ossl_quic_tserver_write(qtserv, sid, (unsigned char *)msg, msglen,
-            &byteswritten)))
+    if (!TEST_true(SSL_write_ex(sstream, msg, msglen, &byteswritten)))
         goto err;
 
     if (!TEST_size_t_eq(msglen, byteswritten))
         goto err;
 
-    ossl_quic_tserver_tick(qtserv);
     if (!TEST_true(SSL_handle_events(cssl)))
         goto err;
 
@@ -145,14 +140,17 @@ static int test_unknown_frame(void)
             SSL_R_QUIC_PROTOCOL_ERROR))
         goto err;
 
-    if (!TEST_true(qtest_check_server_frame_encoding_err(qtserv)))
+    if (!TEST_true(qtest_check_server_transport_err_ssl(sconn,
+            OSSL_QUIC_ERR_FRAME_ENCODING_ERROR)))
         goto err;
 
     testresult = 1;
 err:
     qtest_fault_free(fault);
     SSL_free(cssl);
-    ossl_quic_tserver_free(qtserv);
+    SSL_free(sstream);
+    SSL_free(sconn);
+    SSL_free(listener);
     SSL_CTX_free(cctx);
     return testresult;
 }
@@ -178,16 +176,15 @@ static int test_drop_extensions(int idx)
 {
     int testresult = 0;
     SSL_CTX *cctx = SSL_CTX_new(OSSL_QUIC_client_method());
-    QUIC_TSERVER *qtserv = NULL;
-    SSL *cssl = NULL;
+    SSL *cssl = NULL, *listener = NULL, *sconn = NULL;
     QTEST_FAULT *fault = NULL;
     int ext, err;
 
     if (!TEST_ptr(cctx))
         goto err;
 
-    if (!TEST_true(qtest_create_quic_objects(NULL, cctx, NULL, cert, privkey, 0,
-            &qtserv, &cssl, &fault, NULL)))
+    if (!TEST_true(qtest_create_quic_objects_ex(NULL, cctx, NULL, cert, privkey,
+            0, &listener, &cssl, &fault, NULL)))
         goto err;
 
     if (idx == 0) {
@@ -207,17 +204,18 @@ static int test_drop_extensions(int idx)
      * We expect the connection to fail because the server failed to provide
      * transport parameters
      */
-    if (!TEST_false(qtest_create_quic_connection(qtserv, cssl)))
+    if (!TEST_false(qtest_create_quic_connection_ssl(listener, cssl, &sconn)))
         goto err;
 
-    if (!TEST_true(qtest_check_server_transport_err(qtserv, err)))
+    if (!TEST_true(qtest_check_server_transport_err_ssl(sconn, err)))
         goto err;
 
     testresult = 1;
 err:
     qtest_fault_free(fault);
     SSL_free(cssl);
-    ossl_quic_tserver_free(qtserv);
+    SSL_free(sconn);
+    SSL_free(listener);
     SSL_CTX_free(cctx);
     return testresult;
 }
@@ -262,19 +260,17 @@ static int test_corrupted_data(int idx)
     QTEST_FAULT *fault = NULL;
     int testresult = 0;
     SSL_CTX *cctx = SSL_CTX_new(OSSL_QUIC_client_method());
-    QUIC_TSERVER *qtserv = NULL;
-    SSL *cssl = NULL;
+    SSL *cssl = NULL, *listener = NULL, *sconn = NULL, *sstream = NULL;
     char *msg = "Hello World!";
     size_t msglen = strlen(msg);
     unsigned char buf[80];
     size_t bytesread, byteswritten;
-    uint64_t sid = UINT64_MAX;
 
     if (!TEST_ptr(cctx))
         goto err;
 
-    if (!TEST_true(qtest_create_quic_objects(NULL, cctx, NULL, cert, privkey,
-            QTEST_FLAG_FAKE_TIME, &qtserv,
+    if (!TEST_true(qtest_create_quic_objects_ex(NULL, cctx, NULL, cert, privkey,
+            QTEST_FLAG_FAKE_TIME, &listener,
             &cssl, &fault, NULL)))
         goto err;
 
@@ -291,22 +287,21 @@ static int test_corrupted_data(int idx)
                 NULL)))
             goto err;
     }
-    if (!TEST_true(qtest_create_quic_connection(qtserv, cssl)))
+    if (!TEST_true(qtest_create_quic_connection_ssl(listener, cssl, &sconn)))
         goto err;
 
     /* Corrupt the next server packet*/
     docorrupt = 1;
 
-    if (!TEST_true(ossl_quic_tserver_stream_new(qtserv, /*is_uni=*/0, &sid))
-        || !TEST_uint64_t_eq(sid, 1))
+    if (!TEST_ptr(sstream = SSL_new_stream(sconn, 0))
+        || !TEST_uint64_t_eq(SSL_get_stream_id(sstream), 1))
         goto err;
 
     /*
      * Send first 5 bytes of message. This will get corrupted and is treated as
      * "lost"
      */
-    if (!TEST_true(ossl_quic_tserver_write(qtserv, sid, (unsigned char *)msg, 5,
-            &byteswritten)))
+    if (!TEST_true(SSL_write_ex(sstream, msg, 5, &byteswritten)))
         goto err;
 
     if (!TEST_size_t_eq(byteswritten, 5))
@@ -321,8 +316,7 @@ static int test_corrupted_data(int idx)
     qtest_add_time(100);
 
     /* Send rest of message */
-    if (!TEST_true(ossl_quic_tserver_write(qtserv, sid, (unsigned char *)msg + 5,
-            msglen - 5, &byteswritten)))
+    if (!TEST_true(SSL_write_ex(sstream, msg + 5, msglen - 5, &byteswritten)))
         goto err;
 
     if (!TEST_size_t_eq(byteswritten, msglen - 5))
@@ -340,7 +334,8 @@ static int test_corrupted_data(int idx)
      * Process the ack. Detect that the first part of the message must have
      * been lost due to the time elapsed since it was sent and resend it
      */
-    ossl_quic_tserver_tick(qtserv);
+    if (!TEST_true(SSL_handle_events(sconn)))
+        goto err;
 
     /* Receive and process the newly arrived message data resend */
     if (!TEST_true(SSL_handle_events(cssl)))
@@ -364,7 +359,9 @@ static int test_corrupted_data(int idx)
 err:
     qtest_fault_free(fault);
     SSL_free(cssl);
-    ossl_quic_tserver_free(qtserv);
+    SSL_free(sstream);
+    SSL_free(sconn);
+    SSL_free(listener);
     SSL_CTX_free(cctx);
     return testresult;
 }
