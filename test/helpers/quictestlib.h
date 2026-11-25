@@ -141,6 +141,15 @@ int qtest_shutdown(QUIC_TSERVER *qtserv, SSL *clientssl);
  */
 int qtest_check_server_transport_err(QUIC_TSERVER *qtserv, uint64_t code);
 
+/**
+ * @brief As qtest_check_server_transport_err() but for a server connection
+ * accepted from a listener.
+ * @param sconn server connection
+ * @param code expected transport error code
+ * @returns 1 on success, 0 on failure
+ */
+int qtest_check_server_transport_err_ssl(SSL *sconn, uint64_t code);
+
 /*
  * Confirm the server has received a protocol error. Equivalent to calling
  * qtest_check_server_transport_err with a code of QUIC_ERR_PROTOCOL_VIOLATION

@@ -936,6 +936,24 @@ int qtest_check_server_transport_err(QUIC_TSERVER *qtserv, uint64_t code)
     return 1;
 }
 
+int qtest_check_server_transport_err_ssl(SSL *sconn, uint64_t code)
+{
+    SSL_CONN_CLOSE_INFO info;
+
+    if (!TEST_ptr(sconn))
+        return 0;
+
+    (void)SSL_handle_events(sconn);
+
+    if (!TEST_int_eq(SSL_get_conn_close_info(sconn, &info, sizeof(info)), 1)
+        || !TEST_false(info.flags & SSL_CONN_CLOSE_FLAG_LOCAL)
+        || !TEST_true(info.flags & SSL_CONN_CLOSE_FLAG_TRANSPORT)
+        || !TEST_uint64_t_eq(info.error_code, code))
+        return 0;
+
+    return 1;
+}
+
 int qtest_check_server_protocol_err(QUIC_TSERVER *qtserv)
 {
     return qtest_check_server_transport_err(qtserv, OSSL_QUIC_ERR_PROTOCOL_VIOLATION);
